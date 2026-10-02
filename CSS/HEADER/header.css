@@ -449,9 +449,9 @@
   margin: 0;
 
   color:
-    #777777;
+    #226ce7;
 
-  font-size: 14px;
+  font-size: 15px;
 
   font-weight: 500;
 
@@ -499,7 +499,7 @@ button:disabled {
 
   #U9-page-header-u9-logo img {
 
-    height: 32px;
+    height: 25px;
 
   }
 
@@ -580,7 +580,7 @@ button:disabled {
       90px;
 
     font-size:
-      13px;
+      19px;
 
   }
 
@@ -678,5 +678,3 @@ button:disabled {
 
 }
 
-
-让 #U9-page-header-user-icon 靠右边一点怎么调整
