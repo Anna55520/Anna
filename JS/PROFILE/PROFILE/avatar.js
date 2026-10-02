@@ -30,6 +30,18 @@ const u9ProfileMeURL =
 "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me";
 
 
+const u9ProfileDefaultFrameURL =
+"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-default";
+
+
+const u9ProfileFreeFrameURL =
+"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free";
+
+
+const u9ProfilePaidFrameURL =
+"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid";
+
+
 
 /* =========================
    DEFAULT
@@ -46,6 +58,171 @@ const u9DefaultFrame =
 
 
 /* =========================
+   LOAD FRAME
+========================= */
+
+
+async function loadU9ProfileFrame(user){
+
+
+u9ProfileAvatarFrame.src =
+u9DefaultFrame;
+
+
+
+const frameType =
+user.avatar_frame_type ||
+"default";
+
+
+const frameId =
+user.avatar_frame_id ||
+null;
+
+
+
+if(
+!frameId
+){
+
+return;
+
+}
+
+
+
+let apiURL =
+u9ProfileDefaultFrameURL;
+
+
+
+if(
+frameType === "free"
+){
+
+apiURL =
+u9ProfileFreeFrameURL;
+
+}
+
+
+
+else if(
+frameType === "paid"
+){
+
+apiURL =
+u9ProfilePaidFrameURL;
+
+}
+
+
+
+try{
+
+
+const response =
+await fetch(
+apiURL,
+{
+
+method:"GET",
+
+credentials:"include"
+
+}
+);
+
+
+
+if(
+!response.ok
+){
+
+return;
+
+}
+
+
+
+const result =
+await response.json();
+
+
+
+const frames =
+result.frames ||
+result.data?.frames ||
+[];
+
+
+
+
+const currentFrame =
+frames.find(
+(frame)=>
+frame.id === frameId
+);
+
+
+
+if(
+!currentFrame
+){
+
+console.log(
+"Frame not found:",
+frameId
+);
+
+return;
+
+}
+
+
+
+if(
+!currentFrame.svg
+){
+
+return;
+
+}
+
+
+
+u9ProfileAvatarFrame.src =
+currentFrame.svg;
+
+
+
+console.log(
+"Profile Frame Loaded:",
+currentFrame
+);
+
+
+
+}
+
+catch(error){
+
+
+console.error(
+"Load frame failed:",
+error
+);
+
+
+}
+
+
+
+}
+
+
+
+/* =========================
    LOAD AVATAR
 ========================= */
 
@@ -58,16 +235,14 @@ try{
 
 const response =
 await fetch(
-  u9ProfileMeURL,
-  {
+u9ProfileMeURL,
+{
 
-    method:
-    "GET",
+method:"GET",
 
-    credentials:
-    "include"
+credentials:"include"
 
-  }
+}
 );
 
 
@@ -75,11 +250,6 @@ await fetch(
 if(
 !response.ok
 ){
-
-console.log(
-"Not logged in"
-);
-
 
 return;
 
@@ -118,20 +288,9 @@ user.avatar ||
 
 
 
-if(
-avatar.url
-){
-
 u9ProfileAvatarImage.src =
-avatar.url;
-
-}
-else{
-
-u9ProfileAvatarImage.src =
+avatar.url ||
 u9DefaultAvatar;
-
-}
 
 
 
@@ -140,22 +299,9 @@ u9DefaultAvatar;
 ========================= */
 
 
-if(
-user.avatar_frame_svg
-){
-
-u9ProfileAvatarFrame.src =
-user.avatar_frame_svg;
-
-}
-else{
-
-
-u9ProfileAvatarFrame.src =
-u9DefaultFrame;
-
-
-}
+await loadU9ProfileFrame(
+user
+);
 
 
 
@@ -170,14 +316,13 @@ user
 
 catch(error){
 
-
 console.error(
 "Load avatar failed:",
 error
 );
 
-
 }
+
 
 
 }
