@@ -1,6 +1,5 @@
-
 /* =========================
-   U9 PROFILE AVATAR
+   PROFILE AVATAR
 ========================= */
 
 
@@ -8,407 +7,186 @@
    ELEMENTS
 ========================= */
 
+
 const u9ProfileAvatarImage =
-  document.getElementById(
-    "U9-profile-avatar-image"
-  );
+document.getElementById(
+  "U9-profile-avatar-image"
+);
 
 
 const u9ProfileAvatarFrame =
-  document.getElementById(
-    "U9-profile-avatar-frame"
-  );
+document.getElementById(
+  "U9-profile-avatar-frame"
+);
 
-
-/* =========================
-   DEFAULT
-========================= */
-
-const u9ProfileAvatarPlaceholder =
-  "SSVG/avatar/profile.svg";
-
-
-const u9ProfileAvatarFramePlaceholder =
-  "SSVG/avatar/ordinary.svg";
 
 
 /* =========================
    API
 ========================= */
 
-const u9ProfileAvatarDefaultFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-default";
 
+const u9ProfileMeURL =
+"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me";
 
-const u9ProfileAvatarFreeFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free";
-
-
-const u9ProfileAvatarPaidFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid";
 
 
 /* =========================
-   RESET AVATAR
+   DEFAULT
 ========================= */
 
-function u9ProfileResetAvatar() {
 
-  if (!u9ProfileAvatarImage) {
-    return;
+const u9DefaultAvatar =
+"SSVG/avatar/profile.svg";
+
+
+const u9DefaultFrame =
+"SSVG/avatar/ordinary.svg";
+
+
+
+/* =========================
+   LOAD AVATAR
+========================= */
+
+
+async function loadU9ProfileAvatar(){
+
+
+try{
+
+
+const response =
+await fetch(
+  u9ProfileMeURL,
+  {
+
+    method:
+    "GET",
+
+    credentials:
+    "include"
+
   }
+);
 
 
-  u9ProfileAvatarImage.src =
-    u9ProfileAvatarPlaceholder;
+
+if(
+!response.ok
+){
+
+console.log(
+"Not logged in"
+);
+
+
+return;
 
 }
 
 
-/* =========================
-   RESET AVATAR FRAME
-========================= */
 
-function u9ProfileResetAvatarFrame() {
-
-  if (!u9ProfileAvatarFrame) {
-    return;
-  }
+const result =
+await response.json();
 
 
-  u9ProfileAvatarFrame.src =
-    u9ProfileAvatarFramePlaceholder;
 
-}
-
-
-/* =========================
-   SET AVATAR
-========================= */
-
-function u9ProfileSetAvatar(
-  user
-) {
-
-  if (!u9ProfileAvatarImage) {
-    return;
-  }
+const user =
+result.user;
 
 
-  /* =========================
-     DEFAULT AVATAR
-  ========================= */
 
-  u9ProfileAvatarImage.src =
-    u9ProfileAvatarPlaceholder;
+if(
+!user
+){
 
-
-  if (!user) {
-    return;
-  }
-
-
-  /* =========================
-     USER AVATAR
-  ========================= */
-
-  const avatar =
-    user.avatar ||
-    null;
-
-
-  const avatarUrl =
-    avatar?.url ||
-    "";
-
-
-  if (!avatarUrl) {
-    return;
-  }
-
-
-  /* =========================
-     SET USER AVATAR
-  ========================= */
-
-  u9ProfileAvatarImage.src =
-    avatarUrl;
+return;
 
 }
 
 
+
 /* =========================
-   LOAD CURRENT FRAME
+   AVATAR
 ========================= */
 
-async function u9ProfileLoadCurrentFrame(
-  user
-) {
 
-  if (!u9ProfileAvatarFrame) {
-    return;
-  }
+const avatar =
+user.avatar ||
+{};
 
 
-  /* =========================
-     DEFAULT FRAME
-  ========================= */
 
-  u9ProfileAvatarFrame.src =
-    u9ProfileAvatarFramePlaceholder;
+if(
+avatar.url
+){
 
+u9ProfileAvatarImage.src =
+avatar.url;
 
-  if (!user) {
-    return;
-  }
+}
+else{
 
-
-  /* =========================
-     DIRECT FRAME URL
-  ========================= */
-
-  const directFrameUrl =
-    user.avatar_frame_svg ||
-    user.avatar_frame_url ||
-    user.frame_url ||
-    "";
-
-
-  if (directFrameUrl) {
-
-    u9ProfileAvatarFrame.src =
-      directFrameUrl;
-
-    return;
-
-  }
-
-
-  /* =========================
-     FRAME TYPE / ID
-  ========================= */
-
-  const frameType =
-    user.avatar_frame_type ||
-    "default";
-
-
-  const frameId =
-    user.avatar_frame_id ||
-    null;
-
-
-  if (!frameId) {
-    return;
-  }
-
-
-  /* =========================
-     REQUEST
-  ========================= */
-
-  try {
-
-    let requestUrl =
-      u9ProfileAvatarDefaultFrameUrl;
-
-
-    let headers = {};
-
-
-    /* =========================
-       DEFAULT
-    ========================= */
-
-    if (
-      frameType ===
-      "default"
-    ) {
-
-      requestUrl =
-        u9ProfileAvatarDefaultFrameUrl;
-
-    }
-
-
-    /* =========================
-       FREE
-    ========================= */
-
-    else if (
-      frameType ===
-      "free"
-    ) {
-
-      requestUrl =
-        u9ProfileAvatarFreeFrameUrl;
-
-    }
-
-
-    /* =========================
-       PAID
-    ========================= */
-
-    else if (
-      frameType ===
-      "paid"
-    ) {
-
-      requestUrl =
-        u9ProfileAvatarPaidFrameUrl;
-
-
-      const sessionToken =
-        localStorage.getItem(
-          "u9_session"
-        );
-
-
-      if (sessionToken) {
-
-        headers = {
-
-          "Authorization":
-            `Bearer ${sessionToken}`
-
-        };
-
-      }
-
-    }
-
-
-    /* =========================
-       FETCH FRAME DATA
-    ========================= */
-
-    const response =
-      await fetch(
-        requestUrl,
-        {
-
-          method:
-            "GET",
-
-          headers
-
-        }
-      );
-
-
-    /* =========================
-       REQUEST FAILED
-    ========================= */
-
-    if (!response.ok) {
-      return;
-    }
-
-
-    /* =========================
-       JSON
-    ========================= */
-
-    const result =
-      await response.json();
-
-
-    const frames =
-      result.frames ||
-      result.data?.frames ||
-      [];
-
-
-    /* =========================
-       FIND CURRENT FRAME
-    ========================= */
-
-    const currentFrame =
-      frames.find(
-        (frame) =>
-          frame.id === frameId
-      );
-
-
-    if (!currentFrame) {
-      return;
-    }
-
-
-    if (!currentFrame.svg) {
-      return;
-    }
-
-
-    /* =========================
-       SET FRAME
-    ========================= */
-
-    u9ProfileAvatarFrame.src =
-      currentFrame.svg;
-
-  }
-
-  catch (error) {
-
-    console.error(
-      "Failed to load profile avatar frame:",
-      error
-    );
-
-  }
+u9ProfileAvatarImage.src =
+u9DefaultAvatar;
 
 }
 
 
+
 /* =========================
-   LOAD AVATAR + FRAME
+   FRAME
 ========================= */
 
-async function u9ProfileLoadAvatar(
-  user
-) {
 
-  /* =========================
-     AVATAR
-  ========================= */
+if(
+user.avatar_frame_svg
+){
 
-  u9ProfileSetAvatar(
-    user
-  );
+u9ProfileAvatarFrame.src =
+user.avatar_frame_svg;
+
+}
+else{
 
 
-  /* =========================
-     FRAME
-  ========================= */
+u9ProfileAvatarFrame.src =
+u9DefaultFrame;
 
-  await u9ProfileLoadCurrentFrame(
-    user
-  );
 
 }
 
 
+
+console.log(
+"Profile Avatar Loaded:",
+user
+);
+
+
+
+}
+
+catch(error){
+
+
+console.error(
+"Load avatar failed:",
+error
+);
+
+
+}
+
+
+}
+
+
+
 /* =========================
-   GLOBAL PROFILE AVATAR API
+   INIT
 ========================= */
 
-window.U9Avatar = {
 
-  load:
-    u9ProfileLoadAvatar,
-
-  loadAvatar:
-    u9ProfileSetAvatar,
-
-  loadFrame:
-    u9ProfileLoadCurrentFrame,
-
-  resetAvatar:
-    u9ProfileResetAvatar,
-
-  resetFrame:
-    u9ProfileResetAvatarFrame
-
-};
+loadU9ProfileAvatar();
