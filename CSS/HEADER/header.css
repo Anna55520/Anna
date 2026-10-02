@@ -8,20 +8,18 @@
 
   align-items: center;
 
-  justify-content: center;
+  justify-content: flex-start;
 
-  gap:
-    8px;
+  gap: 10px;
 
   min-width: 0;
 
-  height:
-    30px;
+  height: 30px;
 
   padding:
-    5px
-    12px
-    5px
+    0
+    15px
+    0
     5px;
 
   margin: 0;
@@ -30,8 +28,7 @@
     2px solid
     #ccc;
 
-  border-radius:
-    21px;
+  border-radius: 21px;
 
   background:
     #ffffff;
@@ -39,20 +36,15 @@
   color:
     #222222;
 
-  font-size:
-    14px;
+  font-size: 14px;
 
-  font-weight:
-    500;
+  font-weight: 500;
 
-  line-height:
-    1;
+  line-height: 1;
 
-  cursor:
-    pointer;
+  cursor: pointer;
 
-  box-sizing:
-    border-box;
+  box-sizing: border-box;
 
   transition:
 
@@ -64,5 +56,146 @@
 
     transform
     0.15s ease;
+
+}
+
+
+/* =========================
+   USER BUTTON HOVER
+========================= */
+
+#U9-page-header-user:hover {
+
+  background:
+    #f7f9fc;
+
+}
+
+
+/* =========================
+   USER BUTTON ACTIVE
+========================= */
+
+#U9-page-header-user:active {
+
+  transform:
+    scale(
+      0.96
+    );
+
+}
+
+
+/* =========================
+   USER BUTTON OPEN
+========================= */
+
+#U9-page-header-user.account-open {
+
+  border:
+    2px solid
+    #2e73e7;
+
+}
+
+
+/* =========================
+   USER ICON
+========================= */
+
+#U9-page-header-user-icon {
+
+  width: 24px;
+
+  height: 24px;
+
+  flex:
+    0
+    0
+    24px;
+
+  display: block;
+
+  box-sizing: border-box;
+
+  padding:
+    3px;
+
+  border:
+    1px solid
+    #ccc;
+
+  border-radius:
+    50%;
+
+  background:
+    #ffffff;
+
+  fill:
+    none;
+
+  stroke:
+    #666666;
+
+  stroke-width:
+    1.5;
+
+  stroke-linecap:
+    round;
+
+  stroke-linejoin:
+    round;
+
+  transition:
+
+    border-color
+    0.2s ease,
+
+    stroke
+    0.2s ease;
+
+}
+
+
+/* =========================
+   USER ICON OPEN
+========================= */
+
+#U9-page-header-user.account-open
+#U9-page-header-user-icon {
+
+  border:
+    1px solid
+    #2e73e7;
+
+  stroke:
+    #2e73e7;
+
+}
+
+
+/* =========================
+   USERNAME
+========================= */
+
+#U9-page-header-username {
+
+  display:
+    block;
+
+  min-width:
+    0;
+
+  max-width:
+    120px;
+
+  overflow:
+    hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
 
 }
