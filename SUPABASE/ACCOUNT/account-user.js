@@ -14,7 +14,7 @@ window.U9User = {
 
       const response =
         await fetch(
-          "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/current-user",
+          "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me",
           {
 
             method:"GET",
@@ -31,7 +31,7 @@ window.U9User = {
 
 
       console.log(
-        "CURRENT USER:",
+        "ME USER:",
         result
       );
 
@@ -39,6 +39,7 @@ window.U9User = {
 
       if(
         !response.ok ||
+        !result.authenticated ||
         !result.user
       ){
 
@@ -61,7 +62,7 @@ window.U9User = {
 
 
       console.error(
-        "USER LOAD ERROR",
+        "USER LOAD ERROR:",
         error
       );
 
@@ -76,6 +77,8 @@ window.U9User = {
 
 
 };
+
+
 
 
 
@@ -119,6 +122,7 @@ function showUserHeader(
       "none";
 
 
+
   if(login)
     login.style.display =
       "none";
@@ -138,6 +142,8 @@ function showUserHeader(
 
 
 }
+
+
 
 
 
@@ -171,6 +177,7 @@ function logoutHeader(){
   if(register)
     register.style.display =
       "block";
+
 
 
   if(login)
