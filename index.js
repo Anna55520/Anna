@@ -25,6 +25,11 @@ let U9_CURRENT_USER =
 
 async function u9GetCurrentUser() {
 
+  console.log(
+    "U9: Requesting /me..."
+  );
+
+
   try {
 
     /* =========================
@@ -35,6 +40,14 @@ async function u9GetCurrentUser() {
       localStorage.getItem(
         "u9_session"
       );
+
+
+    console.log(
+      "U9: Session token:",
+      sessionToken
+        ? "FOUND"
+        : "NOT FOUND"
+    );
 
 
     /* =========================
@@ -73,40 +86,43 @@ async function u9GetCurrentUser() {
       );
 
 
-    /* =========================
-       NOT AUTHENTICATED
-    ========================= */
-
-    if (
-      !response.ok
-    ) {
-
-      U9_CURRENT_USER =
-        null;
-
-      return null;
-
-    }
+    console.log(
+      "U9: /me status:",
+      response.status
+    );
 
 
     /* =========================
-       JSON
+       RESPONSE JSON
     ========================= */
 
     const result =
       await response.json();
 
 
+    console.log(
+      "U9: /me response:",
+      result
+    );
+
+
     /* =========================
-       CHECK AUTHENTICATED
+       NOT AUTHENTICATED
     ========================= */
 
     if (
+      !response.ok ||
       result.authenticated !== true
     ) {
 
       U9_CURRENT_USER =
         null;
+
+
+      console.log(
+        "U9: User is NOT authenticated."
+      );
+
 
       return null;
 
@@ -126,6 +142,12 @@ async function u9GetCurrentUser() {
       user;
 
 
+    console.log(
+      "U9: Current user:",
+      user
+    );
+
+
     return user;
 
   }
@@ -133,7 +155,7 @@ async function u9GetCurrentUser() {
   catch (error) {
 
     console.error(
-      "Failed to get current user:",
+      "U9: Failed to get current user:",
       error
     );
 
@@ -162,6 +184,11 @@ function u9UpdateUserUI(
   ========================= */
 
   if (user) {
+
+    console.log(
+      "U9: Updating UI → Logged In"
+    );
+
 
     /* =========================
        HEADER
@@ -208,6 +235,11 @@ function u9UpdateUserUI(
      LOGGED OUT
   ========================= */
 
+  console.log(
+    "U9: Updating UI → Logged Out"
+  );
+
+
   if (
     window.U9Header &&
     typeof
@@ -241,6 +273,11 @@ function u9UpdateUserUI(
 ========================= */
 
 async function u9RefreshUser() {
+
+  console.log(
+    "U9: Refreshing user..."
+  );
+
 
   const user =
     await u9GetCurrentUser();
@@ -290,6 +327,11 @@ window.U9User = {
 ========================= */
 
 async function u9Initialize() {
+
+  console.log(
+    "U9: Initializing..."
+  );
+
 
   await u9RefreshUser();
 
