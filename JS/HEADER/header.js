@@ -88,12 +88,16 @@ function getHeaderLoading(){
 
 
 /* =========================
-   INITIAL LOADING
+   INITIAL LOADING STATE
 ========================= */
 
 function u9HeaderLoadingState(){
 
   createHeaderLoading();
+
+
+  u9HeaderActions.style.display =
+  "flex";
 
 
   u9HeaderRegister.style.display =
@@ -111,10 +115,6 @@ function u9HeaderLoadingState(){
   getHeaderLoading().style.display =
   "block";
 
-
-  u9HeaderActions.style.display =
-  "flex";
-
 }
 
 
@@ -123,11 +123,10 @@ u9HeaderLoadingState();
 
 
 /* =========================
-   GUEST
+   SHOW GUEST
 ========================= */
 
 function u9HeaderShowGuest(){
-
 
   u9HeaderRegister.style.display =
   "flex";
@@ -154,13 +153,12 @@ function u9HeaderShowGuest(){
 
 
 /* =========================
-   USER
+   SHOW USER
 ========================= */
 
 function u9HeaderShowUser(
   user
 ){
-
 
   u9HeaderRegister.style.display =
   "none";
@@ -185,12 +183,16 @@ function u9HeaderShowUser(
 
 
 
+  /*
+     LIMIT USERNAME LENGTH
+  */
+
   if(
     username.length > 8
   ){
 
     username =
-    username.slice(
+    username.substring(
       0,
       8
     )
@@ -215,7 +217,6 @@ function u9HeaderShowUser(
 
 function u9HeaderKeepLoading(){
 
-
   u9HeaderRegister.style.display =
   "none";
 
@@ -231,32 +232,73 @@ function u9HeaderKeepLoading(){
   getHeaderLoading().style.display =
   "block";
 
-
 }
 
 
 
 /* =========================
-   RECEIVE USER
+   WAIT U9 USER
 ========================= */
 
-function u9HeaderUpdateUser(){
+function waitForU9User(){
+
+  const timer =
+  setInterval(
+    function(){
+
+      if(
+        window.U9User
+      ){
 
 
-  if(
-    !window.U9User
-  ){
-
-    return;
-
-  }
+        const user =
+        window.U9User.get();
 
 
 
-  const user =
-  window.U9User.get();
+        if(
+          user
+        ){
+
+          u9HeaderShowUser(
+            user
+          );
+
+        }
+        else{
+
+          u9HeaderShowGuest();
+
+        }
 
 
+
+        clearInterval(
+          timer
+        );
+
+
+      }
+
+
+    },
+    100
+  );
+
+}
+
+
+waitForU9User();
+
+
+
+/* =========================
+   UPDATE FROM OTHER FILES
+========================= */
+
+function u9HeaderUpdateUser(
+  user
+){
 
   if(
     user
@@ -267,46 +309,13 @@ function u9HeaderUpdateUser(){
     );
 
   }
-
   else{
 
     u9HeaderShowGuest();
 
   }
 
-
 }
-
-
-
-/* =========================
-   WAIT INDEX
-========================= */
-
-const u9HeaderWait =
-setInterval(
-function(){
-
-
-  if(
-    window.U9User
-  ){
-
-
-    u9HeaderUpdateUser();
-
-
-
-    clearInterval(
-      u9HeaderWait
-    );
-
-
-  }
-
-
-},
-100);
 
 
 
@@ -326,6 +335,11 @@ window.U9Header = {
 
 
   loading:
-  u9HeaderKeepLoading
+  u9HeaderKeepLoading,
+
+
+  update:
+  u9HeaderUpdateUser
+
 
 };
