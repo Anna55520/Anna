@@ -12,12 +12,45 @@ const U9_ME_URL =
 
 
 /* =========================
+   CURRENT USER
+========================= */
+
+let U9_CURRENT_USER =
+  null;
+
+
+/* =========================
    GET CURRENT USER
 ========================= */
 
 async function u9GetCurrentUser() {
 
   try {
+
+    /* =========================
+       SESSION TOKEN
+    ========================= */
+
+    const sessionToken =
+      localStorage.getItem(
+        "u9_session"
+      );
+
+
+    /* =========================
+       REQUEST HEADERS
+    ========================= */
+
+    const headers = {};
+
+
+    if (sessionToken) {
+
+      headers.Authorization =
+        `Bearer ${sessionToken}`;
+
+    }
+
 
     /* =========================
        REQUEST /ME
@@ -32,7 +65,9 @@ async function u9GetCurrentUser() {
             "GET",
 
           credentials:
-            "include"
+            "include",
+
+          headers
 
         }
       );
@@ -45,6 +80,9 @@ async function u9GetCurrentUser() {
     if (
       !response.ok
     ) {
+
+      U9_CURRENT_USER =
+        null;
 
       return null;
 
@@ -67,6 +105,9 @@ async function u9GetCurrentUser() {
       result.authenticated !== true
     ) {
 
+      U9_CURRENT_USER =
+        null;
+
       return null;
 
     }
@@ -76,10 +117,16 @@ async function u9GetCurrentUser() {
        GET USER
     ========================= */
 
-    return (
+    const user =
       result.user ||
-      null
-    );
+      null;
+
+
+    U9_CURRENT_USER =
+      user;
+
+
+    return user;
 
   }
 
@@ -91,6 +138,10 @@ async function u9GetCurrentUser() {
     );
 
 
+    U9_CURRENT_USER =
+      null;
+
+
     return null;
 
   }
@@ -99,18 +150,12 @@ async function u9GetCurrentUser() {
 
 
 /* =========================
-   INITIALIZE U9
+   UPDATE UI
 ========================= */
 
-async function u9Initialize() {
-
-  /* =========================
-     GET CURRENT USER
-  ========================= */
-
-  const user =
-    await u9GetCurrentUser();
-
+function u9UpdateUserUI(
+  user
+) {
 
   /* =========================
      LOGGED IN
@@ -153,6 +198,9 @@ async function u9Initialize() {
 
     }
 
+
+    return;
+
   }
 
 
@@ -160,42 +208,90 @@ async function u9Initialize() {
      LOGGED OUT
   ========================= */
 
-  else {
+  if (
+    window.U9Header &&
+    typeof
+      window.U9Header.showLoggedOut ===
+      "function"
+  ) {
 
-    /* =========================
-       HEADER
-    ========================= */
-
-    if (
-      window.U9Header &&
-      typeof
-        window.U9Header.showLoggedOut ===
-        "function"
-    ) {
-
-      window.U9Header.showLoggedOut();
-
-    }
-
-
-    /* =========================
-       AVATAR
-    ========================= */
-
-    if (
-      window.U9Avatar &&
-      typeof
-        window.U9Avatar.load ===
-        "function"
-    ) {
-
-      window.U9Avatar.load(
-        null
-      );
-
-    }
+    window.U9Header.showLoggedOut();
 
   }
+
+
+  if (
+    window.U9Avatar &&
+    typeof
+      window.U9Avatar.load ===
+      "function"
+  ) {
+
+    window.U9Avatar.load(
+      null
+    );
+
+  }
+
+}
+
+
+/* =========================
+   REFRESH USER
+========================= */
+
+async function u9RefreshUser() {
+
+  const user =
+    await u9GetCurrentUser();
+
+
+  u9UpdateUserUI(
+    user
+  );
+
+
+  return user;
+
+}
+
+
+/* =========================
+   GET STORED USER
+========================= */
+
+function u9GetStoredUser() {
+
+  return U9_CURRENT_USER;
+
+}
+
+
+/* =========================
+   GLOBAL USER API
+========================= */
+
+window.U9User = {
+
+  get:
+    u9GetStoredUser,
+
+  fetch:
+    u9GetCurrentUser,
+
+  refresh:
+    u9RefreshUser
+
+};
+
+
+/* =========================
+   INITIALIZE U9
+========================= */
+
+async function u9Initialize() {
+
+  await u9RefreshUser();
 
 }
 
