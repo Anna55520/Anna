@@ -8,18 +8,21 @@
 
   align-items: center;
 
-  justify-content: flex-start;
+  justify-content: center;
 
   gap:
-    6px;
+    8px;
 
   min-width: 0;
 
-  height: 30px;
+  height:
+    30px;
 
   padding:
-    0
-    8px;
+    5px
+    12px
+    5px
+    5px;
 
   margin: 0;
 
@@ -61,142 +64,5 @@
 
     transform
     0.15s ease;
-
-}
-
-
-/* =========================
-   USER BUTTON HOVER
-========================= */
-
-#U9-page-header-user:hover {
-
-  background:
-    #f7f9fc;
-
-}
-
-
-/* =========================
-   USER BUTTON ACTIVE
-========================= */
-
-#U9-page-header-user:active {
-
-  transform:
-    scale(
-      0.96
-    );
-
-}
-
-
-/* =========================
-   USER BUTTON OPEN
-========================= */
-
-#U9-page-header-user.account-open {
-
-  border:
-    2px solid
-    #2e73e7;
-
-}
-
-
-/* =========================
-   USER ICON
-========================= */
-
-#U9-page-header-user-icon {
-
-  width:
-    24px;
-
-  height:
-    24px;
-
-  flex:
-    0 0 24px;
-
-  display:
-    block;
-
-  box-sizing:
-    border-box;
-
-  border:
-    1px solid
-    #ccc;
-
-  border-radius:
-    50%;
-
-  fill:
-    none;
-
-  stroke:
-    #666666;
-
-  stroke-width:
-    1.5;
-
-  stroke-linecap:
-    round;
-
-  stroke-linejoin:
-    round;
-
-  transition:
-
-    border-color
-    0.2s ease,
-
-    stroke
-    0.2s ease;
-
-}
-
-
-/* =========================
-   USER ICON OPEN
-========================= */
-
-#U9-page-header-user.account-open
-#U9-page-header-user-icon {
-
-  border:
-    1px solid
-    #2e73e7;
-
-  stroke:
-    #2e73e7;
-
-}
-
-
-/* =========================
-   USERNAME
-========================= */
-
-#U9-page-header-username {
-
-  display:
-    block;
-
-  min-width:
-    0;
-
-  max-width:
-    120px;
-
-  overflow:
-    hidden;
-
-  text-overflow:
-    ellipsis;
-
-  white-space:
-    nowrap;
 
 }
