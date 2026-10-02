@@ -212,12 +212,24 @@ loginForm.addEventListener(
         result.session.token
       );
 
-
       /* =========================
-         UPDATE HEADER
+      UPDATE HEADER
       ========================= */
 
       await window.U9User.refresh();
+
+
+      /* =========================
+      UPDATE PROFILE AVATAR
+      ========================= */
+
+      if(
+      window.U9ProfileAvatar
+      ){
+
+      await window.U9ProfileAvatar.refresh();
+
+      }
 
 
       /* =========================
@@ -246,3 +258,8 @@ loginForm.addEventListener(
 
   }
 );
+
+
+
+
+
