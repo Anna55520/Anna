@@ -217,7 +217,7 @@ loginForm.addEventListener(
          UPDATE HEADER
       ========================= */
 
-      await getCurrentUser();
+      await window.U9User.refresh();
 
 
       /* =========================
