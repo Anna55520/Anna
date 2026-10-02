@@ -1,245 +1,346 @@
+
 /* =========================
    HEADER ELEMENTS
 ========================= */
 
 
 const headerRegister =
-document.getElementById(
-  "U9-page-header-register"
-);
+  document.getElementById(
+    "U9-page-header-register"
+  );
 
 
 const headerLogin =
-document.getElementById(
-  "U9-page-header-login"
-);
+  document.getElementById(
+    "U9-page-header-login"
+  );
 
 
 const headerUser =
-document.getElementById(
-  "U9-page-header-user"
-);
+  document.getElementById(
+    "U9-page-header-user"
+  );
 
 
 const headerUsername =
-document.getElementById(
-  "U9-page-header-username"
-);
-
+  document.getElementById(
+    "U9-page-header-username"
+  );
 
 
 /* =========================
    UPDATE HEADER
 ========================= */
 
-
 function updateHeaderUser(
   user
-){
+) {
 
-if(
-  user
-){
+  /* =========================
+     LOGGED IN
+  ========================= */
 
-  /*
-     HIDE LOGIN REGISTER
-  */
+  if (
+    user
+  ) {
 
-  if(headerRegister){
+    /*
+       HIDE LOGIN
+    */
 
-    headerRegister.style.display =
-    "none";
+    if (
+      headerRegister
+    ) {
+
+      headerRegister.style.display =
+        "none";
+
+    }
+
+
+    /*
+       HIDE REGISTER
+    */
+
+    if (
+      headerLogin
+    ) {
+
+      headerLogin.style.display =
+        "none";
+
+    }
+
+
+    /*
+       SHOW USER
+    */
+
+    if (
+      headerUser
+    ) {
+
+      headerUser.classList.add(
+        "active"
+      );
+
+    }
+
+
+    /*
+       USERNAME
+    */
+
+    if (
+      headerUsername
+    ) {
+
+      headerUsername.textContent =
+        user.username || "";
+
+    }
 
   }
 
 
-  if(headerLogin){
+  /* =========================
+     LOGGED OUT
+  ========================= */
 
-    headerLogin.style.display =
-    "none";
+  else {
+
+    /*
+       SHOW REGISTER
+    */
+
+    if (
+      headerRegister
+    ) {
+
+      headerRegister.style.display =
+        "";
+
+    }
+
+
+    /*
+       SHOW LOGIN
+    */
+
+    if (
+      headerLogin
+    ) {
+
+      headerLogin.style.display =
+        "";
+
+    }
+
+
+    /*
+       HIDE USER
+    */
+
+    if (
+      headerUser
+    ) {
+
+      headerUser.classList.remove(
+        "active"
+      );
+
+    }
+
+
+    /*
+       CLEAR USERNAME
+    */
+
+    if (
+      headerUsername
+    ) {
+
+      headerUsername.textContent =
+        "";
+
+    }
 
   }
-
-
-
-  /*
-     SHOW USER
-  */
-
-
-  if(headerUser){
-
-    headerUser.classList.add(
-      "active"
-    );
-
-  }
-
-
-  if(headerUsername){
-
-    headerUsername.textContent =
-    user.username;
-
-  }
-
-
 
 }
-else{
-
-
-  /*
-     SHOW LOGIN REGISTER
-  */
-
-
-  if(headerRegister){
-
-    headerRegister.style.display =
-    "";
-
-  }
-
-
-  if(headerLogin){
-
-    headerLogin.style.display =
-    "";
-
-  }
-
-
-
-  /*
-     HIDE USER
-  */
-
-
-  if(headerUser){
-
-    headerUser.classList.remove(
-      "active"
-    );
-
-  }
-
-
-  if(headerUsername){
-
-    headerUsername.textContent =
-    "";
-
-  }
-
-
-}
-
-
-
-}
-
 
 
 /* =========================
    CHECK USER
 ========================= */
 
+async function getCurrentUser() {
 
-async function getCurrentUser(){
+  try {
+
+    /* =========================
+       GET SESSION TOKEN
+    ========================= */
+
+    const sessionToken =
+      localStorage.getItem(
+        "u9_session"
+      );
 
 
-try{
+    /* =========================
+       NO SESSION
+    ========================= */
+
+    if (
+      !sessionToken
+    ) {
+
+      updateHeaderUser(
+        null
+      );
+
+      return null;
+
+    }
 
 
-const response =
-await fetch(
+    /* =========================
+       REQUEST /ME
+    ========================= */
 
-"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me",
+    const response =
+      await fetch(
 
-{
+        "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me",
 
-method:"GET",
+        {
 
-credentials:"include"
+          method:
+            "GET",
+
+          headers: {
+
+            "Authorization":
+              `Bearer ${sessionToken}`
+
+          }
+
+        }
+
+      );
+
+
+    /* =========================
+       SESSION INVALID
+    ========================= */
+
+    if (
+      !response.ok
+    ) {
+
+      /*
+         REMOVE INVALID SESSION
+      */
+
+      localStorage.removeItem(
+        "u9_session"
+      );
+
+
+      updateHeaderUser(
+        null
+      );
+
+
+      return null;
+
+    }
+
+
+    /* =========================
+       JSON
+    ========================= */
+
+    const result =
+      await response.json();
+
+
+    /* =========================
+       USER
+    ========================= */
+
+    if (
+      !result.user
+    ) {
+
+      updateHeaderUser(
+        null
+      );
+
+      return null;
+
+    }
+
+
+    /* =========================
+       UPDATE HEADER
+    ========================= */
+
+    updateHeaderUser(
+      result.user
+    );
+
+
+    /* =========================
+       RETURN USER
+    ========================= */
+
+    return result.user;
+
+  }
+
+
+  /* =========================
+     ERROR
+  ========================= */
+
+  catch (
+    error
+  ) {
+
+    console.error(
+      "Get current user failed:",
+      error
+    );
+
+
+    updateHeaderUser(
+      null
+    );
+
+
+    return null;
+
+  }
 
 }
-
-);
-
-
-
-if(
-!response.ok
-){
-
-updateHeaderUser(
-null
-);
-
-return null;
-
-}
-
-
-
-const result =
-await response.json();
-
-
-
-updateHeaderUser(
-result.user
-);
-
-
-
-return result.user;
-
-
-
-}
-catch(error){
-
-
-console.error(
-error
-);
-
-
-updateHeaderUser(
-null
-);
-
-
-return null;
-
-
-}
-
-
-
-}
-
 
 
 /* =========================
    EXPORT
 ========================= */
 
-
 window.U9User = {
 
-refresh:
-getCurrentUser
+  refresh:
+    getCurrentUser
 
 };
-
 
 
 /* =========================
    INIT
 ========================= */
-
 
 getCurrentUser();
