@@ -1,0 +1,236 @@
+/* =========== LOGOUT CONFIRM =========== */
+
+#U9-account-logout {
+
+  display: none;
+
+  position: fixed;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 100%;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background-color:
+    rgba(
+      0,
+      0,
+      0,
+      0.25
+    );
+
+  backdrop-filter:
+    blur(5px);
+
+  -webkit-backdrop-filter:
+    blur(5px);
+
+  z-index: 2500;
+
+}
+
+
+/* =========== CONTENT =========== */
+
+#U9-account-logout-content {
+
+  width: 320px;
+
+  padding: 25px;
+
+  box-sizing: border-box;
+
+  background-color:
+    white;
+
+  border-radius: 12px;
+
+  text-align: center;
+
+}
+
+
+/* =========== TITLE =========== */
+
+#U9-account-logout-content h2 {
+
+  margin:
+    0
+    0
+    25px
+    0;
+
+}
+
+
+/* =========== BUTTON AREA =========== */
+
+#U9-account-logout-actions {
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 10px;
+
+}
+
+
+/* =========== BUTTON =========== */
+
+#U9-account-logout-actions button {
+
+  min-width: 90px;
+
+  height: 40px;
+
+  padding:
+    0
+    14px;
+
+  border: none;
+
+  border-radius: 6px;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease,
+    transform 0.15s ease;
+
+}
+
+
+/* =========== NO BUTTON =========== */
+
+#U9-account-logout-no {
+
+  background-color:
+    #eeeeee;
+
+  color:
+    #333333;
+
+}
+
+
+/* =========== NO HOVER =========== */
+
+#U9-account-logout-no:hover {
+
+  background-color:
+    #e3e3e3;
+
+}
+
+
+/* =========== NO ACTIVE =========== */
+
+#U9-account-logout-no:active {
+
+  transform:
+    scale(0.97);
+
+}
+
+
+/* =========== YES DEFAULT =========== */
+
+#U9-account-logout-yes {
+
+  background-color:
+    #eeeeee;
+
+  color:
+    #333333;
+
+}
+
+
+/* =========== YES READY =========== */
+
+#U9-account-logout-yes.ready {
+
+  background-color:
+    #71a6ff;
+
+  color:
+    #ffffff;
+
+}
+
+
+/* =========== YES READY HOVER =========== */
+
+#U9-account-logout-yes.ready:hover {
+
+  background-color:
+    #669cff;
+
+}
+
+
+/* =========== YES ACTIVE =========== */
+
+#U9-account-logout-yes.ready:active {
+
+  transform:
+    scale(0.97);
+
+}
+
+
+/* =========== YES DISABLED =========== */
+
+#U9-account-logout-yes:disabled {
+
+  cursor:
+    not-allowed;
+
+  opacity:
+    0.5;
+
+}
+
+
+/* =========== LOADING =========== */
+
+#U9-account-logout-yes.loading {
+
+  background-color:
+    #71a6ff;
+
+  color:
+    #ffffff;
+
+  cursor:
+    wait;
+
+  opacity:
+    0.85;
+
+}
+
+
+/* =========== HEADER LOGOUT SVG =========== */
+
+#U9-page-header-logout svg {
+
+  width:
+    18px;
+
+  height:
+    18px;
+
+  fill:
+    currentColor;
+
+}

@@ -1,0 +1,38 @@
+/* =========================
+   AUCTION PAGE
+========================= */
+
+#U9-page-auction {
+
+  position: relative;
+
+  width: 100%;
+
+  min-height: calc(100vh - 115px);
+
+  box-sizing: border-box;
+
+  margin-top: 115px;
+
+  background-color: #ffee00;
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 480px) {
+
+  #U9-page-auction {
+
+    width: 100%;
+
+    min-height: calc(100vh - 115px);
+
+    margin-top: 115px;
+
+  }
+
+}

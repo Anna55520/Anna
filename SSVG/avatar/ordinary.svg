@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="200"
+     height="200"
+     viewBox="0 0 200 200">
+
+  <defs>
+
+    <linearGradient
+      id="blueSky"
+      x1="45"
+      y1="45"
+      x2="155"
+      y2="155"
+      gradientUnits="userSpaceOnUse">
+
+      <stop
+        offset="0%"
+        stop-color="#0066FF"/>
+
+      <stop
+        offset="100%"
+        stop-color="#70D6FF"/>
+
+    </linearGradient>
+
+  </defs>
+
+
+  <circle
+    cx="100"
+    cy="100"
+    r="54.5"
+    fill="none"
+    stroke="url(#blueSky)"
+    stroke-width="6"/>
+
+
+</svg>

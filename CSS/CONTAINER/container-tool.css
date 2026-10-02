@@ -1,0 +1,1063 @@
+/* =========================
+   CONTAINER TOOL
+========================= */
+
+#U9-page-container-tool {
+
+  position: fixed;
+
+  top: 60px;
+  left: 0;
+
+  width: 100%;
+  height: 55px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 10px;
+
+  background-color: rgba(113, 165, 255, 0);
+
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  z-index: 900;
+
+  overflow: hidden;
+
+
+  /* =========================
+     CONTAINER TOOL BUTTON COLORS
+  ========================= */
+
+  --U9-container-button-background: rgb(255, 255, 255);
+
+  --U9-container-button-hover: white;
+
+}
+
+
+/* =========================
+   ALL CONTAINER TOOL BUTTONS
+========================= */
+
+#U9-page-container-tool
+button:not(#U9-page-container-tool-search-button) {
+
+  background-color:
+    var(--U9-container-button-background);
+
+}
+
+
+/* =========================
+   ALL CONTAINER TOOL BUTTON HOVER
+========================= */
+
+#U9-page-container-tool
+button:not(#U9-page-container-tool-search-button):hover {
+
+  background-color:
+    var(--U9-container-button-hover);
+
+}
+
+
+/* =========================
+   NORMAL PAGE TOOL
+========================= */
+
+#U9-page-container-tool-normal {
+
+  position: absolute;
+
+  top: 7.5px;
+  left: 10px;
+
+  width: calc(100% - 20px);
+
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  transform: translateX(0);
+
+  transition:
+    transform 0.45s ease;
+
+  z-index: 2;
+
+}
+
+
+/* =========================
+   PAGE MENU
+========================= */
+
+#U9-page-container-tool-pages {
+
+  position: absolute;
+
+  top: 7.5px;
+  left: 10px;
+
+  width: calc(100% - 20px);
+
+  height: 40px;
+
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+
+  gap: 6px;
+
+  overflow: hidden;
+
+  transform: translateX(-100%);
+
+  transition:
+    transform 0.45s ease;
+
+  z-index: 1;
+
+}
+
+
+/* =========================
+   MENU BUTTON
+========================= */
+
+#U9-page-container-tool-menu {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+
+#U9-page-container-tool-menu img {
+
+  display: block;
+
+  width: 18px;
+  height: 18px;
+
+  max-width: 18px;
+  max-height: 18px;
+
+  object-fit: contain;
+
+  flex: 0 0 18px;
+
+}
+
+
+/* =========================
+   MENU HEARTBEAT
+========================= */
+
+#U9-page-container-tool-menu.menu-heartbeat img {
+
+  animation:
+    menu-heartbeat 2.2s ease-in-out 1;
+
+}
+
+
+@keyframes menu-heartbeat {
+
+  0% {
+    transform: scale(1);
+  }
+
+  10% {
+    transform: scale(1.2);
+  }
+
+  20% {
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(1.2);
+  }
+
+  40% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.2);
+  }
+
+  60% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+
+}
+
+
+/* =========================
+   SEARCH CONTAINER
+========================= */
+
+#U9-page-container-tool-search {
+
+  display: flex;
+  align-items: center;
+
+  flex: 1;
+  min-width: 0;
+
+  height: 40px;
+
+  padding: 8px;
+
+  box-sizing: border-box;
+
+  background-color: white;
+
+  border-radius: 50px;
+
+  overflow: hidden;
+
+}
+
+
+/* =========================
+   SEARCH INPUT
+========================= */
+
+#U9-page-container-tool-search-input {
+
+  flex: 1;
+  min-width: 0;
+
+  height: 100%;
+
+  padding: 0 10px;
+
+  border: none;
+  outline: none;
+
+  background-color: white;
+
+}
+
+
+/* =========================
+   SEARCH BUTTON
+========================= */
+
+#U9-page-container-tool-search-button {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 30px;
+  min-width: 24px;
+  height: 30px;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background-color: #abacb2;
+
+  color: white;
+
+  cursor: pointer;
+
+  flex-shrink: 0;
+
+}
+
+
+/* =========================
+   SEARCH ICON
+========================= */
+
+#U9-page-container-tool-search-button img {
+
+  display: block;
+
+  width: 16px;
+  height: 16px;
+
+  max-width: 16px;
+  max-height: 16px;
+
+  object-fit: contain;
+
+  flex: 0 0 16px;
+
+}
+
+
+/* =========================
+   SEARCH EFFECT
+========================= */
+
+#U9-page-container-tool-search-button.search-effect img {
+
+  animation:
+    search-effect 1.2s ease-in-out 1;
+
+}
+
+
+@keyframes search-effect {
+
+  0% {
+    transform: scale(1);
+  }
+
+  35% {
+    transform: scale(1.35);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+
+}
+
+
+/* =========================
+   MESSAGE BUTTON
+========================= */
+
+#U9-page-container-tool-message {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+
+#U9-page-container-tool-message img {
+
+  display: block;
+
+  width: 18px;
+  height: 18px;
+
+  max-width: 18px;
+  max-height: 18px;
+
+  object-fit: contain;
+
+  flex: 0 0 18px;
+
+}
+
+
+/* =========================
+   MESSAGE BOUNCE
+========================= */
+
+#U9-page-container-tool-message.message-bounce img {
+
+  animation:
+    message-bounce 0.7s ease-in-out 1;
+
+}
+
+
+@keyframes message-bounce {
+
+  0% {
+    transform:
+      translateY(0)
+      rotate(0deg);
+  }
+
+  25% {
+    transform:
+      translateY(-6px)
+      rotate(0deg);
+  }
+
+  45% {
+    transform:
+      translateY(0)
+      rotate(0deg);
+  }
+
+  60% {
+    transform:
+      translateY(0)
+      rotate(-8deg);
+  }
+
+  75% {
+    transform:
+      translateY(0)
+      rotate(8deg);
+  }
+
+  90% {
+    transform:
+      translateY(0)
+      rotate(-4deg);
+  }
+
+  100% {
+    transform:
+      translateY(0)
+      rotate(0deg);
+  }
+
+}
+
+
+/* =========================
+   INBOX BUTTON
+========================= */
+
+#U9-page-container-tool-inbox {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+
+#U9-page-container-tool-inbox img {
+
+  display: block;
+
+  width: 18px;
+  height: 18px;
+
+  max-width: 18px;
+  max-height: 18px;
+
+  object-fit: contain;
+
+  flex: 0 0 18px;
+
+}
+
+
+/* =========================
+   INBOX SHAKE
+========================= */
+
+#U9-page-container-tool-inbox.inbox-shake img {
+
+  animation:
+    inbox-shake 0.8s ease-in-out 1;
+
+}
+
+
+@keyframes inbox-shake {
+
+  0% {
+    transform: rotate(0deg);
+  }
+
+  15% {
+    transform: rotate(-15deg);
+  }
+
+  30% {
+    transform: rotate(15deg);
+  }
+
+  45% {
+    transform: rotate(-12deg);
+  }
+
+  60% {
+    transform: rotate(12deg);
+  }
+
+  75% {
+    transform: rotate(-6deg);
+  }
+
+  90% {
+    transform: rotate(4deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+
+}
+
+
+/* =========================
+   GIFT BUTTON
+========================= */
+
+#U9-page-container-tool-gift {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+
+#U9-page-container-tool-gift img {
+
+  display: block;
+
+  width: 18px;
+  height: 17px;
+
+  max-width: 18px;
+  max-height: 17px;
+
+  object-fit: contain;
+
+  flex: 0 0 auto;
+
+}
+
+
+/* =========================
+   GIFT BOUNCE
+========================= */
+
+#U9-page-container-tool-gift.gift-bounce img {
+
+  animation:
+    gift-bounce 0.8s ease-in-out 1;
+
+}
+
+
+@keyframes gift-bounce {
+
+  0% {
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+  20% {
+    transform:
+      translateY(3px)
+      scale(0.95);
+  }
+
+  45% {
+    transform:
+      translateY(-6px)
+      scale(1.12);
+  }
+
+  60% {
+    transform:
+      translateY(0)
+      scale(1.05);
+  }
+
+  75% {
+    transform:
+      translateY(-3px)
+      scale(1.02);
+  }
+
+  100% {
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+}
+
+
+/* =========================
+   HISTORY BUTTON
+========================= */
+
+#U9-page-container-tool-history {
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+
+#U9-page-container-tool-history img {
+
+  display: block;
+
+  width: 21px;
+  height: 21px;
+
+  max-width: 21px;
+  max-height: 21px;
+
+  object-fit: contain;
+
+  flex: 0 0 21px;
+
+}
+
+
+/* =========================
+   HISTORY SHAKE
+========================= */
+
+#U9-page-container-tool-history.history-shake img {
+
+  animation:
+    history-shake 0.8s ease-in-out 1;
+
+}
+
+
+@keyframes history-shake {
+
+  0% {
+    transform:
+      translateY(0)
+      rotate(0deg);
+  }
+
+  15% {
+    transform:
+      translateY(2px)
+      rotate(-12deg);
+  }
+
+  30% {
+    transform:
+      translateY(0)
+      rotate(12deg);
+  }
+
+  45% {
+    transform:
+      translateY(1px)
+      rotate(-10deg);
+  }
+
+  60% {
+    transform:
+      translateY(0)
+      rotate(8deg);
+  }
+
+  75% {
+    transform:
+      translateY(0)
+      rotate(-5deg);
+  }
+
+  100% {
+    transform:
+      translateY(0)
+      rotate(0deg);
+  }
+
+}
+
+
+/* =========================
+   COMMON TOOL BUTTONS
+========================= */
+
+#U9-page-container-tool-menu,
+#U9-page-container-tool-message,
+#U9-page-container-tool-inbox,
+#U9-page-container-tool-gift,
+#U9-page-container-tool-history {
+
+  width: 40px;
+  min-width: 40px;
+
+  height: 40px;
+
+  padding: 0;
+
+  border: none;
+  outline: none;
+
+  border-radius: 30%;
+
+  background-color:
+    var(--U9-container-button-background);
+
+  cursor: pointer;
+
+  flex: 0 0 40px;
+
+}
+
+
+/* =========================
+   COMMON TOOL BUTTON HOVER
+========================= */
+
+#U9-page-container-tool-menu:hover,
+#U9-page-container-tool-message:hover,
+#U9-page-container-tool-inbox:hover,
+#U9-page-container-tool-gift:hover,
+#U9-page-container-tool-history:hover {
+
+  background-color:
+    var(--U9-container-button-hover);
+
+}
+
+
+/* =========================
+   PROFILE BUTTON
+========================= */
+
+#U9-page-container-tool-profile {
+
+  width: 40px;
+  min-width: 40px;
+
+  height: 40px;
+
+  padding: 0;
+
+  border: none;
+  outline: none;
+
+  border-radius: 30%;
+
+  background-color:
+    var(--U9-container-button-background);
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 40px;
+
+}
+
+
+#U9-page-container-tool-profile img {
+
+  display: block;
+
+  width: 17px;
+  height: 17px;
+
+  max-width: 17px;
+  max-height: 17px;
+
+  object-fit: contain;
+
+}
+
+
+/* =========================
+   PROFILE HOVER
+========================= */
+
+#U9-page-container-tool-profile:hover {
+
+  background-color:
+    var(--U9-container-button-hover);
+
+}
+
+
+/* =========================
+   PAGE ARROWS
+========================= */
+
+#U9-page-container-tool-pages-prev,
+#U9-page-container-tool-pages-next {
+
+  width: 40px;
+  min-width: 40px;
+
+  height: 40px;
+
+  padding: 0;
+
+  border: none;
+  outline: none;
+
+  border-radius: 30%;
+
+  background-color:
+    var(--U9-container-button-background);
+
+  color: #111111;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 40px;
+
+  font-size: 18px;
+  font-weight: 600;
+
+  line-height: 1;
+
+}
+
+
+/* =========================
+   PAGE ARROW HOVER
+========================= */
+
+#U9-page-container-tool-pages-prev,
+#U9-page-container-tool-pages-next {
+
+  background-color:
+    var(--U9-container-button-background);
+
+}
+
+
+#U9-page-container-tool-pages-prev:hover,
+#U9-page-container-tool-pages-next:hover {
+
+  background-color:
+    var(--U9-container-button-hover);
+
+}
+
+
+/* =========================
+   PAGE BUTTONS
+========================= */
+
+#U9-page-container-tool-home,
+#U9-page-container-tool-shop-page,
+#U9-page-container-tool-auction,
+#U9-page-container-tool-test1,
+#U9-page-container-tool-test2 {
+
+  height: 40px;
+
+  padding:
+    0 10px;
+
+  border: none;
+  outline: none;
+
+  border-radius: 10%;
+
+  background-color:
+    var(--U9-container-button-background);
+
+  box-shadow: none;
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  color: #111111;
+
+}
+
+
+/* =========================
+   PAGE ACTIVE
+========================= */
+
+#U9-page-container-tool-home.active,
+#U9-page-container-tool-shop-page.active,
+#U9-page-container-tool-auction.active,
+#U9-page-container-tool-test1.active,
+#U9-page-container-tool-test2.active {
+
+  color: #1b67ea;
+
+}
+
+
+/* =========================
+   PAGE BUTTON HOVER
+========================= */
+
+#U9-page-container-tool-home:hover,
+#U9-page-container-tool-shop-page:hover,
+#U9-page-container-tool-auction:hover,
+#U9-page-container-tool-test1:hover,
+#U9-page-container-tool-test2:hover {
+
+  background-color:
+    var(--U9-container-button-hover);
+
+}
+
+
+/* =========================
+   BUTTON PRESS
+========================= */
+
+#U9-page-container-tool-menu:active,
+#U9-page-container-tool-message:active,
+#U9-page-container-tool-inbox:active,
+#U9-page-container-tool-gift:active,
+#U9-page-container-tool-history:active,
+#U9-page-container-tool-profile:active,
+#U9-page-container-tool-pages-prev:active,
+#U9-page-container-tool-pages-next:active,
+#U9-page-container-tool-home:active,
+#U9-page-container-tool-shop-page:active,
+#U9-page-container-tool-auction:active,
+#U9-page-container-tool-test1:active,
+#U9-page-container-tool-test2:active {
+
+  transform: scale(0.96);
+
+}
+
+
+/* =========================
+   MENU OPEN
+========================= */
+
+#U9-page-container-tool.menu-open
+#U9-page-container-tool-normal {
+
+  transform:
+    translateX(
+      calc(100% - 40px)
+    );
+
+}
+
+
+#U9-page-container-tool.menu-open
+#U9-page-container-tool-pages {
+
+  transform: translateX(0);
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 480px) {
+
+  #U9-page-container-tool {
+
+    padding:
+      0 8px;
+
+  }
+
+
+  #U9-page-container-tool-normal {
+
+    left: 8px;
+
+    width:
+      calc(100% - 16px);
+
+  }
+
+
+  #U9-page-container-tool-pages {
+
+    left: 8px;
+
+    width:
+      calc(100% - 16px);
+
+    gap: 4px;
+
+  }
+
+
+  #U9-page-container-tool-menu,
+  #U9-page-container-tool-message,
+  #U9-page-container-tool-inbox,
+  #U9-page-container-tool-gift,
+  #U9-page-container-tool-history {
+
+    width: 36px;
+    min-width: 36px;
+
+    flex: 0 0 36px;
+
+  }
+
+
+  #U9-page-container-tool-profile,
+  #U9-page-container-tool-pages-prev,
+  #U9-page-container-tool-pages-next {
+
+    width: 36px;
+    min-width: 36px;
+    height: 40px;
+
+    flex: 0 0 36px;
+
+  }
+
+
+  #U9-page-container-tool-profile img {
+
+    width: 16px;
+    height: 16px;
+
+  }
+
+
+  #U9-page-container-tool-pages-prev,
+  #U9-page-container-tool-pages-next {
+
+    font-size: 17px;
+
+  }
+
+
+  #U9-page-container-tool-home,
+  #U9-page-container-tool-shop-page,
+  #U9-page-container-tool-auction,
+  #U9-page-container-tool-test1,
+  #U9-page-container-tool-test2 {
+
+    padding:
+      0 8px;
+
+    font-size: 14px;
+
+  }
+
+}

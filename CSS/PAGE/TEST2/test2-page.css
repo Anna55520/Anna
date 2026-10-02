@@ -1,0 +1,38 @@
+/* =========================
+   TEST2 PAGE
+========================= */
+
+#U9-page-test2 {
+
+  position: relative;
+
+  width: 100%;
+
+  min-height: calc(100vh - 115px);
+
+  box-sizing: border-box;
+
+  margin-top: 115px;
+
+  background-color: #00e1ff;
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 480px) {
+
+  #U9-page-test2 {
+
+    width: 100%;
+
+    min-height: calc(100vh - 115px);
+
+    margin-top: 115px;
+
+  }
+
+}

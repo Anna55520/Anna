@@ -1,0 +1,124 @@
+
+/* =========================
+   U9 PROFILE AVATAR
+========================= */
+
+
+/* =========================
+   AVATAR CONTAINER
+========================= */
+
+#U9-profile-avatar {
+
+  position: relative;
+
+  width: 130px;
+
+  height: 130px;
+
+  margin: 55px auto 25px auto;
+
+  flex: 0 0 130px;
+
+}
+
+
+/* =========================
+   AVATAR IMAGE
+========================= */
+
+#U9-profile-avatar-image {
+
+  position: absolute;
+
+  top: 50%;
+
+  left: 50%;
+
+  width: 105px;
+
+  height: 105px;
+
+  transform:
+    translate(
+      -50%,
+      -50%
+    );
+
+  object-fit: cover;
+
+  border-radius: 50%;
+
+  display: block;
+
+}
+
+
+/* =========================
+   AVATAR FRAME
+========================= */
+
+#U9-profile-avatar-frame {
+
+  position: absolute;
+
+  top: 50%;
+
+  left: 50%;
+
+  width: 200px;
+
+  height: 200px;
+
+  transform:
+    translate(
+      -50%,
+      -50%
+    );
+
+  display: block;
+
+  pointer-events: none;
+
+  object-fit: contain;
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (
+  max-width: 480px
+) {
+
+  #U9-profile-avatar {
+
+    width: 130px;
+
+    height: 130px;
+
+    flex: 0 0 130px;
+
+  }
+
+
+  #U9-profile-avatar-image {
+
+    width: 105px;
+
+    height: 105px;
+
+  }
+
+
+  #U9-profile-avatar-frame {
+
+    width: 200px;
+
+    height: 200px;
+
+  }
+
+}
