@@ -501,6 +501,10 @@ u9ProfileLoadAvatar();
 window.U9ProfileAvatar = {
 
   load:
+    u9ProfileLoadAvatar,
+
+
+  refresh:
     u9ProfileLoadAvatar
 
 };
