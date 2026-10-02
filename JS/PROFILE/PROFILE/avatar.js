@@ -1,4 +1,4 @@
-```js
+
 /* =========================
    U9 PROFILE AVATAR
    AVATAR + FRAME ONLY
@@ -504,4 +504,3 @@ window.U9ProfileAvatar = {
     u9ProfileLoadAvatar
 
 };
-```
