@@ -1,10 +1,40 @@
 /* =========================
-   U9 PAGE HEADER
+
+   U9 HEADER
+
 ========================= */
 
 
 /* =========================
+
+   HEADER U9 LOGO
+
+========================= */
+
+#U9-page-header-u9-logo {
+
+  display: flex;
+
+  align-items: center;
+
+}
+
+
+#U9-page-header-u9-logo img {
+
+  display: block;
+
+  width: 100px;
+
+  height: auto;
+
+}
+
+
+/* =========================
+
    HEADER
+
 ========================= */
 
 #U9-page-header {
@@ -19,22 +49,41 @@
 
   height: 60px;
 
+  padding:
+
+    0px
+
+    10px
+
+    0px
+
+    25px;
+
   display: flex;
 
   align-items: center;
 
   justify-content: space-between;
 
-  padding: 0px 10px 0px 15px;
-
-  box-sizing: border-box;
-
-  background:
-    #ffffff;
+  background-color: white;
 
   border-bottom:
-    1px solid
-    #eeeeee;
+
+    0px
+
+    solid
+
+    rgba(
+
+      255,
+
+      255,
+
+      255,
+
+      0
+
+    );
 
   z-index: 1000;
 
@@ -42,10 +91,52 @@
 
 
 /* =========================
-   U9 LOGO
+
+   HEADER ACTIONS
+
 ========================= */
 
-#U9-page-header-u9-logo {
+#U9-page-header-actions {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+}
+
+
+/* =========================
+
+   REGISTER / LOGIN BUTTON
+
+========================= */
+
+#U9-page-header-register,
+
+#U9-page-header-login {
+
+  border: none;
+
+  padding:
+
+    10px
+
+    15px;
+
+  cursor: pointer;
+
+}
+
+
+/* =========================
+
+   USER BUTTON
+
+========================= */
+
+#U9-page-header-user {
 
   display: flex;
 
@@ -53,625 +144,124 @@
 
   justify-content: center;
 
-  flex: 0 0 auto;
-
-}
-
-
-#U9-page-header-u9-logo img {
-
-  display: block;
-
-  width: auto;
-
-  height: 20px;
-
-  object-fit: contain;
-
-}
-
-
-/* =========================
-   HEADER ACTIONS
-========================= */
-
-#U9-page-header-actions {
-
-  display: none;
-
-  align-items: center;
-
-  justify-content: flex-end;
-
   gap: 10px;
 
-  flex: 0 0 auto;
-
-}
-
-
-/* =========================
-   REGISTER
-========================= */
-
-#U9-page-header-register {
-
-  display: none;
-
-  align-items: center;
-
-  justify-content: center;
-
-  height: 30px;
-
   padding:
-    0
-    16px;
 
-  margin: 0;
+    5px
+
+    15px
+
+    5px
+
+    5px;
 
   border:
-    1px solid
-    #2e73e7;
 
-  border-radius: 8px;
+    2px
 
-  background:
-    #ffffff;
+    solid
 
-  color:
-    #2e73e7;
-
-  font-size: 14px;
-
-  font-weight: 500;
-
-  line-height: 1;
-
-  cursor: pointer;
-
-  box-sizing: border-box;
-
-  transition:
-    background-color
-    0.2s ease,
-
-    color
-    0.2s ease,
-
-    border-color
-    0.2s ease,
-
-    transform
-    0.15s ease;
-
-}
-
-
-#U9-page-header-register:hover {
-
-  background:
-    #2e73e7;
-
-  color:
-    #ffffff;
-
-}
-
-
-#U9-page-header-register:active {
-
-  transform:
-    scale(
-      0.96
-    );
-
-}
-
-
-/* =========================
-   LOGIN
-========================= */
-
-#U9-page-header-login {
-
-  display: none;
-
-  align-items: center;
-
-  justify-content: center;
-
-  height: 30px;
-
-  padding:
-    0
-    16px;
-
-  margin: 0;
-
-  border:
-    1px solid
-    #2e73e7;
-
-  border-radius: 8px;
-
-  background:
-    #2e73e7;
-
-  color:
-    #ffffff;
-
-  font-size: 14px;
-
-  font-weight: 500;
-
-  line-height: 1;
-
-  cursor: pointer;
-
-  box-sizing: border-box;
-
-  transition:
-    background-color
-    0.2s ease,
-
-    color
-    0.2s ease,
-
-    border-color
-    0.2s ease,
-
-    transform
-    0.15s ease;
-
-}
-
-
-#U9-page-header-login:hover {
-
-  background:
-    #245fc4;
-
-  border-color:
-    #245fc4;
-
-}
-
-
-#U9-page-header-login:active {
-
-  transform:
-    scale(
-      0.96
-    );
-
-}
-
-
-/* =========================
-   USER BUTTON
-========================= */
-
-#U9-page-header-user {
-
-  display: none;
-
-  align-items: center;
-
-  justify-content: center;
-
-  gap: 8px;
-
-  min-width: 0;
-
-  height: 38px;
-
-  padding:
-    0
-    10px;
-
-  margin: 0;
-
-  border:
-    2px solid
     #ccc;
 
-  border-radius: 21px;
+  border-radius: 50px;
 
-  background:
-    #ffffff;
-
-  color:
-    #222222;
-
-  font-size: 14px;
-
-  font-weight: 500;
-
-  line-height: 1;
+  background-color: white;
 
   cursor: pointer;
 
-  box-sizing: border-box;
-
-  transition:
-    border-color
-    0.2s ease,
-
-    background-color
-    0.2s ease,
-
-    transform
-    0.15s ease;
-
 }
 
 
 /* =========================
-   USER BUTTON HOVER
-========================= */
 
-#U9-page-header-user:hover {
-
-  background:
-    #f7f9fc;
-
-}
-
-
-/* =========================
    USER BUTTON ACTIVE
-========================= */
 
-#U9-page-header-user:active {
-
-  transform:
-    scale(
-      0.96
-    );
-
-}
-
-
-/* =========================
-   USER BUTTON OPEN
 ========================= */
 
 #U9-page-header-user.account-open {
 
   border:
-    2px solid
-    #2e73e7;
+
+    2px
+
+    solid
+
+    #71a6ff;
 
 }
 
 
 /* =========================
+
    USER ICON
+
 ========================= */
 
 #U9-page-header-user-icon {
 
-  width: 24px;
+  width: 22px;
 
-  height: 24px;
+  height: 22px;
 
-  flex:
-    0 0 24px;
-
-  display: block;
-
-  box-sizing: border-box;
-
-  border:
-    1px solid
-    #ccc;
-
-  border-radius: 50%;
+  padding: 3px;
 
   fill: none;
 
-  stroke:
-    #666666;
+  stroke: currentColor;
 
-  stroke-width: 1.5;
+  stroke-width: 2;
 
   stroke-linecap: round;
 
   stroke-linejoin: round;
 
-  transition:
-    border-color
-    0.2s ease,
+  border:
 
-    stroke
-    0.2s ease;
+    1px
+
+    solid
+
+    #ccc;
+
+  border-radius: 50%;
+
+  background-color: white;
 
 }
 
 
 /* =========================
-   USER ICON OPEN
+
+   USER ICON ACTIVE
+
 ========================= */
 
 #U9-page-header-user.account-open
+
 #U9-page-header-user-icon {
 
   border:
-    1px solid
-    #2e73e7;
 
-  stroke:
-    #2e73e7;
+    1px
+
+    solid
+
+    #71a6ff;
 
 }
 
 
 /* =========================
+
    USERNAME
+
 ========================= */
 
 #U9-page-header-username {
 
-  display: block;
-
-  min-width: 0;
-
-  max-width: 120px;
-
-  overflow: hidden;
-
-  text-overflow: ellipsis;
-
-  white-space: nowrap;
-
-}
-
-
-/* =========================
-   LOADING
-========================= */
-
-#U9-page-header-loading {
-
-  display: block;
-
-  height: 38px;
-
-  line-height: 38px;
-
-  padding:
-    0
-    4px;
-
-  margin: 0;
-
-  color:
-    #226ce7;
-
   font-size: 15px;
 
   font-weight: 500;
-
-  white-space: nowrap;
-
-  user-select: none;
-
-}
-
-
-/* =========================
-   DISABLED
-========================= */
-
-#U9-page-header
-button:disabled {
-
-  cursor:
-    default;
-
-  opacity:
-    0.6;
-
-}
-
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (
-  max-width: 480px
-) {
-
-  #U9-page-header {
-
-    height: 60px;
-
-    padding:
-      0
-      12px;
-
-  }
-
-
-  #U9-page-header-u9-logo img {
-
-    height: 25px;
-
-  }
-
-
-  #U9-page-header-actions {
-
-    gap:
-      6px;
-
-  }
-
-
-  #U9-page-header-register {
-
-    height: 30px;
-
-    padding:
-      0
-      12px;
-
-    font-size:
-      13px;
-
-    border-radius:
-      8px;
-
-  }
-
-
-  #U9-page-header-login {
-
-    height: 30px;
-
-    padding:
-      0
-      12px;
-
-    font-size:
-      13px;
-
-    border-radius:
-      8px;
-
-  }
-
-
-  #U9-page-header-user {
-
-    height: 40px;
-
-    padding:
-      0
-      8px;
-
-    gap:
-      6px;
-
-  }
-
-
-  #U9-page-header-user-icon {
-
-    width:
-      23px;
-
-    height:
-      23px;
-
-    flex-basis:
-      23px;
-
-  }
-
-
-  #U9-page-header-username {
-
-    max-width:
-      90px;
-
-    font-size:
-      19px;
-
-  }
-
-
-  #U9-page-header-loading {
-
-    font-size:
-      13px;
-
-  }
-
-}
-
-
-/* =========================
-   SMALL MOBILE
-========================= */
-
-@media (
-  max-width: 360px
-) {
-
-  #U9-page-header {
-
-    padding:
-      0
-      10px;
-
-  }
-
-
-  #U9-page-header-u9-logo img {
-
-    height:
-      30px;
-
-  }
-
-
-  #U9-page-header-actions {
-
-    gap:
-      4px;
-
-  }
-
-
-  #U9-page-header-register {
-
-    padding:
-      0
-      9px;
-
-    font-size:
-      12px;
-
-  }
-
-
-  #U9-page-header-login {
-
-    padding:
-      0
-      9px;
-
-    font-size:
-      12px;
-
-  }
-
-
-  #U9-page-header-user {
-
-    padding:
-      0
-      7px;
-
-  }
-
-
-  #U9-page-header-username {
-
-    max-width:
-      70px;
-
-  }
-
-
-  #U9-page-header-loading {
-
-    font-size:
-      12px;
-
-  }
 
 }
