@@ -1,256 +1,4 @@
 /* =========================
-   U9 PAGE HEADER
-========================= */
-
-
-/* =========================
-   HEADER
-========================= */
-
-#U9-page-header {
-
-  position: fixed;
-
-  top: 0;
-
-  left: 0;
-
-  width: 100%;
-
-  height: 60px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  padding:
-    0
-    20px;
-
-  box-sizing: border-box;
-
-  background:
-    #ffffff;
-
-  border-bottom:
-    1px solid
-    #eeeeee;
-
-  z-index: 1000;
-
-}
-
-
-/* =========================
-   U9 LOGO
-========================= */
-
-#U9-page-header-u9-logo {
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  flex: 0 0 auto;
-
-}
-
-
-#U9-page-header-u9-logo img {
-
-  display: block;
-
-  width: auto;
-
-  height: 20px;
-
-  object-fit: contain;
-
-}
-
-
-/* =========================
-   HEADER ACTIONS
-========================= */
-
-#U9-page-header-actions {
-
-  display: none;
-
-  align-items: center;
-
-  justify-content: flex-end;
-
-  gap: 10px;
-
-  flex: 0 0 auto;
-
-}
-
-
-/* =========================
-   REGISTER
-========================= */
-
-#U9-page-header-register {
-
-  display: none;
-
-  align-items: center;
-
-  justify-content: center;
-
-  height: 38px;
-
-  padding:
-    0
-    16px;
-
-  margin: 0;
-
-  border:
-    1px solid
-    #2e73e7;
-
-  border-radius: 8px;
-
-  background:
-    #ffffff;
-
-  color:
-    #2e73e7;
-
-  font-size: 14px;
-
-  font-weight: 500;
-
-  line-height: 1;
-
-  cursor: pointer;
-
-  box-sizing: border-box;
-
-  transition:
-    background-color
-    0.2s ease,
-
-    color
-    0.2s ease,
-
-    border-color
-    0.2s ease,
-
-    transform
-    0.15s ease;
-
-}
-
-
-#U9-page-header-register:hover {
-
-  background:
-    #2e73e7;
-
-  color:
-    #ffffff;
-
-}
-
-
-#U9-page-header-register:active {
-
-  transform:
-    scale(
-      0.96
-    );
-
-}
-
-
-/* =========================
-   LOGIN
-========================= */
-
-#U9-page-header-login {
-
-  display: none;
-
-  align-items: center;
-
-  justify-content: center;
-
-  height: 38px;
-
-  padding:
-    0
-    16px;
-
-  margin: 0;
-
-  border:
-    1px solid
-    #2e73e7;
-
-  border-radius: 8px;
-
-  background:
-    #2e73e7;
-
-  color:
-    #ffffff;
-
-  font-size: 14px;
-
-  font-weight: 500;
-
-  line-height: 1;
-
-  cursor: pointer;
-
-  box-sizing: border-box;
-
-  transition:
-    background-color
-    0.2s ease,
-
-    color
-    0.2s ease,
-
-    border-color
-    0.2s ease,
-
-    transform
-    0.15s ease;
-
-}
-
-
-#U9-page-header-login:hover {
-
-  background:
-    #245fc4;
-
-  border-color:
-    #245fc4;
-
-}
-
-
-#U9-page-header-login:active {
-
-  transform:
-    scale(
-      0.96
-    );
-
-}
-
-
-/* =========================
    USER BUTTON
 ========================= */
 
@@ -260,9 +8,10 @@
 
   align-items: center;
 
-  justify-content: center;
+  justify-content: flex-start;
 
-  gap: 8px;
+  gap:
+    6px;
 
   min-width: 0;
 
@@ -270,7 +19,7 @@
 
   padding:
     0
-    10px;
+    8px;
 
   margin: 0;
 
@@ -278,7 +27,8 @@
     2px solid
     #ccc;
 
-  border-radius: 21px;
+  border-radius:
+    21px;
 
   background:
     #ffffff;
@@ -286,17 +36,23 @@
   color:
     #222222;
 
-  font-size: 14px;
+  font-size:
+    14px;
 
-  font-weight: 500;
+  font-weight:
+    500;
 
-  line-height: 1;
+  line-height:
+    1;
 
-  cursor: pointer;
+  cursor:
+    pointer;
 
-  box-sizing: border-box;
+  box-sizing:
+    border-box;
 
   transition:
+
     border-color
     0.2s ease,
 
@@ -354,35 +110,45 @@
 
 #U9-page-header-user-icon {
 
-  width: 24px;
+  width:
+    24px;
 
-  height: 24px;
+  height:
+    24px;
 
   flex:
     0 0 24px;
 
-  display: block;
+  display:
+    block;
 
-  box-sizing: border-box;
+  box-sizing:
+    border-box;
 
   border:
     1px solid
     #ccc;
 
-  border-radius: 50%;
+  border-radius:
+    50%;
 
-  fill: none;
+  fill:
+    none;
 
   stroke:
     #666666;
 
-  stroke-width: 1.5;
+  stroke-width:
+    1.5;
 
-  stroke-linecap: round;
+  stroke-linecap:
+    round;
 
-  stroke-linejoin: round;
+  stroke-linejoin:
+    round;
 
   transition:
+
     border-color
     0.2s ease,
 
@@ -415,265 +181,22 @@
 
 #U9-page-header-username {
 
-  display: block;
+  display:
+    block;
 
-  min-width: 0;
+  min-width:
+    0;
 
-  max-width: 120px;
+  max-width:
+    120px;
 
-  overflow: hidden;
+  overflow:
+    hidden;
 
-  text-overflow: ellipsis;
+  text-overflow:
+    ellipsis;
 
-  white-space: nowrap;
-
-}
-
-
-/* =========================
-   LOADING
-========================= */
-
-#U9-page-header-loading {
-
-  display: block;
-
-  height: 38px;
-
-  line-height: 38px;
-
-  padding:
-    0
-    4px;
-
-  margin: 0;
-
-  color:
-    #777777;
-
-  font-size: 14px;
-
-  font-weight: 500;
-
-  white-space: nowrap;
-
-  user-select: none;
-
-}
-
-
-/* =========================
-   DISABLED
-========================= */
-
-#U9-page-header
-button:disabled {
-
-  cursor:
-    default;
-
-  opacity:
-    0.6;
-
-}
-
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (
-  max-width: 480px
-) {
-
-  #U9-page-header {
-
-    height: 60px;
-
-    padding:
-      0
-      12px;
-
-  }
-
-
-  #U9-page-header-u9-logo img {
-
-    height: 32px;
-
-  }
-
-
-  #U9-page-header-actions {
-
-    gap:
-      6px;
-
-  }
-
-
-  #U9-page-header-register {
-
-    height: 36px;
-
-    padding:
-      0
-      12px;
-
-    font-size:
-      13px;
-
-    border-radius:
-      8px;
-
-  }
-
-
-  #U9-page-header-login {
-
-    height: 36px;
-
-    padding:
-      0
-      12px;
-
-    font-size:
-      13px;
-
-    border-radius:
-      8px;
-
-  }
-
-
-  #U9-page-header-user {
-
-    height: 40px;
-
-    padding:
-      0
-      8px;
-
-    gap:
-      6px;
-
-  }
-
-
-  #U9-page-header-user-icon {
-
-    width:
-      23px;
-
-    height:
-      23px;
-
-    flex-basis:
-      23px;
-
-  }
-
-
-  #U9-page-header-username {
-
-    max-width:
-      90px;
-
-    font-size:
-      13px;
-
-  }
-
-
-  #U9-page-header-loading {
-
-    font-size:
-      13px;
-
-  }
-
-}
-
-
-/* =========================
-   SMALL MOBILE
-========================= */
-
-@media (
-  max-width: 360px
-) {
-
-  #U9-page-header {
-
-    padding:
-      0
-      10px;
-
-  }
-
-
-  #U9-page-header-u9-logo img {
-
-    height:
-      30px;
-
-  }
-
-
-  #U9-page-header-actions {
-
-    gap:
-      4px;
-
-  }
-
-
-  #U9-page-header-register {
-
-    padding:
-      0
-      9px;
-
-    font-size:
-      12px;
-
-  }
-
-
-  #U9-page-header-login {
-
-    padding:
-      0
-      9px;
-
-    font-size:
-      12px;
-
-  }
-
-
-  #U9-page-header-user {
-
-    padding:
-      0
-      7px;
-
-  }
-
-
-  #U9-page-header-username {
-
-    max-width:
-      70px;
-
-  }
-
-
-  #U9-page-header-loading {
-
-    font-size:
-      12px;
-
-  }
+  white-space:
+    nowrap;
 
 }
