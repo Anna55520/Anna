@@ -294,6 +294,19 @@ registerForm.addEventListener(
 
 
       await getCurrentUser();
+      
+
+      /* =========================
+        UPDATE PROFILE AVATAR
+      ========================= */
+
+      if(
+        window.U9ProfileAvatar
+      ){
+
+        await window.U9ProfileAvatar.refresh();
+
+      }
 
 
     } catch (error) {
