@@ -265,3 +265,21 @@
   font-weight: 500;
 
 }
+
+/* =========================
+   HEADER AUTH STATE
+========================= */
+
+
+#U9-page-header-user {
+
+  display: none;
+
+}
+
+
+#U9-page-header-user.active {
+
+  display: flex;
+
+}
