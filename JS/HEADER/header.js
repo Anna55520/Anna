@@ -39,18 +39,7 @@ document.getElementById(
 
 
 /* =========================
-   PROFILE MODAL
-========================= */
-
-const u9ProfileModal =
-document.getElementById(
-  "U9-profile-modal"
-);
-
-
-
-/* =========================
-   LOADING TEXT
+   LOADING
 ========================= */
 
 function createHeaderLoading(){
@@ -87,16 +76,19 @@ function createHeaderLoading(){
 }
 
 
-const u9HeaderLoading =
-() =>
-document.getElementById(
-  "U9-page-header-loading"
-);
+
+function getHeaderLoading(){
+
+  return document.getElementById(
+    "U9-page-header-loading"
+  );
+
+}
 
 
 
 /* =========================
-   INITIAL STATE
+   INITIAL LOADING
 ========================= */
 
 function u9HeaderLoadingState(){
@@ -116,7 +108,7 @@ function u9HeaderLoadingState(){
   "none";
 
 
-  u9HeaderLoading().style.display =
+  getHeaderLoading().style.display =
   "block";
 
 
@@ -126,23 +118,23 @@ function u9HeaderLoadingState(){
 }
 
 
-
 u9HeaderLoadingState();
 
 
 
 /* =========================
-   SHOW LOGIN STATE
+   GUEST
 ========================= */
 
 function u9HeaderShowGuest(){
 
+
   u9HeaderRegister.style.display =
-  "block";
+  "flex";
 
 
   u9HeaderLogin.style.display =
-  "block";
+  "flex";
 
 
   u9HeaderUser.style.display =
@@ -153,7 +145,7 @@ function u9HeaderShowGuest(){
   "";
 
 
-  u9HeaderLoading().style.display =
+  getHeaderLoading().style.display =
   "none";
 
 
@@ -162,12 +154,13 @@ function u9HeaderShowGuest(){
 
 
 /* =========================
-   SHOW USER STATE
+   USER
 ========================= */
 
 function u9HeaderShowUser(
   user
 ){
+
 
   u9HeaderRegister.style.display =
   "none";
@@ -181,13 +174,15 @@ function u9HeaderShowUser(
   "flex";
 
 
-  u9HeaderLoading().style.display =
+  getHeaderLoading().style.display =
   "none";
+
 
 
   let username =
   user?.username ||
   "";
+
 
 
   if(
@@ -205,8 +200,10 @@ function u9HeaderShowUser(
   }
 
 
+
   u9HeaderUsername.textContent =
   username;
+
 
 }
 
@@ -217,6 +214,7 @@ function u9HeaderShowUser(
 ========================= */
 
 function u9HeaderKeepLoading(){
+
 
   u9HeaderRegister.style.display =
   "none";
@@ -230,129 +228,20 @@ function u9HeaderKeepLoading(){
   "none";
 
 
-  u9HeaderLoading().style.display =
+  getHeaderLoading().style.display =
   "block";
 
-}
-
-
-
-/* =========================
-   PROFILE OPEN
-========================= */
-
-function openHeaderProfile(){
-
-  if(
-    window.openProfileModal
-  ){
-
-    window.openProfileModal();
-
-  }
-
-
-  u9HeaderUser.classList.add(
-    "account-open"
-  );
 
 }
 
 
 
 /* =========================
-   PROFILE CLOSE
-========================= */
-
-function closeHeaderProfile(){
-
-  if(
-    window.closeProfileModal
-  ){
-
-    window.closeProfileModal();
-
-  }
-
-
-  u9HeaderUser.classList.remove(
-    "account-open"
-  );
-
-}
-
-
-
-/* =========================
-   USER BUTTON
-========================= */
-
-u9HeaderUser.addEventListener(
-"click",
-function(event){
-
-
-  event.stopPropagation();
-
-
-  if(
-    u9ProfileModal &&
-    u9ProfileModal.classList.contains(
-      "modal-open"
-    )
-  ){
-
-    closeHeaderProfile();
-
-  }
-
-  else{
-
-    openHeaderProfile();
-
-  }
-
-
-});
-
-
-
-/* =========================
-   PROFILE CLOSE SYNC
-========================= */
-
-if(
-  u9ProfileModal
-){
-
-  u9ProfileModal.addEventListener(
-  "click",
-  function(event){
-
-
-    if(
-      event.target.id ===
-      "U9-profile-modal-close"
-    ){
-
-      u9HeaderUser.classList.remove(
-        "account-open"
-      );
-
-    }
-
-
-  });
-
-}
-
-
-
-/* =========================
-   RECEIVE INDEX USER
+   RECEIVE USER
 ========================= */
 
 function u9HeaderUpdateUser(){
+
 
   if(
     !window.U9User
@@ -361,6 +250,7 @@ function u9HeaderUpdateUser(){
     return;
 
   }
+
 
 
   const user =
@@ -384,15 +274,16 @@ function u9HeaderUpdateUser(){
 
   }
 
+
 }
 
 
 
 /* =========================
-   WAIT INDEX.JS
+   WAIT INDEX
 ========================= */
 
-let u9HeaderWait =
+const u9HeaderWait =
 setInterval(
 function(){
 
@@ -402,26 +293,8 @@ function(){
   ){
 
 
-    const user =
-    window.U9User.get();
+    u9HeaderUpdateUser();
 
-
-
-    if(
-      user
-    ){
-
-      u9HeaderShowUser(
-        user
-      );
-
-    }
-
-    else{
-
-      u9HeaderShowGuest();
-
-    }
 
 
     clearInterval(
@@ -442,6 +315,7 @@ function(){
 ========================= */
 
 window.U9Header = {
+
 
   showLoggedIn:
   u9HeaderShowUser,
