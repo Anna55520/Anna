@@ -499,6 +499,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
   </div>
 
 
+
   <!-- =========================
       PROFILE BODY
   ========================= -->
@@ -534,6 +535,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
       </div>
 
+
       <!-- =========================
           USER INFO LOADING
       ========================= -->
@@ -554,72 +556,114 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
       <div id="U9-profile-info">
 
+
+        <!-- =========================
+            USERNAME
+        ========================= -->
+
         <div id="U9-profile-username"></div>
+
+
+        <!-- =========================
+            USER ACCOUNT
+        ========================= -->
 
         <div id="U9-profile-account"></div>
 
-        <div id="U9-profile-balance"></div>
 
-        <div id="U9-profile-coins"></div>
+        <!-- =========================
+            BALANCE + COINS + BUTTONS
+        ========================= -->
+
+        <div id="U9-profile-balance-container">
+
+
+          <!-- =========================
+              BALANCE + COINS
+          ========================= -->
+
+          <div id="U9-profile-balance-info">
+
+
+            <!-- =========================
+                BALANCE
+            ========================= -->
+
+            <div id="U9-profile-balance"></div>
+
+
+            <!-- =========================
+                COINS
+            ========================= -->
+
+            <div id="U9-profile-coins"></div>
+
+
+          </div>
+
+
+          <!-- =========================
+              BUTTON 1 + BUTTON 2
+          ========================= -->
+
+          <div id="U9-profile-balance-buttons">
+
+
+            <!-- =========================
+                BUTTON 1
+                SVG ONLY
+            ========================= -->
+
+            <button
+              id="U9-profile-button-1"
+              type="button"
+              aria-label="Profile Button 1"
+            >
+
+              <img
+                src="SSVG/account/account-edit-button.svg"
+                alt=""
+                aria-hidden="true"
+              >
+
+            </button>
+
+
+            <!-- =========================
+                BUTTON 2
+                SVG ONLY
+            ========================= -->
+
+            <button
+              id="U9-profile-button-2"
+              type="button"
+              aria-label="Profile Button 2"
+            >
+
+              <img
+                src="SSVG/account/account-edit-button.svg"
+                alt=""
+                aria-hidden="true"
+              >
+
+            </button>
+
+
+          </div>
+
+
+        </div>
+
 
       </div>
 
 
       <!-- =========================
           PROFILE BUTTONS
+          BUTTON 3 / 4 / 5
       ========================= -->
 
       <div id="U9-profile-buttons">
-
-
-        <!-- =========================
-            BUTTON 1 + BUTTON 2
-        ========================= -->
-
-        <div id="U9-profile-button-top">
-
-
-          <!-- =========================
-              BUTTON 1
-              SVG ONLY
-          ========================= -->
-
-          <button
-            id="U9-profile-button-1"
-            type="button"
-            aria-label="Profile Button 1"
-          >
-
-            <img
-              src="SSVG/account/account-edit-button.svg"
-              alt=""
-              aria-hidden="true"
-            >
-
-          </button>
-
-
-          <!-- =========================
-              BUTTON 2
-              SVG ONLY
-          ========================= -->
-
-          <button
-            id="U9-profile-button-2"
-            type="button"
-            aria-label="Profile Button 2"
-          >
-
-            <img
-              src="SSVG/account/account-edit-button.svg"
-              alt=""
-              aria-hidden="true"
-            >
-
-          </button>
-
-
-        </div>
 
 
         <!-- =========================
@@ -696,11 +740,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
     </div>
 
-
-  </div>
-
-  
-</div>
 
   </div>
 
