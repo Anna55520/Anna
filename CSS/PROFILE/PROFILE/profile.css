@@ -1,3 +1,4 @@
+
 /* =========================
    PROFILE MODAL
 ========================= */
@@ -362,7 +363,11 @@
 
   height: 130px;
 
-  margin: 55px auto 25px auto;
+  margin:
+    55px
+    auto
+    25px
+    auto;
 
   flex: 0 0 130px;
 
@@ -794,13 +799,13 @@
 
 #U9-profile-button-1 {
 
+  position: relative;
+
   width: 120px;
 
   height: 50px;
 
-  padding:
-    0
-    12px;
+  padding: 0;
 
   margin:
     0
@@ -818,9 +823,7 @@
 
   align-items: center;
 
-  justify-content: flex-start;
-
-  gap: 10px;
+  justify-content: center;
 
   background-color: #eef5ff;
 
@@ -841,13 +844,13 @@
 
 #U9-profile-button-2 {
 
+  position: relative;
+
   width: 120px;
 
   height: 50px;
 
-  padding:
-    0
-    12px;
+  padding: 0;
 
   margin:
     0
@@ -865,9 +868,7 @@
 
   align-items: center;
 
-  justify-content: flex-start;
-
-  gap: 10px;
+  justify-content: center;
 
   background-color: #eef5ff;
 
@@ -889,15 +890,24 @@
 #U9-profile-button-1 img,
 #U9-profile-button-2 img {
 
+  position: absolute;
+
+  left: 12px;
+
+  top: 50%;
+
   width: 28px;
 
   height: 28px;
 
-  flex: 0 0 28px;
+  transform:
+    translateY(-50%);
 
   display: block;
 
   object-fit: contain;
+
+  pointer-events: none;
 
 }
 
@@ -915,6 +925,8 @@
 
   white-space: nowrap;
 
+  text-align: center;
+
 }
 
 
@@ -924,13 +936,13 @@
 
 #U9-profile-button-3 {
 
+  position: relative;
+
   width: 220px;
 
   height: 50px;
 
-  padding:
-    0
-    18px;
+  padding: 0;
 
   margin:
     20px
@@ -948,9 +960,7 @@
 
   align-items: center;
 
-  justify-content: flex-start;
-
-  gap: 12px;
+  justify-content: center;
 
   background-color: #eef5ff;
 
@@ -971,13 +981,13 @@
 
 #U9-profile-button-4 {
 
+  position: relative;
+
   width: 220px;
 
   height: 50px;
 
-  padding:
-    0
-    18px;
+  padding: 0;
 
   margin:
     12px
@@ -995,9 +1005,7 @@
 
   align-items: center;
 
-  justify-content: flex-start;
-
-  gap: 12px;
+  justify-content: center;
 
   background-color: #eef5ff;
 
@@ -1018,13 +1026,13 @@
 
 #U9-profile-button-5 {
 
+  position: relative;
+
   width: 220px;
 
   height: 50px;
 
-  padding:
-    0
-    18px;
+  padding: 0;
 
   margin:
     12px
@@ -1042,9 +1050,7 @@
 
   align-items: center;
 
-  justify-content: flex-start;
-
-  gap: 12px;
+  justify-content: center;
 
   background-color: #eef5ff;
 
@@ -1067,15 +1073,24 @@
 #U9-profile-button-4 img,
 #U9-profile-button-5 img {
 
+  position: absolute;
+
+  left: 18px;
+
+  top: 50%;
+
   width: 30px;
 
   height: 30px;
 
-  flex: 0 0 30px;
+  transform:
+    translateY(-50%);
 
   display: block;
 
   object-fit: contain;
+
+  pointer-events: none;
 
 }
 
@@ -1093,6 +1108,8 @@
   line-height: 1.2;
 
   white-space: nowrap;
+
+  text-align: center;
 
 }
 
@@ -1238,11 +1255,7 @@
 
     height: 48px;
 
-    padding:
-      0
-      10px;
-
-    gap: 8px;
+    padding: 0;
 
     font-size: 14px;
 
@@ -1290,7 +1303,7 @@
 
     height: 26px;
 
-    flex: 0 0 26px;
+    left: 10px;
 
   }
 
@@ -1324,7 +1337,7 @@
 
     height: 28px;
 
-    flex: 0 0 28px;
+    left: 18px;
 
   }
 
