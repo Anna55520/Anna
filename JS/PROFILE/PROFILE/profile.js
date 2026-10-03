@@ -1,3 +1,4 @@
+
 /* =========================
    PROFILE MODAL
 ========================= */
@@ -535,7 +536,9 @@ async function u9ProfileLoadFrame(
      FRAME ID REQUIRED
   ========================= */
 
-  if (!frameId) {
+  if (
+    !frameId
+  ) {
 
     if (
       u9ProfileAvatarFrame
@@ -952,7 +955,13 @@ async function u9ProfileLoad() {
     !sessionToken
   ) {
 
-    u9ProfileHideLoading();
+    /*
+      没有登入时：
+
+      1. 保持 loading.svg
+      2. 不显示用户资料
+      3. 不执行 hide loading
+    */
 
     return;
 
@@ -997,7 +1006,11 @@ async function u9ProfileLoad() {
         response.status
       );
 
-      u9ProfileHideLoading();
+      /*
+        /me 失败：
+
+        保持 loading.svg
+      */
 
       return;
 
@@ -1030,7 +1043,11 @@ async function u9ProfileLoad() {
       !user
     ) {
 
-      u9ProfileHideLoading();
+      /*
+        没有取得 user：
+
+        保持 loading.svg
+      */
 
       return;
 
@@ -1084,7 +1101,13 @@ async function u9ProfileLoad() {
     u9ProfileResetAvatar();
 
 
-    u9ProfileHideLoading();
+    /*
+      网络错误：
+
+      保持 loading.svg
+    */
+
+    return;
 
   }
 
