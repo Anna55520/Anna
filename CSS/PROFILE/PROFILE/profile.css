@@ -282,11 +282,6 @@
 
 @media (max-width: 480px) {
 
-
-  /* =========================
-     MODAL
-  ========================= */
-
   #U9-profile-modal {
 
     top: 60px;
@@ -297,10 +292,6 @@
   }
 
 
-  /* =========================
-     CONTENT
-  ========================= */
-
   #U9-profile-modal-content {
 
     width: 100%;
@@ -309,10 +300,6 @@
 
   }
 
-
-  /* =========================
-     HEADER
-  ========================= */
 
   #U9-profile-modal-header {
 
@@ -327,20 +314,12 @@
   }
 
 
-  /* =========================
-     TITLE
-  ========================= */
-
   #U9-profile-modal-title {
 
     font-size: 18px;
 
   }
 
-
-  /* =========================
-     CLOSE
-  ========================= */
 
   #U9-profile-modal-close {
 
@@ -352,10 +331,6 @@
 
   }
 
-
-  /* =========================
-     PROFILE ICON
-  ========================= */
 
   #U9-profile-modal-icon {
 
@@ -461,7 +436,6 @@
 ========================= */
 
 @media (max-width: 480px) {
-
 
   #U9-profile-avatar {
 
@@ -659,9 +633,6 @@
   margin-top: 25px;
 
   padding:
-    20px
-    20px
-    20px
     20px;
 
   display: flex;
@@ -823,21 +794,23 @@
 
 #U9-profile-button-1 {
 
-  width: 55px;
+  width: 120px;
 
-  height: 55px;
+  height: 50px;
 
-  padding: 0;
+  padding:
+    0
+    12px;
 
   margin:
     0
-    8px
+    6px
     0
     0;
 
   border: none;
 
-  border-radius: 12px;
+  border-radius: 10px;
 
   box-sizing: border-box;
 
@@ -845,9 +818,17 @@
 
   align-items: center;
 
-  justify-content: center;
+  justify-content: flex-start;
 
-  background-color: #e8f0ff;
+  gap: 10px;
+
+  background-color: #eef5ff;
+
+  color: #222222;
+
+  font-size: 15px;
+
+  font-weight: 500;
 
   cursor: pointer;
 
@@ -860,21 +841,23 @@
 
 #U9-profile-button-2 {
 
-  width: 55px;
+  width: 120px;
 
-  height: 55px;
+  height: 50px;
 
-  padding: 0;
+  padding:
+    0
+    12px;
 
   margin:
     0
     0
     0
-    8px;
+    6px;
 
   border: none;
 
-  border-radius: 12px;
+  border-radius: 10px;
 
   box-sizing: border-box;
 
@@ -882,9 +865,17 @@
 
   align-items: center;
 
-  justify-content: center;
+  justify-content: flex-start;
 
-  background-color: #e8f0ff;
+  gap: 10px;
+
+  background-color: #eef5ff;
+
+  color: #222222;
+
+  font-size: 15px;
+
+  font-weight: 500;
 
   cursor: pointer;
 
@@ -898,13 +889,31 @@
 #U9-profile-button-1 img,
 #U9-profile-button-2 img {
 
-  width: 30px;
+  width: 28px;
 
-  height: 30px;
+  height: 28px;
+
+  flex: 0 0 28px;
 
   display: block;
 
   object-fit: contain;
+
+}
+
+
+/* =========================
+   BUTTON 1 + 2 TEXT
+========================= */
+
+#U9-profile-button-1 span,
+#U9-profile-button-2 span {
+
+  display: block;
+
+  line-height: 1.2;
+
+  white-space: nowrap;
 
 }
 
@@ -1189,8 +1198,6 @@
 
     padding:
       18px
-      15px
-      18px
       15px;
 
   }
@@ -1221,14 +1228,38 @@
 
 
   /* =========================
+     BUTTON 1 + 2
+  ========================= */
+
+  #U9-profile-button-1,
+  #U9-profile-button-2 {
+
+    width: 105px;
+
+    height: 48px;
+
+    padding:
+      0
+      10px;
+
+    gap: 8px;
+
+    font-size: 14px;
+
+  }
+
+
+  /* =========================
      BUTTON 1
   ========================= */
 
   #U9-profile-button-1 {
 
-    width: 52px;
-
-    height: 52px;
+    margin:
+      0
+      4px
+      0
+      0;
 
   }
 
@@ -1239,9 +1270,11 @@
 
   #U9-profile-button-2 {
 
-    width: 52px;
-
-    height: 52px;
+    margin:
+      0
+      0
+      0
+      4px;
 
   }
 
@@ -1253,9 +1286,11 @@
   #U9-profile-button-1 img,
   #U9-profile-button-2 img {
 
-    width: 28px;
+    width: 26px;
 
-    height: 28px;
+    height: 26px;
+
+    flex: 0 0 26px;
 
   }
 
