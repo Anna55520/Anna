@@ -631,7 +631,7 @@
 
 #U9-profile-balance-container {
 
-  width: 320px;
+  width: 400px;
 
   box-sizing: border-box;
 
@@ -646,7 +646,7 @@
 
   align-items: center;
 
-  background-color: #4caf50;
+  background-color: #78ace9;
 
   border-radius: 14px;
 
@@ -700,7 +700,7 @@
 
   line-height: 1.4;
 
-  color: #333333;
+  color: #ffffff;
 
 }
 
@@ -801,7 +801,7 @@
 
   position: relative;
 
-  width: 120px;
+  width: 170px;
 
   height: 50px;
 
@@ -846,7 +846,7 @@
 
   position: relative;
 
-  width: 120px;
+  width: 170px;
 
   height: 50px;
 
@@ -1209,7 +1209,7 @@
 
     width: calc(100% - 30px);
 
-    max-width: 320px;
+    max-width: 350px;
 
     margin-top: 25px;
 
@@ -1251,7 +1251,7 @@
   #U9-profile-button-1,
   #U9-profile-button-2 {
 
-    width: 105px;
+    width: 148px;
 
     height: 48px;
 
