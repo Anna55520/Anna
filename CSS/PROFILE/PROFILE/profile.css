@@ -647,6 +647,56 @@
 
 
 /* =========================
+   BALANCE CONTAINER
+========================= */
+
+#U9-profile-balance-container {
+
+  width: 320px;
+
+  box-sizing: border-box;
+
+  margin-top: 25px;
+
+  padding:
+    20px
+    20px
+    20px
+    20px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  background-color: #4caf50;
+
+  border-radius: 14px;
+
+}
+
+
+/* =========================
+   BALANCE + COINS INFO
+========================= */
+
+#U9-profile-balance-info {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+}
+
+
+/* =========================
    BALANCE
 ========================= */
 
@@ -656,7 +706,7 @@
 
   box-sizing: border-box;
 
-  margin-top: 25px;
+  margin: 0;
 
   min-height: 28px;
 
@@ -713,6 +763,29 @@
 
 
 /* =========================
+   BALANCE BUTTONS
+========================= */
+
+#U9-profile-balance-buttons {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-top: 18px;
+
+  display: flex;
+
+  flex-direction: row;
+
+  align-items: center;
+
+  justify-content: center;
+
+}
+
+
+/* =========================
    PROFILE INFO LOADING HIDDEN
 ========================= */
 
@@ -740,23 +813,6 @@
   flex-direction: column;
 
   align-items: center;
-
-}
-
-
-/* =========================
-   BUTTON 1 + BUTTON 2
-========================= */
-
-#U9-profile-button-top {
-
-  display: flex;
-
-  flex-direction: row;
-
-  align-items: center;
-
-  justify-content: center;
 
 }
 
@@ -1115,6 +1171,27 @@
   #U9-profile-coins {
 
     font-size: 16px;
+
+  }
+
+
+  /* =========================
+     BALANCE CONTAINER
+  ========================= */
+
+  #U9-profile-balance-container {
+
+    width: calc(100% - 30px);
+
+    max-width: 320px;
+
+    margin-top: 25px;
+
+    padding:
+      18px
+      15px
+      18px
+      15px;
 
   }
 
