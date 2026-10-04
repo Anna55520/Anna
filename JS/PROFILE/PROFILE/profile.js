@@ -467,6 +467,22 @@ let u9ProfilePageAnimating =
   false;
 
 
+/*
+   Separate Back action lock.
+
+   This is intentionally separate
+   from page animation state.
+
+   It prevents a second Back action
+   from being accepted after the
+   first Back action has already
+   changed the current page.
+*/
+
+let u9ProfileBackActionRunning =
+  false;
+
+
 const u9ProfilePageAnimationDuration =
   380;
 
@@ -641,6 +657,10 @@ function u9ProfileGoHome(
 
 
   u9ProfilePageAnimating =
+    false;
+
+
+  u9ProfileBackActionRunning =
     false;
 
 
@@ -832,6 +852,10 @@ function u9ProfileOpenPage(
     true;
 
 
+  u9ProfileBackActionRunning =
+    false;
+
+
   /*
     Clean destination page.
   */
@@ -923,18 +947,48 @@ function u9ProfileOpenPage(
 
 function u9ProfileGoBack() {
 
-  if (u9ProfilePageAnimating) {
+  /*
+     HARD BACK LOCK
+
+     Once Back starts, absolutely
+     no second Back action can start
+     until the current navigation
+     has completely finished.
+  */
+
+  if (
+    u9ProfileBackActionRunning
+  ) {
 
     return false;
 
   }
 
 
+  /*
+     If the Profile is already on
+     Home, Back does nothing.
+  */
+
   if (
     u9ProfileCurrentPage === 0
   ) {
 
-    return true;
+    return false;
+
+  }
+
+
+  /*
+     Do not allow Back while another
+     page animation is running.
+  */
+
+  if (
+    u9ProfilePageAnimating
+  ) {
+
+    return false;
 
   }
 
@@ -960,9 +1014,20 @@ function u9ProfileGoBack() {
 
     u9ProfileGoHome(true);
 
-    return true;
+    return false;
 
   }
+
+
+  /*
+     LOCK IMMEDIATELY.
+
+     This happens BEFORE any
+     animation or DOM change.
+  */
+
+  u9ProfileBackActionRunning =
+    true;
 
 
   u9ProfilePageAnimating =
@@ -970,7 +1035,27 @@ function u9ProfileGoBack() {
 
 
   /*
-    Clean Home first.
+     VERY IMPORTANT:
+
+     Change the current page
+     immediately.
+
+     Therefore, even if another
+     handler somehow calls
+     u9ProfileGoBack() again,
+     it will see:
+
+        u9ProfileCurrentPage === 0
+
+     and will be rejected.
+  */
+
+  u9ProfileCurrentPage =
+    0;
+
+
+  /*
+     Clean Home first.
   */
 
   u9ProfileRemovePageClasses(
@@ -979,12 +1064,13 @@ function u9ProfileGoBack() {
 
 
   /*
-    IMPORTANT:
+     Home starts from RIGHT.
 
-    Home starts from RIGHT.
+     Home:
+       RIGHT → CENTER
 
-    This makes Profile Home
-    move from right -> left.
+     Current Page:
+       CENTER → LEFT
   */
 
   previousPage.classList.add(
@@ -993,15 +1079,15 @@ function u9ProfileGoBack() {
 
 
   /*
-    Force browser layout.
+     Force browser layout.
   */
 
   void previousPage.offsetWidth;
 
 
   /*
-    Current internal page
-    moves to the LEFT.
+     Current internal page
+     moves to the LEFT.
   */
 
   u9ProfileRemovePageClasses(
@@ -1015,8 +1101,8 @@ function u9ProfileGoBack() {
 
 
   /*
-    Home moves from
-    right -> center.
+     Home moves from
+     right → center.
   */
 
   previousPage.classList.remove(
@@ -1034,10 +1120,6 @@ function u9ProfileGoBack() {
   );
 
 
-  u9ProfileCurrentPage =
-    0;
-
-
   if (profileHomeBody) {
 
     profileHomeBody.scrollTop =
@@ -1045,6 +1127,10 @@ function u9ProfileGoBack() {
 
   }
 
+
+  /*
+     Finish animation.
+  */
 
   setTimeout(
     function () {
@@ -1055,6 +1141,10 @@ function u9ProfileGoBack() {
 
 
       u9ProfilePageAnimating =
+        false;
+
+
+      u9ProfileBackActionRunning =
         false;
 
     },
@@ -1093,10 +1183,6 @@ function u9ProfileUpdateBalanceDisplay() {
 
   if (u9ProfileShowingCoins) {
 
-    /*
-      Show Coins
-    */
-
     u9ProfileBalance.classList.remove(
       "U9-profile-value-active"
     );
@@ -1117,10 +1203,6 @@ function u9ProfileUpdateBalanceDisplay() {
   }
 
   else {
-
-    /*
-      Show Balance
-    */
 
     u9ProfileCoins.classList.remove(
       "U9-profile-value-active"
@@ -1212,6 +1294,8 @@ for (
     "click",
     function (event) {
 
+      event.preventDefault();
+
       event.stopPropagation();
 
 
@@ -1228,6 +1312,18 @@ for (
 /* =========================================================
    PROFILE PAGE BACK BUTTON EVENTS
 ========================================================= */
+
+/*
+   Back buttons use direct onclick
+   assignment.
+
+   This intentionally replaces
+   addEventListener() here.
+
+   Each Back button has exactly
+   one handler controlled by this
+   Profile JS.
+*/
 
 for (
   let pageNumber = 1;
@@ -1262,11 +1358,13 @@ for (
 
 
       /*
-        If a back animation is already running,
-        ignore this click completely.
+         Ignore the event when the
+         Back action is already running.
       */
 
-      if (u9ProfilePageAnimating) {
+      if (
+        u9ProfileBackActionRunning
+      ) {
 
         return false;
 
@@ -1274,8 +1372,32 @@ for (
 
 
       /*
-        Return to Profile Home.
+         Ignore if another Profile
+         page animation is running.
       */
+
+      if (
+        u9ProfilePageAnimating
+      ) {
+
+        return false;
+
+      }
+
+
+      /*
+         Ignore if we are already
+         on Profile Home.
+      */
+
+      if (
+        u9ProfileCurrentPage === 0
+      ) {
+
+        return false;
+
+      }
+
 
       u9ProfileGoBack();
 
@@ -1285,7 +1407,6 @@ for (
     };
 
 }
-
 
 
 /* =========================================================
