@@ -49,7 +49,8 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
   <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-3.css">
   <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-4.css">
   <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-5.css">
-
+  <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-6.css">
+  <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-7.css">
 
   <!-- Setting -->
 
@@ -458,168 +459,101 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
   </div>
 
-
   <!-- =================================================
       PROFILE MODAL
   ================================================= -->
 
   <div id="U9-profile-modal">
 
-
     <div id="U9-profile-modal-content">
 
 
-      <!-- =========================
-          PROFILE HEADER
-      ========================= -->
+      <!-- =====================================================
+          PROFILE HOME
+      ====================================================== -->
 
-      <div id="U9-profile-modal-header">
+      <div
+        id="U9-profile-home"
+        class="U9-profile-page U9-profile-page-active"
+      >
 
+        <!-- =========================
+            HOME HEADER
+        ========================== -->
 
-        <!-- CLOSE -->
+        <div id="U9-profile-home-header">
 
-        <button
-          id="U9-profile-modal-close"
-          type="button"
-          aria-label="Close"
-        >
-          ×
-        </button>
+          <button
+            id="U9-profile-modal-close"
+            type="button"
+            aria-label="Close"
+          >
+            ×
+          </button>
 
+          <div id="U9-profile-home-title">
+            Profile
+          </div>
 
-        <!-- TITLE -->
+          <img
+            id="U9-profile-home-icon"
+            src="SSVG/logo/U9website.svg"
+            alt=""
+            aria-hidden="true"
+          >
 
-        <div
-          id="U9-profile-modal-title"
-        >
-          Profile
         </div>
 
 
-        <!-- PROFILE SVG -->
-
-        <img
-          id="U9-profile-modal-icon"
-          src="SSVG/logo/U9website.svg"
-          alt=""
-          aria-hidden="true"
-        >
-
-      </div>
-
-
-      <!-- =========================
-          PROFILE BODY
-      ========================= -->
-
-      <div id="U9-profile-modal-body">
-
-
         <!-- =========================
-            PROFILE MAIN
-        ========================= -->
+            HOME BODY
+        ========================== -->
 
-        <div id="U9-profile-main">
+        <div id="U9-profile-home-body">
 
-
-          <!-- =========================
-              PROFILE AVATAR
-          ========================= -->
-
-          <div id="U9-profile-avatar">
-
-            <img
-              id="U9-profile-avatar-image"
-              src="SSVG/avatar/profile.svg"
-              alt="Avatar"
-            >
-
-            <img
-              id="U9-profile-avatar-frame"
-              src="SSVG/avatar/ordinary.svg"
-              alt=""
-              aria-hidden="true"
-            >
-
-          </div>
-
-
-          <!-- =========================
-              USER INFO LOADING
-          ========================= -->
-
-          <div id="U9-profile-info-loading">
-
-            <img
-              src="SSVG/logo/loading.svg"
-              alt="Loading"
-            >
-
-          </div>
-
-
-          <!-- =========================
-              USER INFO
-          ========================= -->
-
-          <div id="U9-profile-info">
+          <div id="U9-profile-main">
 
 
             <!-- =========================
-                USERNAME
-            ========================= -->
+                AVATAR AREA
+            ========================== -->
 
-            <div id="U9-profile-username"></div>
-
-
-            <!-- =========================
-                USER ACCOUNT
-            ========================= -->
-
-            <div id="U9-profile-account"></div>
+            <div id="U9-profile-avatar-area">
 
 
-            <!-- =========================
-                BALANCE + COINS + BUTTONS
-            ========================= -->
+              <!-- =====================
+                  AVATAR
+              ====================== -->
 
-            <div id="U9-profile-balance-container">
+              <div id="U9-profile-avatar">
 
+                <img
+                  id="U9-profile-avatar-image"
+                  src="SSVG/avatar/profile.svg"
+                  alt="Avatar"
+                >
 
-              <!-- =========================
-                  BALANCE + COINS
-              ========================= -->
-
-              <div id="U9-profile-balance-info">
-
-
-                <!-- =========================
-                    BALANCE
-                ========================= -->
-
-                <div id="U9-profile-balance"></div>
-
-
-                <!-- =========================
-                    COINS
-                ========================= -->
-
-                <div id="U9-profile-coins"></div>
-
+                <img
+                  id="U9-profile-avatar-frame"
+                  src="SSVG/avatar/ordinary.svg"
+                  alt=""
+                  aria-hidden="true"
+                >
 
               </div>
 
 
-              <!-- =========================
-                  BUTTON 1 + BUTTON 2
-              ========================= -->
+              <!-- =====================
+                  BUTTON 1 / 2
+                  AVATAR RIGHT SIDE
+              ====================== -->
 
-              <div id="U9-profile-balance-buttons">
-
+              <div id="U9-profile-avatar-buttons">
 
                 <button
                   id="U9-profile-button-1"
                   type="button"
+                  aria-label="Button 1"
                 >
 
                   <img
@@ -627,10 +561,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                     alt=""
                     aria-hidden="true"
                   >
-
-                  <span>
-                    Button 1
-                  </span>
 
                 </button>
 
@@ -638,6 +568,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                 <button
                   id="U9-profile-button-2"
                   type="button"
+                  aria-label="Button 2"
                 >
 
                   <img
@@ -646,12 +577,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                     aria-hidden="true"
                   >
 
-                  <span>
-                    Button 2
-                  </span>
-
                 </button>
-
 
               </div>
 
@@ -659,97 +585,477 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
             </div>
 
 
+            <!-- =========================
+                PROFILE INFO LOADING
+            ========================== -->
+
+            <div id="U9-profile-info-loading">
+
+              <img
+                src="SSVG/logo/loading.svg"
+                alt="Loading"
+              >
+
+            </div>
+
+
+            <!-- =========================
+                PROFILE INFO
+            ========================== -->
+
+            <div id="U9-profile-info">
+
+              <div id="U9-profile-username"></div>
+
+              <div id="U9-profile-account"></div>
+
+
+              <!-- =====================
+                  BALANCE
+              ====================== -->
+
+              <div id="U9-profile-balance-container">
+
+                <div id="U9-profile-balance-info">
+
+                  <div id="U9-profile-balance"></div>
+
+                  <div id="U9-profile-coins"></div>
+
+                </div>
+
+              </div>
+
+
+            </div>
+
+
+            <!-- =========================
+                BUTTON 3 / 4 / 5 / 6 / 7
+            ========================== -->
+
+            <div id="U9-profile-buttons">
+
+
+              <!-- BUTTON 3 -->
+
+              <button
+                id="U9-profile-button-3"
+                type="button"
+              >
+
+                <img
+                  src="SSVG/account/account-edit-button.svg"
+                  alt=""
+                  aria-hidden="true"
+                >
+
+                <span>
+                  Button 3
+                </span>
+
+              </button>
+
+
+              <!-- BUTTON 4 -->
+
+              <button
+                id="U9-profile-button-4"
+                type="button"
+              >
+
+                <img
+                  src="SSVG/account/account-edit-button.svg"
+                  alt=""
+                  aria-hidden="true"
+                >
+
+                <span>
+                  Button 4
+                </span>
+
+              </button>
+
+
+              <!-- BUTTON 5 -->
+
+              <button
+                id="U9-profile-button-5"
+                type="button"
+              >
+
+                <img
+                  src="SSVG/account/account-edit-button.svg"
+                  alt=""
+                  aria-hidden="true"
+                >
+
+                <span>
+                  Button 5
+                </span>
+
+              </button>
+
+
+              <!-- BUTTON 6 -->
+
+              <button
+                id="U9-profile-button-6"
+                type="button"
+              >
+
+                <img
+                  src="SSVG/account/account-edit-button.svg"
+                  alt=""
+                  aria-hidden="true"
+                >
+
+                <span>
+                  Button 6
+                </span>
+
+              </button>
+
+
+              <!-- BUTTON 7 -->
+
+              <button
+                id="U9-profile-button-7"
+                type="button"
+              >
+
+                <img
+                  src="SSVG/account/account-edit-button.svg"
+                  alt=""
+                  aria-hidden="true"
+                >
+
+                <span>
+                  Button 7
+                </span>
+
+              </button>
+
+
+            </div>
+
+
           </div>
-
-
-          <!-- =========================
-              PROFILE BUTTONS
-              BUTTON 3 / 4 / 5
-          ========================= -->
-
-          <div id="U9-profile-buttons">
-
-
-            <!-- =========================
-                BUTTON 3
-                SVG + TEXT
-            ========================= -->
-
-            <button
-              id="U9-profile-button-3"
-              type="button"
-            >
-
-              <img
-                src="SSVG/account/account-edit-button.svg"
-                alt=""
-                aria-hidden="true"
-              >
-
-              <span>
-                Button 3
-              </span>
-
-            </button>
-
-
-            <!-- =========================
-                BUTTON 4
-                SVG + TEXT
-            ========================= -->
-
-            <button
-              id="U9-profile-button-4"
-              type="button"
-            >
-
-              <img
-                src="SSVG/account/account-edit-button.svg"
-                alt=""
-                aria-hidden="true"
-              >
-
-              <span>
-                Button 4
-              </span>
-
-            </button>
-
-
-            <!-- =========================
-                BUTTON 5
-                SVG + TEXT
-            ========================= -->
-
-            <button
-              id="U9-profile-button-5"
-              type="button"
-            >
-
-              <img
-                src="SSVG/account/account-edit-button.svg"
-                alt=""
-                aria-hidden="true"
-              >
-
-              <span>
-                Button 5
-              </span>
-
-            </button>
-
-
-          </div>
-
 
         </div>
 
+      </div>
+
+
+
+      <!-- =====================================================
+          PROFILE PAGE 1
+      ====================================================== -->
+
+      <div
+        id="U9-profile-page-1"
+        class="U9-profile-page"
+      >
+
+        <div id="U9-profile-page-1-header">
+
+          <button
+            id="U9-profile-page-1-back"
+            class="U9-profile-page-back"
+            type="button"
+            aria-label="Back"
+          >
+            ‹
+          </button>
+
+          <div id="U9-profile-page-1-title">
+            Button 1
+          </div>
+
+          <img
+            id="U9-profile-page-1-icon"
+            src="SSVG/logo/U9website.svg"
+            alt=""
+            aria-hidden="true"
+          >
+
+        </div>
+
+
+        <div id="U9-profile-page-1-body">
+
+          <!-- PAGE 1 CONTENT -->
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =====================================================
+          PROFILE PAGE 2
+      ====================================================== -->
+
+      <div
+        id="U9-profile-page-2"
+        class="U9-profile-page"
+      >
+
+        <div id="U9-profile-page-2-header">
+
+          <button
+            id="U9-profile-page-2-back"
+            class="U9-profile-page-back"
+            type="button"
+            aria-label="Back"
+          >
+            ‹
+          </button>
+
+          <div id="U9-profile-page-2-title">
+            Button 2
+          </div>
+
+          <img
+            id="U9-profile-page-2-icon"
+            src="SSVG/logo/U9website.svg"
+            alt=""
+            aria-hidden="true"
+          >
+
+        </div>
+
+
+        <div id="U9-profile-page-2-body">
+
+          <!-- PAGE 2 CONTENT -->
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =====================================================
+          PROFILE PAGE 3
+      ====================================================== -->
+
+      <div
+        id="U9-profile-page-3"
+        class="U9-profile-page"
+      >
+
+        <div id="U9-profile-page-3-header">
+
+          <button
+            id="U9-profile-page-3-back"
+            class="U9-profile-page-back"
+            type="button"
+            aria-label="Back"
+          >
+            ‹
+          </button>
+
+          <div id="U9-profile-page-3-title">
+            Button 3
+          </div>
+
+          <img
+            id="U9-profile-page-3-icon"
+            src="SSVG/logo/U9website.svg"
+            alt=""
+            aria-hidden="true"
+          >
+
+        </div>
+
+
+        <div id="U9-profile-page-3-body">
+
+          <!-- PAGE 3 CONTENT -->
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =====================================================
+          PROFILE PAGE 4
+      ====================================================== -->
+
+      <div
+        id="U9-profile-page-4"
+        class="U9-profile-page"
+      >
+
+        <div id="U9-profile-page-4-header">
+
+          <button
+            id="U9-profile-page-4-back"
+            class="U9-profile-page-back"
+            type="button"
+            aria-label="Back"
+          >
+            ‹
+          </button>
+
+          <div id="U9-profile-page-4-title">
+            Button 4
+          </div>
+
+          <img
+            id="U9-profile-page-4-icon"
+            src="SSVG/logo/U9website.svg"
+            alt=""
+            aria-hidden="true"
+          >
+
+        </div>
+
+
+        <div id="U9-profile-page-4-body">
+
+          <!-- PAGE 4 CONTENT -->
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =====================================================
+          PROFILE PAGE 5
+      ====================================================== -->
+
+      <div
+        id="U9-profile-page-5"
+        class="U9-profile-page"
+      >
+
+        <div id="U9-profile-page-5-header">
+
+          <button
+            id="U9-profile-page-5-back"
+            class="U9-profile-page-back"
+            type="button"
+            aria-label="Back"
+          >
+            ‹
+          </button>
+
+          <div id="U9-profile-page-5-title">
+            Button 5
+          </div>
+
+          <img
+            id="U9-profile-page-5-icon"
+            src="SSVG/logo/U9website.svg"
+            alt=""
+            aria-hidden="true"
+          >
+
+        </div>
+
+
+        <div id="U9-profile-page-5-body">
+
+          <!-- PAGE 5 CONTENT -->
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =====================================================
+          PROFILE PAGE 6
+      ====================================================== -->
+
+      <div
+        id="U9-profile-page-6"
+        class="U9-profile-page"
+      >
+
+        <div id="U9-profile-page-6-header">
+
+          <button
+            id="U9-profile-page-6-back"
+            class="U9-profile-page-back"
+            type="button"
+            aria-label="Back"
+          >
+            ‹
+          </button>
+
+          <div id="U9-profile-page-6-title">
+            Button 6
+          </div>
+
+          <img
+            id="U9-profile-page-6-icon"
+            src="SSVG/logo/U9website.svg"
+            alt=""
+            aria-hidden="true"
+          >
+
+        </div>
+
+
+        <div id="U9-profile-page-6-body">
+
+          <!-- PAGE 6 CONTENT -->
+
+        </div>
+
+      </div>
+
+
+
+      <!-- =====================================================
+          PROFILE PAGE 7
+      ====================================================== -->
+
+      <div
+        id="U9-profile-page-7"
+        class="U9-profile-page"
+      >
+
+        <div id="U9-profile-page-7-header">
+
+          <button
+            id="U9-profile-page-7-back"
+            class="U9-profile-page-back"
+            type="button"
+            aria-label="Back"
+          >
+            ‹
+          </button>
+
+          <div id="U9-profile-page-7-title">
+            Button 7
+          </div>
+
+          <img
+            id="U9-profile-page-7-icon"
+            src="SSVG/logo/U9website.svg"
+            alt=""
+            aria-hidden="true"
+          >
+
+        </div>
+
+
+        <div id="U9-profile-page-7-body">
+
+          <!-- PAGE 7 CONTENT -->
+
+        </div>
 
       </div>
 
 
     </div>
-
 
   </div>
 
@@ -1187,6 +1493,10 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
   <script src="JS/PROFILE/PROFILE/profile-page-4.js"></script>
 
   <script src="JS/PROFILE/PROFILE/profile-page-5.js"></script>
+
+  <script src="JS/PROFILE/PROFILE/profile-page-6.js"></script>
+
+  <script src="JS/PROFILE/PROFILE/profile-page-7.js"></script>
 
 
   <!-- =================================================
