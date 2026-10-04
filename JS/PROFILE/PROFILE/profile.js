@@ -1,4 +1,3 @@
-
 /* =========================
    PROFILE MODAL
 ========================= */
@@ -107,6 +106,16 @@ const u9ProfileCoins =
 
 
 /* =========================================================
+   BALANCE / COINS TOGGLE
+========================================================= */
+
+const u9ProfileBalanceToggle =
+  document.getElementById(
+    "U9-profile-balance-toggle"
+  );
+
+
+/* =========================================================
    AVATAR ELEMENTS
 ========================================================= */
 
@@ -128,33 +137,40 @@ const u9ProfileAvatarFrame =
 
 const u9ProfileButtons = {
 
-  1: document.getElementById(
-    "U9-profile-button-1"
-  ),
+  1:
+    document.getElementById(
+      "U9-profile-button-1"
+    ),
 
-  2: document.getElementById(
-    "U9-profile-button-2"
-  ),
+  2:
+    document.getElementById(
+      "U9-profile-button-2"
+    ),
 
-  3: document.getElementById(
-    "U9-profile-button-3"
-  ),
+  3:
+    document.getElementById(
+      "U9-profile-button-3"
+    ),
 
-  4: document.getElementById(
-    "U9-profile-button-4"
-  ),
+  4:
+    document.getElementById(
+      "U9-profile-button-4"
+    ),
 
-  5: document.getElementById(
-    "U9-profile-button-5"
-  ),
+  5:
+    document.getElementById(
+      "U9-profile-button-5"
+    ),
 
-  6: document.getElementById(
-    "U9-profile-button-6"
-  ),
+  6:
+    document.getElementById(
+      "U9-profile-button-6"
+    ),
 
-  7: document.getElementById(
-    "U9-profile-button-7"
-  )
+  7:
+    document.getElementById(
+      "U9-profile-button-7"
+    )
 
 };
 
@@ -166,9 +182,9 @@ const u9ProfileButtons = {
 const u9ProfilePages = {};
 
 
-/* =========================
+/* =========================================================
    PAGE 1
-========================= */
+========================================================= */
 
 u9ProfilePages[1] = {
 
@@ -205,9 +221,9 @@ u9ProfilePages[1] = {
 };
 
 
-/* =========================
+/* =========================================================
    PAGE 2
-========================= */
+========================================================= */
 
 u9ProfilePages[2] = {
 
@@ -244,9 +260,9 @@ u9ProfilePages[2] = {
 };
 
 
-/* =========================
+/* =========================================================
    PAGE 3
-========================= */
+========================================================= */
 
 u9ProfilePages[3] = {
 
@@ -283,9 +299,9 @@ u9ProfilePages[3] = {
 };
 
 
-/* =========================
+/* =========================================================
    PAGE 4
-========================= */
+========================================================= */
 
 u9ProfilePages[4] = {
 
@@ -322,9 +338,9 @@ u9ProfilePages[4] = {
 };
 
 
-/* =========================
+/* =========================================================
    PAGE 5
-========================= */
+========================================================= */
 
 u9ProfilePages[5] = {
 
@@ -361,9 +377,9 @@ u9ProfilePages[5] = {
 };
 
 
-/* =========================
+/* =========================================================
    PAGE 6
-========================= */
+========================================================= */
 
 u9ProfilePages[6] = {
 
@@ -400,9 +416,9 @@ u9ProfilePages[6] = {
 };
 
 
-/* =========================
+/* =========================================================
    PAGE 7
-========================= */
+========================================================= */
 
 u9ProfilePages[7] = {
 
@@ -489,17 +505,6 @@ const u9ProfilePageTitles = {
   7: "Button 7"
 
 };
-
-
-/* =========================================================
-   PROFILE PAGE ICON
-========================================================= */
-
-/*
-  当前不强制修改 HTML 中的 icon src。
-
-  每个页面可以独立设置自己的 SVG。
-*/
 
 
 /* =========================================================
@@ -635,33 +640,17 @@ function u9ProfileGoHome(
   }
 
 
-  /*
-    Stop current animation.
-  */
-
   u9ProfilePageAnimating =
     false;
 
 
-  /*
-    Remove all internal page classes.
-  */
-
   u9ProfileResetPageClasses();
 
-
-  /*
-    Reset Home classes.
-  */
 
   u9ProfileRemovePageClasses(
     profileHome
   );
 
-
-  /*
-    Show Home.
-  */
 
   profileHome.classList.add(
     "U9-profile-page-active"
@@ -673,17 +662,9 @@ function u9ProfileGoHome(
   );
 
 
-  /*
-    Current page = Home.
-  */
-
   u9ProfileCurrentPage =
     0;
 
-
-  /*
-    Reset scroll positions.
-  */
 
   u9ProfileResetPageScroll();
 
@@ -717,13 +698,6 @@ function u9ProfilePreparePage(
   }
 
 
-  /*
-    Set page title.
-
-    If HTML already has a title,
-    this keeps it consistent.
-  */
-
   if (pageData.title) {
 
     pageData.title.textContent =
@@ -734,10 +708,6 @@ function u9ProfilePreparePage(
 
   }
 
-
-  /*
-    Reset page scroll.
-  */
 
   if (pageData.body) {
 
@@ -760,20 +730,12 @@ function u9ProfileOpenPage(
   pageNumber
 ) {
 
-  /*
-    Prevent overlapping animations.
-  */
-
   if (u9ProfilePageAnimating) {
 
     return false;
 
   }
 
-
-  /*
-    Validate page number.
-  */
 
   if (
     !Number.isInteger(pageNumber) ||
@@ -807,10 +769,6 @@ function u9ProfileOpenPage(
   }
 
 
-  /*
-    Already on this page.
-  */
-
   if (
     u9ProfileCurrentPage ===
     pageNumber
@@ -820,10 +778,6 @@ function u9ProfileOpenPage(
 
   }
 
-
-  /*
-    Get current page.
-  */
 
   const currentPageNumber =
     u9ProfileCurrentPage;
@@ -869,26 +823,17 @@ function u9ProfileOpenPage(
   }
 
 
-  /*
-    Prepare destination page.
-  */
-
   u9ProfilePreparePage(
     pageNumber
   );
 
-
-  /*
-    Lock animation.
-  */
 
   u9ProfilePageAnimating =
     true;
 
 
   /*
-    Remove old classes from
-    destination page.
+    Clean destination page.
   */
 
   u9ProfileRemovePageClasses(
@@ -897,7 +842,8 @@ function u9ProfileOpenPage(
 
 
   /*
-    Destination starts from right.
+    Destination starts
+    from the right.
   */
 
   nextPage.page.classList.add(
@@ -927,7 +873,8 @@ function u9ProfileOpenPage(
 
 
   /*
-    Destination moves to center.
+    Destination moves
+    into the center.
   */
 
   nextPage.page.classList.remove(
@@ -945,33 +892,17 @@ function u9ProfileOpenPage(
   );
 
 
-  /*
-    Update current page.
-  */
-
   u9ProfileCurrentPage =
     pageNumber;
 
 
-  /*
-    Finish animation.
-  */
-
   setTimeout(
     function () {
-
-      /*
-        Hide previous page.
-      */
 
       u9ProfileRemovePageClasses(
         currentPage
       );
 
-
-      /*
-        Unlock animation.
-      */
 
       u9ProfilePageAnimating =
         false;
@@ -992,20 +923,12 @@ function u9ProfileOpenPage(
 
 function u9ProfileGoBack() {
 
-  /*
-    Prevent overlapping animations.
-  */
-
   if (u9ProfilePageAnimating) {
 
     return false;
 
   }
 
-
-  /*
-    Already Home.
-  */
 
   if (
     u9ProfileCurrentPage === 0
@@ -1042,16 +965,12 @@ function u9ProfileGoBack() {
   }
 
 
-  /*
-    Lock animation.
-  */
-
   u9ProfilePageAnimating =
     true;
 
 
   /*
-    Remove old Home classes.
+    Clean Home first.
   */
 
   u9ProfileRemovePageClasses(
@@ -1060,11 +979,16 @@ function u9ProfileGoBack() {
 
 
   /*
-    Home starts from left.
+    IMPORTANT:
+
+    Home starts from RIGHT.
+
+    This makes Profile Home
+    move from right -> left.
   */
 
   previousPage.classList.add(
-    "U9-profile-page-slide-from-left"
+    "U9-profile-page-slide-from-right"
   );
 
 
@@ -1076,7 +1000,8 @@ function u9ProfileGoBack() {
 
 
   /*
-    Current page moves right.
+    Current internal page
+    moves to the LEFT.
   */
 
   u9ProfileRemovePageClasses(
@@ -1085,16 +1010,17 @@ function u9ProfileGoBack() {
 
 
   currentPage.classList.add(
-    "U9-profile-page-slide-right"
+    "U9-profile-page-slide-left"
   );
 
 
   /*
-    Home moves to center.
+    Home moves from
+    right -> center.
   */
 
   previousPage.classList.remove(
-    "U9-profile-page-slide-from-left"
+    "U9-profile-page-slide-from-right"
   );
 
 
@@ -1108,17 +1034,9 @@ function u9ProfileGoBack() {
   );
 
 
-  /*
-    Current page becomes Home.
-  */
-
   u9ProfileCurrentPage =
     0;
 
-
-  /*
-    Reset Home scroll.
-  */
 
   if (profileHomeBody) {
 
@@ -1128,25 +1046,13 @@ function u9ProfileGoBack() {
   }
 
 
-  /*
-    Finish animation.
-  */
-
   setTimeout(
     function () {
-
-      /*
-        Hide previous internal page.
-      */
 
       u9ProfileRemovePageClasses(
         currentPage
       );
 
-
-      /*
-        Unlock animation.
-      */
 
       u9ProfilePageAnimating =
         false;
@@ -1157,6 +1063,124 @@ function u9ProfileGoBack() {
 
 
   return true;
+
+}
+
+
+/* =========================================================
+   BALANCE / COINS DISPLAY
+========================================================= */
+
+let u9ProfileShowingCoins =
+  false;
+
+
+/* =========================================================
+   UPDATE BALANCE / COINS DISPLAY
+========================================================= */
+
+function u9ProfileUpdateBalanceDisplay() {
+
+  if (
+    !u9ProfileBalance ||
+    !u9ProfileCoins
+  ) {
+
+    return;
+
+  }
+
+
+  if (u9ProfileShowingCoins) {
+
+    /*
+      Show Coins
+    */
+
+    u9ProfileBalance.classList.remove(
+      "U9-profile-value-active"
+    );
+
+    u9ProfileBalance.classList.add(
+      "U9-profile-value-hidden"
+    );
+
+
+    u9ProfileCoins.classList.remove(
+      "U9-profile-value-hidden"
+    );
+
+    u9ProfileCoins.classList.add(
+      "U9-profile-value-active"
+    );
+
+  }
+
+  else {
+
+    /*
+      Show Balance
+    */
+
+    u9ProfileCoins.classList.remove(
+      "U9-profile-value-active"
+    );
+
+    u9ProfileCoins.classList.add(
+      "U9-profile-value-hidden"
+    );
+
+
+    u9ProfileBalance.classList.remove(
+      "U9-profile-value-hidden"
+    );
+
+    u9ProfileBalance.classList.add(
+      "U9-profile-value-active"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   TOGGLE BALANCE / COINS
+========================================================= */
+
+function u9ProfileToggleBalance() {
+
+  u9ProfileShowingCoins =
+    !u9ProfileShowingCoins;
+
+
+  u9ProfileUpdateBalanceDisplay();
+
+
+  return u9ProfileShowingCoins;
+
+}
+
+
+/* =========================================================
+   BALANCE TOGGLE EVENT
+========================================================= */
+
+if (u9ProfileBalanceToggle) {
+
+  u9ProfileBalanceToggle.addEventListener(
+    "click",
+    function (event) {
+
+      event.preventDefault();
+
+      event.stopPropagation();
+
+
+      u9ProfileToggleBalance();
+
+    }
+  );
 
 }
 
@@ -1421,10 +1445,6 @@ function openProfileModal() {
   }
 
 
-  /*
-    Check authentication.
-  */
-
   if (
     !u9ProfileCanOpen()
   ) {
@@ -1438,42 +1458,38 @@ function openProfileModal() {
   }
 
 
-  /*
-    Cancel any previous closing animation.
-  */
-
   u9ProfileCancelClose();
 
 
   /*
-    Every time Profile opens,
-    start from Home.
+    Always start from Profile Home.
   */
 
   u9ProfileGoHome(true);
 
 
   /*
-    Remove closing state.
+    Balance is always
+    the first displayed value
+    when Profile opens.
   */
+
+  u9ProfileShowingCoins =
+    false;
+
+
+  u9ProfileUpdateBalanceDisplay();
+
 
   profileModal.classList.remove(
     "modal-closing"
   );
 
 
-  /*
-    Open Profile Window.
-  */
-
   profileModal.classList.add(
     "modal-open"
   );
 
-
-  /*
-    Activate header user button.
-  */
 
   if (profileUserButton) {
 
@@ -1483,10 +1499,6 @@ function openProfileModal() {
 
   }
 
-
-  /*
-    Load profile information.
-  */
 
   u9ProfileLoad();
 
@@ -1512,10 +1524,6 @@ function closeProfileModal() {
   }
 
 
-  /*
-    Already closed.
-  */
-
   if (
     !profileModal.classList.contains(
       "modal-open"
@@ -1527,34 +1535,18 @@ function closeProfileModal() {
   }
 
 
-  /*
-    Cancel previous close handler.
-  */
-
   u9ProfileCancelClose();
 
-
-  /*
-    Remove open state.
-  */
 
   profileModal.classList.remove(
     "modal-open"
   );
 
 
-  /*
-    Start closing animation.
-  */
-
   profileModal.classList.add(
     "modal-closing"
   );
 
-
-  /*
-    Deactivate header user button.
-  */
 
   if (profileUserButton) {
 
@@ -1569,10 +1561,6 @@ function closeProfileModal() {
     false;
 
 
-  /*
-    Finish closing.
-  */
-
   function finishClose() {
 
     if (closeFinished) {
@@ -1581,12 +1569,6 @@ function closeProfileModal() {
 
     }
 
-
-    /*
-      If Profile has already
-      reopened, do not finish
-      the previous closing.
-    */
 
     if (
       !profileModal.classList.contains(
@@ -1603,36 +1585,18 @@ function closeProfileModal() {
       true;
 
 
-    /*
-      Remove closing state.
-    */
-
     profileModal.classList.remove(
       "modal-closing"
     );
 
 
-    /*
-      Reset internal pages.
-
-      Next opening starts at Home.
-    */
-
     u9ProfileGoHome(true);
 
-
-    /*
-      Remove event listener.
-    */
 
     u9ProfileCancelClose();
 
   }
 
-
-  /*
-    Transition event.
-  */
 
   u9ProfileCloseHandler =
     function (event) {
@@ -1668,10 +1632,6 @@ function closeProfileModal() {
   );
 
 
-  /*
-    Fallback timer.
-  */
-
   u9ProfileCloseTimer =
     setTimeout(
       finishClose,
@@ -1696,10 +1656,6 @@ async function toggleProfileModal() {
 
   }
 
-
-  /*
-    Profile is open.
-  */
 
   if (
     profileModal.classList.contains(
@@ -1728,10 +1684,6 @@ async function toggleProfileModal() {
 
   }
 
-
-  /*
-    Profile is closed.
-  */
 
   if (
     window.U9WindowManager
@@ -1811,12 +1763,6 @@ if (profileModalClose) {
 
 function u9ProfileResetAvatar() {
 
-  /*
-    =========================
-    RESET AVATAR
-    =========================
-  */
-
   if (u9ProfileAvatarImage) {
 
     u9ProfileAvatarImage.dataset.u9Fallback =
@@ -1828,12 +1774,6 @@ function u9ProfileResetAvatar() {
 
   }
 
-
-  /*
-    =========================
-    RESET FRAME
-    =========================
-  */
 
   if (u9ProfileAvatarFrame) {
 
@@ -1859,10 +1799,6 @@ if (u9ProfileAvatarImage) {
     "error",
     function () {
 
-      /*
-        Prevent infinite fallback.
-      */
-
       if (
         this.dataset.u9Fallback ===
         "true"
@@ -1876,10 +1812,6 @@ if (u9ProfileAvatarImage) {
       this.dataset.u9Fallback =
         "true";
 
-
-      /*
-        Use embedded default avatar.
-      */
 
       this.src =
         u9ProfileDefaultAvatar;
@@ -1900,10 +1832,6 @@ if (u9ProfileAvatarFrame) {
     "error",
     function () {
 
-      /*
-        Prevent infinite fallback.
-      */
-
       if (
         this.dataset.u9Fallback ===
         "true"
@@ -1917,10 +1845,6 @@ if (u9ProfileAvatarFrame) {
       this.dataset.u9Fallback =
         "true";
 
-
-      /*
-        Use default frame.
-      */
 
       this.src =
         u9ProfileDefaultFrame;
@@ -1951,20 +1875,6 @@ const u9ProfilePaidFrameUrl =
    FRONTEND DEFAULT AVATAR
 ========================================================= */
 
-/*
-  Frontend default avatar.
-
-  This SVG is embedded directly
-  into JavaScript as a Data URI.
-
-  Therefore:
-
-  - No network request
-  - No dependency on profile.svg
-  - Works offline
-  - Works when Vercel is unreachable
-*/
-
 const u9ProfileDefaultAvatarSvg =
 
   `<svg width="199px" height="199px" viewBox="-2.56 -2.56 21.12 21.12" xmlns="http://www.w3.org/2000/svg" fill="#000000" stroke="#000000" stroke-width="0.00016">
@@ -1992,7 +1902,7 @@ const u9ProfileDefaultAvatarSvg =
     <g id="SVGRepo_iconCarrier">
 
       <path
-        d="m 8 1 c -1.65625 0 -3 1.34375 -3 3 s 1.34375 3 3 3 s 3 -1.34375 3 -3 s -1.34375 -3 -3 -3 z m -1.5 7 c -2.492188 0 -4.5 2.007812 -4.5 4.5 v 0.5 c 0 1.109375 0.890625 2 2 2 h 8 c 1.109375 0 2 -0.890625 2 -2 v -0.5 c 0 -2.492188 -2.007812 -4.5 -4.5 -4.5 z m 0 0"
+        d="m 8 1 c -1.65625 0 -3 1.34375 -3 3 s 1.34375 3 3 3 s 3 -1.34375 3 -3 s -1.34375 -3 -1.34375 -3 z m -1.5 7 c -2.492188 0 -4.5 2.007812 -4.5 4.5 v 0.5 c 0 1.109375 0.890625 2 2 2 h 8 c 1.109375 0 2 -0.890625 2 -2 v -0.5 c 0 -2.492188 -2.007812 -4.5 -4.5 -4.5 z m 0 0"
         fill="#357cf1"
       ></path>
 
@@ -2001,9 +1911,9 @@ const u9ProfileDefaultAvatarSvg =
   </svg>`;
 
 
-/*
-  Convert SVG to Data URI.
-*/
+/* =========================================================
+   CONVERT DEFAULT AVATAR TO DATA URI
+========================================================= */
 
 const u9ProfileDefaultAvatar =
 
@@ -2031,12 +1941,6 @@ async function u9ProfileLoadFrame(
   frameId
 ) {
 
-  /*
-    =========================
-    DATABASE DEFAULT FRAME
-    =========================
-  */
-
   if (
     !frameType ||
     frameType === "default"
@@ -2058,12 +1962,6 @@ async function u9ProfileLoadFrame(
 
   }
 
-
-  /*
-    =========================
-    NO FRAME ID
-    =========================
-  */
 
   if (!frameId) {
 
@@ -2088,12 +1986,6 @@ async function u9ProfileLoadFrame(
     "";
 
 
-  /*
-    =========================
-    FREE FRAME
-    =========================
-  */
-
   if (frameType === "free") {
 
     requestUrl =
@@ -2101,26 +1993,12 @@ async function u9ProfileLoadFrame(
 
   }
 
-
-  /*
-    =========================
-    PAID FRAME
-    =========================
-  */
-
   else if (frameType === "paid") {
 
     requestUrl =
       u9ProfilePaidFrameUrl;
 
   }
-
-
-  /*
-    =========================
-    UNKNOWN FRAME TYPE
-    =========================
-  */
 
   else {
 
@@ -2130,12 +2008,6 @@ async function u9ProfileLoadFrame(
 
   }
 
-
-  /*
-    =========================
-    REQUEST
-    =========================
-  */
 
   try {
 
@@ -2148,12 +2020,6 @@ async function u9ProfileLoadFrame(
       );
 
 
-    /*
-      =========================
-      REQUEST FAILED
-      =========================
-    */
-
     if (!response.ok) {
 
       u9ProfileResetAvatar();
@@ -2162,12 +2028,6 @@ async function u9ProfileLoadFrame(
 
     }
 
-
-    /*
-      =========================
-      JSON
-      =========================
-    */
 
     const result =
       await response.json();
@@ -2179,24 +2039,12 @@ async function u9ProfileLoadFrame(
       [];
 
 
-    /*
-      =========================
-      FIND CURRENT FRAME
-      =========================
-    */
-
     const currentFrame =
       frames.find(
         (frame) =>
           frame.id === frameId
       );
 
-
-    /*
-      =========================
-      FRAME NOT FOUND
-      =========================
-    */
 
     if (!currentFrame) {
 
@@ -2207,12 +2055,6 @@ async function u9ProfileLoadFrame(
     }
 
 
-    /*
-      =========================
-      FRAME SVG NOT FOUND
-      =========================
-    */
-
     if (!currentFrame.svg) {
 
       u9ProfileResetAvatar();
@@ -2221,12 +2063,6 @@ async function u9ProfileLoadFrame(
 
     }
 
-
-    /*
-      =========================
-      LOAD REAL FRAME
-      =========================
-    */
 
     if (u9ProfileAvatarFrame) {
 
@@ -2245,15 +2081,6 @@ async function u9ProfileLoadFrame(
   }
 
   catch (error) {
-
-    /*
-      Network error
-      Offline
-      Connection changed
-      Fetch failed
-
-      Use frontend defaults.
-    */
 
     console.error(
       "Load avatar frame failed:",
@@ -2320,6 +2147,19 @@ function u9ProfileDisplayUser(
 
   }
 
+
+  /*
+    Keep Balance as the
+    default displayed value
+    whenever user data is loaded.
+  */
+
+  u9ProfileShowingCoins =
+    false;
+
+
+  u9ProfileUpdateBalanceDisplay();
+
 }
 
 
@@ -2331,24 +2171,8 @@ async function u9ProfileLoadAvatarFromUser(
   user
 ) {
 
-  /*
-    Always start with frontend defaults.
-
-    Avatar:
-    embedded SVG
-
-    Frame:
-    ordinary.svg
-  */
-
   u9ProfileResetAvatar();
 
-
-  /*
-    =========================
-    NO USER
-    =========================
-  */
 
   if (!user) {
 
@@ -2359,12 +2183,6 @@ async function u9ProfileLoadAvatarFromUser(
 
   try {
 
-    /*
-      =========================
-      USER AVATAR
-      =========================
-    */
-
     const avatar =
       user.avatar ||
       null;
@@ -2374,12 +2192,6 @@ async function u9ProfileLoadAvatarFromUser(
       avatar?.url ||
       "";
 
-
-    /*
-      =========================
-      USER HAS AVATAR
-      =========================
-    */
 
     if (
       avatarUrl &&
@@ -2395,13 +2207,6 @@ async function u9ProfileLoadAvatarFromUser(
 
     }
 
-
-    /*
-      =========================
-      NO USER AVATAR
-      =========================
-    */
-
     else if (u9ProfileAvatarImage) {
 
       u9ProfileAvatarImage.dataset.u9Fallback =
@@ -2413,12 +2218,6 @@ async function u9ProfileLoadAvatarFromUser(
 
     }
 
-
-    /*
-      =========================
-      USER FRAME
-      =========================
-    */
 
     const frameType =
       user.avatar_frame_type ||
@@ -2437,11 +2236,6 @@ async function u9ProfileLoadAvatarFromUser(
       );
 
 
-    /*
-      Frame failed:
-      use frontend defaults.
-    */
-
     if (!frameLoaded) {
 
       u9ProfileResetAvatar();
@@ -2456,11 +2250,6 @@ async function u9ProfileLoadAvatarFromUser(
   }
 
   catch (error) {
-
-    /*
-      Unexpected error:
-      frontend defaults.
-    */
 
     console.error(
       "Load profile avatar failed:",
@@ -2483,30 +2272,11 @@ async function u9ProfileLoadAvatarFromUser(
 
 async function u9ProfileLoad() {
 
-  /*
-    =========================
-    SHOW LOADING
-    =========================
-  */
-
   u9ProfileShowLoading();
 
 
-  /*
-    Start with frontend defaults.
-
-    Avatar -> embedded SVG
-    Frame  -> ordinary.svg
-  */
-
   u9ProfileResetAvatar();
 
-
-  /*
-    =========================
-    U9 USER NOT AVAILABLE
-    =========================
-  */
 
   if (!window.U9User) {
 
@@ -2524,21 +2294,9 @@ async function u9ProfileLoad() {
   }
 
 
-  /*
-    =========================
-    GET USER
-    =========================
-  */
-
   const user =
     window.U9User.get();
 
-
-  /*
-    =========================
-    NOT LOGGED IN
-    =========================
-  */
 
   if (
     !window.U9User.isLoggedIn() ||
@@ -2554,30 +2312,12 @@ async function u9ProfileLoad() {
   }
 
 
-  /*
-    =========================
-    LOAD
-    =========================
-  */
-
   try {
-
-    /*
-      =========================
-      DISPLAY USER
-      =========================
-    */
 
     u9ProfileDisplayUser(
       user
     );
 
-
-    /*
-      =========================
-      LOAD AVATAR + FRAME
-      =========================
-    */
 
     const avatarLoaded =
       await u9ProfileLoadAvatarFromUser(
@@ -2585,23 +2325,12 @@ async function u9ProfileLoad() {
       );
 
 
-    /*
-      Any failure:
-      frontend defaults.
-    */
-
     if (!avatarLoaded) {
 
       u9ProfileResetAvatar();
 
     }
 
-
-    /*
-      =========================
-      HIDE LOADING
-      =========================
-    */
 
     u9ProfileHideLoading();
 
@@ -2615,19 +2344,11 @@ async function u9ProfileLoad() {
 
   catch (error) {
 
-    /*
-      Any unexpected profile error.
-    */
-
     console.error(
       "Load profile failed:",
       error
     );
 
-
-    /*
-      Frontend defaults.
-    */
 
     u9ProfileResetAvatar();
 
@@ -2705,6 +2426,17 @@ u9ProfileGoHome(true);
 u9ProfileResetAvatar();
 
 
+/*
+  Balance is the default value.
+*/
+
+u9ProfileShowingCoins =
+  false;
+
+
+u9ProfileUpdateBalanceDisplay();
+
+
 /* =========================================================
    GLOBAL ACCESS
 ========================================================= */
@@ -2727,25 +2459,11 @@ window.toggleProfileModal =
 
 window.U9ProfilePages = {
 
-  /*
-    Open page 1 - 7.
-  */
-
   open:
     u9ProfileOpenPage,
 
-
-  /*
-    Return to Home.
-  */
-
   back:
     u9ProfileGoBack,
-
-
-  /*
-    Go Home immediately.
-  */
 
   home:
     function () {
@@ -2753,11 +2471,6 @@ window.U9ProfilePages = {
       return u9ProfileGoHome(true);
 
     },
-
-
-  /*
-    Get current page number.
-  */
 
   current:
     function () {
