@@ -1,3 +1,4 @@
+
 /* =========================
    U9 WINDOW MANAGER
 ========================= */
@@ -6,21 +7,6 @@
 /* =========================
    WINDOW REGISTRY
 ========================= */
-
-/*
-   All U9 windows are registered
-   here.
-
-   Example:
-
-   U9WindowManager.register(
-     "profile",
-     {
-       open: openProfileModal,
-       close: closeProfileModal
-     }
-   );
-*/
 
 const u9Windows =
   new Map();
@@ -38,14 +24,88 @@ let currentWindow =
    ACTION LOCK
 ========================= */
 
-/*
-   Prevent multiple window
-   open / close actions from
-   running at the same time.
-*/
-
 let windowActionRunning =
   false;
+
+
+/* =========================
+   PAGE SCROLL LOCK
+========================= */
+
+/*
+   Window Manager is the ONLY
+   place that controls page
+   scroll locking.
+
+   Individual windows must NOT
+   unlock the page themselves.
+
+   This prevents:
+
+   Window A
+      ↓
+   unlock
+      ↓
+   Window B
+      ↓
+   lock
+
+   which can cause a visual
+   flash / layout reflow.
+*/
+
+let windowScrollLocked =
+  false;
+
+
+function lockWindowPageScroll() {
+
+  if (
+    windowScrollLocked
+  ) {
+
+    return;
+
+  }
+
+
+  document.documentElement.style.overflow =
+    "hidden";
+
+
+  document.body.style.overflow =
+    "hidden";
+
+
+  windowScrollLocked =
+    true;
+
+}
+
+
+function unlockWindowPageScroll() {
+
+  if (
+    !windowScrollLocked
+  ) {
+
+    return;
+
+  }
+
+
+  document.documentElement.style.overflow =
+    "";
+
+
+  document.body.style.overflow =
+    "";
+
+
+  windowScrollLocked =
+    false;
+
+}
 
 
 /* =========================
@@ -69,10 +129,6 @@ function registerWindow(
 
   }
 
-
-  /*
-     Save window configuration
-  */
 
   u9Windows.set(
     name,
@@ -132,11 +188,6 @@ function unregisterWindow(
   }
 
 
-  /*
-     Do not unregister
-     the currently open window.
-  */
-
   if (
     currentWindow ===
     name
@@ -195,11 +246,6 @@ function isWindowOpen(
   }
 
 
-  /*
-     Use custom isOpen()
-     when provided.
-  */
-
   if (
     typeof windowConfig.isOpen ===
     "function"
@@ -242,13 +288,31 @@ function isWindowOpen(
 function findCurrentWindow() {
 
   /*
-     First check registered
-     windows.
+     Prefer the currentWindow
+     reference first.
 
-     This makes the manager
-     compatible even if the
-     currentWindow variable
-     has not been updated yet.
+     A window can still be in
+     modal-closing state while
+     another window is being
+     opened.
+  */
+
+  if (
+    currentWindow &&
+    isWindowOpen(
+      currentWindow
+    )
+  ) {
+
+    return currentWindow;
+
+  }
+
+
+  /*
+     Search registered windows
+     when currentWindow is not
+     available.
   */
 
   for (
@@ -295,25 +359,11 @@ function findCurrentWindow() {
   }
 
 
-  /*
-     If no registered window
-     is currently open.
-  */
-
-  if (
-    currentWindow &&
-    !isWindowOpen(
-      currentWindow
-    )
-  ) {
-
-    currentWindow =
-      null;
-
-  }
+  currentWindow =
+    null;
 
 
-  return currentWindow;
+  return null;
 
 }
 
@@ -375,12 +425,6 @@ async function waitForWindowClose(
   }
 
 
-  /*
-     If no isOpen() method exists,
-     assume close() has finished
-     after a short delay.
-  */
-
   if (
     typeof windowConfig.isOpen !==
     "function"
@@ -395,10 +439,6 @@ async function waitForWindowClose(
   }
 
 
-  /*
-     Already closed
-  */
-
   if (
     !windowConfig.isOpen()
   ) {
@@ -407,11 +447,6 @@ async function waitForWindowClose(
 
   }
 
-
-  /*
-     Wait until the window
-     reports closed.
-  */
 
   const startTime =
     Date.now();
@@ -456,13 +491,6 @@ async function waitForWindowClose(
   }
 
 
-  /*
-     Timeout reached.
-
-     Do not leave the manager
-     permanently locked.
-  */
-
   return !isWindowOpen(
     name
   );
@@ -475,7 +503,8 @@ async function waitForWindowClose(
 ========================= */
 
 async function closeWindow(
-  name
+  name,
+  options = {}
 ) {
 
   const windowConfig =
@@ -494,7 +523,7 @@ async function closeWindow(
 
 
   /*
-     Already closed
+     Already closed.
   */
 
   if (
@@ -519,10 +548,6 @@ async function closeWindow(
   }
 
 
-  /*
-     No close function
-  */
-
   if (
     typeof windowConfig.close !==
     "function"
@@ -541,16 +566,20 @@ async function closeWindow(
   try {
 
     /*
-       Close the window.
+       Tell the page that a
+       Window is still active.
+
+       Never unlock here when
+       another Window is going
+       to open.
     */
+
+    lockWindowPageScroll();
+
 
     const result =
       windowConfig.close();
 
-
-    /*
-       Support async close()
-    */
 
     if (
       result &&
@@ -564,18 +593,22 @@ async function closeWindow(
 
 
     /*
-       Wait for CSS close
-       animation to finish.
+       When this is a normal
+       standalone close, wait
+       for the CSS animation.
     */
 
-    await waitForWindowClose(
-      name
-    );
+    if (
+      options.waitForAnimation !==
+      false
+    ) {
 
+      await waitForWindowClose(
+        name
+      );
 
-    /*
-       Clear current window.
-    */
+    }
+
 
     if (
       currentWindow ===
@@ -584,6 +617,20 @@ async function closeWindow(
 
       currentWindow =
         null;
+
+    }
+
+
+    /*
+       Only unlock when there is
+       really no Window remaining.
+    */
+
+    if (
+      !findCurrentWindow()
+    ) {
+
+      unlockWindowPageScroll();
 
     }
 
@@ -627,6 +674,9 @@ async function closeCurrentWindow() {
       null;
 
 
+    unlockWindowPageScroll();
+
+
     return true;
 
   }
@@ -666,10 +716,6 @@ function canOpenWindow(
 
   }
 
-
-  /*
-     Custom permission check
-  */
 
   if (
     typeof windowConfig.canOpen ===
@@ -711,11 +757,6 @@ async function openWindow(
   name
 ) {
 
-  /*
-     Prevent multiple
-     simultaneous operations.
-  */
-
   if (
     windowActionRunning
   ) {
@@ -731,10 +772,6 @@ async function openWindow(
     );
 
 
-  /*
-     Window not registered
-  */
-
   if (
     !targetWindow
   ) {
@@ -749,10 +786,6 @@ async function openWindow(
   }
 
 
-  /*
-     Window cannot open
-  */
-
   if (
     !canOpenWindow(
       name
@@ -764,13 +797,13 @@ async function openWindow(
   }
 
 
-  /*
-     Already open
-  */
-
   const activeWindow =
     findCurrentWindow();
 
+
+  /*
+     Already active.
+  */
 
   if (
     activeWindow ===
@@ -781,11 +814,6 @@ async function openWindow(
 
   }
 
-
-  /*
-     Target must have
-     an open function.
-  */
 
   if (
     typeof targetWindow.open !==
@@ -808,6 +836,19 @@ async function openWindow(
 
   try {
 
+    /*
+       Lock BEFORE doing any
+       Window transition.
+
+       This is important because
+       the old Window must never
+       unlock the page while the
+       new Window is opening.
+    */
+
+    lockWindowPageScroll();
+
+
     /* =========================
        CLOSE CURRENT WINDOW
     ========================= */
@@ -816,21 +857,30 @@ async function openWindow(
       activeWindow
     ) {
 
+      /*
+         Start closing the old
+         Window.
+
+         DO NOT wait for the
+         closing animation here.
+
+         The new Window will open
+         immediately.
+
+         This creates a smooth
+         Window-to-Window switch
+         instead of a visible gap.
+      */
+
       const closed =
         await closeWindow(
-          activeWindow
+          activeWindow,
+          {
+            waitForAnimation:
+              false
+          }
         );
 
-
-      /*
-         If old window could
-         not close, do not open
-         the new window.
-
-         This guarantees:
-
-         ONE WINDOW ONLY
-      */
 
       if (
         !closed
@@ -851,10 +901,6 @@ async function openWindow(
       targetWindow.open();
 
 
-    /*
-       Support async open()
-    */
-
     if (
       result &&
       typeof result.then ===
@@ -867,12 +913,20 @@ async function openWindow(
 
 
     /*
-       Set current window
-       only after open request.
+       Set current Window
+       immediately after the
+       new Window has opened.
     */
 
     currentWindow =
       name;
+
+
+    /*
+       Keep scroll locked.
+    */
+
+    lockWindowPageScroll();
 
 
     return true;
@@ -939,11 +993,6 @@ async function closeAllWindows() {
 
   try {
 
-    /*
-       Get all currently open
-       registered windows.
-    */
-
     const openWindows =
       [];
 
@@ -970,17 +1019,17 @@ async function closeAllWindows() {
     }
 
 
-    /*
-       Close every open window.
-    */
-
     for (
       const name
       of openWindows
     ) {
 
       await closeWindow(
-        name
+        name,
+        {
+          waitForAnimation:
+            true
+        }
       );
 
     }
@@ -988,6 +1037,9 @@ async function closeAllWindows() {
 
     currentWindow =
       null;
+
+
+    unlockWindowPageScroll();
 
 
     return true;
@@ -1050,20 +1102,11 @@ function getRegisteredWindows() {
 
 window.U9WindowManager = {
 
-  /*
-     Registration
-  */
-
   register:
     registerWindow,
 
   unregister:
     unregisterWindow,
-
-
-  /*
-     Window information
-  */
 
   get:
     getWindow,
@@ -1074,29 +1117,14 @@ window.U9WindowManager = {
   getRegistered:
     getRegisteredWindows,
 
-
-  /*
-     State
-  */
-
   isOpen:
     isWindowOpen,
 
   isBusy:
     isBusy,
 
-
-  /*
-     Permission
-  */
-
   canOpen:
     canOpenWindow,
-
-
-  /*
-     Actions
-  */
 
   open:
     openWindow,
