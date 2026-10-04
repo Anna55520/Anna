@@ -1,3 +1,4 @@
+
 /* =========================
    GIFT NORMAL MODAL
 ========================= */
@@ -26,61 +27,29 @@ const giftModalClose =
 
 
 /* =========================
-   PAGE SCROLL LOCK
-========================= */
-
-function lockGiftPageScroll() {
-
-  document.documentElement.style.overflow =
-    "hidden";
-
-  document.body.style.overflow =
-    "hidden";
-
-}
-
-
-function unlockGiftPageScroll() {
-
-  document.documentElement.style.overflow =
-    "";
-
-  document.body.style.overflow =
-    "";
-
-}
-
-
-/* =========================
    OPEN GIFT MODAL
 ========================= */
 
 function openGiftModal() {
 
-  if (!giftModal) {
+  if (
+    !giftModal ||
+    !giftModalContent
+  ) {
 
     return false;
 
   }
 
 
-  /* REMOVE CLOSING */
-
   giftModal.classList.remove(
     "modal-closing"
   );
 
 
-  /* OPEN */
-
   giftModal.classList.add(
     "modal-open"
   );
-
-
-  /* LOCK PAGE SCROLL */
-
-  lockGiftPageScroll();
 
 
   return true;
@@ -94,19 +63,9 @@ function openGiftModal() {
 
 function closeGiftModal() {
 
-  if (!giftModal) {
-
-    return false;
-
-  }
-
-
-  /* ALREADY CLOSED */
-
   if (
-    !giftModal.classList.contains(
-      "modal-open"
-    )
+    !giftModal ||
+    !giftModalContent
   ) {
 
     return false;
@@ -114,33 +73,44 @@ function closeGiftModal() {
   }
 
 
-  /* REMOVE OPEN */
+  if (
+    !giftModal.classList.contains(
+      "modal-open"
+    )
+  ) {
+
+    return true;
+
+  }
+
 
   giftModal.classList.remove(
     "modal-open"
   );
 
 
-  /* START CLOSING */
-
   giftModal.classList.add(
     "modal-closing"
   );
 
 
-  let finished = false;
+  let finished =
+    false;
 
 
   function finishClose() {
 
-    if (finished) {
+    if (
+      finished
+    ) {
 
       return;
 
     }
 
 
-    finished = true;
+    finished =
+      true;
 
 
     giftModal.classList.remove(
@@ -148,22 +118,17 @@ function closeGiftModal() {
     );
 
 
-    unlockGiftPageScroll();
-
-
-    if (giftModalContent) {
-
-      giftModalContent.removeEventListener(
-        "transitionend",
-        handleCloseAnimation
-      );
-
-    }
+    giftModalContent.removeEventListener(
+      "transitionend",
+      handleCloseAnimation
+    );
 
   }
 
 
-  function handleCloseAnimation(event) {
+  function handleCloseAnimation(
+    event
+  ) {
 
     if (
       event.propertyName !==
@@ -180,17 +145,11 @@ function closeGiftModal() {
   }
 
 
-  if (giftModalContent) {
+  giftModalContent.addEventListener(
+    "transitionend",
+    handleCloseAnimation
+  );
 
-    giftModalContent.addEventListener(
-      "transitionend",
-      handleCloseAnimation
-    );
-
-  }
-
-
-  /* FALLBACK */
 
   setTimeout(
     finishClose,
@@ -224,7 +183,9 @@ if (
       isOpen:
         function () {
 
-          if (!giftModal) {
+          if (
+            !giftModal
+          ) {
 
             return false;
 
@@ -235,6 +196,7 @@ if (
             giftModal.classList.contains(
               "modal-open"
             ) ||
+
             giftModal.classList.contains(
               "modal-closing"
             )
@@ -280,7 +242,9 @@ if (
           "gift"
         );
 
-      } else {
+      }
+
+      else {
 
         closeGiftModal();
 
