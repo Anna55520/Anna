@@ -186,6 +186,12 @@ const u9ProfileButton5 =
     "U9-profile-button-5"
   );
 
+  
+const u9ProfileButton6 =
+  document.getElementById(
+    "U9-profile-button-6"
+  );
+
 
 /* =========================
    PROFILE INTERNAL PAGES
@@ -1204,6 +1210,56 @@ if (
 
 }
 
+/* =========================
+   PROFILE BUTTON 6
+========================= */
+
+if (
+  u9ProfileButton6
+) {
+
+  u9ProfileButton6.addEventListener(
+    "click",
+    function () {
+
+      /* =========================
+         CLOSE PROFILE WINDOW
+      ========================= */
+
+      if (
+        window.U9WindowManager
+      ) {
+
+        window.U9WindowManager.close(
+          "profile"
+        );
+
+      }
+
+      else {
+
+        closeProfileModal();
+
+      }
+
+
+      /* =========================
+         OPEN LOGOUT MODAL
+      ========================= */
+
+      if (
+        typeof openLogoutConfirm ===
+        "function"
+      ) {
+
+        openLogoutConfirm();
+
+      }
+
+    }
+  );
+
+}
 
 /* =========================
    RESET AVATAR
