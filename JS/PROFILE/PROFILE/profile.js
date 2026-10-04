@@ -186,7 +186,7 @@ const u9ProfileButton5 =
     "U9-profile-button-5"
   );
 
-  
+
 const u9ProfileButton6 =
   document.getElementById(
     "U9-profile-button-6"
@@ -1223,27 +1223,6 @@ if (
     function () {
 
       /* =========================
-         CLOSE PROFILE WINDOW
-      ========================= */
-
-      if (
-        window.U9WindowManager
-      ) {
-
-        window.U9WindowManager.close(
-          "profile"
-        );
-
-      }
-
-      else {
-
-        closeProfileModal();
-
-      }
-
-
-      /* =========================
          OPEN LOGOUT MODAL
       ========================= */
 
@@ -1260,6 +1239,7 @@ if (
   );
 
 }
+
 
 /* =========================
    RESET AVATAR
