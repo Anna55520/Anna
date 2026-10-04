@@ -105,7 +105,7 @@ const u9ProfilePaidFrameUrl =
 
 
 /* =========================
-   DEFAULT AVATAR
+   FRONTEND DEFAULT AVATAR
 ========================= */
 
 const u9ProfileDefaultAvatar =
@@ -113,7 +113,7 @@ const u9ProfileDefaultAvatar =
 
 
 /* =========================
-   DEFAULT FRAME
+   FRONTEND DEFAULT FRAME
 ========================= */
 
 const u9ProfileDefaultFrame =
@@ -547,8 +547,8 @@ function u9ProfileResetAvatar() {
   ) {
 
     /*
-      Remove fallback lock so a
-      future real avatar can load.
+      Allow a future avatar
+      to use fallback again.
     */
 
     u9ProfileAvatarImage.dataset.u9Fallback =
@@ -570,8 +570,8 @@ function u9ProfileResetAvatar() {
   ) {
 
     /*
-      Remove fallback lock so a
-      future real frame can load.
+      Allow a future frame
+      to use fallback again.
     */
 
     u9ProfileAvatarFrame.dataset.u9Fallback =
@@ -599,15 +599,18 @@ if (
     function () {
 
       /*
-        If the default avatar itself
-        has already failed, stop here.
+        If the frontend default
+        has already failed, stop.
 
-        This prevents an infinite loop:
+        This prevents:
+
         profile.svg
-        -> error
-        -> profile.svg
-        -> error
-        -> ...
+        ->
+        profile.svg
+        ->
+        profile.svg
+        ->
+        infinite loop
       */
 
       if (
@@ -629,8 +632,7 @@ if (
 
 
       /*
-        Always fall back to the
-        default profile avatar.
+        Frontend default avatar.
       */
 
       this.src =
@@ -655,8 +657,8 @@ if (
     function () {
 
       /*
-        If ordinary.svg itself has
-        already failed, stop here.
+        If ordinary.svg has
+        already failed, stop.
 
         Prevent infinite loop.
       */
@@ -680,8 +682,7 @@ if (
 
 
       /*
-        Always fall back to the
-        default ordinary frame.
+        Frontend default frame.
       */
 
       this.src =
@@ -703,7 +704,7 @@ async function u9ProfileLoadFrame(
 ) {
 
   /* =========================
-     DEFAULT FRAME
+     DATABASE DEFAULT FRAME
   ========================= */
 
   if (
@@ -772,6 +773,7 @@ async function u9ProfileLoadFrame(
 
   }
 
+
   /* =========================
      PAID FRAME
   ========================= */
@@ -784,6 +786,7 @@ async function u9ProfileLoadFrame(
       u9ProfilePaidFrameUrl;
 
   }
+
 
   /* =========================
      UNKNOWN FRAME TYPE
@@ -884,7 +887,7 @@ async function u9ProfileLoadFrame(
 
 
     /* =========================
-       LOAD FRAME
+       LOAD REAL FRAME
     ========================= */
 
     if (
@@ -892,8 +895,8 @@ async function u9ProfileLoadFrame(
     ) {
 
       /*
-        New real frame:
-        allow onerror fallback again.
+        Allow fallback if
+        real frame fails.
       */
 
       u9ProfileAvatarFrame.dataset.u9Fallback =
@@ -915,10 +918,12 @@ async function u9ProfileLoadFrame(
   ) {
 
     /*
-      Network error / offline /
-      fetch failed.
+      Network error
+      Offline
+      Connection changed
+      Fetch failed
 
-      Reset BOTH avatar and frame.
+      Use frontend defaults.
     */
 
     u9ProfileResetAvatar();
@@ -1002,7 +1007,8 @@ async function u9ProfileLoadAvatarFromUser(
 ) {
 
   /*
-    Always start from defaults.
+    Always start with
+    frontend defaults.
   */
 
   u9ProfileResetAvatar();
@@ -1037,31 +1043,43 @@ async function u9ProfileLoadAvatarFromUser(
       "";
 
 
+    /* =========================
+       USER HAS AVATAR
+    ========================= */
+
     if (
       avatarUrl &&
       u9ProfileAvatarImage
     ) {
 
       /*
-        Allow avatar onerror fallback.
+        Enable fallback again.
       */
 
       u9ProfileAvatarImage.dataset.u9Fallback =
         "false";
 
 
+      /*
+        Database/user avatar.
+      */
+
       u9ProfileAvatarImage.src =
         avatarUrl;
 
     }
+
+
+    /* =========================
+       NO USER AVATAR
+    ========================= */
 
     else if (
       u9ProfileAvatarImage
     ) {
 
       /*
-        No user avatar:
-        use default.
+        Frontend default avatar.
       */
 
       u9ProfileAvatarImage.dataset.u9Fallback =
@@ -1096,8 +1114,8 @@ async function u9ProfileLoadAvatarFromUser(
 
 
     /*
-      If frame loading failed,
-      reset BOTH avatar and frame.
+      Frame failed:
+      use BOTH frontend defaults.
     */
 
     if (
@@ -1121,7 +1139,7 @@ async function u9ProfileLoadAvatarFromUser(
 
     /*
       Unexpected error:
-      default avatar + frame.
+      frontend defaults.
     */
 
     u9ProfileResetAvatar();
@@ -1147,7 +1165,8 @@ async function u9ProfileLoad() {
 
 
   /*
-    Always begin with:
+    Start with frontend defaults.
+
     Avatar -> profile.svg
     Frame  -> ordinary.svg
   */
@@ -1233,8 +1252,8 @@ async function u9ProfileLoad() {
 
 
     /*
-      Any loading failure:
-      default avatar + frame.
+      Any failure:
+      frontend defaults.
     */
 
     if (
@@ -1273,6 +1292,10 @@ async function u9ProfileLoad() {
       error
     );
 
+
+    /*
+      Frontend defaults.
+    */
 
     u9ProfileResetAvatar();
 
