@@ -1,3 +1,4 @@
+
 /* =========================
    PROFILE MODAL
 ========================= */
@@ -88,34 +89,6 @@ const u9ProfileAvatarFrame =
 
 
 /* =========================
-   PAGE SCROLL LOCK
-========================= */
-
-function lockProfilePageScroll() {
-
-  document.documentElement.style.overflow =
-    "hidden";
-
-
-  document.body.style.overflow =
-    "hidden";
-
-}
-
-
-function unlockProfilePageScroll() {
-
-  document.documentElement.style.overflow =
-    "";
-
-
-  document.body.style.overflow =
-    "";
-
-}
-
-
-/* =========================
    PROFILE INFO LOADING
 ========================= */
 
@@ -181,13 +154,6 @@ function u9ProfileHideLoading() {
 
 function u9ProfileCanOpen() {
 
-  /*
-     U9User must already exist.
-
-     header.js is responsible
-     for checking /me.
-  */
-
   if (
     !window.U9User
   ) {
@@ -202,15 +168,6 @@ function u9ProfileCanOpen() {
   }
 
 
-  /*
-     Only AUTHENTICATED can
-     open Profile.
-
-     CHECKING is not enough.
-     ERROR is not enough.
-     INVALID is not enough.
-  */
-
   if (
     !window.U9User.isLoggedIn()
   ) {
@@ -219,10 +176,6 @@ function u9ProfileCanOpen() {
 
   }
 
-
-  /*
-     User object must exist.
-  */
 
   if (
     !window.U9User.get()
@@ -244,14 +197,6 @@ function u9ProfileCanOpen() {
 
 function openProfileModal() {
 
-  /*
-     Profile must be opened
-     through Window Manager.
-
-     This function only performs
-     the actual Profile opening.
-  */
-
   if (
     !profileModal ||
     !profileModalContent
@@ -261,15 +206,6 @@ function openProfileModal() {
 
   }
 
-
-  /*
-     Double protection.
-
-     Even if another script
-     directly calls openProfileModal(),
-     Profile still cannot open
-     without authentication.
-  */
 
   if (
     !u9ProfileCanOpen()
@@ -285,27 +221,21 @@ function openProfileModal() {
   }
 
 
-  /* =========================
-     REMOVE CLOSING
-  ========================= */
+  /* REMOVE CLOSING */
 
   profileModal.classList.remove(
     "modal-closing"
   );
 
 
-  /* =========================
-     OPEN
-  ========================= */
+  /* OPEN */
 
   profileModal.classList.add(
     "modal-open"
   );
 
 
-  /* =========================
-     USER BUTTON ACTIVE
-  ========================= */
+  /* USER BUTTON ACTIVE */
 
   if (
     profileUserButton
@@ -318,16 +248,7 @@ function openProfileModal() {
   }
 
 
-  /* =========================
-     LOCK PAGE SCROLL
-  ========================= */
-
-  lockProfilePageScroll();
-
-
-  /* =========================
-     LOAD PROFILE
-  ========================= */
+  /* LOAD PROFILE */
 
   u9ProfileLoad();
 
@@ -353,10 +274,6 @@ function closeProfileModal() {
   }
 
 
-  /* =========================
-     ALREADY CLOSED
-  ========================= */
-
   if (
     !profileModal.classList.contains(
       "modal-open"
@@ -368,27 +285,21 @@ function closeProfileModal() {
   }
 
 
-  /* =========================
-     REMOVE OPEN
-  ========================= */
+  /* REMOVE OPEN */
 
   profileModal.classList.remove(
     "modal-open"
   );
 
 
-  /* =========================
-     START CLOSING
-  ========================= */
+  /* START CLOSING */
 
   profileModal.classList.add(
     "modal-closing"
   );
 
 
-  /* =========================
-     USER BUTTON INACTIVE
-  ========================= */
+  /* USER BUTTON INACTIVE */
 
   if (
     profileUserButton
@@ -400,10 +311,6 @@ function closeProfileModal() {
 
   }
 
-
-  /* =========================
-     WAIT FOR ANIMATION
-  ========================= */
 
   let closeFinished =
     false;
@@ -424,25 +331,14 @@ function closeProfileModal() {
       true;
 
 
-    /* =========================
-       REMOVE CLOSING
-    ========================= */
+    /* REMOVE CLOSING */
 
     profileModal.classList.remove(
       "modal-closing"
     );
 
 
-    /* =========================
-       UNLOCK PAGE SCROLL
-    ========================= */
-
-    unlockProfilePageScroll();
-
-
-    /* =========================
-       REMOVE EVENT
-    ========================= */
+    /* REMOVE EVENT */
 
     profileModalContent.removeEventListener(
       "transitionend",
@@ -455,10 +351,6 @@ function closeProfileModal() {
   function handleCloseAnimation(
     event
   ) {
-
-    /*
-       Only wait for transform.
-    */
 
     if (
       event.propertyName !==
@@ -480,15 +372,6 @@ function closeProfileModal() {
     handleCloseAnimation
   );
 
-
-  /*
-     Safety fallback.
-
-     If transitionend is not
-     triggered for any reason,
-     Profile will still finish
-     closing.
-  */
 
   setTimeout(
     finishClose,
@@ -516,28 +399,33 @@ async function toggleProfileModal() {
   }
 
 
-  /*
-     If Profile is currently
-     open, close it directly.
-  */
-
   if (
     profileModal.classList.contains(
       "modal-open"
     )
   ) {
 
-    closeProfileModal();
+    if (
+      window.U9WindowManager
+    ) {
+
+      await window.U9WindowManager.close(
+        "profile"
+      );
+
+    }
+
+    else {
+
+      closeProfileModal();
+
+    }
+
 
     return true;
 
   }
 
-
-  /*
-     Otherwise ask Window Manager
-     to open Profile.
-  */
 
   if (
     window.U9WindowManager
@@ -549,14 +437,6 @@ async function toggleProfileModal() {
 
   }
 
-
-  /*
-     Fallback.
-
-     This should normally never
-     be needed once Window Manager
-     is loaded correctly.
-  */
 
   return openProfileModal();
 
@@ -598,7 +478,21 @@ if (
     "click",
     function () {
 
-      closeProfileModal();
+      if (
+        window.U9WindowManager
+      ) {
+
+        window.U9WindowManager.close(
+          "profile"
+        );
+
+      }
+
+      else {
+
+        closeProfileModal();
+
+      }
 
     }
   );
@@ -609,18 +503,6 @@ if (
 /* =========================
    API
 ========================= */
-
-/*
-   These are NOT /me.
-
-   They are only used to load
-   the available avatar frame
-   resources.
-
-   Current user information
-   still comes exclusively from
-   header.js / U9User.
-*/
 
 const u9ProfileDefaultFrameUrl =
   "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-default";
@@ -687,10 +569,6 @@ async function u9ProfileLoadFrame(
   frameId
 ) {
 
-  /* =========================
-     DEFAULT FRAME
-  ========================= */
-
   if (
     !frameType ||
     frameType === "default"
@@ -710,10 +588,6 @@ async function u9ProfileLoadFrame(
   }
 
 
-  /* =========================
-     FRAME ID REQUIRED
-  ========================= */
-
   if (
     !frameId
   ) {
@@ -731,10 +605,6 @@ async function u9ProfileLoadFrame(
 
   }
 
-
-  /* =========================
-     SELECT API
-  ========================= */
 
   let requestUrl =
     "";
@@ -776,10 +646,6 @@ async function u9ProfileLoadFrame(
 
   try {
 
-    /* =========================
-       REQUEST FRAME
-    ========================= */
-
     const response =
       await fetch(
         requestUrl,
@@ -788,10 +654,6 @@ async function u9ProfileLoadFrame(
         }
       );
 
-
-    /* =========================
-       REQUEST FAILED
-    ========================= */
 
     if (
       !response.ok
@@ -818,17 +680,9 @@ async function u9ProfileLoadFrame(
     }
 
 
-    /* =========================
-       JSON
-    ========================= */
-
     const result =
       await response.json();
 
-
-    /* =========================
-       GET FRAMES
-    ========================= */
 
     const frames =
       result.frames ||
@@ -836,20 +690,12 @@ async function u9ProfileLoadFrame(
       [];
 
 
-    /* =========================
-       FIND CURRENT FRAME
-    ========================= */
-
     const currentFrame =
       frames.find(
         (frame) =>
           frame.id === frameId
       );
 
-
-    /* =========================
-       FRAME NOT FOUND
-    ========================= */
 
     if (
       !currentFrame
@@ -876,10 +722,6 @@ async function u9ProfileLoadFrame(
     }
 
 
-    /* =========================
-       SVG REQUIRED
-    ========================= */
-
     if (
       !currentFrame.svg
     ) {
@@ -904,10 +746,6 @@ async function u9ProfileLoadFrame(
 
     }
 
-
-    /* =========================
-       DISPLAY FRAME
-    ========================= */
 
     if (
       u9ProfileAvatarFrame
@@ -961,10 +799,6 @@ function u9ProfileDisplayUser(
   }
 
 
-  /* =========================
-     USERNAME
-  ========================= */
-
   if (
     u9ProfileUsername
   ) {
@@ -975,10 +809,6 @@ function u9ProfileDisplayUser(
 
   }
 
-
-  /* =========================
-     ACCOUNT
-  ========================= */
 
   if (
     u9ProfileAccount
@@ -991,10 +821,6 @@ function u9ProfileDisplayUser(
   }
 
 
-  /* =========================
-     BALANCE
-  ========================= */
-
   if (
     u9ProfileBalance
   ) {
@@ -1005,10 +831,6 @@ function u9ProfileDisplayUser(
 
   }
 
-
-  /* =========================
-     COINS
-  ========================= */
 
   if (
     u9ProfileCoins
@@ -1031,10 +853,6 @@ async function u9ProfileLoadAvatarFromUser(
   user
 ) {
 
-  /* =========================
-     RESET FIRST
-  ========================= */
-
   u9ProfileResetAvatar();
 
 
@@ -1046,10 +864,6 @@ async function u9ProfileLoadAvatarFromUser(
 
   }
 
-
-  /* =========================
-     AVATAR
-  ========================= */
 
   const avatar =
     user.avatar ||
@@ -1081,10 +895,6 @@ async function u9ProfileLoadAvatarFromUser(
   }
 
 
-  /* =========================
-     FRAME
-  ========================= */
-
   const frameType =
     user.avatar_frame_type ||
     "default";
@@ -1109,23 +919,11 @@ async function u9ProfileLoadAvatarFromUser(
 
 async function u9ProfileLoad() {
 
-  /* =========================
-     SHOW LOADING
-  ========================= */
-
   u9ProfileShowLoading();
 
 
-  /* =========================
-     RESET AVATAR
-  ========================= */
-
   u9ProfileResetAvatar();
 
-
-  /* =========================
-     GET CURRENT USER
-  ========================= */
 
   if (
     !window.U9User
@@ -1145,20 +943,10 @@ async function u9ProfileLoad() {
     window.U9User.get();
 
 
-  /* =========================
-     USER NOT AUTHENTICATED
-  ========================= */
-
   if (
     !window.U9User.isLoggedIn() ||
     !user
   ) {
-
-    /*
-       Do not show Profile data.
-
-       Keep loading state.
-    */
 
     return;
 
@@ -1167,34 +955,18 @@ async function u9ProfileLoad() {
 
   try {
 
-    /* =========================
-       DISPLAY USER INFO
-    ========================= */
-
     u9ProfileDisplayUser(
       user
     );
 
-
-    /* =========================
-       LOAD AVATAR + FRAME
-    ========================= */
 
     await u9ProfileLoadAvatarFromUser(
       user
     );
 
 
-    /* =========================
-       HIDE LOADING
-    ========================= */
-
     u9ProfileHideLoading();
 
-
-    /* =========================
-       DEBUG
-    ========================= */
 
     console.log(
       "Profile Loaded:",
@@ -1216,11 +988,6 @@ async function u9ProfileLoad() {
     u9ProfileResetAvatar();
 
 
-    /*
-       Keep loading state
-       when Profile data fails.
-    */
-
     return;
 
   }
@@ -1240,25 +1007,11 @@ if (
     "profile",
     {
 
-      /* =========================
-         OPEN
-      ========================= */
-
       open:
         openProfileModal,
 
-
-      /* =========================
-         CLOSE
-      ========================= */
-
       close:
         closeProfileModal,
-
-
-      /* =========================
-         IS OPEN
-      ========================= */
 
       isOpen:
         function () {
@@ -1283,11 +1036,6 @@ if (
           );
 
         },
-
-
-      /* =========================
-         CAN OPEN
-      ========================= */
 
       canOpen:
         u9ProfileCanOpen
