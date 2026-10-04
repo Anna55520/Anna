@@ -1255,8 +1255,44 @@ for (
     "click",
     function (event) {
 
+      /*
+        Prevent default button behavior.
+      */
+
+      event.preventDefault();
+
+
+      /*
+        Stop the event from bubbling
+        to parent elements.
+      */
+
       event.stopPropagation();
 
+
+      /*
+        Prevent another click listener
+        on the same button from running.
+      */
+
+      event.stopImmediatePropagation();
+
+
+      /*
+        Prevent duplicate back action
+        while the page animation is running.
+      */
+
+      if (u9ProfilePageAnimating) {
+
+        return;
+
+      }
+
+
+      /*
+        Go back to Profile Home.
+      */
 
       u9ProfileGoBack();
 
