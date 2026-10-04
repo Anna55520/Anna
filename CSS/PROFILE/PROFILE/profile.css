@@ -151,39 +151,23 @@
 ========================= */
 
 #U9-profile-modal-close {
-
-  position: absolute;
-
-  top: 50%;
-
-  left: 15px;
-
-  width: 36px;
-
-  height: 36px;
-
-  padding: 0;
-
-  border: none;
-
-  outline: none;
-
-  border-radius: 50%;
-
-  background-color: #f1f1f1;
-
-  cursor: pointer;
-
-  transform:
+    position: absolute;
+    top: 50%;
+    left: 15px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    outline: none;
+    border-radius: 50%;
+    background-color: #f1f1f100;
+    cursor: pointer;
+    transform:
     translateY(-50%);
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-}
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    }
 
 
 /* =========================
@@ -726,48 +710,30 @@
 ========================= */
 
 #U9-profile-balance-toggle {
-
-  position: absolute;
-
-  top: 50%;
-
-  right:
+    position: absolute;
+    top: 50%;
+    right:
     calc(
       (100% - 352px) / 2
     );
-
-  width: 36px;
-
-  height: 36px;
-
-  padding: 0;
-
-  border: none;
-
-  outline: none;
-
-  border-radius: 50%;
-
-  box-sizing: border-box;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  background-color: #ffffff;
-
-  cursor: pointer;
-
-  transform:
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: none;
+    outline: none;
+    border-radius: 50%;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff00;
+    cursor: pointer;
+    transform:
     translateY(-50%);
-
-  transition:
+    transition:
     background-color 0.2s ease,
     transform 0.15s ease;
-
-}
+    }
 
 
 /* =========================
@@ -862,39 +828,7 @@
 ========================= */
 
 #U9-profile-button-1,
-#U9-profile-button-2 {
-
-  position: relative;
-
-  width: 170px;
-
-  height: 50px;
-
-  padding: 0;
-
-  border: none;
-
-  border-radius: 10px;
-
-  box-sizing: border-box;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  background-color: #ffffff;
-
-  color: #222222;
-
-  font-size: 15px;
-
-  font-weight: 500;
-
-  cursor: pointer;
-
-}
+#U9-profile-button-2 {position: relative;width: 170px;height: 50px;padding: 0;border: none;border-radius: 10px;box-sizing: border-box;display: flex;align-items: center;justify-content: center;background-color: #fefeff;color: #222222;font-size: 15px;font-weight: 500;cursor: pointer;}
 
 
 /* =========================
@@ -993,42 +927,26 @@
 #U9-profile-button-4,
 #U9-profile-button-5,
 #U9-profile-button-6 {
-
-  position: relative;
-
-  width:
+    position: relative;
+    width:
     min(
       400px,
       calc(100% - 30px)
     );
-
-  height: 50px;
-
-  padding: 0;
-
-  border: none;
-
-  border-radius: 10px;
-
-  box-sizing: border-box;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  background-color: #eef5ff;
-
-  color: #222222;
-
-  font-size: 16px;
-
-  font-weight: 500;
-
-  cursor: pointer;
-
-}
+    height: 50px;
+    padding: 0;
+    border: none;
+    border-radius: 10px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e1e2e6;
+    color: #222222;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    }
 
 
 /* =========================
