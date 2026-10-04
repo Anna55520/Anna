@@ -108,8 +108,37 @@ const u9ProfilePaidFrameUrl =
    FRONTEND DEFAULT AVATAR
 ========================= */
 
+/*
+  Frontend default avatar.
+
+  This SVG is embedded directly into
+  the JavaScript as a Data URI.
+
+  Therefore:
+
+  - No network request
+  - No dependency on profile.svg
+  - Works when offline
+  - Works when Vercel is unreachable
+*/
+
+const u9ProfileDefaultAvatarSvg =
+  `<svg width="199px" height="199px" viewBox="-2.56 -2.56 21.12 21.12" xmlns="http://www.w3.org/2000/svg" fill="#000000" stroke="#000000" stroke-width="0.00016"><g id="SVGRepo_bgCarrier" stroke-width="0"><rect x="-2.56" y="-2.56" width="21.12" height="21.12" rx="0" fill="#ffffff" strokewidth="0"></rect></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="m 8 1 c -1.65625 0 -3 1.34375 -3 3 s 1.34375 3 3 3 s 3 -1.34375 3 -3 s -1.34375 -3 -3 -3 z m -1.5 7 c -2.492188 0 -4.5 2.007812 -4.5 4.5 v 0.5 c 0 1.109375 0.890625 2 2 2 h 8 c 1.109375 0 2 -0.890625 2 -2 v -0.5 c 0 -2.492188 -2.007812 -4.5 -4.5 -4.5 z m 0 0" fill="#357cf1"></path></g></svg>`;
+
+
+/*
+  Convert SVG to Data URI.
+
+  encodeURIComponent()
+  makes the SVG safe to use
+  inside an image src.
+*/
+
 const u9ProfileDefaultAvatar =
-  "/SSVG/avatar/profile.svg";
+  "data:image/svg+xml;charset=UTF-8," +
+  encodeURIComponent(
+    u9ProfileDefaultAvatarSvg
+  );
 
 
 /* =========================
@@ -555,6 +584,16 @@ function u9ProfileResetAvatar() {
       "false";
 
 
+    /*
+      Frontend default avatar.
+
+      This is now an embedded SVG.
+
+      It does NOT request:
+
+      /SSVG/avatar/profile.svg
+    */
+
     u9ProfileAvatarImage.src =
       u9ProfileDefaultAvatar;
 
@@ -602,15 +641,7 @@ if (
         If the frontend default
         has already failed, stop.
 
-        This prevents:
-
-        profile.svg
-        ->
-        profile.svg
-        ->
-        profile.svg
-        ->
-        infinite loop
+        Prevent infinite loop.
       */
 
       if (
@@ -632,7 +663,8 @@ if (
 
 
       /*
-        Frontend default avatar.
+        Use the embedded frontend
+        default avatar again.
       */
 
       this.src =
@@ -1009,6 +1041,12 @@ async function u9ProfileLoadAvatarFromUser(
   /*
     Always start with
     frontend defaults.
+
+    Avatar:
+    embedded SVG
+
+    Frame:
+    ordinary.svg
   */
 
   u9ProfileResetAvatar();
@@ -1062,6 +1100,10 @@ async function u9ProfileLoadAvatarFromUser(
 
       /*
         Database/user avatar.
+
+        If this URL fails,
+        onerror will automatically
+        return to embedded default.
       */
 
       u9ProfileAvatarImage.src =
@@ -1080,6 +1122,8 @@ async function u9ProfileLoadAvatarFromUser(
 
       /*
         Frontend default avatar.
+
+        Embedded SVG.
       */
 
       u9ProfileAvatarImage.dataset.u9Fallback =
@@ -1167,7 +1211,7 @@ async function u9ProfileLoad() {
   /*
     Start with frontend defaults.
 
-    Avatar -> profile.svg
+    Avatar -> embedded profile SVG
     Frame  -> ordinary.svg
   */
 
