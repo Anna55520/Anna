@@ -26,6 +26,34 @@ const profileButton =
 
 
 /* =========================
+   NORMAL TOOL BUTTONS
+========================= */
+
+const messageButton =
+  document.getElementById(
+    "U9-page-container-tool-message"
+  );
+
+
+const inboxButton =
+  document.getElementById(
+    "U9-page-container-tool-inbox"
+  );
+
+
+const giftButton =
+  document.getElementById(
+    "U9-page-container-tool-gift"
+  );
+
+
+const historyButton =
+  document.getElementById(
+    "U9-page-container-tool-history"
+  );
+
+
+/* =========================
    PAGE BUTTONS
 ========================= */
 
@@ -76,158 +104,122 @@ const pageNextButton =
 
 
 /* =========================
-   NORMAL MODALS
+   WINDOW MANAGER
 ========================= */
 
-const normalModals = [
+function getWindowManager() {
 
-  {
-    modal:
-      document.getElementById(
-        "U9-message-normal-modal"
-      ),
+  return window.U9WindowManager || null;
 
-    content:
-      document.getElementById(
-        "U9-message-normal-modal-content"
-      ),
+}
 
-    close:
-      document.getElementById(
-        "U9-message-normal-modal-close"
-      ),
 
-    button:
-      document.getElementById(
-        "U9-page-container-tool-message"
-      ),
+/* =========================
+   CLOSE CURRENT WINDOW
+========================= */
 
-    animation:
-      "message-bounce",
+async function closeCurrentWindow() {
 
-    open:
-      "openMessageModal"
+  const manager =
+    getWindowManager();
 
-  },
 
-  {
-    modal:
-      document.getElementById(
-        "U9-inbox-normal-modal"
-      ),
+  if (
+    !manager
+  ) {
 
-    content:
-      document.getElementById(
-        "U9-inbox-normal-modal-content"
-      ),
-
-    close:
-      document.getElementById(
-        "U9-inbox-normal-modal-close"
-      ),
-
-    button:
-      document.getElementById(
-        "U9-page-container-tool-inbox"
-      ),
-
-    animation:
-      "inbox-shake",
-
-    open:
-      "openInboxModal"
-
-  },
-
-  {
-    modal:
-      document.getElementById(
-        "U9-gift-normal-modal"
-      ),
-
-    content:
-      document.getElementById(
-        "U9-gift-normal-modal-content"
-      ),
-
-    close:
-      document.getElementById(
-        "U9-gift-normal-modal-close"
-      ),
-
-    button:
-      document.getElementById(
-        "U9-page-container-tool-gift"
-      ),
-
-    animation:
-      "gift-bounce",
-
-    open:
-      "openGiftModal"
-
-  },
-
-  {
-    modal:
-      document.getElementById(
-        "U9-history-normal-modal"
-      ),
-
-    content:
-      document.getElementById(
-        "U9-history-normal-modal-content"
-      ),
-
-    close:
-      document.getElementById(
-        "U9-history-normal-modal-close"
-      ),
-
-    button:
-      document.getElementById(
-        "U9-page-container-tool-history"
-      ),
-
-    animation:
-      "history-shake",
-
-    open:
-      "openHistoryModal"
+    return true;
 
   }
 
-];
+
+  return await manager.closeCurrent();
+
+}
 
 
 /* =========================
-   NORMAL MODAL STATE
+   OPEN WINDOW
 ========================= */
 
-let normalModalActionRunning =
-  false;
+async function openContainerWindow(
+  windowName
+) {
+
+  const manager =
+    getWindowManager();
+
+
+  if (
+    !manager
+  ) {
+
+    return false;
+
+  }
+
+
+  return await manager.open(
+    windowName
+  );
+
+}
 
 
 /* =========================
-   GET ACTIVE NORMAL MODAL
+   TOOL BUTTON ANIMATION
 ========================= */
 
-function getActiveNormalModal() {
+function playToolAnimation(
+  button,
+  animation
+) {
 
-  return normalModals.find(
-    function (item) {
+  if (
+    !button ||
+    !animation
+  ) {
 
-      return (
-        item.modal &&
-        (
-          item.modal.classList.contains(
-            "modal-open"
-          ) ||
+    return;
 
-          item.modal.classList.contains(
-            "modal-closing"
-          )
-        )
+  }
+
+
+  button.classList.remove(
+    animation
+  );
+
+
+  void button.offsetWidth;
+
+
+  button.classList.add(
+    animation
+  );
+
+}
+
+
+/* =========================
+   MESSAGE BUTTON
+========================= */
+
+if (
+  messageButton
+) {
+
+  messageButton.addEventListener(
+    "click",
+    function () {
+
+      playToolAnimation(
+        messageButton,
+        "message-bounce"
+      );
+
+
+      openContainerWindow(
+        "message"
       );
 
     }
@@ -237,263 +229,26 @@ function getActiveNormalModal() {
 
 
 /* =========================
-   WAIT FOR MODAL CLOSE
+   INBOX BUTTON
 ========================= */
 
-function waitForNormalModalClose(
-  item,
-  callback
+if (
+  inboxButton
 ) {
 
-  if (
-    !item ||
-    !item.content
-  ) {
-
-    callback();
-
-    return;
-
-  }
-
-
-  let finished =
-    false;
-
-
-  function finish() {
-
-    if (
-      finished
-    ) {
-
-      return;
-
-    }
-
-
-    finished =
-      true;
-
-
-    item.content.removeEventListener(
-      "transitionend",
-      handleTransitionEnd
-    );
-
-
-    callback();
-
-  }
-
-
-  function handleTransitionEnd(
-    event
-  ) {
-
-    if (
-      event.propertyName !==
-      "transform"
-    ) {
-
-      return;
-
-    }
-
-
-    finish();
-
-  }
-
-
-  item.content.addEventListener(
-    "transitionend",
-    handleTransitionEnd
-  );
-
-
-  setTimeout(
+  inboxButton.addEventListener(
+    "click",
     function () {
 
-      finish();
-
-    },
-    500
-  );
-
-}
-
-
-/* =========================
-   CLOSE ACTIVE MODAL
-========================= */
-
-function closeActiveNormalModal(
-  callback
-) {
-
-  const activeModal =
-    getActiveNormalModal();
-
-
-  if (
-    !activeModal
-  ) {
-
-    callback();
-
-    return;
-
-  }
-
-
-  /*
-     ALREADY CLOSING
-
-     Wait for the existing
-     closing animation.
-  */
-
-  if (
-    activeModal.modal.classList.contains(
-      "modal-closing"
-    )
-  ) {
-
-    waitForNormalModalClose(
-      activeModal,
-      callback
-    );
-
-    return;
-
-  }
-
-
-  /*
-     CLOSE USING THE MODAL'S
-     OWN CLOSE BUTTON
-  */
-
-  if (
-    activeModal.close
-  ) {
-
-    activeModal.close.click();
-
-  }
-
-
-  waitForNormalModalClose(
-    activeModal,
-    callback
-  );
-
-}
-
-
-/* =========================
-   PLAY NORMAL TOOL ANIMATION
-========================= */
-
-function playNormalToolAnimation(
-  item
-) {
-
-  if (
-    !item ||
-    !item.button ||
-    !item.animation
-  ) {
-
-    return;
-
-  }
-
-
-  item.button.classList.remove(
-    item.animation
-  );
-
-
-  void item.button.offsetWidth;
-
-
-  item.button.classList.add(
-    item.animation
-  );
-
-}
-
-
-/* =========================
-   OPEN NORMAL MODAL
-========================= */
-
-function openNormalModal(
-  target
-) {
-
-  if (
-    !target ||
-    !target.open
-  ) {
-
-    return;
-
-  }
-
-
-  const openFunction =
-    window[target.open];
-
-
-  if (
-    typeof openFunction !==
-    "function"
-  ) {
-
-    return;
-
-  }
-
-
-  openFunction();
-
-}
-
-
-/* =========================
-   SWITCH NORMAL MODAL
-========================= */
-
-function switchNormalModal(
-  target
-) {
-
-  if (
-    normalModalActionRunning
-  ) {
-
-    return;
-
-  }
-
-
-  normalModalActionRunning =
-    true;
-
-
-  closeActiveNormalModal(
-    function () {
-
-      openNormalModal(
-        target
+      playToolAnimation(
+        inboxButton,
+        "inbox-shake"
       );
 
 
-      normalModalActionRunning =
-        false;
+      openContainerWindow(
+        "inbox"
+      );
 
     }
   );
@@ -502,96 +257,59 @@ function switchNormalModal(
 
 
 /* =========================
-   NORMAL MODAL BUTTONS
+   GIFT BUTTON
 ========================= */
 
-normalModals.forEach(
-  function (item) {
+if (
+  giftButton
+) {
 
-    if (
-      !item.button
-    ) {
+  giftButton.addEventListener(
+    "click",
+    function () {
 
-      return;
+      playToolAnimation(
+        giftButton,
+        "gift-bounce"
+      );
+
+
+      openContainerWindow(
+        "gift"
+      );
 
     }
+  );
+
+}
 
 
-    item.button.addEventListener(
-      "click",
-      function (event) {
+/* =========================
+   HISTORY BUTTON
+========================= */
+
+if (
+  historyButton
+) {
+
+  historyButton.addEventListener(
+    "click",
+    function () {
+
+      playToolAnimation(
+        historyButton,
+        "history-shake"
+      );
 
 
-        /* =========================
-           TOOL ICON ANIMATION
-        ========================= */
+      openContainerWindow(
+        "history"
+      );
 
-        playNormalToolAnimation(
-          item
-        );
+    }
+  );
 
-
-        const activeModal =
-          getActiveNormalModal();
-
-
-        /*
-           No modal is open.
-
-           Open this modal directly.
-        */
-
-        if (
-          !activeModal
-        ) {
-
-          openNormalModal(
-            item
-          );
-
-          return;
-
-        }
-
-
-        /*
-           The current modal is already
-           the requested modal.
-
-           Do nothing.
-        */
-
-        if (
-          activeModal.button ===
-          item.button
-        ) {
-
-          return;
-
-        }
-
-
-        /*
-           Another modal is open.
-
-           Stop the normal click
-           and switch modal.
-        */
-
-        event.preventDefault();
-
-        event.stopImmediatePropagation();
-
-
-        switchNormalModal(
-          item
-        );
-
-      }
-    );
-
-  }
-);
+}
 
 
 /* =========================
@@ -604,81 +322,55 @@ if (
 
   menuButton.addEventListener(
     "click",
-    function (event) {
+    async function () {
+
+      const manager =
+        getWindowManager();
 
 
       /*
-         If a normal modal is open,
+         If a Window is open,
          close it first.
-
-         Then open the menu.
       */
 
-      const activeModal =
-        getActiveNormalModal();
-
-
       if (
-        activeModal &&
-        !normalModalActionRunning
+        manager &&
+        manager.getCurrent()
       ) {
 
-        event.preventDefault();
-
-        event.stopImmediatePropagation();
-
-
-        normalModalActionRunning =
-          true;
+        const closed =
+          await closeCurrentWindow();
 
 
-        closeActiveNormalModal(
-          function () {
+        if (
+          !closed
+        ) {
 
+          return;
 
-            tool.classList.add(
-              "menu-open"
-            );
-
-
-            /*
-               MENU ANIMATION
-            */
-
-            menuButton.classList.remove(
-              "menu-heartbeat"
-            );
-
-
-            void menuButton.offsetWidth;
-
-
-            menuButton.classList.add(
-              "menu-heartbeat"
-            );
-
-
-            normalModalActionRunning =
-              false;
-
-          }
-        );
-
-
-        return;
+        }
 
       }
 
 
       /*
-         Normal menu behavior
-         when no modal is open.
+         Open / close menu
       */
 
-      tool.classList.toggle(
-        "menu-open"
-      );
+      if (
+        tool
+      ) {
 
+        tool.classList.toggle(
+          "menu-open"
+        );
+
+      }
+
+
+      /*
+         Menu animation
+      */
 
       menuButton.classList.remove(
         "menu-heartbeat"
@@ -692,8 +384,7 @@ if (
         "menu-heartbeat"
       );
 
-    },
-    true
+    }
   );
 
 }
@@ -703,11 +394,14 @@ if (
    PROFILE MODAL
 ========================= */
 
-function openProfileFromContainerTool() {
+async function openProfileFromContainerTool() {
+
+  const manager =
+    getWindowManager();
+
 
   if (
-    typeof window.openProfileModal !==
-    "function"
+    !manager
   ) {
 
     return;
@@ -715,7 +409,9 @@ function openProfileFromContainerTool() {
   }
 
 
-  window.openProfileModal();
+  await manager.open(
+    "profile"
+  );
 
 }
 
@@ -858,7 +554,31 @@ if (
 
   homeButton.addEventListener(
     "click",
-    function () {
+    async function () {
+
+      const manager =
+        getWindowManager();
+
+
+      if (
+        manager &&
+        manager.getCurrent()
+      ) {
+
+        const closed =
+          await closeCurrentWindow();
+
+
+        if (
+          !closed
+        ) {
+
+          return;
+
+        }
+
+      }
+
 
       if (
         typeof window.openHomePage !==
@@ -893,7 +613,31 @@ if (
 
   shopButton.addEventListener(
     "click",
-    function () {
+    async function () {
+
+      const manager =
+        getWindowManager();
+
+
+      if (
+        manager &&
+        manager.getCurrent()
+      ) {
+
+        const closed =
+          await closeCurrentWindow();
+
+
+        if (
+          !closed
+        ) {
+
+          return;
+
+        }
+
+      }
+
 
       if (
         typeof window.openShopPage !==
@@ -928,7 +672,31 @@ if (
 
   auctionButton.addEventListener(
     "click",
-    function () {
+    async function () {
+
+      const manager =
+        getWindowManager();
+
+
+      if (
+        manager &&
+        manager.getCurrent()
+      ) {
+
+        const closed =
+          await closeCurrentWindow();
+
+
+        if (
+          !closed
+        ) {
+
+          return;
+
+        }
+
+      }
+
 
       if (
         typeof window.openAuctionPage !==
@@ -963,7 +731,31 @@ if (
 
   test1Button.addEventListener(
     "click",
-    function () {
+    async function () {
+
+      const manager =
+        getWindowManager();
+
+
+      if (
+        manager &&
+        manager.getCurrent()
+      ) {
+
+        const closed =
+          await closeCurrentWindow();
+
+
+        if (
+          !closed
+        ) {
+
+          return;
+
+        }
+
+      }
+
 
       if (
         typeof window.openTest1Page !==
@@ -998,7 +790,31 @@ if (
 
   test2Button.addEventListener(
     "click",
-    function () {
+    async function () {
+
+      const manager =
+        getWindowManager();
+
+
+      if (
+        manager &&
+        manager.getCurrent()
+      ) {
+
+        const closed =
+          await closeCurrentWindow();
+
+
+        if (
+          !closed
+        ) {
+
+          return;
+
+        }
+
+      }
+
 
       if (
         typeof window.openTest2Page !==
