@@ -1,3 +1,4 @@
+
 /* =========================================================
    PROFILE MODAL
 ========================================================= */
@@ -459,20 +460,13 @@ u9ProfilePages[7] = {
    PROFILE PAGE STATE
 ========================================================= */
 
-let u9ProfileCurrentPage =
-  0;
+let u9ProfileCurrentPage = 0;
 
+let u9ProfilePageAnimating = false;
 
-let u9ProfilePageAnimating =
-  false;
+let u9ProfileBackActionRunning = false;
 
-
-let u9ProfileBackActionRunning =
-  false;
-
-
-const u9ProfilePageAnimationDuration =
-  380;
+const u9ProfilePageAnimationDuration = 400;
 
 
 /*
@@ -536,16 +530,11 @@ const u9ProfilePageClasses = [
    REMOVE PAGE CLASSES
 ========================================================= */
 
-function u9ProfileRemovePageClasses(
-  page
-) {
+function u9ProfileRemovePageClasses(page) {
 
   if (!page) {
-
     return;
-
   }
-
 
   page.classList.remove(
     ...u9ProfilePageClasses
@@ -567,20 +556,14 @@ function u9ProfileResetPageClasses() {
   ) {
 
     const pageData =
-      u9ProfilePages[
-        pageNumber
-      ];
-
+      u9ProfilePages[pageNumber];
 
     if (
       !pageData ||
       !pageData.page
     ) {
-
       continue;
-
     }
-
 
     u9ProfileRemovePageClasses(
       pageData.page
@@ -599,11 +582,9 @@ function u9ProfileResetPageScroll() {
 
   if (profileHomeBody) {
 
-    profileHomeBody.scrollTop =
-      0;
+    profileHomeBody.scrollTop = 0;
 
   }
-
 
   for (
     let pageNumber = 1;
@@ -612,15 +593,11 @@ function u9ProfileResetPageScroll() {
   ) {
 
     const pageData =
-      u9ProfilePages[
-        pageNumber
-      ];
-
+      u9ProfilePages[pageNumber];
 
     if (pageData?.body) {
 
-      pageData.body.scrollTop =
-        0;
+      pageData.body.scrollTop = 0;
 
     }
 
@@ -630,12 +607,25 @@ function u9ProfileResetPageScroll() {
 
 
 /* =========================================================
+   FORCE REFLOW
+========================================================= */
+
+function u9ProfileForceReflow(element) {
+
+  if (!element) {
+    return;
+  }
+
+  void element.offsetWidth;
+
+}
+
+
+/* =========================================================
    RESET TO PROFILE HOME
 ========================================================= */
 
-function u9ProfileGoHome(
-  immediate = false
-) {
+function u9ProfileGoHome(immediate = false) {
 
   if (!profileHome) {
 
@@ -643,39 +633,27 @@ function u9ProfileGoHome(
 
   }
 
+  u9ProfilePageAnimating = false;
 
-  u9ProfilePageAnimating =
-    false;
-
-
-  u9ProfileBackActionRunning =
-    false;
-
+  u9ProfileBackActionRunning = false;
 
   u9ProfileResetPageClasses();
-
 
   u9ProfileRemovePageClasses(
     profileHome
   );
 
-
   profileHome.classList.add(
     "U9-profile-page-active"
   );
-
 
   profileHome.classList.add(
     "U9-profile-page-current"
   );
 
-
-  u9ProfileCurrentPage =
-    0;
-
+  u9ProfileCurrentPage = 0;
 
   u9ProfileResetPageScroll();
-
 
   return true;
 
@@ -686,15 +664,10 @@ function u9ProfileGoHome(
    PREPARE INTERNAL PAGE
 ========================================================= */
 
-function u9ProfilePreparePage(
-  pageNumber
-) {
+function u9ProfilePreparePage(pageNumber) {
 
   const pageData =
-    u9ProfilePages[
-      pageNumber
-    ];
-
+    u9ProfilePages[pageNumber];
 
   if (
     !pageData ||
@@ -705,25 +678,19 @@ function u9ProfilePreparePage(
 
   }
 
-
   if (pageData.title) {
 
     pageData.title.textContent =
-      u9ProfilePageTitles[
-        pageNumber
-      ] ||
+      u9ProfilePageTitles[pageNumber] ||
       `Button ${pageNumber}`;
 
   }
 
-
   if (pageData.body) {
 
-    pageData.body.scrollTop =
-      0;
+    pageData.body.scrollTop = 0;
 
   }
-
 
   return true;
 
@@ -734,16 +701,23 @@ function u9ProfilePreparePage(
    OPEN PROFILE PAGE
 ========================================================= */
 
-function u9ProfileOpenPage(
-  pageNumber
-) {
+/*
+  Forward:
+
+  CURRENT:
+    CENTER → LEFT
+
+  NEXT:
+    RIGHT → CENTER
+*/
+
+function u9ProfileOpenPage(pageNumber) {
 
   if (u9ProfilePageAnimating) {
 
     return false;
 
   }
-
 
   if (
     !Number.isInteger(pageNumber) ||
@@ -755,12 +729,8 @@ function u9ProfileOpenPage(
 
   }
 
-
   const nextPage =
-    u9ProfilePages[
-      pageNumber
-    ];
-
+    u9ProfilePages[pageNumber];
 
   if (
     !nextPage ||
@@ -776,7 +746,6 @@ function u9ProfileOpenPage(
 
   }
 
-
   if (
     u9ProfileCurrentPage ===
     pageNumber
@@ -786,21 +755,16 @@ function u9ProfileOpenPage(
 
   }
 
-
   const currentPageNumber =
     u9ProfileCurrentPage;
 
-
-  let currentPage =
-    null;
-
+  let currentPage = null;
 
   if (
     currentPageNumber === 0
   ) {
 
-    currentPage =
-      profileHome;
+    currentPage = profileHome;
 
   }
 
@@ -813,16 +777,13 @@ function u9ProfileOpenPage(
 
   }
 
-
   if (!currentPage) {
 
     u9ProfileGoHome(true);
 
-    currentPage =
-      profileHome;
+    currentPage = profileHome;
 
   }
-
 
   if (!currentPage) {
 
@@ -830,39 +791,27 @@ function u9ProfileOpenPage(
 
   }
 
+  if (
+    !u9ProfilePreparePage(
+      pageNumber
+    )
+  ) {
 
-  u9ProfilePreparePage(
-    pageNumber
-  );
+    return false;
 
+  }
 
-  u9ProfilePageAnimating =
-    true;
+  u9ProfilePageAnimating = true;
 
-
-  u9ProfileBackActionRunning =
-    false;
-
-
-  /*
-   ========================================================
-   FORWARD ANIMATION
-
-   Current Page:
-     CENTER → LEFT
-
-   Destination:
-     RIGHT → CENTER
-   ========================================================
-  */
+  u9ProfileBackActionRunning = false;
 
 
   /*
-   --------------------------------------------------------
-   STEP 1
+    ========================================================
+    STEP 1
+    ========================================================
 
-   Clean destination.
-   --------------------------------------------------------
+    Clean destination completely.
   */
 
   u9ProfileRemovePageClasses(
@@ -871,11 +820,11 @@ function u9ProfileOpenPage(
 
 
   /*
-   --------------------------------------------------------
-   STEP 2
+    ========================================================
+    STEP 2
+    ========================================================
 
-   Put destination on RIGHT.
-   --------------------------------------------------------
+    Destination starts at RIGHT.
   */
 
   nextPage.page.classList.add(
@@ -884,27 +833,20 @@ function u9ProfileOpenPage(
 
 
   /*
-   Force browser to render
-   destination at RIGHT first.
+    Force RIGHT position to be rendered.
   */
 
-  void nextPage.page.offsetWidth;
+  u9ProfileForceReflow(
+    nextPage.page
+  );
 
 
   /*
-   --------------------------------------------------------
-   STEP 3
+    ========================================================
+    STEP 3
+    ========================================================
 
-   Make sure current page is
-   definitely CENTER first.
-
-   This is important.
-
-   We do NOT directly remove all
-   classes and then slide-left,
-   because the default CSS state
-   may already be RIGHT.
-   --------------------------------------------------------
+    Clean current page.
   */
 
   u9ProfileRemovePageClasses(
@@ -912,82 +854,130 @@ function u9ProfileOpenPage(
   );
 
 
+  /*
+    Put current page explicitly at CENTER.
+  */
+
   currentPage.classList.add(
     "U9-profile-page-current"
   );
 
 
   /*
-   Force browser to render
-   current page at CENTER.
+    Force CENTER position to be rendered.
   */
 
-  void currentPage.offsetWidth;
-
-
-  /*
-   --------------------------------------------------------
-   STEP 4
-
-   Current:
-     CENTER → LEFT
-   --------------------------------------------------------
-  */
-
-  currentPage.classList.add(
-    "U9-profile-page-slide-left"
+  u9ProfileForceReflow(
+    currentPage
   );
 
 
   /*
-   --------------------------------------------------------
-   STEP 5
+    ========================================================
+    STEP 4
+    ========================================================
 
-   Destination:
-     RIGHT → CENTER
-   --------------------------------------------------------
+    Start animation frame.
+
+    CURRENT:
+      CENTER → LEFT
+
+    NEXT:
+      RIGHT → CENTER
   */
 
-  nextPage.page.classList.remove(
-    "U9-profile-page-slide-from-right"
-  );
+  requestAnimationFrame(
+    function () {
+
+      /*
+        Current page leaves to LEFT.
+      */
+
+      currentPage.classList.remove(
+        "U9-profile-page-current"
+      );
+
+      currentPage.classList.add(
+        "U9-profile-page-slide-left"
+      );
 
 
-  nextPage.page.classList.add(
-    "U9-profile-page-active"
-  );
+      /*
+        Destination leaves its
+        "from-right" starting state.
+
+        It therefore transitions:
+
+        RIGHT → CENTER
+      */
+
+      nextPage.page.classList.remove(
+        "U9-profile-page-slide-from-right"
+      );
+
+      nextPage.page.classList.add(
+        "U9-profile-page-active"
+      );
+
+      nextPage.page.classList.add(
+        "U9-profile-page-current"
+      );
 
 
-  nextPage.page.classList.add(
-    "U9-profile-page-current"
+      /*
+        Update state.
+      */
+
+      u9ProfileCurrentPage =
+        pageNumber;
+
+    }
   );
 
 
   /*
-   Update state immediately.
-  */
+    ========================================================
+    STEP 5
+    ========================================================
 
-  u9ProfileCurrentPage =
-    pageNumber;
-
-
-  /*
-   --------------------------------------------------------
-   STEP 6
-
-   Finish animation.
-   --------------------------------------------------------
+    Finish after animation.
   */
 
   setTimeout(
     function () {
+
+      /*
+        Old page becomes completely
+        hidden/default again.
+      */
 
       u9ProfileRemovePageClasses(
         currentPage
       );
 
 
+      /*
+        Make destination the final
+        stable page.
+      */
+
+      u9ProfileRemovePageClasses(
+        nextPage.page
+      );
+
+      nextPage.page.classList.add(
+        "U9-profile-page-active"
+      );
+
+      nextPage.page.classList.add(
+        "U9-profile-page-current"
+      );
+
+
       u9ProfilePageAnimating =
+        false;
+
+      u9ProfileBackActionRunning =
         false;
 
     },
@@ -1004,12 +994,22 @@ function u9ProfileOpenPage(
    BACK TO PROFILE HOME
 ========================================================= */
 
+/*
+  Back:
+
+  CURRENT:
+    CENTER → RIGHT
+
+  HOME:
+    LEFT → CENTER
+*/
+
 function u9ProfileGoBack() {
 
   /*
-   --------------------------------------------------------
-   HARD BACK LOCK
-   --------------------------------------------------------
+    ========================================================
+    HARD BACK LOCK
+    ========================================================
   */
 
   if (
@@ -1020,11 +1020,6 @@ function u9ProfileGoBack() {
 
   }
 
-
-  /*
-   Already on Home.
-  */
-
   if (
     u9ProfileCurrentPage === 0
   ) {
@@ -1032,11 +1027,6 @@ function u9ProfileGoBack() {
     return false;
 
   }
-
-
-  /*
-   Another animation is running.
-  */
 
   if (
     u9ProfilePageAnimating
@@ -1050,20 +1040,18 @@ function u9ProfileGoBack() {
   const currentPageNumber =
     u9ProfileCurrentPage;
 
-
   const currentPage =
     u9ProfilePages[
       currentPageNumber
     ]?.page || null;
 
-
-  const previousPage =
+  const homePage =
     profileHome;
 
 
   if (
     !currentPage ||
-    !previousPage
+    !homePage
   ) {
 
     u9ProfileGoHome(true);
@@ -1074,180 +1062,153 @@ function u9ProfileGoBack() {
 
 
   /*
-   --------------------------------------------------------
-   LOCK IMMEDIATELY
-   --------------------------------------------------------
+    ========================================================
+    LOCK IMMEDIATELY
+    ========================================================
   */
 
   u9ProfileBackActionRunning =
     true;
-
 
   u9ProfilePageAnimating =
     true;
 
 
   /*
-   Change state immediately.
+    ========================================================
+    STEP 1
+    ========================================================
 
-   This prevents another Back
-   action from being accepted.
-  */
-
-  u9ProfileCurrentPage =
-    0;
-
-
-  /*
-   ========================================================
-   BACK ANIMATION
-
-   Home:
-     LEFT → CENTER
-
-   Current Page:
-     CENTER → RIGHT
-   ========================================================
-  */
-
-
-  /*
-   --------------------------------------------------------
-   STEP 1
-
-   Clean Home.
-   --------------------------------------------------------
+    Prepare Home at LEFT.
   */
 
   u9ProfileRemovePageClasses(
-    previousPage
+    homePage
   );
 
-
-  /*
-   --------------------------------------------------------
-   STEP 2
-
-   Put Home on LEFT.
-   --------------------------------------------------------
-  */
-
-  previousPage.classList.add(
+  homePage.classList.add(
     "U9-profile-page-slide-from-left"
   );
 
 
   /*
-   IMPORTANT:
-   Force Home to actually render
-   at LEFT before starting the
-   transition to CENTER.
+    Force Home LEFT position.
   */
 
-  void previousPage.offsetWidth;
+  u9ProfileForceReflow(
+    homePage
+  );
 
 
   /*
-   --------------------------------------------------------
-   STEP 3
+    ========================================================
+    STEP 2
+    ========================================================
 
-   Clean current Page.
-   --------------------------------------------------------
+    Prepare current page at CENTER.
   */
 
   u9ProfileRemovePageClasses(
     currentPage
   );
 
-
-  /*
-   IMPORTANT:
-
-   The default .U9-profile-page
-   position is RIGHT.
-
-   Therefore we must explicitly
-   put the current page at CENTER
-   before asking it to move RIGHT.
-  */
-
   currentPage.classList.add(
     "U9-profile-page-current"
   );
 
 
   /*
-   Force browser to render
-   current Page at CENTER.
+    Force current page CENTER.
   */
 
-  void currentPage.offsetWidth;
-
-
-  /*
-   --------------------------------------------------------
-   STEP 4
-
-   Current Page:
-     CENTER → RIGHT
-   --------------------------------------------------------
-  */
-
-  currentPage.classList.add(
-    "U9-profile-page-slide-right"
+  u9ProfileForceReflow(
+    currentPage
   );
 
 
   /*
-   --------------------------------------------------------
-   STEP 5
+    ========================================================
+    STEP 3
+    ========================================================
 
-   Home:
-     LEFT → CENTER
-   --------------------------------------------------------
+    Start animation.
+
+    CURRENT:
+      CENTER → RIGHT
+
+    HOME:
+      LEFT → CENTER
   */
 
-  previousPage.classList.remove(
-    "U9-profile-page-slide-from-left"
-  );
+  requestAnimationFrame(
+    function () {
+
+      /*
+        Current page leaves to RIGHT.
+      */
+
+      currentPage.classList.remove(
+        "U9-profile-page-current"
+      );
+
+      currentPage.classList.add(
+        "U9-profile-page-slide-right"
+      );
 
 
-  previousPage.classList.add(
-    "U9-profile-page-active"
-  );
+      /*
+        Home leaves its starting state.
+
+        LEFT → CENTER
+      */
+
+      homePage.classList.remove(
+        "U9-profile-page-slide-from-left"
+      );
+
+      homePage.classList.add(
+        "U9-profile-page-active"
+      );
+
+      homePage.classList.add(
+        "U9-profile-page-current"
+      );
 
 
-  previousPage.classList.add(
-    "U9-profile-page-current"
+      /*
+        Update state immediately.
+      */
+
+      u9ProfileCurrentPage = 0;
+
+
+      /*
+        Reset Home scroll.
+      */
+
+      if (profileHomeBody) {
+
+        profileHomeBody.scrollTop = 0;
+
+      }
+
+    }
   );
 
 
   /*
-   Reset Home scroll.
-  */
+    ========================================================
+    STEP 4
+    ========================================================
 
-  if (profileHomeBody) {
-
-    profileHomeBody.scrollTop =
-      0;
-
-  }
-
-
-  /*
-   --------------------------------------------------------
-   STEP 6
-
-   Finish animation.
-   --------------------------------------------------------
+    Finish animation.
   */
 
   setTimeout(
     function () {
 
       /*
-       Completely clean
-       the old internal page.
+        Remove old internal page.
       */
 
       u9ProfileRemovePageClasses(
@@ -1256,28 +1217,24 @@ function u9ProfileGoBack() {
 
 
       /*
-       Make sure Home remains
-       the final active page.
+        Stabilize Home.
       */
 
       u9ProfileRemovePageClasses(
-        previousPage
+        homePage
       );
 
-
-      previousPage.classList.add(
+      homePage.classList.add(
         "U9-profile-page-active"
       );
 
-
-      previousPage.classList.add(
+      homePage.classList.add(
         "U9-profile-page-current"
       );
 
 
       u9ProfilePageAnimating =
         false;
-
 
       u9ProfileBackActionRunning =
         false;
@@ -1296,8 +1253,7 @@ function u9ProfileGoBack() {
    BALANCE / COINS DISPLAY
 ========================================================= */
 
-let u9ProfileShowingCoins =
-  false;
+let u9ProfileShowingCoins = false;
 
 
 /* =========================================================
@@ -1370,9 +1326,7 @@ function u9ProfileToggleBalance() {
   u9ProfileShowingCoins =
     !u9ProfileShowingCoins;
 
-
   u9ProfileUpdateBalanceDisplay();
-
 
   return u9ProfileShowingCoins;
 
@@ -1393,7 +1347,6 @@ if (u9ProfileBalanceToggle) {
 
       event.stopPropagation();
 
-
       u9ProfileToggleBalance();
 
     }
@@ -1413,17 +1366,13 @@ for (
 ) {
 
   const button =
-    u9ProfileButtons[
-      pageNumber
-    ];
-
+    u9ProfileButtons[pageNumber];
 
   if (!button) {
 
     continue;
 
   }
-
 
   button.addEventListener(
     "click",
@@ -1432,7 +1381,6 @@ for (
       event.preventDefault();
 
       event.stopPropagation();
-
 
       u9ProfileOpenPage(
         pageNumber
@@ -1455,10 +1403,7 @@ for (
 ) {
 
   const pageData =
-    u9ProfilePages[
-      pageNumber
-    ];
-
+    u9ProfilePages[pageNumber];
 
   if (
     !pageData ||
@@ -1469,8 +1414,8 @@ for (
 
   }
 
-
-  pageData.back.onclick =
+  pageData.back.addEventListener(
+    "click",
     function (event) {
 
       event.preventDefault();
@@ -1488,7 +1433,6 @@ for (
 
       }
 
-
       if (
         u9ProfilePageAnimating
       ) {
@@ -1496,7 +1440,6 @@ for (
         return false;
 
       }
-
 
       if (
         u9ProfileCurrentPage === 0
@@ -1506,13 +1449,12 @@ for (
 
       }
 
-
       u9ProfileGoBack();
-
 
       return false;
 
-    };
+    }
+  );
 
 }
 
@@ -1530,7 +1472,6 @@ function u9ProfileShowLoading() {
     );
 
   }
-
 
   if (u9ProfileInfo) {
 
@@ -1557,7 +1498,6 @@ function u9ProfileHideLoading() {
 
   }
 
-
   if (u9ProfileInfo) {
 
     u9ProfileInfo.classList.add(
@@ -1575,9 +1515,7 @@ function u9ProfileHideLoading() {
 
 function u9ProfileCanOpen() {
 
-  if (
-    !window.U9User
-  ) {
+  if (!window.U9User) {
 
     console.warn(
       "U9User is not available."
@@ -1586,7 +1524,6 @@ function u9ProfileCanOpen() {
     return false;
 
   }
-
 
   if (
     typeof window.U9User.isLoggedIn !==
@@ -1597,7 +1534,6 @@ function u9ProfileCanOpen() {
 
   }
 
-
   if (
     typeof window.U9User.get !==
     "function"
@@ -1607,7 +1543,6 @@ function u9ProfileCanOpen() {
 
   }
 
-
   if (
     !window.U9User.isLoggedIn()
   ) {
@@ -1616,7 +1551,6 @@ function u9ProfileCanOpen() {
 
   }
 
-
   if (
     !window.U9User.get()
   ) {
@@ -1624,7 +1558,6 @@ function u9ProfileCanOpen() {
     return false;
 
   }
-
 
   return true;
 
@@ -1635,12 +1568,9 @@ function u9ProfileCanOpen() {
    PROFILE CLOSE TIMER
 ========================================================= */
 
-let u9ProfileCloseTimer =
-  null;
+let u9ProfileCloseTimer = null;
 
-
-let u9ProfileCloseHandler =
-  null;
+let u9ProfileCloseHandler = null;
 
 
 /* =========================================================
@@ -1655,11 +1585,9 @@ function u9ProfileCancelClose() {
       u9ProfileCloseTimer
     );
 
-    u9ProfileCloseTimer =
-      null;
+    u9ProfileCloseTimer = null;
 
   }
-
 
   if (
     profileModalContent &&
@@ -1673,9 +1601,7 @@ function u9ProfileCancelClose() {
 
   }
 
-
-  u9ProfileCloseHandler =
-    null;
+  u9ProfileCloseHandler = null;
 
 }
 
@@ -1695,7 +1621,6 @@ function openProfileModal() {
 
   }
 
-
   if (
     !u9ProfileCanOpen()
   ) {
@@ -1708,25 +1633,22 @@ function openProfileModal() {
 
   }
 
-
   u9ProfileCancelClose();
 
 
   /*
-   Always start from Profile Home.
+    Always start from Home.
   */
 
   u9ProfileGoHome(true);
 
 
   /*
-   Balance is always the first
-   displayed value.
+    Balance is always the first
+    displayed value.
   */
 
-  u9ProfileShowingCoins =
-    false;
-
+  u9ProfileShowingCoins = false;
 
   u9ProfileUpdateBalanceDisplay();
 
@@ -1734,7 +1656,6 @@ function openProfileModal() {
   profileModal.classList.remove(
     "modal-closing"
   );
-
 
   profileModal.classList.add(
     "modal-open"
@@ -1751,7 +1672,6 @@ function openProfileModal() {
 
 
   u9ProfileLoad();
-
 
   return true;
 
@@ -1773,7 +1693,6 @@ function closeProfileModal() {
 
   }
 
-
   if (
     !profileModal.classList.contains(
       "modal-open"
@@ -1784,14 +1703,12 @@ function closeProfileModal() {
 
   }
 
-
   u9ProfileCancelClose();
 
 
   profileModal.classList.remove(
     "modal-open"
   );
-
 
   profileModal.classList.add(
     "modal-closing"
@@ -1807,8 +1724,7 @@ function closeProfileModal() {
   }
 
 
-  let closeFinished =
-    false;
+  let closeFinished = false;
 
 
   function finishClose() {
@@ -1818,7 +1734,6 @@ function closeProfileModal() {
       return;
 
     }
-
 
     if (
       !profileModal.classList.contains(
@@ -1830,18 +1745,13 @@ function closeProfileModal() {
 
     }
 
-
-    closeFinished =
-      true;
-
+    closeFinished = true;
 
     profileModal.classList.remove(
       "modal-closing"
     );
 
-
     u9ProfileGoHome(true);
-
 
     u9ProfileCancelClose();
 
@@ -1860,7 +1770,6 @@ function closeProfileModal() {
 
       }
 
-
       if (
         event.propertyName !==
         "transform"
@@ -1869,7 +1778,6 @@ function closeProfileModal() {
         return;
 
       }
-
 
       finishClose();
 
@@ -1906,7 +1814,6 @@ async function toggleProfileModal() {
 
   }
 
-
   if (
     profileModal.classList.contains(
       "modal-open"
@@ -1928,7 +1835,6 @@ async function toggleProfileModal() {
       closeProfileModal();
 
     }
-
 
     return true;
 
@@ -1963,7 +1869,6 @@ if (profileUserButton) {
 
       event.stopPropagation();
 
-
       await toggleProfileModal();
 
     }
@@ -1983,7 +1888,6 @@ if (profileModalClose) {
     function (event) {
 
       event.stopPropagation();
-
 
       if (
         window.U9WindowManager
@@ -2008,6 +1912,96 @@ if (profileModalClose) {
 
 
 /* =========================================================
+   API
+========================================================= */
+
+const u9ProfileDefaultFrameUrl =
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-default";
+
+
+const u9ProfileFreeFrameUrl =
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free";
+
+
+const u9ProfilePaidFrameUrl =
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid";
+
+
+/* =========================================================
+   FRONTEND DEFAULT AVATAR
+========================================================= */
+
+const u9ProfileDefaultAvatarSvg = `
+<svg
+  width="199px"
+  height="199px"
+  viewBox="-2.56 -2.56 21.12 21.12"
+  xmlns="http://www.w3.org/2000/svg"
+  fill="#000000"
+  stroke="#000000"
+  stroke-width="0.00016"
+>
+
+  <g
+    id="SVGRepo_bgCarrier"
+    stroke-width="0"
+  >
+
+    <rect
+      x="-2.56"
+      y="-2.56"
+      width="21.12"
+      height="21.12"
+      rx="0"
+      fill="#ffffff"
+      stroke-width="0"
+    ></rect>
+
+  </g>
+
+
+  <g
+    id="SVGRepo_tracerCarrier"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  ></g>
+
+
+  <g
+    id="SVGRepo_iconCarrier"
+  >
+
+    <path
+      d="m 8 1 c -1.65625 0 -3 1.34375 -3 3 s 1.34375 3 3 3 s 3 -1.34375 3 -3 s -1.34375 -3 -3 -3 z m -1.5 7 c -2.492188 0 -4.5 2.007812 -4.5 4.5 v 0.5 c 0 1.109375 0.890625 2 2 2 h 8 c 1.109375 0 2 -0.890625 2 -2 v -0.5 c 0 -2.492188 -2.007812 -4.5 -4.5 -4.5 z m 0 0"
+      fill="#357cf1"
+    ></path>
+
+  </g>
+
+</svg>
+`;
+
+
+/* =========================================================
+   CONVERT DEFAULT AVATAR TO DATA URI
+========================================================= */
+
+const u9ProfileDefaultAvatar =
+  "data:image/svg+xml;charset=UTF-8," +
+  encodeURIComponent(
+    u9ProfileDefaultAvatarSvg
+  );
+
+
+/* =========================================================
+   FRONTEND DEFAULT FRAME
+========================================================= */
+
+const u9ProfileDefaultFrame =
+  "/SSVG/avatar/ordinary.svg";
+
+
+/* =========================================================
    RESET AVATAR
 ========================================================= */
 
@@ -2018,18 +2012,15 @@ function u9ProfileResetAvatar() {
     u9ProfileAvatarImage.dataset.u9Fallback =
       "false";
 
-
     u9ProfileAvatarImage.src =
       u9ProfileDefaultAvatar;
 
   }
 
-
   if (u9ProfileAvatarFrame) {
 
     u9ProfileAvatarFrame.dataset.u9Fallback =
       "false";
-
 
     u9ProfileAvatarFrame.src =
       u9ProfileDefaultFrame;
@@ -2058,10 +2049,8 @@ if (u9ProfileAvatarImage) {
 
       }
 
-
       this.dataset.u9Fallback =
         "true";
-
 
       this.src =
         u9ProfileDefaultAvatar;
@@ -2091,10 +2080,8 @@ if (u9ProfileAvatarFrame) {
 
       }
 
-
       this.dataset.u9Fallback =
         "true";
-
 
       this.src =
         u9ProfileDefaultFrame;
@@ -2103,98 +2090,6 @@ if (u9ProfileAvatarFrame) {
   );
 
 }
-
-
-/* =========================================================
-   API
-========================================================= */
-
-const u9ProfileDefaultFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-default";
-
-
-const u9ProfileFreeFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free";
-
-
-const u9ProfilePaidFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid";
-
-
-/* =========================================================
-   FRONTEND DEFAULT AVATAR
-========================================================= */
-
-const u9ProfileDefaultAvatarSvg =
-
-  `<svg
-    width="199px"
-    height="199px"
-    viewBox="-2.56 -2.56 21.12 21.12"
-    xmlns="http://www.w3.org/2000/svg"
-    fill="#000000"
-    stroke="#000000"
-    stroke-width="0.00016"
-  >
-
-    <g
-      id="SVGRepo_bgCarrier"
-      stroke-width="0"
-    >
-
-      <rect
-        x="-2.56"
-        y="-2.56"
-        width="21.12"
-        height="21.12"
-        rx="0"
-        fill="#ffffff"
-        stroke-width="0"
-      ></rect>
-
-    </g>
-
-
-    <g
-      id="SVGRepo_tracerCarrier"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    ></g>
-
-
-    <g
-      id="SVGRepo_iconCarrier"
-    >
-
-      <path
-        d="m 8 1 c -1.65625 0 -3 1.34375 -3 3 s 1.34375 3 3 3 s 3 -1.34375 3 -3 s -1.34375 -3 -3 -3 z m -1.5 7 c -2.492188 0 -4.5 2.007812 -4.5 4.5 v 0.5 c 0 1.109375 0.890625 2 2 2 h 8 c 1.109375 0 2 -0.890625 2 -2 v -0.5 c 0 -2.492188 -2.007812 -4.5 -4.5 -4.5 z m 0 0"
-        fill="#357cf1"
-      ></path>
-
-    </g>
-
-  </svg>`;
-
-
-/* =========================================================
-   CONVERT DEFAULT AVATAR TO DATA URI
-========================================================= */
-
-const u9ProfileDefaultAvatar =
-
-  "data:image/svg+xml;charset=UTF-8," +
-
-  encodeURIComponent(
-    u9ProfileDefaultAvatarSvg
-  );
-
-
-/* =========================================================
-   FRONTEND DEFAULT FRAME
-========================================================= */
-
-const u9ProfileDefaultFrame =
-  "/SSVG/avatar/ordinary.svg";
 
 
 /* =========================================================
@@ -2216,12 +2111,10 @@ async function u9ProfileLoadFrame(
       u9ProfileAvatarFrame.dataset.u9Fallback =
         "false";
 
-
       u9ProfileAvatarFrame.src =
         u9ProfileDefaultFrame;
 
     }
-
 
     return true;
 
@@ -2235,20 +2128,17 @@ async function u9ProfileLoadFrame(
       u9ProfileAvatarFrame.dataset.u9Fallback =
         "false";
 
-
       u9ProfileAvatarFrame.src =
         u9ProfileDefaultFrame;
 
     }
-
 
     return true;
 
   }
 
 
-  let requestUrl =
-    "";
+  let requestUrl = "";
 
 
   if (frameType === "free") {
@@ -2334,7 +2224,6 @@ async function u9ProfileLoadFrame(
       u9ProfileAvatarFrame.dataset.u9Fallback =
         "false";
 
-
       u9ProfileAvatarFrame.src =
         currentFrame.svg;
 
@@ -2352,7 +2241,6 @@ async function u9ProfileLoadFrame(
       error
     );
 
-
     u9ProfileResetAvatar();
 
     return false;
@@ -2366,9 +2254,7 @@ async function u9ProfileLoadFrame(
    DISPLAY USER INFO
 ========================================================= */
 
-function u9ProfileDisplayUser(
-  user
-) {
+function u9ProfileDisplayUser(user) {
 
   if (!user) {
 
@@ -2414,12 +2300,11 @@ function u9ProfileDisplayUser(
 
 
   /*
-   Keep Balance as default.
+    Balance is the default value.
   */
 
   u9ProfileShowingCoins =
     false;
-
 
   u9ProfileUpdateBalanceDisplay();
 
@@ -2464,17 +2349,17 @@ async function u9ProfileLoadAvatarFromUser(
       u9ProfileAvatarImage.dataset.u9Fallback =
         "false";
 
-
       u9ProfileAvatarImage.src =
         avatarUrl;
 
     }
 
-    else if (u9ProfileAvatarImage) {
+    else if (
+      u9ProfileAvatarImage
+    ) {
 
       u9ProfileAvatarImage.dataset.u9Fallback =
         "false";
-
 
       u9ProfileAvatarImage.src =
         u9ProfileDefaultAvatar;
@@ -2519,7 +2404,6 @@ async function u9ProfileLoadAvatarFromUser(
       error
     );
 
-
     u9ProfileResetAvatar();
 
     return false;
@@ -2537,7 +2421,6 @@ async function u9ProfileLoad() {
 
   u9ProfileShowLoading();
 
-
   u9ProfileResetAvatar();
 
 
@@ -2546,7 +2429,6 @@ async function u9ProfileLoad() {
     console.warn(
       "U9User is not available."
     );
-
 
     u9ProfileResetAvatar();
 
@@ -2612,7 +2494,6 @@ async function u9ProfileLoad() {
       error
     );
 
-
     u9ProfileResetAvatar();
 
     u9ProfileHideLoading();
@@ -2646,7 +2527,6 @@ if (window.U9WindowManager) {
             return false;
 
           }
-
 
           return (
 
@@ -2685,7 +2565,6 @@ else {
 
 u9ProfileGoHome(true);
 
-
 u9ProfileResetAvatar();
 
 
@@ -2695,7 +2574,6 @@ u9ProfileResetAvatar();
 
 u9ProfileShowingCoins =
   false;
-
 
 u9ProfileUpdateBalanceDisplay();
 
