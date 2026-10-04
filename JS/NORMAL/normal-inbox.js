@@ -57,6 +57,12 @@ function unlockInboxPageScroll() {
 
 function openInboxModal() {
 
+  if (!inboxModal) {
+
+    return false;
+
+  }
+
 
   /* REMOVE CLOSING */
 
@@ -76,6 +82,9 @@ function openInboxModal() {
 
   lockInboxPageScroll();
 
+
+  return true;
+
 }
 
 
@@ -84,6 +93,12 @@ function openInboxModal() {
 ========================= */
 
 function closeInboxModal() {
+
+  if (!inboxModal) {
+
+    return false;
+
+  }
 
 
   /* ALREADY CLOSED */
@@ -94,7 +109,7 @@ function closeInboxModal() {
     )
   ) {
 
-    return;
+    return false;
 
   }
 
@@ -113,35 +128,119 @@ function closeInboxModal() {
   );
 
 
-  /* WAIT FOR TRANSITION */
-
-  inboxModalContent.addEventListener(
-    "transitionend",
-    function handleCloseAnimation(event) {
+  let finished = false;
 
 
-      if (
-        event.propertyName !==
-        "transform"
-      ) {
+  function finishClose() {
 
-        return;
+    if (finished) {
 
-      }
+      return;
 
-
-      inboxModal.classList.remove(
-        "modal-closing"
-      );
+    }
 
 
-      unlockInboxPageScroll();
+    finished = true;
 
+
+    inboxModal.classList.remove(
+      "modal-closing"
+    );
+
+
+    unlockInboxPageScroll();
+
+
+    if (inboxModalContent) {
 
       inboxModalContent.removeEventListener(
         "transitionend",
         handleCloseAnimation
       );
+
+    }
+
+  }
+
+
+  function handleCloseAnimation(event) {
+
+    if (
+      event.propertyName !==
+      "transform"
+    ) {
+
+      return;
+
+    }
+
+
+    finishClose();
+
+  }
+
+
+  if (inboxModalContent) {
+
+    inboxModalContent.addEventListener(
+      "transitionend",
+      handleCloseAnimation
+    );
+
+  }
+
+
+  /* FALLBACK */
+
+  setTimeout(
+    finishClose,
+    700
+  );
+
+
+  return true;
+
+}
+
+
+/* =========================
+   WINDOW MANAGER
+========================= */
+
+if (
+  window.U9WindowManager
+) {
+
+  window.U9WindowManager.register(
+    "inbox",
+    {
+
+      open:
+        openInboxModal,
+
+      close:
+        closeInboxModal,
+
+      isOpen:
+        function () {
+
+          if (!inboxModal) {
+
+            return false;
+
+          }
+
+
+          return (
+            inboxModal.classList.contains(
+              "modal-open"
+            ) ||
+            inboxModal.classList.contains(
+              "modal-closing"
+            )
+          );
+
+        }
 
     }
   );
@@ -150,16 +249,12 @@ function closeInboxModal() {
 
 
 /* =========================
-   OPEN FUNCTION
+   GLOBAL FUNCTIONS
 ========================= */
 
 window.openInboxModal =
   openInboxModal;
 
-
-/* =========================
-   CLOSE FUNCTION
-========================= */
 
 window.closeInboxModal =
   closeInboxModal;
@@ -177,7 +272,19 @@ if (
     "click",
     function () {
 
-      closeInboxModal();
+      if (
+        window.U9WindowManager
+      ) {
+
+        window.U9WindowManager.close(
+          "inbox"
+        );
+
+      } else {
+
+        closeInboxModal();
+
+      }
 
     }
   );
