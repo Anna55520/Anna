@@ -282,6 +282,46 @@
 
 
 /* =========================================================
+   BACK ANIMATION PRIORITY
+========================================================= */
+
+/*
+   IMPORTANT
+
+   Back animation must override
+   the normal ACTIVE / CURRENT state.
+
+   Home:
+     LEFT → CENTER
+
+   Page:
+     CENTER → RIGHT
+*/
+
+
+.U9-profile-page.U9-profile-page-slide-from-left {
+
+  transform: translateX(-100%);
+
+  visibility: visible;
+
+  pointer-events: none;
+
+}
+
+
+.U9-profile-page.U9-profile-page-slide-right {
+
+  transform: translateX(100%);
+
+  visibility: visible;
+
+  pointer-events: none;
+
+}
+
+
+/* =========================================================
    HOME
 ========================================================= */
 
