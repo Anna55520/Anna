@@ -1,6 +1,6 @@
-/* =========================
+/* =========================================================
    PROFILE MODAL
-========================= */
+========================================================= */
 
 
 /* =========================================================
@@ -467,18 +467,6 @@ let u9ProfilePageAnimating =
   false;
 
 
-/*
-   Separate Back action lock.
-
-   This is intentionally separate
-   from page animation state.
-
-   It prevents a second Back action
-   from being accepted after the
-   first Back action has already
-   changed the current page.
-*/
-
 let u9ProfileBackActionRunning =
   false;
 
@@ -857,25 +845,24 @@ function u9ProfileOpenPage(
 
 
   /*
-    =======================================================
-    ENTER ANIMATION
+   ========================================================
+   FORWARD ANIMATION
 
-    Current:
-      CENTER → LEFT
+   Current Page:
+     CENTER → LEFT
 
-    Destination:
-      RIGHT → CENTER
-
-    Visual:
-
-      Profile  ←←←
-                   Button  ←←←
-    =======================================================
+   Destination:
+     RIGHT → CENTER
+   ========================================================
   */
 
 
   /*
-    Clean destination first.
+   --------------------------------------------------------
+   STEP 1
+
+   Clean destination.
+   --------------------------------------------------------
   */
 
   u9ProfileRemovePageClasses(
@@ -884,8 +871,11 @@ function u9ProfileOpenPage(
 
 
   /*
-    Put destination on
-    the RIGHT side first.
+   --------------------------------------------------------
+   STEP 2
+
+   Put destination on RIGHT.
+   --------------------------------------------------------
   */
 
   nextPage.page.classList.add(
@@ -894,16 +884,27 @@ function u9ProfileOpenPage(
 
 
   /*
-    Force browser to apply
-    the starting position.
+   Force browser to render
+   destination at RIGHT first.
   */
 
   void nextPage.page.offsetWidth;
 
 
   /*
-    Current page:
-    CENTER → LEFT
+   --------------------------------------------------------
+   STEP 3
+
+   Make sure current page is
+   definitely CENTER first.
+
+   This is important.
+
+   We do NOT directly remove all
+   classes and then slide-left,
+   because the default CSS state
+   may already be RIGHT.
+   --------------------------------------------------------
   */
 
   u9ProfileRemovePageClasses(
@@ -912,18 +913,39 @@ function u9ProfileOpenPage(
 
 
   currentPage.classList.add(
+    "U9-profile-page-current"
+  );
+
+
+  /*
+   Force browser to render
+   current page at CENTER.
+  */
+
+  void currentPage.offsetWidth;
+
+
+  /*
+   --------------------------------------------------------
+   STEP 4
+
+   Current:
+     CENTER → LEFT
+   --------------------------------------------------------
+  */
+
+  currentPage.classList.add(
     "U9-profile-page-slide-left"
   );
 
 
   /*
-    Destination:
-    RIGHT → CENTER
+   --------------------------------------------------------
+   STEP 5
 
-    Removing the starting
-    class allows the CSS
-    transition to animate
-    from 100% to 0%.
+   Destination:
+     RIGHT → CENTER
+   --------------------------------------------------------
   */
 
   nextPage.page.classList.remove(
@@ -942,8 +964,7 @@ function u9ProfileOpenPage(
 
 
   /*
-    Update current page
-    immediately.
+   Update state immediately.
   */
 
   u9ProfileCurrentPage =
@@ -951,7 +972,11 @@ function u9ProfileOpenPage(
 
 
   /*
-    Finish animation.
+   --------------------------------------------------------
+   STEP 6
+
+   Finish animation.
+   --------------------------------------------------------
   */
 
   setTimeout(
@@ -982,12 +1007,9 @@ function u9ProfileOpenPage(
 function u9ProfileGoBack() {
 
   /*
-     HARD BACK LOCK
-
-     Once Back starts, absolutely
-     no second Back action can start
-     until the current navigation
-     has completely finished.
+   --------------------------------------------------------
+   HARD BACK LOCK
+   --------------------------------------------------------
   */
 
   if (
@@ -1000,8 +1022,7 @@ function u9ProfileGoBack() {
 
 
   /*
-     If the Profile is already on
-     Home, Back does nothing.
+   Already on Home.
   */
 
   if (
@@ -1014,8 +1035,7 @@ function u9ProfileGoBack() {
 
 
   /*
-     Do not allow Back while another
-     page animation is running.
+   Another animation is running.
   */
 
   if (
@@ -1054,7 +1074,9 @@ function u9ProfileGoBack() {
 
 
   /*
-     LOCK IMMEDIATELY.
+   --------------------------------------------------------
+   LOCK IMMEDIATELY
+   --------------------------------------------------------
   */
 
   u9ProfileBackActionRunning =
@@ -1066,11 +1088,10 @@ function u9ProfileGoBack() {
 
 
   /*
-     Change the current page
-     immediately.
+   Change state immediately.
 
-     This prevents another
-     Back action from starting.
+   This prevents another Back
+   action from being accepted.
   */
 
   u9ProfileCurrentPage =
@@ -1078,25 +1099,24 @@ function u9ProfileGoBack() {
 
 
   /*
-     =======================================================
-     BACK ANIMATION
+   ========================================================
+   BACK ANIMATION
 
-     Home:
-       LEFT → CENTER
+   Home:
+     LEFT → CENTER
 
-     Current Page:
-       CENTER → RIGHT
-
-     Visual:
-
-       Profile  →→→
-                    Button  →→→
-     =======================================================
+   Current Page:
+     CENTER → RIGHT
+   ========================================================
   */
 
 
   /*
-     Clean Home first.
+   --------------------------------------------------------
+   STEP 1
+
+   Clean Home.
+   --------------------------------------------------------
   */
 
   u9ProfileRemovePageClasses(
@@ -1105,7 +1125,11 @@ function u9ProfileGoBack() {
 
 
   /*
-     Put Home on the LEFT.
+   --------------------------------------------------------
+   STEP 2
+
+   Put Home on LEFT.
+   --------------------------------------------------------
   */
 
   previousPage.classList.add(
@@ -1114,16 +1138,21 @@ function u9ProfileGoBack() {
 
 
   /*
-     Force browser to apply
-     Home's starting position.
+   IMPORTANT:
+   Force Home to actually render
+   at LEFT before starting the
+   transition to CENTER.
   */
 
   void previousPage.offsetWidth;
 
 
   /*
-     Current Button Page:
-     CENTER → RIGHT
+   --------------------------------------------------------
+   STEP 3
+
+   Clean current Page.
+   --------------------------------------------------------
   */
 
   u9ProfileRemovePageClasses(
@@ -1131,19 +1160,51 @@ function u9ProfileGoBack() {
   );
 
 
+  /*
+   IMPORTANT:
+
+   The default .U9-profile-page
+   position is RIGHT.
+
+   Therefore we must explicitly
+   put the current page at CENTER
+   before asking it to move RIGHT.
+  */
+
+  currentPage.classList.add(
+    "U9-profile-page-current"
+  );
+
+
+  /*
+   Force browser to render
+   current Page at CENTER.
+  */
+
+  void currentPage.offsetWidth;
+
+
+  /*
+   --------------------------------------------------------
+   STEP 4
+
+   Current Page:
+     CENTER → RIGHT
+   --------------------------------------------------------
+  */
+
   currentPage.classList.add(
     "U9-profile-page-slide-right"
   );
 
 
   /*
-     Home:
-     LEFT → CENTER
+   --------------------------------------------------------
+   STEP 5
 
-     Removing the starting
-     class allows the CSS
-     transition to animate
-     from -100% to 0%.
+   Home:
+     LEFT → CENTER
+   --------------------------------------------------------
   */
 
   previousPage.classList.remove(
@@ -1161,6 +1222,10 @@ function u9ProfileGoBack() {
   );
 
 
+  /*
+   Reset Home scroll.
+  */
+
   if (profileHomeBody) {
 
     profileHomeBody.scrollTop =
@@ -1170,14 +1235,43 @@ function u9ProfileGoBack() {
 
 
   /*
-     Finish animation.
+   --------------------------------------------------------
+   STEP 6
+
+   Finish animation.
+   --------------------------------------------------------
   */
 
   setTimeout(
     function () {
 
+      /*
+       Completely clean
+       the old internal page.
+      */
+
       u9ProfileRemovePageClasses(
         currentPage
+      );
+
+
+      /*
+       Make sure Home remains
+       the final active page.
+      */
+
+      u9ProfileRemovePageClasses(
+        previousPage
+      );
+
+
+      previousPage.classList.add(
+        "U9-profile-page-active"
+      );
+
+
+      previousPage.classList.add(
+        "U9-profile-page-current"
       );
 
 
@@ -1354,18 +1448,6 @@ for (
    PROFILE PAGE BACK BUTTON EVENTS
 ========================================================= */
 
-/*
-   Back buttons use direct onclick
-   assignment.
-
-   This intentionally replaces
-   addEventListener() here.
-
-   Each Back button has exactly
-   one handler controlled by this
-   Profile JS.
-*/
-
 for (
   let pageNumber = 1;
   pageNumber <= 7;
@@ -1398,11 +1480,6 @@ for (
       event.stopImmediatePropagation();
 
 
-      /*
-         Ignore the event when the
-         Back action is already running.
-      */
-
       if (
         u9ProfileBackActionRunning
       ) {
@@ -1412,11 +1489,6 @@ for (
       }
 
 
-      /*
-         Ignore if another Profile
-         page animation is running.
-      */
-
       if (
         u9ProfilePageAnimating
       ) {
@@ -1425,11 +1497,6 @@ for (
 
       }
 
-
-      /*
-         Ignore if we are already
-         on Profile Home.
-      */
 
       if (
         u9ProfileCurrentPage === 0
@@ -1646,16 +1713,15 @@ function openProfileModal() {
 
 
   /*
-    Always start from Profile Home.
+   Always start from Profile Home.
   */
 
   u9ProfileGoHome(true);
 
 
   /*
-    Balance is always
-    the first displayed value
-    when Profile opens.
+   Balance is always the first
+   displayed value.
   */
 
   u9ProfileShowingCoins =
@@ -2061,9 +2127,20 @@ const u9ProfilePaidFrameUrl =
 
 const u9ProfileDefaultAvatarSvg =
 
-  `<svg width="199px" height="199px" viewBox="-2.56 -2.56 21.12 21.12" xmlns="http://www.w3.org/2000/svg" fill="#000000" stroke="#000000" stroke-width="0.00016">
+  `<svg
+    width="199px"
+    height="199px"
+    viewBox="-2.56 -2.56 21.12 21.12"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="#000000"
+    stroke="#000000"
+    stroke-width="0.00016"
+  >
 
-    <g id="SVGRepo_bgCarrier" stroke-width="0">
+    <g
+      id="SVGRepo_bgCarrier"
+      stroke-width="0"
+    >
 
       <rect
         x="-2.56"
@@ -2077,13 +2154,17 @@ const u9ProfileDefaultAvatarSvg =
 
     </g>
 
+
     <g
       id="SVGRepo_tracerCarrier"
       stroke-linecap="round"
       stroke-linejoin="round"
     ></g>
 
-    <g id="SVGRepo_iconCarrier">
+
+    <g
+      id="SVGRepo_iconCarrier"
+    >
 
       <path
         d="m 8 1 c -1.65625 0 -3 1.34375 -3 3 s 1.34375 3 3 3 s 3 -1.34375 3 -3 s -1.34375 -3 -3 -3 z m -1.5 7 c -2.492188 0 -4.5 2.007812 -4.5 4.5 v 0.5 c 0 1.109375 0.890625 2 2 2 h 8 c 1.109375 0 2 -0.890625 2 -2 v -0.5 c 0 -2.492188 -2.007812 -4.5 -4.5 -4.5 z m 0 0"
@@ -2333,9 +2414,7 @@ function u9ProfileDisplayUser(
 
 
   /*
-    Keep Balance as the
-    default displayed value
-    whenever user data is loaded.
+   Keep Balance as default.
   */
 
   u9ProfileShowingCoins =
