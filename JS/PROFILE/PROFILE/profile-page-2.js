@@ -1,79 +1,71 @@
 /* =================================================
-   PROFILE PAGE 2
+   PROFILE PAGE 2 JS
 
 
    IMPORTANT:
 
-   DO NOT MODIFY PROFILE HEADER HERE.
+   This file controls:
+
+   #U9-profile-page2
 
 
-   The following elements are controlled by:
+   Profile Header is controlled by:
 
    CSS/PROFILE/PROFILE/profile.css
 
 
-   Header:
-
-   #U9-profile-modal-header
-
-   #U9-profile-modal-close
-
-   #U9-profile-modal-title
-
-   #U9-profile-modal-icon
-
-
-   This file only controls:
-
-   #U9-profile-page2
-
-   #U9-profile-page2-content
-
-   Page 2 own elements.
-
-
 ================================================= */
 
 
-/* =================================================
-   PROFILE PAGE 2 WINDOW
-================================================= */
+const u9ProfilePage2 =
+  document.getElementById(
+    "U9-profile-page2"
+  );
 
-#U9-profile-page2 {
 
-  width: 100%;
+const u9ProfilePage2Content =
+  document.getElementById(
+    "U9-profile-page2-content"
+  );
 
-  min-height: 100%;
 
-  display: none;
+
+function openProfilePage2(){
+
+  if(
+    u9ProfilePage2
+  ){
+
+    u9ProfilePage2.style.display =
+      "block";
+
+  }
 
 }
 
 
-/* =================================================
-   PROFILE PAGE 2 CONTENT
-================================================= */
 
-#U9-profile-page2-content {
+function closeProfilePage2(){
 
-  width: 100%;
+  if(
+    u9ProfilePage2
+  ){
 
-  min-height: 300px;
+    u9ProfilePage2.style.display =
+      "none";
 
-  background: blue;
-
-  border-radius: 12px;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  color: white;
-
-  font-size: 24px;
-
-  font-weight: 600;
+  }
 
 }
+
+
+
+window.U9ProfilePage2 = {
+
+  open:
+    openProfilePage2,
+
+  close:
+    closeProfilePage2
+
+};
