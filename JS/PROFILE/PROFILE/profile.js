@@ -89,6 +89,38 @@ const u9ProfileAvatarFrame =
 
 
 /* =========================
+   API
+========================= */
+
+const u9ProfileDefaultFrameUrl =
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-default";
+
+
+const u9ProfileFreeFrameUrl =
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free";
+
+
+const u9ProfilePaidFrameUrl =
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid";
+
+
+/* =========================
+   DEFAULT AVATAR
+========================= */
+
+const u9ProfileDefaultAvatar =
+  "/SSVG/avatar/profile.svg";
+
+
+/* =========================
+   DEFAULT FRAME
+========================= */
+
+const u9ProfileDefaultFrame =
+  "/SSVG/avatar/ordinary.svg";
+
+
+/* =========================
    PROFILE INFO LOADING
 ========================= */
 
@@ -501,46 +533,27 @@ if (
 
 
 /* =========================
-   API
-========================= */
-
-const u9ProfileDefaultFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-default";
-
-
-const u9ProfileFreeFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free";
-
-
-const u9ProfilePaidFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid";
-
-
-/* =========================
-   DEFAULT AVATAR
-========================= */
-
-const u9ProfileDefaultAvatar =
-  "/SSVG/avatar/profile.svg";
-
-
-/* =========================
-   DEFAULT FRAME
-========================= */
-
-const u9ProfileDefaultFrame =
-  "/SSVG/avatar/ordinary.svg";
-
-
-/* =========================
    RESET AVATAR
 ========================= */
 
 function u9ProfileResetAvatar() {
 
+  /* =========================
+     RESET AVATAR
+  ========================= */
+
   if (
     u9ProfileAvatarImage
   ) {
+
+    /*
+      Remove fallback lock so a
+      future real avatar can load.
+    */
+
+    u9ProfileAvatarImage.dataset.u9Fallback =
+      "false";
+
 
     u9ProfileAvatarImage.src =
       u9ProfileDefaultAvatar;
@@ -548,14 +561,134 @@ function u9ProfileResetAvatar() {
   }
 
 
+  /* =========================
+     RESET FRAME
+  ========================= */
+
   if (
     u9ProfileAvatarFrame
   ) {
+
+    /*
+      Remove fallback lock so a
+      future real frame can load.
+    */
+
+    u9ProfileAvatarFrame.dataset.u9Fallback =
+      "false";
+
 
     u9ProfileAvatarFrame.src =
       u9ProfileDefaultFrame;
 
   }
+
+}
+
+
+/* =========================
+   AVATAR ONERROR FALLBACK
+========================= */
+
+if (
+  u9ProfileAvatarImage
+) {
+
+  u9ProfileAvatarImage.addEventListener(
+    "error",
+    function () {
+
+      /*
+        If the default avatar itself
+        has already failed, stop here.
+
+        This prevents an infinite loop:
+        profile.svg
+        -> error
+        -> profile.svg
+        -> error
+        -> ...
+      */
+
+      if (
+        this.dataset.u9Fallback ===
+        "true"
+      ) {
+
+        return;
+
+      }
+
+
+      /*
+        Mark fallback as used.
+      */
+
+      this.dataset.u9Fallback =
+        "true";
+
+
+      /*
+        Always fall back to the
+        default profile avatar.
+      */
+
+      this.src =
+        u9ProfileDefaultAvatar;
+
+    }
+  );
+
+}
+
+
+/* =========================
+   FRAME ONERROR FALLBACK
+========================= */
+
+if (
+  u9ProfileAvatarFrame
+) {
+
+  u9ProfileAvatarFrame.addEventListener(
+    "error",
+    function () {
+
+      /*
+        If ordinary.svg itself has
+        already failed, stop here.
+
+        Prevent infinite loop.
+      */
+
+      if (
+        this.dataset.u9Fallback ===
+        "true"
+      ) {
+
+        return;
+
+      }
+
+
+      /*
+        Mark fallback as used.
+      */
+
+      this.dataset.u9Fallback =
+        "true";
+
+
+      /*
+        Always fall back to the
+        default ordinary frame.
+      */
+
+      this.src =
+        u9ProfileDefaultFrame;
+
+    }
+  );
 
 }
 
@@ -582,6 +715,10 @@ async function u9ProfileLoadFrame(
       u9ProfileAvatarFrame
     ) {
 
+      u9ProfileAvatarFrame.dataset.u9Fallback =
+        "false";
+
+
       u9ProfileAvatarFrame.src =
         u9ProfileDefaultFrame;
 
@@ -603,6 +740,10 @@ async function u9ProfileLoadFrame(
     if (
       u9ProfileAvatarFrame
     ) {
+
+      u9ProfileAvatarFrame.dataset.u9Fallback =
+        "false";
+
 
       u9ProfileAvatarFrame.src =
         u9ProfileDefaultFrame;
@@ -750,6 +891,15 @@ async function u9ProfileLoadFrame(
       u9ProfileAvatarFrame
     ) {
 
+      /*
+        New real frame:
+        allow onerror fallback again.
+      */
+
+      u9ProfileAvatarFrame.dataset.u9Fallback =
+        "false";
+
+
       u9ProfileAvatarFrame.src =
         currentFrame.svg;
 
@@ -766,7 +916,9 @@ async function u9ProfileLoadFrame(
 
     /*
       Network error / offline /
-      fetch failed
+      fetch failed.
+
+      Reset BOTH avatar and frame.
     */
 
     u9ProfileResetAvatar();
@@ -850,11 +1002,7 @@ async function u9ProfileLoadAvatarFromUser(
 ) {
 
   /*
-    Always reset first.
-
-    This guarantees:
-    Avatar  -> profile.svg
-    Frame   -> ordinary.svg
+    Always start from defaults.
   */
 
   u9ProfileResetAvatar();
@@ -894,6 +1042,14 @@ async function u9ProfileLoadAvatarFromUser(
       u9ProfileAvatarImage
     ) {
 
+      /*
+        Allow avatar onerror fallback.
+      */
+
+      u9ProfileAvatarImage.dataset.u9Fallback =
+        "false";
+
+
       u9ProfileAvatarImage.src =
         avatarUrl;
 
@@ -902,6 +1058,15 @@ async function u9ProfileLoadAvatarFromUser(
     else if (
       u9ProfileAvatarImage
     ) {
+
+      /*
+        No user avatar:
+        use default.
+      */
+
+      u9ProfileAvatarImage.dataset.u9Fallback =
+        "false";
+
 
       u9ProfileAvatarImage.src =
         u9ProfileDefaultAvatar;
@@ -955,8 +1120,8 @@ async function u9ProfileLoadAvatarFromUser(
   ) {
 
     /*
-      Any unexpected error:
-      use default avatar + frame.
+      Unexpected error:
+      default avatar + frame.
     */
 
     u9ProfileResetAvatar();
@@ -982,10 +1147,9 @@ async function u9ProfileLoad() {
 
 
   /*
-    Always start with defaults.
-
-    Avatar  -> profile.svg
-    Frame   -> ordinary.svg
+    Always begin with:
+    Avatar -> profile.svg
+    Frame  -> ordinary.svg
   */
 
   u9ProfileResetAvatar();
@@ -1005,6 +1169,9 @@ async function u9ProfileLoad() {
 
 
     u9ProfileResetAvatar();
+
+
+    u9ProfileHideLoading();
 
 
     return;
@@ -1030,6 +1197,9 @@ async function u9ProfileLoad() {
   ) {
 
     u9ProfileResetAvatar();
+
+
+    u9ProfileHideLoading();
 
 
     return;
@@ -1063,8 +1233,8 @@ async function u9ProfileLoad() {
 
 
     /*
-      If anything failed,
-      keep default avatar + frame.
+      Any loading failure:
+      default avatar + frame.
     */
 
     if (
@@ -1095,8 +1265,7 @@ async function u9ProfileLoad() {
   ) {
 
     /*
-      Any unexpected profile error
-      falls back to defaults.
+      Any unexpected profile error.
     */
 
     console.error(
