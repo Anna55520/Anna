@@ -521,7 +521,7 @@ const u9ProfilePaidFrameUrl =
 ========================= */
 
 const u9ProfileDefaultAvatar =
-  "SSVG/avatar/profile.svg";
+  "/SSVG/avatar/profile.svg";
 
 
 /* =========================
@@ -529,7 +529,7 @@ const u9ProfileDefaultAvatar =
 ========================= */
 
 const u9ProfileDefaultFrame =
-  "SSVG/avatar/ordinary.svg";
+  "/SSVG/avatar/ordinary.svg";
 
 
 /* =========================
@@ -569,6 +569,10 @@ async function u9ProfileLoadFrame(
   frameId
 ) {
 
+  /* =========================
+     DEFAULT FRAME
+  ========================= */
+
   if (
     !frameType ||
     frameType === "default"
@@ -583,10 +587,14 @@ async function u9ProfileLoadFrame(
 
     }
 
-    return;
+    return true;
 
   }
 
+
+  /* =========================
+     NO FRAME ID
+  ========================= */
 
   if (
     !frameId
@@ -601,7 +609,7 @@ async function u9ProfileLoadFrame(
 
     }
 
-    return;
+    return true;
 
   }
 
@@ -609,6 +617,10 @@ async function u9ProfileLoadFrame(
   let requestUrl =
     "";
 
+
+  /* =========================
+     FREE FRAME
+  ========================= */
 
   if (
     frameType === "free"
@@ -619,6 +631,10 @@ async function u9ProfileLoadFrame(
 
   }
 
+  /* =========================
+     PAID FRAME
+  ========================= */
+
   else if (
     frameType === "paid"
   ) {
@@ -628,21 +644,22 @@ async function u9ProfileLoadFrame(
 
   }
 
+  /* =========================
+     UNKNOWN FRAME TYPE
+  ========================= */
+
   else {
 
-    if (
-      u9ProfileAvatarFrame
-    ) {
+    u9ProfileResetAvatar();
 
-      u9ProfileAvatarFrame.src =
-        u9ProfileDefaultFrame;
-
-    }
-
-    return;
+    return false;
 
   }
 
+
+  /* =========================
+     REQUEST
+  ========================= */
 
   try {
 
@@ -655,30 +672,24 @@ async function u9ProfileLoadFrame(
       );
 
 
+    /* =========================
+       REQUEST FAILED
+    ========================= */
+
     if (
       !response.ok
     ) {
 
-      console.error(
-        "Failed to load profile frame:",
-        response.status
-      );
+      u9ProfileResetAvatar();
 
-
-      if (
-        u9ProfileAvatarFrame
-      ) {
-
-        u9ProfileAvatarFrame.src =
-          u9ProfileDefaultFrame;
-
-      }
-
-
-      return;
+      return false;
 
     }
 
+
+    /* =========================
+       JSON
+    ========================= */
 
     const result =
       await response.json();
@@ -690,6 +701,10 @@ async function u9ProfileLoadFrame(
       [];
 
 
+    /* =========================
+       FIND CURRENT FRAME
+    ========================= */
+
     const currentFrame =
       frames.find(
         (frame) =>
@@ -697,55 +712,39 @@ async function u9ProfileLoadFrame(
       );
 
 
+    /* =========================
+       FRAME NOT FOUND
+    ========================= */
+
     if (
       !currentFrame
     ) {
 
-      console.warn(
-        "Profile frame not found:",
-        frameId
-      );
+      u9ProfileResetAvatar();
 
-
-      if (
-        u9ProfileAvatarFrame
-      ) {
-
-        u9ProfileAvatarFrame.src =
-          u9ProfileDefaultFrame;
-
-      }
-
-
-      return;
+      return false;
 
     }
 
+
+    /* =========================
+       FRAME SVG NOT FOUND
+    ========================= */
 
     if (
       !currentFrame.svg
     ) {
 
-      console.warn(
-        "Profile frame SVG not found:",
-        frameId
-      );
+      u9ProfileResetAvatar();
 
-
-      if (
-        u9ProfileAvatarFrame
-      ) {
-
-        u9ProfileAvatarFrame.src =
-          u9ProfileDefaultFrame;
-
-      }
-
-
-      return;
+      return false;
 
     }
 
+
+    /* =========================
+       LOAD FRAME
+    ========================= */
 
     if (
       u9ProfileAvatarFrame
@@ -756,26 +755,23 @@ async function u9ProfileLoadFrame(
 
     }
 
+
+    return true;
+
   }
 
   catch (
     error
   ) {
 
-    console.error(
-      "Load profile frame failed:",
-      error
-    );
+    /*
+      Network error / offline /
+      fetch failed
+    */
 
+    u9ProfileResetAvatar();
 
-    if (
-      u9ProfileAvatarFrame
-    ) {
-
-      u9ProfileAvatarFrame.src =
-        u9ProfileDefaultFrame;
-
-    }
+    return false;
 
   }
 
@@ -853,62 +849,121 @@ async function u9ProfileLoadAvatarFromUser(
   user
 ) {
 
+  /*
+    Always reset first.
+
+    This guarantees:
+    Avatar  -> profile.svg
+    Frame   -> ordinary.svg
+  */
+
   u9ProfileResetAvatar();
 
+
+  /* =========================
+     NO USER
+  ========================= */
 
   if (
     !user
   ) {
 
-    return;
+    return false;
 
   }
 
 
-  const avatar =
-    user.avatar ||
-    null;
+  try {
+
+    /* =========================
+       USER AVATAR
+    ========================= */
+
+    const avatar =
+      user.avatar ||
+      null;
 
 
-  const avatarUrl =
-    avatar?.url ||
-    "";
+    const avatarUrl =
+      avatar?.url ||
+      "";
 
 
-  if (
-    avatarUrl &&
-    u9ProfileAvatarImage
+    if (
+      avatarUrl &&
+      u9ProfileAvatarImage
+    ) {
+
+      u9ProfileAvatarImage.src =
+        avatarUrl;
+
+    }
+
+    else if (
+      u9ProfileAvatarImage
+    ) {
+
+      u9ProfileAvatarImage.src =
+        u9ProfileDefaultAvatar;
+
+    }
+
+
+    /* =========================
+       USER FRAME
+    ========================= */
+
+    const frameType =
+      user.avatar_frame_type ||
+      "default";
+
+
+    const frameId =
+      user.avatar_frame_id ||
+      null;
+
+
+    const frameLoaded =
+      await u9ProfileLoadFrame(
+        frameType,
+        frameId
+      );
+
+
+    /*
+      If frame loading failed,
+      reset BOTH avatar and frame.
+    */
+
+    if (
+      !frameLoaded
+    ) {
+
+      u9ProfileResetAvatar();
+
+      return false;
+
+    }
+
+
+    return true;
+
+  }
+
+  catch (
+    error
   ) {
 
-    u9ProfileAvatarImage.src =
-      avatarUrl;
+    /*
+      Any unexpected error:
+      use default avatar + frame.
+    */
+
+    u9ProfileResetAvatar();
+
+    return false;
 
   }
-
-  else if (
-    u9ProfileAvatarImage
-  ) {
-
-    u9ProfileAvatarImage.src =
-      u9ProfileDefaultAvatar;
-
-  }
-
-
-  const frameType =
-    user.avatar_frame_type ||
-    "default";
-
-
-  const frameId =
-    user.avatar_frame_id ||
-    null;
-
-
-  await u9ProfileLoadFrame(
-    frameType,
-    frameId
-  );
 
 }
 
@@ -919,11 +974,26 @@ async function u9ProfileLoadAvatarFromUser(
 
 async function u9ProfileLoad() {
 
+  /* =========================
+     SHOW LOADING
+  ========================= */
+
   u9ProfileShowLoading();
 
 
+  /*
+    Always start with defaults.
+
+    Avatar  -> profile.svg
+    Frame   -> ordinary.svg
+  */
+
   u9ProfileResetAvatar();
 
+
+  /* =========================
+     U9 USER NOT AVAILABLE
+  ========================= */
 
   if (
     !window.U9User
@@ -934,36 +1004,81 @@ async function u9ProfileLoad() {
     );
 
 
+    u9ProfileResetAvatar();
+
+
     return;
 
   }
 
 
+  /* =========================
+     GET USER
+  ========================= */
+
   const user =
     window.U9User.get();
 
+
+  /* =========================
+     NOT LOGGED IN
+  ========================= */
 
   if (
     !window.U9User.isLoggedIn() ||
     !user
   ) {
 
+    u9ProfileResetAvatar();
+
+
     return;
 
   }
 
 
+  /* =========================
+     LOAD
+  ========================= */
+
   try {
+
+    /* =========================
+       DISPLAY USER
+    ========================= */
 
     u9ProfileDisplayUser(
       user
     );
 
 
-    await u9ProfileLoadAvatarFromUser(
-      user
-    );
+    /* =========================
+       LOAD AVATAR + FRAME
+    ========================= */
 
+    const avatarLoaded =
+      await u9ProfileLoadAvatarFromUser(
+        user
+      );
+
+
+    /*
+      If anything failed,
+      keep default avatar + frame.
+    */
+
+    if (
+      !avatarLoaded
+    ) {
+
+      u9ProfileResetAvatar();
+
+    }
+
+
+    /* =========================
+       HIDE LOADING
+    ========================= */
 
     u9ProfileHideLoading();
 
@@ -979,6 +1094,11 @@ async function u9ProfileLoad() {
     error
   ) {
 
+    /*
+      Any unexpected profile error
+      falls back to defaults.
+    */
+
     console.error(
       "Load profile failed:",
       error
@@ -988,7 +1108,7 @@ async function u9ProfileLoad() {
     u9ProfileResetAvatar();
 
 
-    return;
+    u9ProfileHideLoading();
 
   }
 
