@@ -1,282 +1,160 @@
 /* =================================================
-   PROFILE PAGE 3 JS
+   U9 PROFILE PAGE 3
+   AVATAR FRAME SYSTEM
 
-   ONLY controls:
+   SVG SOURCE:
+   Supabase Database
 
-   #U9-profile-page3-content
-
-   DO NOT control:
-   #U9-profile-page3
-
-   Profile window switching is handled by profile.js
-
+   NO LOCAL SVG FILE
 ================================================= */
+
 
 
 /* =================================================
-   ELEMENT
+   API
+================================================= */
+
+const U9_FRAME_API =
+"https://tvtakmswbzawaweytimx.supabase.co/functions/v1";
+
+
+
+/* =================================================
+   ELEMENTS
 ================================================= */
 
 
-const u9ProfilePage3Content =
+const page3 =
 document.getElementById(
-  "U9-profile-page3-content"
+"U9-profile-page3"
 );
 
 
 
-if (!u9ProfilePage3Content) {
-
-  console.error(
-    "Profile Page3 content not found"
-  );
-
-  throw new Error(
-    "Missing #U9-profile-page3-content"
-  );
-
-}
-
-
-
-/* =================================================
-   AVATAR DATA
-================================================= */
-
-
-const freeAvatarList = [
-
-  "avatar-1.svg",
-  "avatar-2.svg",
-  "avatar-3.svg",
-  "avatar-4.svg",
-  "avatar-5.svg",
-  "avatar-6.svg",
-  "avatar-7.svg",
-  "avatar-8.svg"
-
-];
-
-
-
-const freeFrameList = [
-
-  {
-    id:"frame1",
-    image:"frame-1.svg"
-  },
-
-  {
-    id:"frame2",
-    image:"frame-2.svg"
-  },
-
-  {
-    id:"frame3",
-    image:"frame-3.svg"
-  },
-
-  {
-    id:"frame4",
-    image:"frame-4.svg"
-  }
-
-];
-
-
-
-const paidFrameList = [
-
-  {
-    id:"gold",
-    image:"gold-frame.svg",
-    owned:false
-  },
-
-
-  {
-    id:"diamond",
-    image:"diamond-frame.svg",
-    owned:true
-  }
-
-];
-
-
-
-/* =================================================
-   CREATE PAGE
-================================================= */
-
-
-function loadProfilePage3(){
-
-
-u9ProfilePage3Content.innerHTML = `
-
-
-<div class="U9-avatar-window">
-
-
-<div class="U9-avatar-upload">
-
-
-<button
-class="U9-avatar-upload-box"
-id="U9-avatar-upload-button"
->
-
-+
-
-</button>
-
-
-<div class="U9-avatar-upload-actions">
-
-<button
-id="U9-avatar-cancel"
->
-cancel
-</button>
-
-
-<button
-id="U9-avatar-save"
->
-save
-</button>
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-<h3>
-Free Avatar
-</h3>
-
-
-<div
-class="U9-free-avatar-list"
-id="U9-free-avatar-list"
-></div>
-
-
-
-
-
-<h3>
-Frame
-</h3>
-
-
-
-<div class="U9-free-frame">
-
-
-<h4>
-free frame
-</h4>
-
-
-<div
-id="U9-free-frame-list"
-class="U9-frame-list"
-></div>
-
-
-</div>
-
-
-
-
-
-<div class="U9-paid-frame">
-
-
-<h4>
-paid frame
-</h4>
-
-
-<div
-id="U9-paid-frame-list"
-class="U9-frame-list"
-></div>
-
-
-</div>
-
-
-
-</div>
-
-
-
-`;
-
-
-renderAvatar();
-
-renderFrame();
-
-
-}
-
-
-
-
-
-/* =================================================
-   AVATAR
-================================================= */
-
-
-function renderAvatar(){
-
-
-const box =
+const freeContainer =
 document.getElementById(
-"U9-free-avatar-list"
+"U9-profile-page3-free-frame"
 );
 
 
 
-freeAvatarList.forEach(
-(item)=>{
-
-
-const div =
-document.createElement(
-"div"
+const paidContainer =
+document.getElementById(
+"U9-profile-page3-paid-frame"
 );
 
 
-div.className =
-"U9-avatar-item";
+
+const imageInput =
+document.getElementById(
+"U9-profile-page3-image-input"
+);
 
 
-div.innerHTML = `
 
-<img
-src="SVG/avatar/${item}"
->
+const preview =
+document.getElementById(
+"U9-profile-page3-preview"
+);
 
+
+
+const cancelButton =
+document.getElementById(
+"U9-profile-page3-cancel"
+);
+
+
+
+const saveButton =
+document.getElementById(
+"U9-profile-page3-save"
+);
+
+
+
+let selectedFile = null;
+
+
+
+
+
+/* =================================================
+   INLINE ICON
+================================================= */
+
+
+const lockSVG = `
+
+<svg
+viewBox="0 0 24 24"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
+
+<path
+d="M7 10V7C7 4.23858 9.23858 2 12 2C14.7614 2 17 4.23858 17 7V10"
+stroke="currentColor"
+stroke-width="2"
+/>
+
+<rect
+x="5"
+y="10"
+width="14"
+height="12"
+rx="2"
+stroke="currentColor"
+stroke-width="2"
+/>
+
+</svg>
 
 `;
 
 
 
-box.appendChild(div);
+const ownerSVG = `
+
+<svg
+viewBox="0 0 24 24"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
+
+<circle
+cx="12"
+cy="12"
+r="10"
+stroke="currentColor"
+stroke-width="2"
+/>
+
+<path
+d="M8 12L11 15L16 9"
+stroke="currentColor"
+stroke-width="2"
+/>
+
+</svg>
+
+`;
 
 
 
-});
+
+
+
+/* =================================================
+   LOAD PAGE
+================================================= */
+
+
+async function loadProfilePage3(){
+
+
+await loadFreeFrames();
+
+
+await loadPaidFrames();
 
 
 }
@@ -285,55 +163,69 @@ box.appendChild(div);
 
 
 
+
+
 /* =================================================
-   FRAME
+   FREE FRAME
 ================================================= */
 
 
-function renderFrame(){
+async function loadFreeFrames(){
 
 
-const freeBox =
-document.getElementById(
-"U9-free-frame-list"
+try{
+
+
+const res =
+await fetch(
+
+`${U9_FRAME_API}/avatar-frame-free`
+
 );
 
 
-const paidBox =
-document.getElementById(
-"U9-paid-frame-list"
-);
+
+const data =
+await res.json();
 
 
 
-freeFrameList.forEach(
+freeContainer.innerHTML="";
+
+
+
+(data.frames || [])
+.forEach(
+
 (frame)=>{
 
 
-createFrame(
-freeBox,
+freeContainer.appendChild(
+
+createFrameCard(
 frame,
 "free"
+)
+
 );
 
 
-});
+}
 
-
-
-
-paidFrameList.forEach(
-(frame)=>{
-
-
-createFrame(
-paidBox,
-frame,
-"paid"
 );
 
 
-});
+
+}
+
+catch(error){
+
+console.error(
+"FREE FRAME ERROR:",
+error
+);
+
+}
 
 
 
@@ -343,103 +235,287 @@ frame,
 
 
 
-function createFrame(
-container,
+
+
+
+
+/* =================================================
+   PAID FRAME
+================================================= */
+
+
+async function loadPaidFrames(){
+
+
+try{
+
+
+const res =
+await fetch(
+
+`${U9_FRAME_API}/avatar-frame-paid`,
+
+{
+credentials:
+"include"
+}
+
+);
+
+
+
+const data =
+await res.json();
+
+
+
+paidContainer.innerHTML="";
+
+
+
+(data.frames || [])
+.forEach(
+
+(frame)=>{
+
+
+paidContainer.appendChild(
+
+createFrameCard(
+frame,
+"paid"
+)
+
+);
+
+
+}
+
+);
+
+
+
+}
+
+catch(error){
+
+console.error(
+"PAID FRAME ERROR:",
+error
+);
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+/* =================================================
+   CREATE FRAME CARD
+================================================= */
+
+
+function createFrameCard(
 frame,
 type
 ){
 
 
-const div =
+
+const card =
 document.createElement(
 "div"
 );
 
 
-div.className =
-"U9-frame-item";
+
+card.className =
+"U9-profile-page3-frame-card";
 
 
 
-let status="use";
-
-let icon="";
 
 
+/* =========================
+   FRAME SVG
+========================= */
 
-if(type==="paid"){
+
+const frameBox =
+document.createElement(
+"div"
+);
 
 
-if(frame.owned){
+frameBox.className =
+"U9-profile-page3-frame-svg";
 
-status="use";
 
-icon=`
 
-<img
-class="U9-owner-icon"
-src="SVG/owner.svg"
->
+frameBox.innerHTML =
+frame.svg || "";
 
-`;
+
+
+card.appendChild(
+frameBox
+);
+
+
+
+
+
+/* =========================
+   STATUS
+========================= */
+
+
+if(
+type==="paid"
+){
+
+
+const status =
+document.createElement(
+"div"
+);
+
+
+
+status.className =
+"U9-profile-page3-frame-status";
+
+
+
+if(
+frame.owned
+){
+
+
+status.innerHTML =
+ownerSVG;
+
 
 }
 else{
 
-status="buy";
 
-
-icon=`
-
-<img
-class="U9-lock-icon"
-src="SVG/lock.svg"
->
-
-`;
-
-}
+status.innerHTML =
+lockSVG;
 
 
 }
 
 
 
-
-div.innerHTML = `
-
-
-<div class="U9-frame-image">
-
-
-<img
-src="SVG/frame/${frame.image}"
->
-
-
-${icon}
-
-
-</div>
-
-
-
-<button>
-
-${status}
-
-</button>
-
-
-
-`;
-
-
-
-container.appendChild(div);
+card.appendChild(
+status
+);
 
 
 }
+
+
+
+
+
+
+
+/* =========================
+   BUTTON
+========================= */
+
+
+const button =
+document.createElement(
+"button"
+);
+
+
+
+button.className =
+"U9-profile-page3-frame-button";
+
+
+
+
+
+if(
+type==="paid"
+&&
+!frame.owned
+){
+
+
+button.textContent =
+"buy";
+
+
+
+button.onclick =
+()=>{
+
+
+buyFrame(
+frame.id
+);
+
+
+};
+
+
+
+}
+
+else{
+
+
+button.textContent =
+"use";
+
+
+
+button.onclick =
+()=>{
+
+
+equipFrame(
+
+type,
+
+frame.id
+
+);
+
+
+};
+
+
+
+}
+
+
+
+card.appendChild(
+button
+);
+
+
+
+return card;
+
+
+
+}
+
+
+
 
 
 
@@ -447,8 +523,456 @@ container.appendChild(div);
 
 
 /* =================================================
-   START
+   EQUIP
 ================================================= */
 
 
+async function equipFrame(
+type,
+id
+){
+
+
+
+try{
+
+
+const res =
+await fetch(
+
+`${U9_FRAME_API}/avatar-frame-equip`,
+
+{
+
+method:
+"POST",
+
+credentials:
+"include",
+
+headers:{
+
+"Content-Type":
+"application/json"
+
+},
+
+
+body:
+JSON.stringify({
+
+frame_type:
+type,
+
+frame_id:
+id
+
+})
+
+}
+
+);
+
+
+
+const result =
+await res.json();
+
+
+
+console.log(
+result
+);
+
+
+
+if(
+result.success
+){
+
+alert(
+"Frame equipped"
+);
+
+
+}
+
+
+
+}
+
+catch(error){
+
+console.error(
+"EQUIP ERROR:",
+error
+);
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =================================================
+   BUY PAID FRAME
+================================================= */
+
+
+async function buyFrame(
+id
+){
+
+
+
+try{
+
+
+const res =
+await fetch(
+
+`${U9_FRAME_API}/avatar-frame-paid-purchase`,
+
+{
+
+method:
+"POST",
+
+credentials:
+"include",
+
+headers:{
+
+"Content-Type":
+"application/json"
+
+},
+
+
+body:
+JSON.stringify({
+
+frame_id:
+id
+
+})
+
+}
+
+);
+
+
+
+const result =
+await res.json();
+
+
+
+console.log(
+result
+);
+
+
+
+if(
+result.success
+){
+
+
+alert(
+"Purchase success"
+);
+
+
+loadPaidFrames();
+
+
+}
+else{
+
+
+alert(
+result.message ||
+"Purchase failed"
+);
+
+
+}
+
+
+
+}
+
+catch(error){
+
+console.error(
+"BUY ERROR:",
+error
+);
+
+
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =================================================
+   UPLOAD PREVIEW
+================================================= */
+
+
+if(
+imageInput
+){
+
+
+imageInput.addEventListener(
+
+"change",
+
+(event)=>{
+
+
+const file =
+event.target.files[0];
+
+
+if(
+!file
+)
+return;
+
+
+
+selectedFile =
+file;
+
+
+
+const reader =
+new FileReader();
+
+
+
+reader.onload =
+()=>{
+
+
+preview.src =
+reader.result;
+
+
+};
+
+
+
+reader.readAsDataURL(
+file
+);
+
+
+}
+
+);
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =================================================
+   CANCEL
+================================================= */
+
+
+if(
+cancelButton
+){
+
+
+cancelButton.onclick =
+()=>{
+
+
+selectedFile =
+null;
+
+
+imageInput.value =
+"";
+
+
+preview.src =
+"";
+
+
+};
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =================================================
+   SAVE UPLOAD
+================================================= */
+
+
+if(
+saveButton
+){
+
+
+saveButton.onclick =
+async()=>{
+
+
+if(
+!selectedFile
+){
+
+alert(
+"Select image first"
+);
+
+
+return;
+
+}
+
+
+
+const form =
+new FormData();
+
+
+
+form.append(
+
+"avatar",
+
+selectedFile
+
+);
+
+
+
+
+try{
+
+
+const res =
+await fetch(
+
+`${U9_FRAME_API}/avatar-upload`,
+
+{
+
+method:
+"POST",
+
+credentials:
+"include",
+
+body:
+form
+
+}
+
+);
+
+
+
+const result =
+await res.json();
+
+
+
+console.log(
+result
+);
+
+
+
+if(
+result.success
+){
+
+
+alert(
+"Avatar uploaded"
+);
+
+
+}
+
+
+}
+
+catch(error){
+
+console.error(
+"UPLOAD ERROR:",
+error
+);
+
+
+}
+
+
+
+};
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =================================================
+   INIT
+================================================= */
+
+
+if(
+page3
+){
+
+
 loadProfilePage3();
+
+
+}
