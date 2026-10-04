@@ -811,12 +811,13 @@
 
 
 /* =========================
-   BUTTON 3 / 4 / 5
+   BUTTON 3 / 4 / 5 / 6
 ========================= */
 
 #U9-profile-button-3,
 #U9-profile-button-4,
-#U9-profile-button-5 {
+#U9-profile-button-5,
+#U9-profile-button-6 {
 
   position: relative;
 
@@ -867,11 +868,12 @@
 
 
 /* =========================
-   BUTTON 4 / 5
+   BUTTON 4 / 5 / 6
 ========================= */
 
 #U9-profile-button-4,
-#U9-profile-button-5 {
+#U9-profile-button-5,
+#U9-profile-button-6 {
 
   margin-top: 12px;
 
@@ -879,12 +881,13 @@
 
 
 /* =========================
-   BUTTON 3 / 4 / 5 SVG
+   BUTTON 3 / 4 / 5 / 6 SVG
 ========================= */
 
 #U9-profile-button-3 img,
 #U9-profile-button-4 img,
-#U9-profile-button-5 img {
+#U9-profile-button-5 img,
+#U9-profile-button-6 img {
 
   position: absolute;
 
@@ -909,12 +912,13 @@
 
 
 /* =========================
-   BUTTON 3 / 4 / 5 TEXT
+   BUTTON 3 / 4 / 5 / 6 TEXT
 ========================= */
 
 #U9-profile-button-3 span,
 #U9-profile-button-4 span,
-#U9-profile-button-5 span {
+#U9-profile-button-5 span,
+#U9-profile-button-6 span {
 
   display: block;
 
@@ -943,7 +947,8 @@
 
 #U9-profile-button-3:hover,
 #U9-profile-button-4:hover,
-#U9-profile-button-5:hover {
+#U9-profile-button-5:hover,
+#U9-profile-button-6:hover {
 
   background-color: #e0ecff;
 
@@ -958,7 +963,8 @@
 #U9-profile-button-2:active,
 #U9-profile-button-3:active,
 #U9-profile-button-4:active,
-#U9-profile-button-5:active {
+#U9-profile-button-5:active,
+#U9-profile-button-6:active {
 
   transform: scale(0.96);
 
@@ -1019,12 +1025,13 @@
 
 
   /* =========================
-     BUTTON 3 / 4 / 5
+     BUTTON 3 / 4 / 5 / 6
   ========================= */
 
   #U9-profile-button-3,
   #U9-profile-button-4,
-  #U9-profile-button-5 {
+  #U9-profile-button-5,
+  #U9-profile-button-6 {
 
     width:
       calc(100% - 30px);
@@ -1039,12 +1046,13 @@
 
 
   /* =========================
-     BUTTON 3 / 4 / 5 SVG
+     BUTTON 3 / 4 / 5 / 6 SVG
   ========================= */
 
   #U9-profile-button-3 img,
   #U9-profile-button-4 img,
-  #U9-profile-button-5 img {
+  #U9-profile-button-5 img,
+  #U9-profile-button-6 img {
 
     width: 28px;
 
