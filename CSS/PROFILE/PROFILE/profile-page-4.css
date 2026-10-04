@@ -1,5 +1,5 @@
 /* =================================================
-   PROFILE PAGE 3
+   PROFILE PAGE 4
 
 
    IMPORTANT:
@@ -25,21 +25,21 @@
 
    This file only controls:
 
-   #U9-profile-page3
+   #U9-profile-page4
 
-   #U9-profile-page3-content
+   #U9-profile-page4-content
 
-   Page 3 own elements.
+   Page 4 own elements.
 
 
 ================================================= */
 
 
 /* =================================================
-   PROFILE PAGE 3 WINDOW
+   PROFILE PAGE 4 WINDOW
 ================================================= */
 
-#U9-profile-page3 {
+#U9-profile-page4 {
 
   width: 100%;
 
@@ -51,16 +51,16 @@
 
 
 /* =================================================
-   PROFILE PAGE 3 CONTENT
+   PROFILE PAGE 4 CONTENT
 ================================================= */
 
-#U9-profile-page3-content {
+#U9-profile-page4-content {
 
   width: 100%;
 
   min-height: 300px;
 
-  background: yellow;
+  background: pink;
 
   border-radius: 12px;
 
@@ -70,7 +70,7 @@
 
   justify-content: center;
 
-  color: black;
+  color: white;
 
   font-size: 24px;
 
