@@ -1,4 +1,3 @@
-
 /* =========================
    PROFILE MODAL
 ========================= */
@@ -36,6 +35,12 @@ const profileModalClose =
   );
 
 
+const profileModalCloseIcon =
+  document.getElementById(
+    "U9-profile-modal-close-icon"
+  );
+
+
 const profileModalTitle =
   document.getElementById(
     "U9-profile-modal-title"
@@ -64,6 +69,14 @@ const u9ProfileMainTitle =
 
 const u9ProfileMainIcon =
   "SSVG/logo/U9website.svg";
+
+
+const u9ProfileMainCloseIcon =
+  "SSVG/account/close.svg";
+
+
+const u9ProfileBackIcon =
+  "SSVG/account/back.svg";
 
 
 const u9ProfilePageTitles = {
@@ -307,11 +320,18 @@ function u9ProfileSetHeader(
     ========================= */
 
     if (
-      profileModalClose
+      profileModalCloseIcon
     ) {
 
-      profileModalClose.innerHTML =
-        "×";
+      profileModalCloseIcon.src =
+        u9ProfileMainCloseIcon;
+
+    }
+
+
+    if (
+      profileModalClose
+    ) {
 
       profileModalClose.setAttribute(
         "aria-label",
@@ -389,11 +409,18 @@ function u9ProfileSetHeader(
   ========================= */
 
   if (
-    profileModalClose
+    profileModalCloseIcon
   ) {
 
-    profileModalClose.innerHTML =
-      "&lt;";
+    profileModalCloseIcon.src =
+      u9ProfileBackIcon;
+
+  }
+
+
+  if (
+    profileModalClose
+  ) {
 
     profileModalClose.setAttribute(
       "aria-label",
@@ -1057,7 +1084,7 @@ if (
 
       /* =========================
          INTERNAL PAGE
-         < = BACK
+         SVG = BACK
       ========================= */
 
       u9ProfileShowMainPage();
