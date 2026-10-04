@@ -1,3 +1,4 @@
+
 /* =========================
    PROFILE MODAL
 ========================= */
@@ -151,8 +152,15 @@
   pointer-events: none;
 
   transition:
-    transform 0.35s ease,
-    visibility 0s linear 0.35s;
+    transform 0.4s cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    ),
+    visibility 0s linear 0.4s;
+
+  will-change: transform;
 
 }
 
@@ -161,7 +169,8 @@
    ACTIVE PAGE
 ========================= */
 
-.U9-profile-page-active {
+.U9-profile-page-active,
+.U9-profile-page-current {
 
   transform: translateX(0);
 
@@ -170,23 +179,13 @@
   pointer-events: auto;
 
   transition:
-    transform 0.35s ease,
+    transform 0.4s cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    ),
     visibility 0s linear 0s;
-
-}
-
-
-/* =========================
-   PAGE CURRENT
-========================= */
-
-.U9-profile-page-current {
-
-  transform: translateX(0);
-
-  visibility: visible;
-
-  pointer-events: auto;
 
 }
 
@@ -203,6 +202,14 @@
 
   pointer-events: none;
 
+  transition:
+    transform 0.4s cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    );
+
 }
 
 
@@ -217,6 +224,14 @@
   visibility: visible;
 
   pointer-events: none;
+
+  transition:
+    transform 0.4s cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    );
 
 }
 
@@ -233,6 +248,14 @@
 
   pointer-events: none;
 
+  transition:
+    transform 0.4s cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    );
+
 }
 
 
@@ -247,6 +270,14 @@
   visibility: visible;
 
   pointer-events: none;
+
+  transition:
+    transform 0.4s cubic-bezier(
+      0.22,
+      1,
+      0.36,
+      1
+    );
 
 }
 
@@ -286,6 +317,8 @@
 
   border-bottom:
     1px solid #eeeeee;
+
+  z-index: 2;
 
 }
 
@@ -562,7 +595,7 @@
 
 /* =========================================================
    BUTTON 1 / 2
-   AVATAR RIGHT SIDE
+   AVATAR UPPER RIGHT
 ========================================================= */
 
 
@@ -574,14 +607,11 @@
 
   position: absolute;
 
-  top: 50%;
+  top: 12px;
 
   right: 0;
 
   width: 50px;
-
-  transform:
-    translateY(-50%);
 
   display: flex;
 
@@ -589,9 +619,11 @@
 
   align-items: center;
 
-  justify-content: center;
+  justify-content: flex-start;
 
   gap: 10px;
+
+  z-index: 3;
 
 }
 
@@ -858,57 +890,39 @@
 
 #U9-profile-balance-info {
 
+  position: relative;
+
   width: 100%;
+
+  min-height: 34px;
 
   box-sizing: border-box;
 
   display: flex;
 
-  flex-direction: column;
-
   align-items: center;
-
-}
-
-
-/* =========================
-   BALANCE
-========================= */
-
-#U9-profile-balance {
-
-  width: 100%;
-
-  min-height: 28px;
-
-  display: flex;
 
   justify-content: center;
 
-  align-items: center;
-
-  text-align: center;
-
-  font-size: 16px;
-
-  font-weight: 500;
-
-  color: #ffffff;
+  padding:
+    0
+    42px;
 
 }
 
 
 /* =========================
-   COINS
+   BALANCE VALUE
 ========================= */
 
+#U9-profile-balance,
 #U9-profile-coins {
 
   width: 100%;
 
   min-height: 28px;
 
-  margin-top: 0;
+  box-sizing: border-box;
 
   display: flex;
 
@@ -922,13 +936,277 @@
 
   font-weight: 500;
 
+  line-height: 1.4;
+
   color: #ffffff;
 
 }
 
 
+/* =========================
+   VALUE ACTIVE
+========================= */
+
+#U9-profile-balance.U9-profile-value-active,
+#U9-profile-coins.U9-profile-value-active {
+
+  display: flex;
+
+}
+
+
+/* =========================
+   VALUE HIDDEN
+========================= */
+
+#U9-profile-balance.U9-profile-value-hidden,
+#U9-profile-coins.U9-profile-value-hidden {
+
+  display: none;
+
+}
+
+
+/* =========================
+   BALANCE / COINS TOGGLE
+========================= */
+
+#U9-profile-balance-toggle {
+
+  position: absolute;
+
+  top: 50%;
+
+  right: 0;
+
+  width: 34px;
+
+  height: 34px;
+
+  padding: 0;
+
+  border: none;
+
+  outline: none;
+
+  border-radius: 9px;
+
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.2
+  );
+
+  transform:
+    translateY(-50%);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  cursor: pointer;
+
+}
+
+
+/* =========================
+   TOGGLE SVG
+========================= */
+
+#U9-profile-balance-toggle img {
+
+  width: 23px;
+
+  height: 23px;
+
+  object-fit: contain;
+
+  display: block;
+
+  pointer-events: none;
+
+}
+
+
+/* =========================
+   TOGGLE HOVER
+========================= */
+
+#U9-profile-balance-toggle:hover {
+
+  background-color: rgba(
+    255,
+    255,
+    255,
+    0.32
+  );
+
+}
+
+
+/* =========================
+   TOGGLE ACTIVE
+========================= */
+
+#U9-profile-balance-toggle:active {
+
+  transform:
+    translateY(-50%)
+    scale(0.92);
+
+}
+
+
 /* =========================================================
-   BUTTON 3 / 4 / 5 / 6 / 7
+   BUTTON 3 / 4
+   INSIDE BALANCE CONTAINER
+========================================================= */
+
+
+/* =========================
+   BALANCE BUTTON AREA
+========================= */
+
+#U9-profile-balance-buttons {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-top: 15px;
+
+  display: flex;
+
+  flex-direction: row;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 12px;
+
+}
+
+
+/* =========================
+   BUTTON 3 / 4
+========================= */
+
+#U9-profile-button-3,
+#U9-profile-button-4 {
+
+  position: relative;
+
+  flex: 1 1 0;
+
+  min-width: 0;
+
+  height: 44px;
+
+  padding:
+    0
+    8px;
+
+  border: none;
+
+  border-radius: 9px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background-color: #eef5ff;
+
+  color: #222222;
+
+  font-size: 15px;
+
+  font-weight: 500;
+
+  cursor: pointer;
+
+}
+
+
+/* =========================
+   BUTTON 3 / 4 SVG
+========================= */
+
+#U9-profile-button-3 img,
+#U9-profile-button-4 img {
+
+  width: 25px;
+
+  height: 25px;
+
+  margin-right: 7px;
+
+  object-fit: contain;
+
+  display: block;
+
+  flex: 0 0 auto;
+
+  pointer-events: none;
+
+}
+
+
+/* =========================
+   BUTTON 3 / 4 TEXT
+========================= */
+
+#U9-profile-button-3 span,
+#U9-profile-button-4 span {
+
+  display: block;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+
+  line-height: 1.2;
+
+}
+
+
+/* =========================
+   BUTTON 3 / 4 HOVER
+========================= */
+
+#U9-profile-button-3:hover,
+#U9-profile-button-4:hover {
+
+  background-color: #dce8ff;
+
+}
+
+
+/* =========================
+   BUTTON 3 / 4 ACTIVE
+========================= */
+
+#U9-profile-button-3:active,
+#U9-profile-button-4:active {
+
+  transform: scale(0.96);
+
+}
+
+
+/* =========================================================
+   BUTTON 5 / 6 / 7
 ========================================================= */
 
 
@@ -938,46 +1216,48 @@
 
 #U9-profile-buttons {
 
-  width: 100%;
-
-  box-sizing: border-box;
-
-  margin:
-    15px
-    0
-    25px
-    0;
-
-  display: flex;
-
-  flex-direction: column;
-
-  align-items: center;
-
-}
-
-
-/* =========================
-   BUTTON 3 - 7
-========================= */
-
-#U9-profile-button-3,
-#U9-profile-button-4,
-#U9-profile-button-5,
-#U9-profile-button-6,
-#U9-profile-button-7 {
-
-  position: relative;
-
   width:
     min(
       400px,
       calc(100% - 30px)
     );
 
+  box-sizing: border-box;
+
+  margin:
+    15px
+    auto
+    25px
+    auto;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: stretch;
+
+  gap: 12px;
+
+}
+
+
+/* =========================
+   BUTTON 5 / 6 / 7
+========================= */
+
+#U9-profile-button-5,
+#U9-profile-button-6,
+#U9-profile-button-7 {
+
+  position: relative;
+
+  width: 100%;
+
   height: 50px;
 
-  padding: 0;
+  padding:
+    0
+    15px;
 
   border: none;
 
@@ -989,7 +1269,7 @@
 
   align-items: center;
 
-  justify-content: center;
+  justify-content: flex-start;
 
   background-color: #eef5ff;
 
@@ -1005,56 +1285,26 @@
 
 
 /* =========================
-   BUTTON 3
+   BUTTON 5 / 6 / 7 SVG
 ========================= */
 
-#U9-profile-button-3 {
-
-  margin-top: 15px;
-
-}
-
-
-/* =========================
-   BUTTON 4 - 7
-========================= */
-
-#U9-profile-button-4,
-#U9-profile-button-5,
-#U9-profile-button-6,
-#U9-profile-button-7 {
-
-  margin-top: 12px;
-
-}
-
-
-/* =========================
-   BUTTON 3 - 7 SVG
-========================= */
-
-#U9-profile-button-3 img,
-#U9-profile-button-4 img,
 #U9-profile-button-5 img,
 #U9-profile-button-6 img,
 #U9-profile-button-7 img {
 
-  position: absolute;
-
-  left: 18px;
-
-  top: 50%;
+  position: relative;
 
   width: 30px;
 
   height: 30px;
 
-  transform:
-    translateY(-50%);
+  margin-right: 15px;
 
   object-fit: contain;
 
   display: block;
+
+  flex: 0 0 30px;
 
   pointer-events: none;
 
@@ -1062,20 +1312,20 @@
 
 
 /* =========================
-   BUTTON 3 - 7 TEXT
+   BUTTON 5 / 6 / 7 TEXT
 ========================= */
 
-#U9-profile-button-3 span,
-#U9-profile-button-4 span,
 #U9-profile-button-5 span,
 #U9-profile-button-6 span,
 #U9-profile-button-7 span {
 
   display: block;
 
-  width: 100%;
+  flex: 1;
 
-  text-align: center;
+  min-width: 0;
+
+  text-align: left;
 
   line-height: 1.2;
 
@@ -1085,11 +1335,9 @@
 
 
 /* =========================
-   BUTTON 3 - 7 HOVER
+   BUTTON 5 / 6 / 7 HOVER
 ========================= */
 
-#U9-profile-button-3:hover,
-#U9-profile-button-4:hover,
 #U9-profile-button-5:hover,
 #U9-profile-button-6:hover,
 #U9-profile-button-7:hover {
@@ -1100,16 +1348,14 @@
 
 
 /* =========================
-   BUTTON 3 - 7 ACTIVE
+   BUTTON 5 / 6 / 7 ACTIVE
 ========================= */
 
-#U9-profile-button-3:active,
-#U9-profile-button-4:active,
 #U9-profile-button-5:active,
 #U9-profile-button-6:active,
 #U9-profile-button-7:active {
 
-  transform: scale(0.96);
+  transform: scale(0.97);
 
 }
 
@@ -1155,6 +1401,8 @@
 
   border-bottom:
     1px solid #eeeeee;
+
+  z-index: 2;
 
 }
 
@@ -1432,6 +1680,8 @@
 
   #U9-profile-avatar-buttons {
 
+    top: 10px;
+
     right: 0;
 
     width: 46px;
@@ -1474,33 +1724,120 @@
 
 
   /* =========================
-     BUTTON 3 - 7
+     BALANCE CONTAINER
   ========================= */
 
-  #U9-profile-button-3,
-  #U9-profile-button-4,
-  #U9-profile-button-5,
-  #U9-profile-button-6,
-  #U9-profile-button-7 {
+  #U9-profile-balance-container {
 
     width:
       calc(100% - 30px);
 
-    max-width: 350px;
+    max-width: 400px;
 
-    height: 48px;
-
-    font-size: 18px;
+    padding: 16px;
 
   }
 
 
   /* =========================
-     BUTTON 3 - 7 SVG
+     BALANCE INFO
+  ========================= */
+
+  #U9-profile-balance-info {
+
+    padding:
+      0
+      38px;
+
+  }
+
+
+  /* =========================
+     BALANCE TOGGLE
+  ========================= */
+
+  #U9-profile-balance-toggle {
+
+    width: 32px;
+
+    height: 32px;
+
+  }
+
+
+  /* =========================
+     BUTTON 3 / 4
+  ========================= */
+
+  #U9-profile-button-3,
+  #U9-profile-button-4 {
+
+    height: 42px;
+
+    padding:
+      0
+      5px;
+
+    font-size: 14px;
+
+  }
+
+
+  /* =========================
+     BUTTON 3 / 4 SVG
   ========================= */
 
   #U9-profile-button-3 img,
-  #U9-profile-button-4 img,
+  #U9-profile-button-4 img {
+
+    width: 22px;
+
+    height: 22px;
+
+    margin-right: 5px;
+
+  }
+
+
+  /* =========================
+     BUTTON 5 / 6 / 7 AREA
+  ========================= */
+
+  #U9-profile-buttons {
+
+    width:
+      calc(100% - 30px);
+
+    max-width: 400px;
+
+    margin-top: 15px;
+
+  }
+
+
+  /* =========================
+     BUTTON 5 / 6 / 7
+  ========================= */
+
+  #U9-profile-button-5,
+  #U9-profile-button-6,
+  #U9-profile-button-7 {
+
+    height: 48px;
+
+    padding:
+      0
+      14px;
+
+    font-size: 15px;
+
+  }
+
+
+  /* =========================
+     BUTTON 5 / 6 / 7 SVG
+  ========================= */
+
   #U9-profile-button-5 img,
   #U9-profile-button-6 img,
   #U9-profile-button-7 img {
@@ -1509,7 +1846,9 @@
 
     height: 28px;
 
-    left: 18px;
+    flex: 0 0 28px;
+
+    margin-right: 14px;
 
   }
 
