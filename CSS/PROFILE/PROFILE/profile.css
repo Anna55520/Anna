@@ -1,4 +1,4 @@
-/* =========================
+ /* =========================
    PROFILE MODAL
 ========================= */
 
@@ -583,14 +583,16 @@
 
 
 /* =========================
-   BALANCE
+   BALANCE / COINS TITLE
 ========================= */
 
-#U9-profile-balance {
+#U9-profile-balance-title {
 
   width: 100%;
 
   min-height: 28px;
+
+  box-sizing: border-box;
 
   display: flex;
 
@@ -603,6 +605,60 @@
   font-size: 16px;
 
   font-weight: 500;
+
+  line-height: 1.2;
+
+  color: #ffffff;
+
+}
+
+
+/* =========================
+   BALANCE / COINS VALUE ROW
+========================= */
+
+#U9-profile-balance-value-row {
+
+  width: 100%;
+
+  min-height: 36px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+}
+
+
+/* =========================
+   BALANCE
+========================= */
+
+#U9-profile-balance {
+
+  min-width: 0;
+
+  min-height: 28px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  text-align: center;
+
+  font-size: 22px;
+
+  font-weight: 600;
+
+  line-height: 1.2;
 
   color: #ffffff;
 
@@ -615,11 +671,11 @@
 
 #U9-profile-coins {
 
-  width: 100%;
+  min-width: 0;
 
   min-height: 28px;
 
-  margin-top: 0;
+  margin: 0;
 
   display: flex;
 
@@ -629,11 +685,97 @@
 
   text-align: center;
 
-  font-size: 16px;
+  font-size: 22px;
 
-  font-weight: 500;
+  font-weight: 600;
+
+  line-height: 1.2;
 
   color: #ffffff;
+
+}
+
+
+/* =========================
+   BALANCE / COINS TOGGLE
+========================= */
+
+#U9-profile-balance-toggle {
+
+  flex:
+    0
+    0
+    36px;
+
+  width: 36px;
+
+  height: 36px;
+
+  padding: 0;
+
+  border: none;
+
+  outline: none;
+
+  border-radius: 50%;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background-color: #ffffff;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.15s ease;
+
+}
+
+
+/* =========================
+   BALANCE / COINS TOGGLE SVG
+========================= */
+
+#U9-profile-balance-toggle img {
+
+  width: 22px;
+
+  height: 22px;
+
+  object-fit: contain;
+
+  display: block;
+
+  pointer-events: none;
+
+}
+
+
+/* =========================
+   BALANCE / COINS TOGGLE HOVER
+========================= */
+
+#U9-profile-balance-toggle:hover {
+
+  background-color: #dce8ff;
+
+}
+
+
+/* =========================
+   BALANCE / COINS TOGGLE ACTIVE
+========================= */
+
+#U9-profile-balance-toggle:active {
+
+  transform:
+    scale(0.92);
 
 }
 
@@ -966,7 +1108,8 @@
 #U9-profile-button-5:active,
 #U9-profile-button-6:active {
 
-  transform: scale(0.96);
+  transform:
+    scale(0.96);
 
 }
 
@@ -1020,6 +1163,89 @@
     height: 26px;
 
     left: 10px;
+
+  }
+
+
+  /* =========================
+     BALANCE / COINS TITLE
+  ========================= */
+
+  #U9-profile-balance-title {
+
+    min-height: 26px;
+
+    font-size: 15px;
+
+  }
+
+
+  /* =========================
+     BALANCE / COINS VALUE ROW
+  ========================= */
+
+  #U9-profile-balance-value-row {
+
+    min-height: 34px;
+
+    gap: 8px;
+
+  }
+
+
+  /* =========================
+     BALANCE
+  ========================= */
+
+  #U9-profile-balance {
+
+    min-height: 26px;
+
+    font-size: 20px;
+
+  }
+
+
+  /* =========================
+     COINS
+  ========================= */
+
+  #U9-profile-coins {
+
+    min-height: 26px;
+
+    font-size: 20px;
+
+  }
+
+
+  /* =========================
+     BALANCE / COINS TOGGLE
+  ========================= */
+
+  #U9-profile-balance-toggle {
+
+    flex:
+      0
+      0
+      34px;
+
+    width: 34px;
+
+    height: 34px;
+
+  }
+
+
+  /* =========================
+     BALANCE / COINS TOGGLE SVG
+  ========================= */
+
+  #U9-profile-balance-toggle img {
+
+    width: 20px;
+
+    height: 20px;
 
   }
 
