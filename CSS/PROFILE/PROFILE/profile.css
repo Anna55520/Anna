@@ -539,6 +539,8 @@
 
 #U9-profile-balance-container {
 
+  position: relative;
+
   width:
     min(
       400px,
@@ -620,6 +622,8 @@
 
 #U9-profile-balance-value-row {
 
+  position: relative;
+
   width: 100%;
 
   min-height: 36px;
@@ -631,8 +635,6 @@
   align-items: center;
 
   justify-content: center;
-
-  gap: 10px;
 
 }
 
@@ -725,10 +727,11 @@
 
 #U9-profile-balance-toggle {
 
-  flex:
-    0
-    0
-    36px;
+  position: absolute;
+
+  top: 50%;
+
+  right: 0;
 
   width: 36px;
 
@@ -753,6 +756,9 @@
   background-color: #ffffff;
 
   cursor: pointer;
+
+  transform:
+    translateY(-50%);
 
   transition:
     background-color 0.2s ease,
@@ -798,6 +804,7 @@
 #U9-profile-balance-toggle:active {
 
   transform:
+    translateY(-50%)
     scale(0.92);
 
 }
@@ -1211,14 +1218,12 @@
 
     min-height: 34px;
 
-    gap: 8px;
-
   }
 
 
   /* =========================
      BALANCE
-  ========================= */
+========================= */
 
   #U9-profile-balance {
 
@@ -1231,7 +1236,7 @@
 
   /* =========================
      COINS
-  ========================= */
+========================= */
 
   #U9-profile-coins {
 
@@ -1248,10 +1253,7 @@
 
   #U9-profile-balance-toggle {
 
-    flex:
-      0
-      0
-      34px;
+    right: 0;
 
     width: 34px;
 
