@@ -113,13 +113,158 @@
 }
 
 
+/* =========================================================
+   PROFILE PAGE SYSTEM
+========================================================= */
+
+
 /* =========================
-   HEADER
+   ALL PROFILE PAGES
 ========================= */
 
-#U9-profile-modal-header {
+.U9-profile-page {
+
+  position: absolute;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 100%;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  flex-direction: column;
+
+  background-color: #ffffff;
+
+  overflow: hidden;
+
+  transform: translateX(100%);
+
+  visibility: hidden;
+
+  pointer-events: none;
+
+  transition:
+    transform 0.35s ease,
+    visibility 0s linear 0.35s;
+
+}
+
+
+/* =========================
+   ACTIVE PAGE
+========================= */
+
+.U9-profile-page-active {
+
+  transform: translateX(0);
+
+  visibility: visible;
+
+  pointer-events: auto;
+
+  transition:
+    transform 0.35s ease,
+    visibility 0s linear 0s;
+
+}
+
+
+/* =========================
+   PAGE CURRENT
+========================= */
+
+.U9-profile-page-current {
+
+  transform: translateX(0);
+
+  visibility: visible;
+
+  pointer-events: auto;
+
+}
+
+
+/* =========================
+   PAGE FORWARD OUT
+========================= */
+
+.U9-profile-page-slide-left {
+
+  transform: translateX(-100%);
+
+  visibility: visible;
+
+  pointer-events: none;
+
+}
+
+
+/* =========================
+   PAGE FORWARD IN
+========================= */
+
+.U9-profile-page-slide-from-right {
+
+  transform: translateX(100%);
+
+  visibility: visible;
+
+  pointer-events: none;
+
+}
+
+
+/* =========================
+   PAGE BACK OUT
+========================= */
+
+.U9-profile-page-slide-right {
+
+  transform: translateX(100%);
+
+  visibility: visible;
+
+  pointer-events: none;
+
+}
+
+
+/* =========================
+   PAGE BACK IN
+========================= */
+
+.U9-profile-page-slide-from-left {
+
+  transform: translateX(-100%);
+
+  visibility: visible;
+
+  pointer-events: none;
+
+}
+
+
+/* =========================================================
+   HOME
+========================================================= */
+
+
+/* =========================
+   HOME HEADER
+========================= */
+
+#U9-profile-home-header {
 
   position: relative;
+
+  flex: 0 0 55px;
 
   width: 100%;
 
@@ -141,6 +286,55 @@
 
   border-bottom:
     1px solid #eeeeee;
+
+}
+
+
+/* =========================
+   HOME TITLE
+========================= */
+
+#U9-profile-home-title {
+
+  position: relative;
+
+  font-size: 20px;
+
+  font-weight: 600;
+
+  line-height: 1;
+
+  color: #ffffff;
+
+  text-align: center;
+
+  white-space: nowrap;
+
+}
+
+
+/* =========================
+   HOME ICON
+========================= */
+
+#U9-profile-home-icon {
+
+  position: absolute;
+
+  top: 50%;
+
+  right: 15px;
+
+  width: 28px;
+
+  height: 28px;
+
+  transform:
+    translateY(-50%);
+
+  object-fit: contain;
+
+  display: block;
 
 }
 
@@ -190,6 +384,8 @@
 
   justify-content: center;
 
+  z-index: 10;
+
 }
 
 
@@ -210,58 +406,14 @@
 
 
 /* =========================
-   TITLE
+   HOME BODY
 ========================= */
 
-#U9-profile-modal-title {
-
-  position: relative;
-
-  font-size: 20px;
-
-  font-weight: 600;
-
-  line-height: 1;
-
-  color: #ffffff;
-
-}
-
-
-/* =========================
-   PROFILE ICON
-========================= */
-
-#U9-profile-modal-icon {
-
-  position: absolute;
-
-  top: 50%;
-
-  right: 15px;
-
-  width: 28px;
-
-  height: 28px;
-
-  transform:
-    translateY(-50%);
-
-  object-fit: contain;
-
-}
-
-
-/* =========================
-   BODY
-========================= */
-
-#U9-profile-modal-body {
+#U9-profile-home-body {
 
   width: 100%;
 
-  height:
-    calc(100% - 55px);
+  height: calc(100% - 55px);
 
   box-sizing: border-box;
 
@@ -270,6 +422,59 @@
   overflow-x: hidden;
 
   -webkit-overflow-scrolling: touch;
+
+}
+
+
+/* =========================
+   PROFILE MAIN
+========================= */
+
+#U9-profile-main {
+
+  width: 100%;
+
+  min-height: 100%;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+}
+
+
+/* =========================================================
+   AVATAR AREA
+========================================================= */
+
+
+/* =========================
+   AVATAR AREA
+========================= */
+
+#U9-profile-avatar-area {
+
+  position: relative;
+
+  width: 220px;
+
+  min-height: 210px;
+
+  margin:
+    55px
+    auto
+    10px
+    auto;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
 
 }
 
@@ -286,11 +491,7 @@
 
   height: 130px;
 
-  margin:
-    55px
-    auto
-    25px
-    auto;
+  margin: 0;
 
   flex: 0 0 130px;
 
@@ -359,17 +560,28 @@
 }
 
 
+/* =========================================================
+   BUTTON 1 / 2
+   AVATAR RIGHT SIDE
+========================================================= */
+
+
 /* =========================
-   PROFILE MAIN
+   BUTTON AREA
 ========================= */
 
-#U9-profile-main {
+#U9-profile-avatar-buttons {
 
-  width: 100%;
+  position: absolute;
 
-  min-height: 100%;
+  top: 50%;
 
-  box-sizing: border-box;
+  right: 0;
+
+  width: 50px;
+
+  transform:
+    translateY(-50%);
 
   display: flex;
 
@@ -377,7 +589,100 @@
 
   align-items: center;
 
+  justify-content: center;
+
+  gap: 10px;
+
 }
+
+
+/* =========================
+   BUTTON 1 / 2
+========================= */
+
+#U9-profile-button-1,
+#U9-profile-button-2 {
+
+  position: relative;
+
+  width: 42px;
+
+  height: 42px;
+
+  padding: 0;
+
+  border: none;
+
+  outline: none;
+
+  border-radius: 10px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background-color: #eef5ff;
+
+  cursor: pointer;
+
+  flex: 0 0 42px;
+
+}
+
+
+/* =========================
+   BUTTON 1 / 2 SVG
+========================= */
+
+#U9-profile-button-1 img,
+#U9-profile-button-2 img {
+
+  position: relative;
+
+  width: 26px;
+
+  height: 26px;
+
+  object-fit: contain;
+
+  display: block;
+
+  pointer-events: none;
+
+}
+
+
+/* =========================
+   BUTTON 1 / 2 HOVER
+========================= */
+
+#U9-profile-button-1:hover,
+#U9-profile-button-2:hover {
+
+  background-color: #dce8ff;
+
+}
+
+
+/* =========================
+   BUTTON 1 / 2 ACTIVE
+========================= */
+
+#U9-profile-button-1:active,
+#U9-profile-button-2:active {
+
+  transform: scale(0.92);
+
+}
+
+
+/* =========================================================
+   PROFILE INFO
+========================================================= */
 
 
 /* =========================
@@ -511,6 +816,11 @@
 }
 
 
+/* =========================================================
+   BALANCE
+========================================================= */
+
+
 /* =========================
    BALANCE CONTAINER
 ========================= */
@@ -617,23 +927,10 @@
 }
 
 
-/* =========================
-   BALANCE BUTTON AREA
-========================= */
+/* =========================================================
+   BUTTON 3 / 4 / 5 / 6 / 7
+========================================================= */
 
-#U9-profile-balance-buttons {
-
-  width: 100%;
-
-  margin-top: 18px;
-
-  display: flex;
-
-  justify-content: center;
-
-  align-items: center;
-
-}
 
 /* =========================
    PROFILE BUTTON AREA
@@ -661,140 +958,14 @@
 
 
 /* =========================
-   BUTTON 1 + BUTTON 2
-========================= */
-
-#U9-profile-button-1,
-#U9-profile-button-2 {
-
-  position: relative;
-
-  width: 170px;
-
-  height: 50px;
-
-  padding: 0;
-
-  border: none;
-
-  border-radius: 10px;
-
-  box-sizing: border-box;
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: center;
-
-  background-color: #ffffff;
-
-  color: #222222;
-
-  font-size: 15px;
-
-  font-weight: 500;
-
-  cursor: pointer;
-
-}
-
-
-/* =========================
-   BUTTON 1
-========================= */
-
-#U9-profile-button-1 {
-
-  margin-right: 6px;
-
-}
-
-
-/* =========================
-   BUTTON 2
-========================= */
-
-#U9-profile-button-2 {
-
-  margin-left: 6px;
-
-}
-
-
-/* =========================
-   BUTTON 1 + 2 ROW
-========================= */
-
-#U9-profile-balance-buttons {
-
-  display: flex;
-
-  flex-direction: row;
-
-  justify-content: center;
-
-  align-items: center;
-
-}
-
-
-/* =========================
-   BUTTON 1 / 2 SVG
-========================= */
-
-#U9-profile-button-1 img,
-#U9-profile-button-2 img {
-
-  position: absolute;
-
-  left: 12px;
-
-  top: 50%;
-
-  width: 28px;
-
-  height: 28px;
-
-  transform:
-    translateY(-50%);
-
-  object-fit: contain;
-
-  display: block;
-
-  pointer-events: none;
-
-}
-
-
-/* =========================
-   BUTTON 1 / 2 TEXT
-========================= */
-
-#U9-profile-button-1 span,
-#U9-profile-button-2 span {
-
-  display: block;
-
-  width: 100%;
-
-  text-align: center;
-
-  line-height: 1.2;
-
-  white-space: nowrap;
-
-}
-
-
-/* =========================
-   BUTTON 3 / 4 / 5
+   BUTTON 3 - 7
 ========================= */
 
 #U9-profile-button-3,
 #U9-profile-button-4,
-#U9-profile-button-5 {
+#U9-profile-button-5,
+#U9-profile-button-6,
+#U9-profile-button-7 {
 
   position: relative;
 
@@ -845,11 +1016,13 @@
 
 
 /* =========================
-   BUTTON 4 / 5
+   BUTTON 4 - 7
 ========================= */
 
 #U9-profile-button-4,
-#U9-profile-button-5 {
+#U9-profile-button-5,
+#U9-profile-button-6,
+#U9-profile-button-7 {
 
   margin-top: 12px;
 
@@ -857,12 +1030,14 @@
 
 
 /* =========================
-   BUTTON 3 / 4 / 5 SVG
+   BUTTON 3 - 7 SVG
 ========================= */
 
 #U9-profile-button-3 img,
 #U9-profile-button-4 img,
-#U9-profile-button-5 img {
+#U9-profile-button-5 img,
+#U9-profile-button-6 img,
+#U9-profile-button-7 img {
 
   position: absolute;
 
@@ -887,12 +1062,14 @@
 
 
 /* =========================
-   BUTTON 3 / 4 / 5 TEXT
+   BUTTON 3 - 7 TEXT
 ========================= */
 
 #U9-profile-button-3 span,
 #U9-profile-button-4 span,
-#U9-profile-button-5 span {
+#U9-profile-button-5 span,
+#U9-profile-button-6 span,
+#U9-profile-button-7 span {
 
   display: block;
 
@@ -908,20 +1085,14 @@
 
 
 /* =========================
-   HOVER
+   BUTTON 3 - 7 HOVER
 ========================= */
-
-#U9-profile-button-1:hover,
-#U9-profile-button-2:hover {
-
-  background-color: #dce8ff;
-
-}
-
 
 #U9-profile-button-3:hover,
 #U9-profile-button-4:hover,
-#U9-profile-button-5:hover {
+#U9-profile-button-5:hover,
+#U9-profile-button-6:hover,
+#U9-profile-button-7:hover {
 
   background-color: #e0ecff;
 
@@ -929,25 +1100,345 @@
 
 
 /* =========================
-   ACTIVE
+   BUTTON 3 - 7 ACTIVE
 ========================= */
 
-#U9-profile-button-1:active,
-#U9-profile-button-2:active,
 #U9-profile-button-3:active,
 #U9-profile-button-4:active,
-#U9-profile-button-5:active {
+#U9-profile-button-5:active,
+#U9-profile-button-6:active,
+#U9-profile-button-7:active {
 
   transform: scale(0.96);
 
 }
 
 
+/* =========================================================
+   INTERNAL PROFILE PAGE HEADER
+========================================================= */
+
+
 /* =========================
-   MOBILE
+   PAGE HEADER
 ========================= */
 
+#U9-profile-page-1-header,
+#U9-profile-page-2-header,
+#U9-profile-page-3-header,
+#U9-profile-page-4-header,
+#U9-profile-page-5-header,
+#U9-profile-page-6-header,
+#U9-profile-page-7-header {
+
+  position: relative;
+
+  flex: 0 0 55px;
+
+  width: 100%;
+
+  height: 55px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding:
+    0
+    60px;
+
+  background-color: #77ace9;
+
+  border-bottom:
+    1px solid #eeeeee;
+
+}
+
+
+/* =========================================================
+   INTERNAL PAGE TITLE
+========================================================= */
+
+#U9-profile-page-1-title,
+#U9-profile-page-2-title,
+#U9-profile-page-3-title,
+#U9-profile-page-4-title,
+#U9-profile-page-5-title,
+#U9-profile-page-6-title,
+#U9-profile-page-7-title {
+
+  position: relative;
+
+  font-size: 20px;
+
+  font-weight: 600;
+
+  line-height: 1;
+
+  color: #ffffff;
+
+  text-align: center;
+
+  white-space: nowrap;
+
+}
+
+
+/* =========================================================
+   INTERNAL PAGE ICON
+========================================================= */
+
+#U9-profile-page-1-icon,
+#U9-profile-page-2-icon,
+#U9-profile-page-3-icon,
+#U9-profile-page-4-icon,
+#U9-profile-page-5-icon,
+#U9-profile-page-6-icon,
+#U9-profile-page-7-icon {
+
+  position: absolute;
+
+  top: 50%;
+
+  right: 15px;
+
+  width: 28px;
+
+  height: 28px;
+
+  transform:
+    translateY(-50%);
+
+  object-fit: contain;
+
+  display: block;
+
+}
+
+
+/* =========================================================
+   INTERNAL PAGE BACK BUTTON
+========================================================= */
+
+.U9-profile-page-back {
+
+  position: absolute;
+
+  top: 50%;
+
+  left: 15px;
+
+  width: 36px;
+
+  height: 36px;
+
+  padding: 0;
+
+  border: none;
+
+  outline: none;
+
+  border-radius: 50%;
+
+  background-color: #f1f1f1;
+
+  color: #111111;
+
+  font-size: 30px;
+
+  font-weight: 300;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transform:
+    translateY(-50%);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  z-index: 10;
+
+}
+
+
+.U9-profile-page-back:hover {
+
+  background-color: #e8e8e8;
+
+}
+
+
+.U9-profile-page-back:active {
+
+  transform:
+    translateY(-50%)
+    scale(0.94);
+
+}
+
+
+/* =========================================================
+   INTERNAL PAGE BODY
+========================================================= */
+
+
+/* =========================
+   PAGE 1 - 7 BODY
+========================= */
+
+#U9-profile-page-1-body,
+#U9-profile-page-2-body,
+#U9-profile-page-3-body,
+#U9-profile-page-4-body,
+#U9-profile-page-5-body,
+#U9-profile-page-6-body,
+#U9-profile-page-7-body {
+
+  width: 100%;
+
+  height: calc(100% - 55px);
+
+  box-sizing: border-box;
+
+  overflow-y: auto;
+
+  overflow-x: hidden;
+
+  -webkit-overflow-scrolling: touch;
+
+}
+
+
+/* =========================================================
+   PAGE CONTENT
+========================================================= */
+
+#U9-profile-page-1-body > *,
+#U9-profile-page-2-body > *,
+#U9-profile-page-3-body > *,
+#U9-profile-page-4-body > *,
+#U9-profile-page-5-body > *,
+#U9-profile-page-6-body > *,
+#U9-profile-page-7-body > * {
+
+  box-sizing: border-box;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
 @media (max-width: 480px) {
+
+
+  /* =========================
+     HOME HEADER
+  ========================= */
+
+  #U9-profile-home-header {
+
+    height: 55px;
+
+    padding:
+      0
+      55px;
+
+  }
+
+
+  /* =========================
+     HOME TITLE
+  ========================= */
+
+  #U9-profile-home-title {
+
+    font-size: 19px;
+
+  }
+
+
+  /* =========================
+     HOME ICON
+  ========================= */
+
+  #U9-profile-home-icon {
+
+    right: 14px;
+
+    width: 27px;
+
+    height: 27px;
+
+  }
+
+
+  /* =========================
+     CLOSE BUTTON
+  ========================= */
+
+  #U9-profile-modal-close {
+
+    left: 12px;
+
+    width: 36px;
+
+    height: 36px;
+
+  }
+
+
+  /* =========================
+     AVATAR AREA
+  ========================= */
+
+  #U9-profile-avatar-area {
+
+    width: 205px;
+
+    min-height: 200px;
+
+    margin-top: 45px;
+
+  }
+
+
+  /* =========================
+     AVATAR
+  ========================= */
+
+  #U9-profile-avatar {
+
+    width: 130px;
+
+    height: 130px;
+
+  }
+
+
+  /* =========================
+     AVATAR BUTTON AREA
+  ========================= */
+
+  #U9-profile-avatar-buttons {
+
+    right: 0;
+
+    width: 46px;
+
+    gap: 8px;
+
+  }
 
 
   /* =========================
@@ -957,25 +1448,13 @@
   #U9-profile-button-1,
   #U9-profile-button-2 {
 
-    width: 148px;
+    width: 40px;
 
-    height: 48px;
+    height: 40px;
 
-    font-size: 14px;
+    flex: 0 0 40px;
 
-  }
-
-
-  #U9-profile-button-1 {
-
-    margin-right: 4px;
-
-  }
-
-
-  #U9-profile-button-2 {
-
-    margin-left: 4px;
+    border-radius: 9px;
 
   }
 
@@ -987,23 +1466,22 @@
   #U9-profile-button-1 img,
   #U9-profile-button-2 img {
 
-    width: 26px;
+    width: 25px;
 
-    height: 26px;
-
-    left: 10px;
+    height: 25px;
 
   }
 
 
-
   /* =========================
-     BUTTON 3 / 4 / 5
+     BUTTON 3 - 7
   ========================= */
 
   #U9-profile-button-3,
   #U9-profile-button-4,
-  #U9-profile-button-5 {
+  #U9-profile-button-5,
+  #U9-profile-button-6,
+  #U9-profile-button-7 {
 
     width:
       calc(100% - 30px);
@@ -1018,12 +1496,14 @@
 
 
   /* =========================
-     BUTTON 3 / 4 / 5 SVG
+     BUTTON 3 - 7 SVG
   ========================= */
 
   #U9-profile-button-3 img,
   #U9-profile-button-4 img,
-  #U9-profile-button-5 img {
+  #U9-profile-button-5 img,
+  #U9-profile-button-6 img,
+  #U9-profile-button-7 img {
 
     width: 28px;
 
@@ -1033,5 +1513,101 @@
 
   }
 
+
+  /* =========================
+     PAGE HEADER
+  ========================= */
+
+  #U9-profile-page-1-header,
+  #U9-profile-page-2-header,
+  #U9-profile-page-3-header,
+  #U9-profile-page-4-header,
+  #U9-profile-page-5-header,
+  #U9-profile-page-6-header,
+  #U9-profile-page-7-header {
+
+    height: 55px;
+
+    padding:
+      0
+      55px;
+
+  }
+
+
+  /* =========================
+     PAGE TITLE
+  ========================= */
+
+  #U9-profile-page-1-title,
+  #U9-profile-page-2-title,
+  #U9-profile-page-3-title,
+  #U9-profile-page-4-title,
+  #U9-profile-page-5-title,
+  #U9-profile-page-6-title,
+  #U9-profile-page-7-title {
+
+    font-size: 19px;
+
+  }
+
+
+  /* =========================
+     PAGE ICON
+  ========================= */
+
+  #U9-profile-page-1-icon,
+  #U9-profile-page-2-icon,
+  #U9-profile-page-3-icon,
+  #U9-profile-page-4-icon,
+  #U9-profile-page-5-icon,
+  #U9-profile-page-6-icon,
+  #U9-profile-page-7-icon {
+
+    right: 14px;
+
+    width: 27px;
+
+    height: 27px;
+
+  }
+
+
+  /* =========================
+     PAGE BACK BUTTON
+  ========================= */
+
+  .U9-profile-page-back {
+
+    left: 12px;
+
+    width: 36px;
+
+    height: 36px;
+
+    font-size: 29px;
+
+  }
+
+}
+
+
+/* =========================================================
+   REDUCE MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  #U9-profile-modal-content {
+
+    transition: none;
+
+  }
+
+  .U9-profile-page {
+
+    transition: none;
+
+  }
 
 }
