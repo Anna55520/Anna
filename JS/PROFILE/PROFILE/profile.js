@@ -1251,55 +1251,41 @@ for (
   }
 
 
-  pageData.back.addEventListener(
-    "click",
+  pageData.back.onclick =
     function (event) {
-
-      /*
-        Prevent default button behavior.
-      */
 
       event.preventDefault();
 
-
-      /*
-        Stop the event from bubbling
-        to parent elements.
-      */
-
       event.stopPropagation();
-
-
-      /*
-        Prevent another click listener
-        on the same button from running.
-      */
 
       event.stopImmediatePropagation();
 
 
       /*
-        Prevent duplicate back action
-        while the page animation is running.
+        If a back animation is already running,
+        ignore this click completely.
       */
 
       if (u9ProfilePageAnimating) {
 
-        return;
+        return false;
 
       }
 
 
       /*
-        Go back to Profile Home.
+        Return to Profile Home.
       */
 
       u9ProfileGoBack();
 
-    }
-  );
+
+      return false;
+
+    };
 
 }
+
 
 
 /* =========================================================
