@@ -867,7 +867,7 @@ function u9ProfileOpenPage(
 
   /*
     Destination starts
-    from the right.
+    from the RIGHT.
   */
 
   nextPage.page.classList.add(
@@ -883,7 +883,8 @@ function u9ProfileOpenPage(
 
 
   /*
-    Current page moves left.
+    Current page moves
+    to the LEFT.
   */
 
   u9ProfileRemovePageClasses(
@@ -898,7 +899,7 @@ function u9ProfileOpenPage(
 
   /*
     Destination moves
-    into the center.
+    into the CENTER.
   */
 
   nextPage.page.classList.remove(
@@ -1035,19 +1036,13 @@ function u9ProfileGoBack() {
 
 
   /*
-     VERY IMPORTANT:
+     IMPORTANT:
 
      Change the current page
      immediately.
 
-     Therefore, even if another
-     handler somehow calls
-     u9ProfileGoBack() again,
-     it will see:
-
-        u9ProfileCurrentPage === 0
-
-     and will be rejected.
+     Therefore, another Back
+     action cannot return again.
   */
 
   u9ProfileCurrentPage =
@@ -1064,17 +1059,17 @@ function u9ProfileGoBack() {
 
 
   /*
-     Home starts from RIGHT.
+     CORRECT BACK ANIMATION
 
      Home:
-       RIGHT → CENTER
+       LEFT → CENTER
 
      Current Page:
-       CENTER → LEFT
+       CENTER → RIGHT
   */
 
   previousPage.classList.add(
-    "U9-profile-page-slide-from-right"
+    "U9-profile-page-slide-from-left"
   );
 
 
@@ -1087,7 +1082,7 @@ function u9ProfileGoBack() {
 
   /*
      Current internal page
-     moves to the LEFT.
+     moves to the RIGHT.
   */
 
   u9ProfileRemovePageClasses(
@@ -1096,17 +1091,17 @@ function u9ProfileGoBack() {
 
 
   currentPage.classList.add(
-    "U9-profile-page-slide-left"
+    "U9-profile-page-slide-right"
   );
 
 
   /*
-     Home moves from
-     right → center.
+     Home moves
+     LEFT → CENTER.
   */
 
   previousPage.classList.remove(
-    "U9-profile-page-slide-from-right"
+    "U9-profile-page-slide-from-left"
   );
 
 
