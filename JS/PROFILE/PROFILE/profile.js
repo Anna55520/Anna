@@ -1,4 +1,3 @@
-
 /* =========================
    PROFILE MODAL
 ========================= */
@@ -127,6 +126,18 @@ const u9ProfileAccount =
   );
 
 
+const u9ProfileBalanceTitle =
+  document.getElementById(
+    "U9-profile-balance-title"
+  );
+
+
+const u9ProfileBalanceValueRow =
+  document.getElementById(
+    "U9-profile-balance-value-row"
+  );
+
+
 const u9ProfileBalance =
   document.getElementById(
     "U9-profile-balance"
@@ -137,6 +148,20 @@ const u9ProfileCoins =
   document.getElementById(
     "U9-profile-coins"
   );
+
+
+const u9ProfileBalanceToggle =
+  document.getElementById(
+    "U9-profile-balance-toggle"
+  );
+
+
+/* =========================
+   BALANCE / COINS STATE
+========================= */
+
+let u9ProfileBalanceMode =
+  "balance";
 
 
 /* =========================
@@ -299,6 +324,187 @@ const u9ProfileDefaultFrame =
 
 let u9ProfileCurrentPage =
   "main";
+
+
+/* =========================
+   RESET BALANCE / COINS
+========================= */
+
+function u9ProfileResetBalanceMode() {
+
+  u9ProfileBalanceMode =
+    "balance";
+
+
+  /* =========================
+     TITLE
+  ========================= */
+
+  if (
+    u9ProfileBalanceTitle
+  ) {
+
+    u9ProfileBalanceTitle.textContent =
+      "Balance";
+
+  }
+
+
+  /* =========================
+     BALANCE
+  ========================= */
+
+  if (
+    u9ProfileBalance
+  ) {
+
+    u9ProfileBalance.hidden =
+      false;
+
+  }
+
+
+  /* =========================
+     COINS
+  ========================= */
+
+  if (
+    u9ProfileCoins
+  ) {
+
+    u9ProfileCoins.hidden =
+      true;
+
+  }
+
+
+  /* =========================
+     TOGGLE ARIA
+  ========================= */
+
+  if (
+    u9ProfileBalanceToggle
+  ) {
+
+    u9ProfileBalanceToggle.setAttribute(
+      "aria-label",
+      "Show Coins"
+    );
+
+  }
+
+}
+
+
+/* =========================
+   TOGGLE BALANCE / COINS
+========================= */
+
+function u9ProfileToggleBalanceCoins() {
+
+  /* =========================
+     REQUIRED ELEMENTS
+  ========================= */
+
+  if (
+    !u9ProfileBalanceTitle ||
+    !u9ProfileBalance ||
+    !u9ProfileCoins ||
+    !u9ProfileBalanceToggle
+  ) {
+
+    return;
+
+  }
+
+
+  /* =========================
+     BALANCE -> COINS
+  ========================= */
+
+  if (
+    u9ProfileBalanceMode ===
+    "balance"
+  ) {
+
+    u9ProfileBalanceMode =
+      "coins";
+
+
+    u9ProfileBalanceTitle.textContent =
+      "Coins";
+
+
+    u9ProfileBalance.hidden =
+      true;
+
+
+    u9ProfileCoins.hidden =
+      false;
+
+
+    u9ProfileBalanceToggle.setAttribute(
+      "aria-label",
+      "Show Balance"
+    );
+
+
+    return;
+
+  }
+
+
+  /* =========================
+     COINS -> BALANCE
+  ========================= */
+
+  u9ProfileBalanceMode =
+    "balance";
+
+
+  u9ProfileBalanceTitle.textContent =
+    "Balance";
+
+
+  u9ProfileBalance.hidden =
+    false;
+
+
+  u9ProfileCoins.hidden =
+    true;
+
+
+  u9ProfileBalanceToggle.setAttribute(
+    "aria-label",
+    "Show Coins"
+  );
+
+}
+
+
+/* =========================
+   BALANCE / COINS TOGGLE
+========================= */
+
+if (
+  u9ProfileBalanceToggle
+) {
+
+  u9ProfileBalanceToggle.addEventListener(
+    "click",
+    function(event) {
+
+      event.preventDefault();
+
+      event.stopPropagation();
+
+
+      u9ProfileToggleBalanceCoins();
+
+    }
+  );
+
+}
 
 
 /* =========================
@@ -531,6 +737,13 @@ function u9ProfileShowMainPage() {
   u9ProfileSetHeader(
     "main"
   );
+
+
+  /* =========================
+     RESET BALANCE / COINS
+  ========================= */
+
+  u9ProfileResetBalanceMode();
 
 }
 
@@ -1584,6 +1797,10 @@ function u9ProfileDisplayUser(
   }
 
 
+  /* =========================
+     USERNAME
+  ========================= */
+
   if (
     u9ProfileUsername
   ) {
@@ -1593,6 +1810,10 @@ function u9ProfileDisplayUser(
 
   }
 
+
+  /* =========================
+     ACCOUNT
+  ========================= */
 
   if (
     u9ProfileAccount
@@ -1604,6 +1825,10 @@ function u9ProfileDisplayUser(
   }
 
 
+  /* =========================
+     BALANCE
+  ========================= */
+
   if (
     u9ProfileBalance
   ) {
@@ -1614,6 +1839,10 @@ function u9ProfileDisplayUser(
   }
 
 
+  /* =========================
+     COINS
+  ========================= */
+
   if (
     u9ProfileCoins
   ) {
@@ -1622,6 +1851,13 @@ function u9ProfileDisplayUser(
       user.coins ?? "0.00";
 
   }
+
+
+  /* =========================
+     ALWAYS START WITH BALANCE
+  ========================= */
+
+  u9ProfileResetBalanceMode();
 
 }
 
@@ -1966,6 +2202,13 @@ u9ProfileResetAvatar();
 
 
 /* =========================
+   INITIAL BALANCE / COINS
+========================= */
+
+u9ProfileResetBalanceMode();
+
+
+/* =========================
    INITIAL MAIN PAGE
 ========================= */
 
@@ -2005,6 +2248,12 @@ window.U9Profile = {
 
   showPage:
     u9ProfileShowPage,
+
+  toggleBalanceCoins:
+    u9ProfileToggleBalanceCoins,
+
+  resetBalanceMode:
+    u9ProfileResetBalanceMode,
 
   getCurrentPage:
     function() {
