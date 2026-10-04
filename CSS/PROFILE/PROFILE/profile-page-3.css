@@ -1,1 +1,79 @@
+/* =================================================
+   PROFILE PAGE 3
 
+
+   IMPORTANT:
+
+   DO NOT MODIFY PROFILE HEADER HERE.
+
+
+   The following elements are controlled by:
+
+   CSS/PROFILE/PROFILE/profile.css
+
+
+   Header:
+
+   #U9-profile-modal-header
+
+   #U9-profile-modal-close
+
+   #U9-profile-modal-title
+
+   #U9-profile-modal-icon
+
+
+   This file only controls:
+
+   #U9-profile-page3
+
+   #U9-profile-page3-content
+
+   Page 3 own elements.
+
+
+================================================= */
+
+
+/* =================================================
+   PROFILE PAGE 3 WINDOW
+================================================= */
+
+#U9-profile-page3 {
+
+  width: 100%;
+
+  min-height: 100%;
+
+  display: none;
+
+}
+
+
+/* =================================================
+   PROFILE PAGE 3 CONTENT
+================================================= */
+
+#U9-profile-page3-content {
+
+  width: 100%;
+
+  min-height: 300px;
+
+  background: yellow;
+
+  border-radius: 12px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  color: black;
+
+  font-size: 24px;
+
+  font-weight: 600;
+
+}
