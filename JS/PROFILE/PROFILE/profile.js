@@ -73,6 +73,137 @@ const u9ProfileCoins =
 
 
 /* =========================
+   PROFILE MAIN PAGE
+========================= */
+
+const u9ProfileMain =
+  document.getElementById(
+    "U9-profile-main"
+  );
+
+
+/* =========================
+   PROFILE PAGE BUTTONS
+========================= */
+
+const u9ProfileButton1 =
+  document.getElementById(
+    "U9-profile-button-1"
+  );
+
+
+const u9ProfileButton2 =
+  document.getElementById(
+    "U9-profile-button-2"
+  );
+
+
+const u9ProfileButton3 =
+  document.getElementById(
+    "U9-profile-button-3"
+  );
+
+
+const u9ProfileButton4 =
+  document.getElementById(
+    "U9-profile-button-4"
+  );
+
+
+const u9ProfileButton5 =
+  document.getElementById(
+    "U9-profile-button-5"
+  );
+
+
+/* =========================
+   PROFILE INTERNAL PAGES
+========================= */
+
+const u9ProfilePage1 =
+  document.getElementById(
+    "U9-profile-page1"
+  );
+
+
+const u9ProfilePage2 =
+  document.getElementById(
+    "U9-profile-page2"
+  );
+
+
+const u9ProfilePage3 =
+  document.getElementById(
+    "U9-profile-page3"
+  );
+
+
+const u9ProfilePage4 =
+  document.getElementById(
+    "U9-profile-page4"
+  );
+
+
+const u9ProfilePage5 =
+  document.getElementById(
+    "U9-profile-page5"
+  );
+
+
+/* =========================
+   PROFILE PAGE BACK BUTTONS
+========================= */
+
+const u9ProfilePage1Back =
+  document.getElementById(
+    "U9-profile-page1-back"
+  );
+
+
+const u9ProfilePage2Back =
+  document.getElementById(
+    "U9-profile-page2-back"
+  );
+
+
+const u9ProfilePage3Back =
+  document.getElementById(
+    "U9-profile-page3-back"
+  );
+
+
+const u9ProfilePage4Back =
+  document.getElementById(
+    "U9-profile-page4-back"
+  );
+
+
+const u9ProfilePage5Back =
+  document.getElementById(
+    "U9-profile-page5-back"
+  );
+
+
+/* =========================
+   PROFILE PAGES
+========================= */
+
+const u9ProfilePages = [
+
+  u9ProfilePage1,
+
+  u9ProfilePage2,
+
+  u9ProfilePage3,
+
+  u9ProfilePage4,
+
+  u9ProfilePage5
+
+];
+
+
+/* =========================
    AVATAR ELEMENTS
 ========================= */
 
@@ -108,31 +239,9 @@ const u9ProfilePaidFrameUrl =
    FRONTEND DEFAULT AVATAR
 ========================= */
 
-/*
-  Frontend default avatar.
-
-  This SVG is embedded directly into
-  the JavaScript as a Data URI.
-
-  Therefore:
-
-  - No network request
-  - No dependency on profile.svg
-  - Works when offline
-  - Works when Vercel is unreachable
-*/
-
 const u9ProfileDefaultAvatarSvg =
   `<svg width="199px" height="199px" viewBox="-2.56 -2.56 21.12 21.12" xmlns="http://www.w3.org/2000/svg" fill="#000000" stroke="#000000" stroke-width="0.00016"><g id="SVGRepo_bgCarrier" stroke-width="0"><rect x="-2.56" y="-2.56" width="21.12" height="21.12" rx="0" fill="#ffffff" strokewidth="0"></rect></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="m 8 1 c -1.65625 0 -3 1.34375 -3 3 s 1.34375 3 3 3 s 3 -1.34375 3 -3 s -1.34375 -3 -3 -3 z m -1.5 7 c -2.492188 0 -4.5 2.007812 -4.5 4.5 v 0.5 c 0 1.109375 0.890625 2 2 2 h 8 c 1.109375 0 2 -0.890625 2 -2 v -0.5 c 0 -2.492188 -2.007812 -4.5 -4.5 -4.5 z m 0 0" fill="#357cf1"></path></g></svg>`;
 
-
-/*
-  Convert SVG to Data URI.
-
-  encodeURIComponent()
-  makes the SVG safe to use
-  inside an image src.
-*/
 
 const u9ProfileDefaultAvatar =
   "data:image/svg+xml;charset=UTF-8," +
@@ -147,6 +256,141 @@ const u9ProfileDefaultAvatar =
 
 const u9ProfileDefaultFrame =
   "/SSVG/avatar/ordinary.svg";
+
+
+/* =========================
+   PROFILE INTERNAL PAGE STATE
+========================= */
+
+let u9ProfileCurrentPage =
+  "main";
+
+
+/* =========================
+   HIDE ALL PROFILE PAGES
+========================= */
+
+function u9ProfileHideAllPages() {
+
+  if (
+    u9ProfileMain
+  ) {
+
+    u9ProfileMain.classList.remove(
+      "profile-page-active"
+    );
+
+    u9ProfileMain.style.display =
+      "none";
+
+  }
+
+
+  u9ProfilePages.forEach(
+    function (page) {
+
+      if (
+        !page
+      ) {
+
+        return;
+
+      }
+
+
+      page.classList.remove(
+        "profile-page-active"
+      );
+
+      page.style.display =
+        "none";
+
+    }
+  );
+
+}
+
+
+/* =========================
+   SHOW PROFILE MAIN PAGE
+========================= */
+
+function u9ProfileShowMainPage() {
+
+  u9ProfileHideAllPages();
+
+
+  if (
+    u9ProfileMain
+  ) {
+
+    u9ProfileMain.style.display =
+      "block";
+
+
+    u9ProfileMain.classList.add(
+      "profile-page-active"
+    );
+
+  }
+
+
+  u9ProfileCurrentPage =
+    "main";
+
+}
+
+
+/* =========================
+   SHOW PROFILE PAGE
+========================= */
+
+function u9ProfileShowPage(
+  pageNumber
+) {
+
+  const page =
+    document.getElementById(
+      "U9-profile-page" +
+      pageNumber
+    );
+
+
+  if (
+    !page
+  ) {
+
+    console.warn(
+      "Profile internal page not found:",
+      pageNumber
+    );
+
+
+    return false;
+
+  }
+
+
+  u9ProfileHideAllPages();
+
+
+  page.style.display =
+    "block";
+
+
+  page.classList.add(
+    "profile-page-active"
+  );
+
+
+  u9ProfileCurrentPage =
+    "page" +
+    pageNumber;
+
+
+  return true;
+
+}
 
 
 /* =========================
@@ -282,21 +526,34 @@ function openProfileModal() {
   }
 
 
-  /* REMOVE CLOSING */
+  /* =========================
+     RESET TO PROFILE MAIN
+  ========================= */
+
+  u9ProfileShowMainPage();
+
+
+  /* =========================
+     REMOVE CLOSING
+  ========================= */
 
   profileModal.classList.remove(
     "modal-closing"
   );
 
 
-  /* OPEN */
+  /* =========================
+     OPEN
+  ========================= */
 
   profileModal.classList.add(
     "modal-open"
   );
 
 
-  /* USER BUTTON ACTIVE */
+  /* =========================
+     USER BUTTON ACTIVE
+  ========================= */
 
   if (
     profileUserButton
@@ -309,7 +566,9 @@ function openProfileModal() {
   }
 
 
-  /* LOAD PROFILE */
+  /* =========================
+     LOAD PROFILE
+  ========================= */
 
   u9ProfileLoad();
 
@@ -346,21 +605,34 @@ function closeProfileModal() {
   }
 
 
-  /* REMOVE OPEN */
+  /* =========================
+     ALWAYS RETURN TO MAIN
+  ========================= */
+
+  u9ProfileShowMainPage();
+
+
+  /* =========================
+     REMOVE OPEN
+  ========================= */
 
   profileModal.classList.remove(
     "modal-open"
   );
 
 
-  /* START CLOSING */
+  /* =========================
+     START CLOSING
+  ========================= */
 
   profileModal.classList.add(
     "modal-closing"
   );
 
 
-  /* USER BUTTON INACTIVE */
+  /* =========================
+     USER BUTTON INACTIVE
+  ========================= */
 
   if (
     profileUserButton
@@ -392,14 +664,18 @@ function closeProfileModal() {
       true;
 
 
-    /* REMOVE CLOSING */
+    /* =========================
+       REMOVE CLOSING
+    ========================= */
 
     profileModal.classList.remove(
       "modal-closing"
     );
 
 
-    /* REMOVE EVENT */
+    /* =========================
+       REMOVE EVENT
+    ========================= */
 
     profileModalContent.removeEventListener(
       "transitionend",
@@ -562,6 +838,196 @@ if (
 
 
 /* =========================
+   PROFILE PAGE 1
+========================= */
+
+if (
+  u9ProfileButton1
+) {
+
+  u9ProfileButton1.addEventListener(
+    "click",
+    function () {
+
+      u9ProfileShowPage(
+        1
+      );
+
+    }
+  );
+
+}
+
+
+if (
+  u9ProfilePage1Back
+) {
+
+  u9ProfilePage1Back.addEventListener(
+    "click",
+    function () {
+
+      u9ProfileShowMainPage();
+
+    }
+  );
+
+}
+
+
+/* =========================
+   PROFILE PAGE 2
+========================= */
+
+if (
+  u9ProfileButton2
+) {
+
+  u9ProfileButton2.addEventListener(
+    "click",
+    function () {
+
+      u9ProfileShowPage(
+        2
+      );
+
+    }
+  );
+
+}
+
+
+if (
+  u9ProfilePage2Back
+) {
+
+  u9ProfilePage2Back.addEventListener(
+    "click",
+    function () {
+
+      u9ProfileShowMainPage();
+
+    }
+  );
+
+}
+
+
+/* =========================
+   PROFILE PAGE 3
+========================= */
+
+if (
+  u9ProfileButton3
+) {
+
+  u9ProfileButton3.addEventListener(
+    "click",
+    function () {
+
+      u9ProfileShowPage(
+        3
+      );
+
+    }
+  );
+
+}
+
+
+if (
+  u9ProfilePage3Back
+) {
+
+  u9ProfilePage3Back.addEventListener(
+    "click",
+    function () {
+
+      u9ProfileShowMainPage();
+
+    }
+  );
+
+}
+
+
+/* =========================
+   PROFILE PAGE 4
+========================= */
+
+if (
+  u9ProfileButton4
+) {
+
+  u9ProfileButton4.addEventListener(
+    "click",
+    function () {
+
+      u9ProfileShowPage(
+        4
+      );
+
+    }
+  );
+
+}
+
+
+if (
+  u9ProfilePage4Back
+) {
+
+  u9ProfilePage4Back.addEventListener(
+    "click",
+    function () {
+
+      u9ProfileShowMainPage();
+
+    }
+  );
+
+}
+
+
+/* =========================
+   PROFILE PAGE 5
+========================= */
+
+if (
+  u9ProfileButton5
+) {
+
+  u9ProfileButton5.addEventListener(
+    "click",
+    function () {
+
+      u9ProfileShowPage(
+        5
+      );
+
+    }
+  );
+
+}
+
+
+if (
+  u9ProfilePage5Back
+) {
+
+  u9ProfilePage5Back.addEventListener(
+    "click",
+    function () {
+
+      u9ProfileShowMainPage();
+
+    }
+  );
+
+}
+
+
+/* =========================
    RESET AVATAR
 ========================= */
 
@@ -575,24 +1041,9 @@ function u9ProfileResetAvatar() {
     u9ProfileAvatarImage
   ) {
 
-    /*
-      Allow a future avatar
-      to use fallback again.
-    */
-
     u9ProfileAvatarImage.dataset.u9Fallback =
       "false";
 
-
-    /*
-      Frontend default avatar.
-
-      This is now an embedded SVG.
-
-      It does NOT request:
-
-      /SSVG/avatar/profile.svg
-    */
 
     u9ProfileAvatarImage.src =
       u9ProfileDefaultAvatar;
@@ -607,11 +1058,6 @@ function u9ProfileResetAvatar() {
   if (
     u9ProfileAvatarFrame
   ) {
-
-    /*
-      Allow a future frame
-      to use fallback again.
-    */
 
     u9ProfileAvatarFrame.dataset.u9Fallback =
       "false";
@@ -637,13 +1083,6 @@ if (
     "error",
     function () {
 
-      /*
-        If the frontend default
-        has already failed, stop.
-
-        Prevent infinite loop.
-      */
-
       if (
         this.dataset.u9Fallback ===
         "true"
@@ -654,18 +1093,9 @@ if (
       }
 
 
-      /*
-        Mark fallback as used.
-      */
-
       this.dataset.u9Fallback =
         "true";
 
-
-      /*
-        Use the embedded frontend
-        default avatar again.
-      */
 
       this.src =
         u9ProfileDefaultAvatar;
@@ -688,13 +1118,6 @@ if (
     "error",
     function () {
 
-      /*
-        If ordinary.svg has
-        already failed, stop.
-
-        Prevent infinite loop.
-      */
-
       if (
         this.dataset.u9Fallback ===
         "true"
@@ -705,17 +1128,9 @@ if (
       }
 
 
-      /*
-        Mark fallback as used.
-      */
-
       this.dataset.u9Fallback =
         "true";
 
-
-      /*
-        Frontend default frame.
-      */
 
       this.src =
         u9ProfileDefaultFrame;
@@ -736,7 +1151,7 @@ async function u9ProfileLoadFrame(
 ) {
 
   /* =========================
-     DATABASE DEFAULT FRAME
+     DEFAULT FRAME
   ========================= */
 
   if (
@@ -926,11 +1341,6 @@ async function u9ProfileLoadFrame(
       u9ProfileAvatarFrame
     ) {
 
-      /*
-        Allow fallback if
-        real frame fails.
-      */
-
       u9ProfileAvatarFrame.dataset.u9Fallback =
         "false";
 
@@ -948,15 +1358,6 @@ async function u9ProfileLoadFrame(
   catch (
     error
   ) {
-
-    /*
-      Network error
-      Offline
-      Connection changed
-      Fetch failed
-
-      Use frontend defaults.
-    */
 
     u9ProfileResetAvatar();
 
@@ -1041,12 +1442,6 @@ async function u9ProfileLoadAvatarFromUser(
   /*
     Always start with
     frontend defaults.
-
-    Avatar:
-    embedded SVG
-
-    Frame:
-    ordinary.svg
   */
 
   u9ProfileResetAvatar();
@@ -1090,21 +1485,9 @@ async function u9ProfileLoadAvatarFromUser(
       u9ProfileAvatarImage
     ) {
 
-      /*
-        Enable fallback again.
-      */
-
       u9ProfileAvatarImage.dataset.u9Fallback =
         "false";
 
-
-      /*
-        Database/user avatar.
-
-        If this URL fails,
-        onerror will automatically
-        return to embedded default.
-      */
 
       u9ProfileAvatarImage.src =
         avatarUrl;
@@ -1119,12 +1502,6 @@ async function u9ProfileLoadAvatarFromUser(
     else if (
       u9ProfileAvatarImage
     ) {
-
-      /*
-        Frontend default avatar.
-
-        Embedded SVG.
-      */
 
       u9ProfileAvatarImage.dataset.u9Fallback =
         "false";
@@ -1157,10 +1534,9 @@ async function u9ProfileLoadAvatarFromUser(
       );
 
 
-    /*
-      Frame failed:
-      use BOTH frontend defaults.
-    */
+    /* =========================
+       FRAME FAILED
+    ========================= */
 
     if (
       !frameLoaded
@@ -1180,11 +1556,6 @@ async function u9ProfileLoadAvatarFromUser(
   catch (
     error
   ) {
-
-    /*
-      Unexpected error:
-      frontend defaults.
-    */
 
     u9ProfileResetAvatar();
 
@@ -1208,14 +1579,18 @@ async function u9ProfileLoad() {
   u9ProfileShowLoading();
 
 
-  /*
-    Start with frontend defaults.
-
-    Avatar -> embedded profile SVG
-    Frame  -> ordinary.svg
-  */
+  /* =========================
+     RESET AVATAR
+  ========================= */
 
   u9ProfileResetAvatar();
+
+
+  /* =========================
+     RESET PAGE
+  ========================= */
+
+  u9ProfileShowMainPage();
 
 
   /* =========================
@@ -1233,9 +1608,7 @@ async function u9ProfileLoad() {
 
     u9ProfileResetAvatar();
 
-
     u9ProfileHideLoading();
-
 
     return;
 
@@ -1261,9 +1634,7 @@ async function u9ProfileLoad() {
 
     u9ProfileResetAvatar();
 
-
     u9ProfileHideLoading();
-
 
     return;
 
@@ -1295,10 +1666,9 @@ async function u9ProfileLoad() {
       );
 
 
-    /*
-      Any failure:
-      frontend defaults.
-    */
+    /* =========================
+       FAILURE
+    ========================= */
 
     if (
       !avatarLoaded
@@ -1327,22 +1697,13 @@ async function u9ProfileLoad() {
     error
   ) {
 
-    /*
-      Any unexpected profile error.
-    */
-
     console.error(
       "Load profile failed:",
       error
     );
 
 
-    /*
-      Frontend defaults.
-    */
-
     u9ProfileResetAvatar();
-
 
     u9ProfileHideLoading();
 
@@ -1418,6 +1779,13 @@ u9ProfileResetAvatar();
 
 
 /* =========================
+   INITIAL PROFILE PAGE
+========================= */
+
+u9ProfileShowMainPage();
+
+
+/* =========================
    GLOBAL ACCESS
 ========================= */
 
@@ -1443,7 +1811,20 @@ window.U9Profile = {
     u9ProfileLoad,
 
   refresh:
-    u9ProfileLoad
+    u9ProfileLoad,
+
+  showMain:
+    u9ProfileShowMainPage,
+
+  showPage:
+    u9ProfileShowPage,
+
+  getCurrentPage:
+    function () {
+
+      return u9ProfileCurrentPage;
+
+    }
 
 };
 
