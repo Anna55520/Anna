@@ -1,3 +1,4 @@
+
 /* =========================
    INBOX NORMAL MODAL
 ========================= */
@@ -26,61 +27,29 @@ const inboxModalClose =
 
 
 /* =========================
-   PAGE SCROLL LOCK
-========================= */
-
-function lockInboxPageScroll() {
-
-  document.documentElement.style.overflow =
-    "hidden";
-
-  document.body.style.overflow =
-    "hidden";
-
-}
-
-
-function unlockInboxPageScroll() {
-
-  document.documentElement.style.overflow =
-    "";
-
-  document.body.style.overflow =
-    "";
-
-}
-
-
-/* =========================
    OPEN INBOX MODAL
 ========================= */
 
 function openInboxModal() {
 
-  if (!inboxModal) {
+  if (
+    !inboxModal ||
+    !inboxModalContent
+  ) {
 
     return false;
 
   }
 
 
-  /* REMOVE CLOSING */
-
   inboxModal.classList.remove(
     "modal-closing"
   );
 
 
-  /* OPEN */
-
   inboxModal.classList.add(
     "modal-open"
   );
-
-
-  /* LOCK PAGE SCROLL */
-
-  lockInboxPageScroll();
 
 
   return true;
@@ -94,19 +63,9 @@ function openInboxModal() {
 
 function closeInboxModal() {
 
-  if (!inboxModal) {
-
-    return false;
-
-  }
-
-
-  /* ALREADY CLOSED */
-
   if (
-    !inboxModal.classList.contains(
-      "modal-open"
-    )
+    !inboxModal ||
+    !inboxModalContent
   ) {
 
     return false;
@@ -114,33 +73,44 @@ function closeInboxModal() {
   }
 
 
-  /* REMOVE OPEN */
+  if (
+    !inboxModal.classList.contains(
+      "modal-open"
+    )
+  ) {
+
+    return true;
+
+  }
+
 
   inboxModal.classList.remove(
     "modal-open"
   );
 
 
-  /* START CLOSING */
-
   inboxModal.classList.add(
     "modal-closing"
   );
 
 
-  let finished = false;
+  let finished =
+    false;
 
 
   function finishClose() {
 
-    if (finished) {
+    if (
+      finished
+    ) {
 
       return;
 
     }
 
 
-    finished = true;
+    finished =
+      true;
 
 
     inboxModal.classList.remove(
@@ -148,22 +118,17 @@ function closeInboxModal() {
     );
 
 
-    unlockInboxPageScroll();
-
-
-    if (inboxModalContent) {
-
-      inboxModalContent.removeEventListener(
-        "transitionend",
-        handleCloseAnimation
-      );
-
-    }
+    inboxModalContent.removeEventListener(
+      "transitionend",
+      handleCloseAnimation
+    );
 
   }
 
 
-  function handleCloseAnimation(event) {
+  function handleCloseAnimation(
+    event
+  ) {
 
     if (
       event.propertyName !==
@@ -180,17 +145,11 @@ function closeInboxModal() {
   }
 
 
-  if (inboxModalContent) {
+  inboxModalContent.addEventListener(
+    "transitionend",
+    handleCloseAnimation
+  );
 
-    inboxModalContent.addEventListener(
-      "transitionend",
-      handleCloseAnimation
-    );
-
-  }
-
-
-  /* FALLBACK */
 
   setTimeout(
     finishClose,
@@ -224,7 +183,9 @@ if (
       isOpen:
         function () {
 
-          if (!inboxModal) {
+          if (
+            !inboxModal
+          ) {
 
             return false;
 
@@ -235,6 +196,7 @@ if (
             inboxModal.classList.contains(
               "modal-open"
             ) ||
+
             inboxModal.classList.contains(
               "modal-closing"
             )
@@ -280,7 +242,9 @@ if (
           "inbox"
         );
 
-      } else {
+      }
+
+      else {
 
         closeInboxModal();
 
