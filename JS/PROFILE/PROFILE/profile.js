@@ -20,9 +20,31 @@ const profileModalContent =
   );
 
 
+/* =========================
+   PROFILE SINGLE HEADER
+========================= */
+
+const profileModalHeader =
+  document.getElementById(
+    "U9-profile-modal-header"
+  );
+
+
 const profileModalClose =
   document.getElementById(
     "U9-profile-modal-close"
+  );
+
+
+const profileModalTitle =
+  document.getElementById(
+    "U9-profile-modal-title"
+  );
+
+
+const profileModalIcon =
+  document.getElementById(
+    "U9-profile-modal-icon"
   );
 
 
@@ -30,6 +52,42 @@ const profileUserButton =
   document.getElementById(
     "U9-page-header-user"
   );
+
+
+/* =========================
+   PROFILE HEADER DEFAULT
+========================= */
+
+const u9ProfileMainTitle =
+  "Profile";
+
+
+const u9ProfileMainIcon =
+  "SSVG/logo/U9website.svg";
+
+
+const u9ProfilePageTitles = {
+
+  1:
+    "buttonpage1",
+
+  2:
+    "buttonpage2",
+
+  3:
+    "buttonpage3",
+
+  4:
+    "buttonpage4",
+
+  5:
+    "buttonpage5"
+
+};
+
+
+const u9ProfilePageIcon =
+  "SSVG/account/account-edit-button.svg";
 
 
 /* =========================
@@ -150,44 +208,6 @@ const u9ProfilePage5 =
   );
 
 
-/* =========================
-   PROFILE PAGE BACK BUTTONS
-========================= */
-
-const u9ProfilePage1Back =
-  document.getElementById(
-    "U9-profile-page1-back"
-  );
-
-
-const u9ProfilePage2Back =
-  document.getElementById(
-    "U9-profile-page2-back"
-  );
-
-
-const u9ProfilePage3Back =
-  document.getElementById(
-    "U9-profile-page3-back"
-  );
-
-
-const u9ProfilePage4Back =
-  document.getElementById(
-    "U9-profile-page4-back"
-  );
-
-
-const u9ProfilePage5Back =
-  document.getElementById(
-    "U9-profile-page5-back"
-  );
-
-
-/* =========================
-   PROFILE PAGES
-========================= */
-
 const u9ProfilePages = [
 
   u9ProfilePage1,
@@ -267,10 +287,161 @@ let u9ProfileCurrentPage =
 
 
 /* =========================
+   SET PROFILE HEADER
+========================= */
+
+function u9ProfileSetHeader(
+  page
+) {
+
+  /* =========================
+     MAIN PROFILE HEADER
+  ========================= */
+
+  if (
+    page === "main"
+  ) {
+
+    /* =========================
+       CLOSE BUTTON
+    ========================= */
+
+    if (
+      profileModalClose
+    ) {
+
+      profileModalClose.innerHTML =
+        "×";
+
+      profileModalClose.setAttribute(
+        "aria-label",
+        "Close"
+      );
+
+    }
+
+
+    /* =========================
+       TITLE
+    ========================= */
+
+    if (
+      profileModalTitle
+    ) {
+
+      profileModalTitle.textContent =
+        u9ProfileMainTitle;
+
+    }
+
+
+    /* =========================
+       ICON
+    ========================= */
+
+    if (
+      profileModalIcon
+    ) {
+
+      profileModalIcon.src =
+        u9ProfileMainIcon;
+
+    }
+
+
+    return;
+
+  }
+
+
+  /* =========================
+     INTERNAL PROFILE PAGE
+  ========================= */
+
+  const pageNumber =
+    Number(
+      String(
+        page
+      ).replace(
+        "page",
+        ""
+      )
+    );
+
+
+  const pageTitle =
+    u9ProfilePageTitles[
+      pageNumber
+    ];
+
+
+  if (
+    !pageTitle
+  ) {
+
+    return;
+
+  }
+
+
+  /* =========================
+     BACK BUTTON
+  ========================= */
+
+  if (
+    profileModalClose
+  ) {
+
+    profileModalClose.innerHTML =
+      "&lt;";
+
+    profileModalClose.setAttribute(
+      "aria-label",
+      "Back"
+    );
+
+  }
+
+
+  /* =========================
+     PAGE TITLE
+  ========================= */
+
+  if (
+    profileModalTitle
+  ) {
+
+    profileModalTitle.textContent =
+      pageTitle;
+
+  }
+
+
+  /* =========================
+     PAGE ICON
+  ========================= */
+
+  if (
+    profileModalIcon
+  ) {
+
+    profileModalIcon.src =
+      u9ProfilePageIcon;
+
+  }
+
+}
+
+
+/* =========================
    HIDE ALL PROFILE PAGES
 ========================= */
 
 function u9ProfileHideAllPages() {
+
+  /* =========================
+     MAIN
+  ========================= */
 
   if (
     u9ProfileMain
@@ -286,8 +457,14 @@ function u9ProfileHideAllPages() {
   }
 
 
+  /* =========================
+     INTERNAL PAGES
+  ========================= */
+
   u9ProfilePages.forEach(
-    function (page) {
+    function (
+      page
+    ) {
 
       if (
         !page
@@ -338,11 +515,20 @@ function u9ProfileShowMainPage() {
   u9ProfileCurrentPage =
     "main";
 
+
+  /* =========================
+     MAIN HEADER
+  ========================= */
+
+  u9ProfileSetHeader(
+    "main"
+  );
+
 }
 
 
 /* =========================
-   SHOW PROFILE PAGE
+   SHOW PROFILE INTERNAL PAGE
 ========================= */
 
 function u9ProfileShowPage(
@@ -361,7 +547,7 @@ function u9ProfileShowPage(
   ) {
 
     console.warn(
-      "Profile internal page not found:",
+      "U9 Profile page not found:",
       pageNumber
     );
 
@@ -371,8 +557,16 @@ function u9ProfileShowPage(
   }
 
 
+  /* =========================
+     HIDE EVERYTHING
+  ========================= */
+
   u9ProfileHideAllPages();
 
+
+  /* =========================
+     SHOW TARGET PAGE
+  ========================= */
 
   page.style.display =
     "block";
@@ -383,9 +577,22 @@ function u9ProfileShowPage(
   );
 
 
+  /* =========================
+     SAVE CURRENT PAGE
+  ========================= */
+
   u9ProfileCurrentPage =
     "page" +
     pageNumber;
+
+
+  /* =========================
+     CHANGE SINGLE HEADER
+  ========================= */
+
+  u9ProfileSetHeader(
+    u9ProfileCurrentPage
+  );
 
 
   return true;
@@ -527,7 +734,7 @@ function openProfileModal() {
 
 
   /* =========================
-     RESET TO PROFILE MAIN
+     ALWAYS OPEN MAIN
   ========================= */
 
   u9ProfileShowMainPage();
@@ -552,7 +759,7 @@ function openProfileModal() {
 
 
   /* =========================
-     USER BUTTON ACTIVE
+     HEADER USER ACTIVE
   ========================= */
 
   if (
@@ -606,7 +813,7 @@ function closeProfileModal() {
 
 
   /* =========================
-     ALWAYS RETURN TO MAIN
+     RESET TO MAIN
   ========================= */
 
   u9ProfileShowMainPage();
@@ -631,7 +838,7 @@ function closeProfileModal() {
 
 
   /* =========================
-     USER BUTTON INACTIVE
+     HEADER USER INACTIVE
   ========================= */
 
   if (
@@ -664,18 +871,10 @@ function closeProfileModal() {
       true;
 
 
-    /* =========================
-       REMOVE CLOSING
-    ========================= */
-
     profileModal.classList.remove(
       "modal-closing"
     );
 
-
-    /* =========================
-       REMOVE EVENT
-    ========================= */
 
     profileModalContent.removeEventListener(
       "transitionend",
@@ -736,6 +935,10 @@ async function toggleProfileModal() {
   }
 
 
+  /* =========================
+     CLOSE
+  ========================= */
+
   if (
     profileModal.classList.contains(
       "modal-open"
@@ -764,6 +967,10 @@ async function toggleProfileModal() {
   }
 
 
+  /* =========================
+     OPEN
+  ========================= */
+
   if (
     window.U9WindowManager
   ) {
@@ -781,7 +988,7 @@ async function toggleProfileModal() {
 
 
 /* =========================
-   USER BUTTON
+   HEADER USER BUTTON
 ========================= */
 
 if (
@@ -790,7 +997,9 @@ if (
 
   profileUserButton.addEventListener(
     "click",
-    async function (event) {
+    async function (
+      event
+    ) {
 
       event.stopPropagation();
 
@@ -804,7 +1013,7 @@ if (
 
 
 /* =========================
-   CLOSE BUTTON
+   PROFILE HEADER BUTTON
 ========================= */
 
 if (
@@ -813,23 +1022,45 @@ if (
 
   profileModalClose.addEventListener(
     "click",
-    function () {
+    async function () {
+
+      /* =========================
+         MAIN PROFILE
+      ========================= */
 
       if (
-        window.U9WindowManager
+        u9ProfileCurrentPage ===
+        "main"
       ) {
 
-        window.U9WindowManager.close(
-          "profile"
-        );
+        if (
+          window.U9WindowManager
+        ) {
+
+          await window.U9WindowManager.close(
+            "profile"
+          );
+
+        }
+
+        else {
+
+          closeProfileModal();
+
+        }
+
+
+        return;
 
       }
 
-      else {
 
-        closeProfileModal();
+      /* =========================
+         INTERNAL PAGE
+         < = BACK
+      ========================= */
 
-      }
+      u9ProfileShowMainPage();
 
     }
   );
@@ -838,7 +1069,7 @@ if (
 
 
 /* =========================
-   PROFILE PAGE 1
+   PROFILE BUTTON 1
 ========================= */
 
 if (
@@ -859,24 +1090,8 @@ if (
 }
 
 
-if (
-  u9ProfilePage1Back
-) {
-
-  u9ProfilePage1Back.addEventListener(
-    "click",
-    function () {
-
-      u9ProfileShowMainPage();
-
-    }
-  );
-
-}
-
-
 /* =========================
-   PROFILE PAGE 2
+   PROFILE BUTTON 2
 ========================= */
 
 if (
@@ -897,24 +1112,8 @@ if (
 }
 
 
-if (
-  u9ProfilePage2Back
-) {
-
-  u9ProfilePage2Back.addEventListener(
-    "click",
-    function () {
-
-      u9ProfileShowMainPage();
-
-    }
-  );
-
-}
-
-
 /* =========================
-   PROFILE PAGE 3
+   PROFILE BUTTON 3
 ========================= */
 
 if (
@@ -935,24 +1134,8 @@ if (
 }
 
 
-if (
-  u9ProfilePage3Back
-) {
-
-  u9ProfilePage3Back.addEventListener(
-    "click",
-    function () {
-
-      u9ProfileShowMainPage();
-
-    }
-  );
-
-}
-
-
 /* =========================
-   PROFILE PAGE 4
+   PROFILE BUTTON 4
 ========================= */
 
 if (
@@ -973,24 +1156,8 @@ if (
 }
 
 
-if (
-  u9ProfilePage4Back
-) {
-
-  u9ProfilePage4Back.addEventListener(
-    "click",
-    function () {
-
-      u9ProfileShowMainPage();
-
-    }
-  );
-
-}
-
-
 /* =========================
-   PROFILE PAGE 5
+   PROFILE BUTTON 5
 ========================= */
 
 if (
@@ -1011,22 +1178,6 @@ if (
 }
 
 
-if (
-  u9ProfilePage5Back
-) {
-
-  u9ProfilePage5Back.addEventListener(
-    "click",
-    function () {
-
-      u9ProfileShowMainPage();
-
-    }
-  );
-
-}
-
-
 /* =========================
    RESET AVATAR
 ========================= */
@@ -1034,7 +1185,7 @@ if (
 function u9ProfileResetAvatar() {
 
   /* =========================
-     RESET AVATAR
+     AVATAR
   ========================= */
 
   if (
@@ -1052,7 +1203,7 @@ function u9ProfileResetAvatar() {
 
 
   /* =========================
-     RESET FRAME
+     FRAME
   ========================= */
 
   if (
@@ -1172,6 +1323,7 @@ async function u9ProfileLoadFrame(
 
     }
 
+
     return true;
 
   }
@@ -1197,6 +1349,7 @@ async function u9ProfileLoadFrame(
         u9ProfileDefaultFrame;
 
     }
+
 
     return true;
 
@@ -1298,8 +1451,16 @@ async function u9ProfileLoadFrame(
 
     const currentFrame =
       frames.find(
-        (frame) =>
-          frame.id === frameId
+        function (
+          frame
+        ) {
+
+          return (
+            frame.id ===
+            frameId
+          );
+
+        }
       );
 
 
@@ -1439,10 +1600,9 @@ async function u9ProfileLoadAvatarFromUser(
   user
 ) {
 
-  /*
-    Always start with
-    frontend defaults.
-  */
+  /* =========================
+     RESET FIRST
+  ========================= */
 
   u9ProfileResetAvatar();
 
@@ -1587,7 +1747,7 @@ async function u9ProfileLoad() {
 
 
   /* =========================
-     RESET PAGE
+     RESET TO MAIN
   ========================= */
 
   u9ProfileShowMainPage();
@@ -1779,7 +1939,7 @@ u9ProfileResetAvatar();
 
 
 /* =========================
-   INITIAL PROFILE PAGE
+   INITIAL MAIN PAGE
 ========================= */
 
 u9ProfileShowMainPage();
