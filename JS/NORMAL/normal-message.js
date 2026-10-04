@@ -1,4 +1,5 @@
- /* =========================
+
+/* =========================
    MESSAGE NORMAL MODAL
 ========================= */
 
@@ -26,34 +27,6 @@ const messageModalClose =
 
 
 /* =========================
-   PAGE SCROLL LOCK
-========================= */
-
-function lockMessagePageScroll() {
-
-  document.documentElement.style.overflow =
-    "hidden";
-
-
-  document.body.style.overflow =
-    "hidden";
-
-}
-
-
-function unlockMessagePageScroll() {
-
-  document.documentElement.style.overflow =
-    "";
-
-
-  document.body.style.overflow =
-    "";
-
-}
-
-
-/* =========================
    OPEN MESSAGE MODAL
 ========================= */
 
@@ -69,29 +42,14 @@ function openMessageModal() {
   }
 
 
-  /* =========================
-     REMOVE CLOSING
-  ========================= */
-
   messageModal.classList.remove(
     "modal-closing"
   );
 
 
-  /* =========================
-     OPEN
-  ========================= */
-
   messageModal.classList.add(
     "modal-open"
   );
-
-
-  /* =========================
-     LOCK PAGE SCROLL
-  ========================= */
-
-  lockMessagePageScroll();
 
 
   return true;
@@ -115,48 +73,26 @@ function closeMessageModal() {
   }
 
 
-  /* =========================
-     ALREADY CLOSED
-  ========================= */
-
   if (
     !messageModal.classList.contains(
       "modal-open"
     )
   ) {
 
-    /*
-       If it is already closing,
-       let the existing animation
-       continue.
-    */
-
     return true;
 
   }
 
-
-  /* =========================
-     REMOVE OPEN
-  ========================= */
 
   messageModal.classList.remove(
     "modal-open"
   );
 
 
-  /* =========================
-     START CLOSING
-  ========================= */
-
   messageModal.classList.add(
     "modal-closing"
   );
 
-
-  /* =========================
-     CLOSE STATE
-  ========================= */
 
   let closeFinished =
     false;
@@ -177,25 +113,10 @@ function closeMessageModal() {
       true;
 
 
-    /* =========================
-       REMOVE CLOSING
-    ========================= */
-
     messageModal.classList.remove(
       "modal-closing"
     );
 
-
-    /* =========================
-       UNLOCK PAGE SCROLL
-    ========================= */
-
-    unlockMessagePageScroll();
-
-
-    /* =========================
-       REMOVE EVENT
-    ========================= */
 
     messageModalContent.removeEventListener(
       "transitionend",
@@ -208,10 +129,6 @@ function closeMessageModal() {
   function handleCloseAnimation(
     event
   ) {
-
-    /* =========================
-       ONLY TRANSFORM
-    ========================= */
 
     if (
       event.propertyName !==
@@ -233,10 +150,6 @@ function closeMessageModal() {
     handleCloseAnimation
   );
 
-
-  /* =========================
-     SAFETY FALLBACK
-  ========================= */
 
   setTimeout(
     finishClose,
@@ -261,25 +174,11 @@ if (
     "message",
     {
 
-      /* =========================
-         OPEN
-      ========================= */
-
       open:
         openMessageModal,
 
-
-      /* =========================
-         CLOSE
-      ========================= */
-
       close:
         closeMessageModal,
-
-
-      /* =========================
-         IS OPEN
-      ========================= */
 
       isOpen:
         function () {
@@ -320,16 +219,12 @@ else {
 
 
 /* =========================
-   OPEN FUNCTION
+   GLOBAL FUNCTIONS
 ========================= */
 
 window.openMessageModal =
   openMessageModal;
 
-
-/* =========================
-   CLOSE FUNCTION
-========================= */
 
 window.closeMessageModal =
   closeMessageModal;
@@ -346,16 +241,6 @@ if (
   messageModalClose.addEventListener(
     "click",
     function () {
-
-      /*
-         Close through the
-         Window Manager when
-         available.
-
-         This keeps the manager's
-         currentWindow state
-         synchronized.
-      */
 
       if (
         window.U9WindowManager
