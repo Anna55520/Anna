@@ -391,10 +391,90 @@ if (
 
 
 /* =========================
-   PROFILE MODAL
+   PROFILE
 ========================= */
 
+/*
+   Logged in:
+   → Open Profile Window
+
+   Not logged in:
+   → Open Login Modal
+*/
+
 async function openProfileFromContainerTool() {
+
+  /*
+     Check U9 user state
+  */
+
+  if (
+    window.U9User &&
+    typeof window.U9User.isLoggedIn ===
+      "function"
+  ) {
+
+    const loggedIn =
+      window.U9User.isLoggedIn();
+
+
+    /*
+       NOT LOGGED IN
+    */
+
+    if (
+      !loggedIn
+    ) {
+
+      /*
+         Prefer the existing
+         Login Modal function.
+      */
+
+      if (
+        typeof window.openLoginModal ===
+        "function"
+      ) {
+
+        window.openLoginModal();
+
+        return;
+
+      }
+
+
+      /*
+         Fallback:
+         click the existing Header
+         Login button.
+      */
+
+      const loginButton =
+        document.getElementById(
+          "U9-page-header-login"
+        );
+
+
+      if (
+        loginButton
+      ) {
+
+        loginButton.click();
+
+      }
+
+
+      return;
+
+    }
+
+  }
+
+
+  /*
+     LOGGED IN
+     → Open Profile Window
+  */
 
   const manager =
     getWindowManager();
