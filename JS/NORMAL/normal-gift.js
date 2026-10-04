@@ -57,17 +57,33 @@ function unlockGiftPageScroll() {
 
 function openGiftModal() {
 
+  if (!giftModal) {
+
+    return false;
+
+  }
+
+
+  /* REMOVE CLOSING */
+
   giftModal.classList.remove(
     "modal-closing"
   );
 
+
+  /* OPEN */
 
   giftModal.classList.add(
     "modal-open"
   );
 
 
+  /* LOCK PAGE SCROLL */
+
   lockGiftPageScroll();
+
+
+  return true;
 
 }
 
@@ -78,6 +94,14 @@ function openGiftModal() {
 
 function closeGiftModal() {
 
+  if (!giftModal) {
+
+    return false;
+
+  }
+
+
+  /* ALREADY CLOSED */
 
   if (
     !giftModal.classList.contains(
@@ -85,48 +109,138 @@ function closeGiftModal() {
     )
   ) {
 
-    return;
+    return false;
 
   }
 
+
+  /* REMOVE OPEN */
 
   giftModal.classList.remove(
     "modal-open"
   );
 
 
+  /* START CLOSING */
+
   giftModal.classList.add(
     "modal-closing"
   );
 
 
-  giftModalContent.addEventListener(
-    "transitionend",
-    function handleCloseAnimation(event) {
+  let finished = false;
 
 
-      if (
-        event.propertyName !==
-        "transform"
-      ) {
+  function finishClose() {
 
-        return;
+    if (finished) {
 
-      }
+      return;
 
-
-      giftModal.classList.remove(
-        "modal-closing"
-      );
+    }
 
 
-      unlockGiftPageScroll();
+    finished = true;
 
+
+    giftModal.classList.remove(
+      "modal-closing"
+    );
+
+
+    unlockGiftPageScroll();
+
+
+    if (giftModalContent) {
 
       giftModalContent.removeEventListener(
         "transitionend",
         handleCloseAnimation
       );
+
+    }
+
+  }
+
+
+  function handleCloseAnimation(event) {
+
+    if (
+      event.propertyName !==
+      "transform"
+    ) {
+
+      return;
+
+    }
+
+
+    finishClose();
+
+  }
+
+
+  if (giftModalContent) {
+
+    giftModalContent.addEventListener(
+      "transitionend",
+      handleCloseAnimation
+    );
+
+  }
+
+
+  /* FALLBACK */
+
+  setTimeout(
+    finishClose,
+    700
+  );
+
+
+  return true;
+
+}
+
+
+/* =========================
+   WINDOW MANAGER
+========================= */
+
+if (
+  window.U9WindowManager
+) {
+
+  window.U9WindowManager.register(
+    "gift",
+    {
+
+      open:
+        openGiftModal,
+
+      close:
+        closeGiftModal,
+
+      isOpen:
+        function () {
+
+          if (!giftModal) {
+
+            return false;
+
+          }
+
+
+          return (
+            giftModal.classList.contains(
+              "modal-open"
+            ) ||
+            giftModal.classList.contains(
+              "modal-closing"
+            )
+          );
+
+        }
 
     }
   );
@@ -135,16 +249,12 @@ function closeGiftModal() {
 
 
 /* =========================
-   OPEN FUNCTION
+   GLOBAL FUNCTIONS
 ========================= */
 
 window.openGiftModal =
   openGiftModal;
 
-
-/* =========================
-   CLOSE FUNCTION
-========================= */
 
 window.closeGiftModal =
   closeGiftModal;
@@ -162,7 +272,19 @@ if (
     "click",
     function () {
 
-      closeGiftModal();
+      if (
+        window.U9WindowManager
+      ) {
+
+        window.U9WindowManager.close(
+          "gift"
+        );
+
+      } else {
+
+        closeGiftModal();
+
+      }
 
     }
   );
