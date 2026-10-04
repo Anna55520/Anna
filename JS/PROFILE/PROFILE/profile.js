@@ -1,4 +1,3 @@
-
 /* =========================
    PROFILE MODAL
 ========================= */
@@ -69,6 +68,22 @@ const u9ProfileBalance =
 const u9ProfileCoins =
   document.getElementById(
     "U9-profile-coins"
+  );
+
+
+/* =========================
+   AVATAR ELEMENTS
+========================= */
+
+const u9ProfileAvatarImage =
+  document.getElementById(
+    "U9-profile-avatar-image"
+  );
+
+
+const u9ProfileAvatarFrame =
+  document.getElementById(
+    "U9-profile-avatar-frame"
   );
 
 
@@ -161,17 +176,111 @@ function u9ProfileHideLoading() {
 
 
 /* =========================
+   CHECK PROFILE AUTH
+========================= */
+
+function u9ProfileCanOpen() {
+
+  /*
+     U9User must already exist.
+
+     header.js is responsible
+     for checking /me.
+  */
+
+  if (
+    !window.U9User
+  ) {
+
+    console.warn(
+      "U9User is not available."
+    );
+
+
+    return false;
+
+  }
+
+
+  /*
+     Only AUTHENTICATED can
+     open Profile.
+
+     CHECKING is not enough.
+     ERROR is not enough.
+     INVALID is not enough.
+  */
+
+  if (
+    !window.U9User.isLoggedIn()
+  ) {
+
+    return false;
+
+  }
+
+
+  /*
+     User object must exist.
+  */
+
+  if (
+    !window.U9User.get()
+  ) {
+
+    return false;
+
+  }
+
+
+  return true;
+
+}
+
+
+/* =========================
    OPEN PROFILE MODAL
 ========================= */
 
 function openProfileModal() {
+
+  /*
+     Profile must be opened
+     through Window Manager.
+
+     This function only performs
+     the actual Profile opening.
+  */
 
   if (
     !profileModal ||
     !profileModalContent
   ) {
 
-    return;
+    return false;
+
+  }
+
+
+  /*
+     Double protection.
+
+     Even if another script
+     directly calls openProfileModal(),
+     Profile still cannot open
+     without authentication.
+  */
+
+  if (
+    !u9ProfileCanOpen()
+  ) {
+
+    console.warn(
+      "Profile cannot open: user is not authenticated."
+    );
+
+
+    return false;
 
   }
 
@@ -222,6 +331,9 @@ function openProfileModal() {
 
   u9ProfileLoad();
 
+
+  return true;
+
 }
 
 
@@ -236,7 +348,7 @@ function closeProfileModal() {
     !profileModalContent
   ) {
 
-    return;
+    return false;
 
   }
 
@@ -251,7 +363,7 @@ function closeProfileModal() {
     )
   ) {
 
-    return;
+    return true;
 
   }
 
@@ -293,53 +405,98 @@ function closeProfileModal() {
      WAIT FOR ANIMATION
   ========================= */
 
-  profileModalContent.addEventListener(
-    "transitionend",
-    function handleCloseAnimation(
-      event
+  let closeFinished =
+    false;
+
+
+  function finishClose() {
+
+    if (
+      closeFinished
     ) {
 
-      /* =========================
-         ONLY TRANSFORM
-      ========================= */
-
-      if (
-        event.propertyName !==
-        "transform"
-      ) {
-
-        return;
-
-      }
-
-
-      /* =========================
-         REMOVE CLOSING
-      ========================= */
-
-      profileModal.classList.remove(
-        "modal-closing"
-      );
-
-
-      /* =========================
-         UNLOCK PAGE SCROLL
-      ========================= */
-
-      unlockProfilePageScroll();
-
-
-      /* =========================
-         REMOVE EVENT
-      ========================= */
-
-      profileModalContent.removeEventListener(
-        "transitionend",
-        handleCloseAnimation
-      );
+      return;
 
     }
+
+
+    closeFinished =
+      true;
+
+
+    /* =========================
+       REMOVE CLOSING
+    ========================= */
+
+    profileModal.classList.remove(
+      "modal-closing"
+    );
+
+
+    /* =========================
+       UNLOCK PAGE SCROLL
+    ========================= */
+
+    unlockProfilePageScroll();
+
+
+    /* =========================
+       REMOVE EVENT
+    ========================= */
+
+    profileModalContent.removeEventListener(
+      "transitionend",
+      handleCloseAnimation
+    );
+
+  }
+
+
+  function handleCloseAnimation(
+    event
+  ) {
+
+    /*
+       Only wait for transform.
+    */
+
+    if (
+      event.propertyName !==
+      "transform"
+    ) {
+
+      return;
+
+    }
+
+
+    finishClose();
+
+  }
+
+
+  profileModalContent.addEventListener(
+    "transitionend",
+    handleCloseAnimation
   );
+
+
+  /*
+     Safety fallback.
+
+     If transitionend is not
+     triggered for any reason,
+     Profile will still finish
+     closing.
+  */
+
+  setTimeout(
+    finishClose,
+    700
+  );
+
+
+  return true;
 
 }
 
@@ -348,16 +505,21 @@ function closeProfileModal() {
    TOGGLE PROFILE MODAL
 ========================= */
 
-function toggleProfileModal() {
+async function toggleProfileModal() {
 
   if (
     !profileModal
   ) {
 
-    return;
+    return false;
 
   }
 
+
+  /*
+     If Profile is currently
+     open, close it directly.
+  */
 
   if (
     profileModal.classList.contains(
@@ -367,12 +529,36 @@ function toggleProfileModal() {
 
     closeProfileModal();
 
-    return;
+    return true;
 
   }
 
 
-  openProfileModal();
+  /*
+     Otherwise ask Window Manager
+     to open Profile.
+  */
+
+  if (
+    window.U9WindowManager
+  ) {
+
+    return await window.U9WindowManager.open(
+      "profile"
+    );
+
+  }
+
+
+  /*
+     Fallback.
+
+     This should normally never
+     be needed once Window Manager
+     is loaded correctly.
+  */
+
+  return openProfileModal();
 
 }
 
@@ -387,12 +573,12 @@ if (
 
   profileUserButton.addEventListener(
     "click",
-    function (event) {
+    async function (event) {
 
       event.stopPropagation();
 
 
-      toggleProfileModal();
+      await toggleProfileModal();
 
     }
   );
@@ -424,9 +610,17 @@ if (
    API
 ========================= */
 
-const u9ProfileMeUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me";
+/*
+   These are NOT /me.
 
+   They are only used to load
+   the available avatar frame
+   resources.
+
+   Current user information
+   still comes exclusively from
+   header.js / U9User.
+*/
 
 const u9ProfileDefaultFrameUrl =
   "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-default";
@@ -454,22 +648,6 @@ const u9ProfileDefaultAvatar =
 
 const u9ProfileDefaultFrame =
   "SSVG/avatar/ordinary.svg";
-
-
-/* =========================
-   AVATAR ELEMENTS
-========================= */
-
-const u9ProfileAvatarImage =
-  document.getElementById(
-    "U9-profile-avatar-image"
-  );
-
-
-const u9ProfileAvatarFrame =
-  document.getElementById(
-    "U9-profile-avatar-frame"
-  );
 
 
 /* =========================
@@ -624,6 +802,7 @@ async function u9ProfileLoadFrame(
         response.status
       );
 
+
       if (
         u9ProfileAvatarFrame
       ) {
@@ -632,6 +811,7 @@ async function u9ProfileLoadFrame(
           u9ProfileDefaultFrame;
 
       }
+
 
       return;
 
@@ -680,6 +860,7 @@ async function u9ProfileLoadFrame(
         frameId
       );
 
+
       if (
         u9ProfileAvatarFrame
       ) {
@@ -688,6 +869,7 @@ async function u9ProfileLoadFrame(
           u9ProfileDefaultFrame;
 
       }
+
 
       return;
 
@@ -707,6 +889,7 @@ async function u9ProfileLoadFrame(
         frameId
       );
 
+
       if (
         u9ProfileAvatarFrame
       ) {
@@ -715,6 +898,7 @@ async function u9ProfileLoadFrame(
           u9ProfileDefaultFrame;
 
       }
+
 
       return;
 
@@ -736,7 +920,9 @@ async function u9ProfileLoadFrame(
 
   }
 
-  catch (error) {
+  catch (
+    error
+  ) {
 
     console.error(
       "Load profile frame failed:",
@@ -938,29 +1124,40 @@ async function u9ProfileLoad() {
 
 
   /* =========================
-     GET SESSION
-  ========================= */
-
-  const sessionToken =
-    localStorage.getItem(
-      "u9_session"
-    );
-
-
-  /* =========================
-     NO SESSION
+     GET CURRENT USER
   ========================= */
 
   if (
-    !sessionToken
+    !window.U9User
+  ) {
+
+    console.warn(
+      "U9User is not available."
+    );
+
+
+    return;
+
+  }
+
+
+  const user =
+    window.U9User.get();
+
+
+  /* =========================
+     USER NOT AUTHENTICATED
+  ========================= */
+
+  if (
+    !window.U9User.isLoggedIn() ||
+    !user
   ) {
 
     /*
-      没有登入时：
+       Do not show Profile data.
 
-      1. 保持 loading.svg
-      2. 不显示用户资料
-      3. 不执行 hide loading
+       Keep loading state.
     */
 
     return;
@@ -969,90 +1166,6 @@ async function u9ProfileLoad() {
 
 
   try {
-
-    /* =========================
-       REQUEST /ME
-    ========================= */
-
-    const response =
-      await fetch(
-        u9ProfileMeUrl,
-        {
-
-          method:
-            "GET",
-
-          headers: {
-
-            "Authorization":
-              `Bearer ${sessionToken}`
-
-          }
-
-        }
-      );
-
-
-    /* =========================
-       ME FAILED
-    ========================= */
-
-    if (
-      !response.ok
-    ) {
-
-      console.warn(
-        "Profile /me request failed:",
-        response.status
-      );
-
-      /*
-        /me 失败：
-
-        保持 loading.svg
-      */
-
-      return;
-
-    }
-
-
-    /* =========================
-       JSON
-    ========================= */
-
-    const result =
-      await response.json();
-
-
-    /* =========================
-       GET USER
-    ========================= */
-
-    const user =
-      result.user ||
-      result.data?.user ||
-      result;
-
-
-    /* =========================
-       USER NOT FOUND
-    ========================= */
-
-    if (
-      !user
-    ) {
-
-      /*
-        没有取得 user：
-
-        保持 loading.svg
-      */
-
-      return;
-
-    }
-
 
     /* =========================
        DISPLAY USER INFO
@@ -1090,7 +1203,9 @@ async function u9ProfileLoad() {
 
   }
 
-  catch (error) {
+  catch (
+    error
+  ) {
 
     console.error(
       "Load profile failed:",
@@ -1102,14 +1217,91 @@ async function u9ProfileLoad() {
 
 
     /*
-      网络错误：
-
-      保持 loading.svg
+       Keep loading state
+       when Profile data fails.
     */
 
     return;
 
   }
+
+}
+
+
+/* =========================
+   WINDOW MANAGER
+========================= */
+
+if (
+  window.U9WindowManager
+) {
+
+  U9WindowManager.register(
+    "profile",
+    {
+
+      /* =========================
+         OPEN
+      ========================= */
+
+      open:
+        openProfileModal,
+
+
+      /* =========================
+         CLOSE
+      ========================= */
+
+      close:
+        closeProfileModal,
+
+
+      /* =========================
+         IS OPEN
+      ========================= */
+
+      isOpen:
+        function () {
+
+          if (
+            !profileModal
+          ) {
+
+            return false;
+
+          }
+
+
+          return (
+            profileModal.classList.contains(
+              "modal-open"
+            ) ||
+
+            profileModal.classList.contains(
+              "modal-closing"
+            )
+          );
+
+        },
+
+
+      /* =========================
+         CAN OPEN
+      ========================= */
+
+      canOpen:
+        u9ProfileCanOpen
+
+    }
+  );
+
+}
+
+else {
+
+  console.warn(
+    "U9WindowManager is not available when Profile was initialized."
+  );
 
 }
 
@@ -1136,6 +1328,10 @@ window.closeProfileModal =
 window.toggleProfileModal =
   toggleProfileModal;
 
+
+/* =========================
+   PROFILE GLOBAL API
+========================= */
 
 window.U9Profile = {
 
