@@ -4,7 +4,7 @@
 
 
 /* =========================
-   LOGOUT CONFIRM ELEMENTS
+   ELEMENTS
 ========================= */
 
 
@@ -47,13 +47,12 @@ const accountSettingLogout =
 
 
 /* =========================
-   TIMER
+   STATE
 ========================= */
 
 
 let logoutTimer =
 null;
-
 
 
 let logoutProcessing =
@@ -62,8 +61,9 @@ false;
 
 
 
+
 /* =========================
-   OPEN LOGOUT CONFIRM
+   OPEN LOGOUT MODAL
 ========================= */
 
 
@@ -137,7 +137,6 @@ null;
 
 
 
-
 logoutTimer =
 setInterval(
 ()=>{
@@ -163,15 +162,14 @@ logoutYes.textContent =
 
 
 
-
 if(
 count <= 0
 ){
 
+
 clearInterval(
 logoutTimer
 );
-
 
 
 logoutTimer =
@@ -198,11 +196,9 @@ logoutYes.classList.add(
 }
 
 
-
 },
 1000
 );
-
 
 
 }
@@ -211,9 +207,8 @@ logoutYes.classList.add(
 
 
 
-
 /* =========================
-   OPEN FROM SETTING PAGE
+   OPEN FROM SETTING
 ========================= */
 
 
@@ -244,12 +239,13 @@ closeAccountSetting();
 openLogoutConfirm();
 
 
-
 }
 
 );
 
+
 }
+
 
 
 
@@ -270,7 +266,6 @@ logoutNo.addEventListener(
 ()=>{
 
 
-
 logoutModal.style.display =
 "none";
 
@@ -278,7 +273,6 @@ logoutModal.style.display =
 
 logoutProcessing =
 false;
-
 
 
 
@@ -291,7 +285,6 @@ logoutYes.classList.remove(
 "loading",
 "ready"
 );
-
 
 
 
@@ -310,10 +303,10 @@ null;
 }
 
 
-
 }
 
 );
+
 
 }
 
@@ -338,7 +331,7 @@ async()=>{
 
 
 /* =========================
-   PREVENT DOUBLE CLICK
+   CHECK
 ========================= */
 
 
@@ -350,7 +343,6 @@ logoutProcessing
 return;
 
 }
-
 
 
 
@@ -383,8 +375,10 @@ logoutYes.textContent =
 
 
 
+
+
 /* =========================
-   LOGOUT REQUEST
+   LOGOUT API
 ========================= */
 
 
@@ -432,6 +426,7 @@ headers:{
 
 
 
+
 const result =
 await response.json();
 
@@ -440,7 +435,7 @@ await response.json();
 
 
 /* =========================
-   LOGOUT ERROR
+   ERROR
 ========================= */
 
 
@@ -501,7 +496,6 @@ return;
 
 
 
-
 /* =========================
    CLEAR USER STATE
 ========================= */
@@ -514,6 +508,30 @@ window.U9User
 window.U9User.clear();
 
 }
+
+
+
+
+
+/* =========================
+   RESET TIMER
+========================= */
+
+
+if(
+logoutTimer
+){
+
+clearInterval(
+logoutTimer
+);
+
+
+logoutTimer =
+null;
+
+}
+
 
 
 
@@ -532,13 +550,21 @@ logoutModal.style.display =
 
 
 
+logoutProcessing =
+false;
+
+
+
+
+
+
 /* =========================
    DEBUG
 ========================= */
 
 
 console.log(
-"Logout result:",
+"Logout success:",
 result
 );
 
@@ -547,6 +573,8 @@ result
 
 
 }
+
+
 
 catch(error){
 
