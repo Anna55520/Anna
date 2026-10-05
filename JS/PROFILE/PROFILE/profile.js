@@ -300,15 +300,7 @@ const u9ProfilePaidFrameUrl =
 ========================= */
 
 const u9ProfileDefaultAvatarSvg =
-  `<svg width="199px" height="199px" viewBox="-2.56 -2.56 21.12 21.12" xmlns="http://www.w3.org/2000/svg" fill="#000000" stroke="#000000" stroke-width="0.00016">
-    <g id="SVGRepo_bgCarrier" stroke-width="0">
-      <rect x="-2.56" y="-2.56" width="21.12" height="21.12" rx="0" fill="#ffffff" stroke-width="0"></rect>
-    </g>
-    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
-    <g id="SVGRepo_iconCarrier">
-      <path d="m 8 1 c -1.65625 0 -3 1.34375 -3 3 s 1.34375 3 3 3 s 3 -1.34375 3 -3 s -1.34375 -3 -1.34375 -3 z m -1.5 7 c -2.492188 0 -4.5 2.007812 -4.5 4.5 v 0.5 c 0 1.109375 0.890625 2 2 2 h 8 c 1.109375 0 2 -0.890625 2 -2 v -0.5 c 0 -2.492188 -2.007812 -4.5 -4.5 -4.5 z m 0 0" fill="#357cf1"></path>
-    </g>
-  </svg>`;
+  `<svg width="199px" height="199px" viewBox="-2.56 -2.56 21.12 21.12" xmlns="http://www.w3.org/2000/svg" fill="#000000" stroke="#000000" stroke-width="0.00016"><g id="SVGRepo_bgCarrier" stroke-width="0"><rect x="-2.56" y="-2.56" width="21.12" height="21.12" rx="0" fill="#ffffff" stroke-width="0"></rect></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="m 8 1 c -1.65625 0 -3 1.34375 -3 3 s 1.34375 3 3 3 s 3 -1.34375 3 -3 s -1.34375 -3 -3 -3 z m -1.5 7 c -2.492188 0 -4.5 2.007812 -4.5 4.5 v 0.5 c 0 1.109375 0.890625 2 2 2 h 8 c 1.109375 0 2 -0.890625 2 -2 v -0.5 c 0 -2.492188 -2.007812 -4.5 -4.5 -4.5 z m 0 0" fill="#357cf1"></path></g></svg>`;
 
 
 const u9ProfileDefaultAvatar =
@@ -332,57 +324,6 @@ const u9ProfileDefaultFrame =
 
 let u9ProfileCurrentPage =
   "main";
-
-
-/* =========================
-   GET AUTH TOKEN
-========================= */
-
-function u9ProfileGetToken() {
-
-  try {
-
-    return localStorage.getItem(
-      "u9_token"
-    );
-
-  }
-
-  catch(error) {
-
-    console.error(
-      "Get U9 token failed:",
-      error
-    );
-
-    return null;
-
-  }
-
-}
-
-
-/* =========================
-   BUILD AUTH HEADERS
-========================= */
-
-function u9ProfileAuthHeaders() {
-
-  const token =
-    u9ProfileGetToken();
-
-  const headers = {};
-
-  if (token) {
-
-    headers.Authorization =
-      `Bearer ${token}`;
-
-  }
-
-  return headers;
-
-}
 
 
 /* =========================
@@ -460,6 +401,10 @@ function u9ProfileResetBalanceMode() {
 ========================= */
 
 function u9ProfileToggleBalanceCoins() {
+
+  /* =========================
+     REQUIRED ELEMENTS
+  ========================= */
 
   if (
     !u9ProfileBalanceTitle ||
@@ -552,6 +497,7 @@ if (
       event.preventDefault();
 
       event.stopPropagation();
+
 
       u9ProfileToggleBalanceCoins();
 
@@ -1713,21 +1659,11 @@ async function u9ProfileLoadFrame(
 
   try {
 
-    const headers =
-      u9ProfileAuthHeaders();
-
-
     const response =
       await fetch(
         requestUrl,
         {
-          method: "GET",
-
-          headers,
-
-          credentials: "omit",
-
-          cache: "no-store"
+          method: "GET"
         }
       );
 
@@ -1739,12 +1675,6 @@ async function u9ProfileLoadFrame(
     if (
       !response.ok
     ) {
-
-      console.warn(
-        "Profile frame request failed:",
-        response.status,
-        frameType
-      );
 
       u9ProfileResetAvatar();
 
@@ -1776,8 +1706,7 @@ async function u9ProfileLoadFrame(
         function(frame) {
 
           return (
-            String(frame.id) ===
-            String(frameId)
+            frame.id === frameId
           );
 
         }
@@ -1791,11 +1720,6 @@ async function u9ProfileLoadFrame(
     if (
       !currentFrame
     ) {
-
-      console.warn(
-        "Current profile frame not found:",
-        frameId
-      );
 
       u9ProfileResetAvatar();
 
@@ -1811,11 +1735,6 @@ async function u9ProfileLoadFrame(
     if (
       !currentFrame.svg
     ) {
-
-      console.warn(
-        "Current profile frame SVG not found:",
-        frameId
-      );
 
       u9ProfileResetAvatar();
 
@@ -1981,15 +1900,8 @@ async function u9ProfileLoadAvatarFromUser(
       user.avatar || null;
 
 
-    /* =========================
-       SUPPORT MULTIPLE FORMATS
-    ========================= */
-
     const avatarUrl =
-      avatar?.url ||
-      avatar?.avatar_url ||
-      user.avatar_url ||
-      "";
+      avatar?.url || "";
 
 
     /* =========================
@@ -2032,20 +1944,12 @@ async function u9ProfileLoadAvatarFromUser(
     ========================= */
 
     const frameType =
-      user.avatar_frame_type ||
-      user.avatar?.frame_type ||
-      "default";
+      user.avatar_frame_type || "default";
 
 
     const frameId =
-      user.avatar_frame_id ||
-      user.avatar?.frame_id ||
-      null;
+      user.avatar_frame_id || null;
 
-
-    /* =========================
-       LOAD FRAME
-    ========================= */
 
     const frameLoaded =
       await u9ProfileLoadFrame(
@@ -2081,77 +1985,6 @@ async function u9ProfileLoadAvatarFromUser(
     );
 
     u9ProfileResetAvatar();
-
-    return false;
-
-  }
-
-}
-
-
-/* =========================
-   REFRESH ONLY AVATAR
-========================= */
-
-async function u9ProfileRefreshAvatar() {
-
-  if (
-    !window.U9User
-  ) {
-
-    console.warn(
-      "U9User is not available."
-    );
-
-    return false;
-
-  }
-
-
-  if (
-    !window.U9User.isLoggedIn()
-  ) {
-
-    return false;
-
-  }
-
-
-  try {
-
-    /* =========================
-       GET FRESH USER
-    ========================= */
-
-    const user =
-      await window.U9User.refresh();
-
-
-    if (
-      !user
-    ) {
-
-      return false;
-
-    }
-
-
-    /* =========================
-       REFRESH AVATAR + FRAME
-    ========================= */
-
-    return await u9ProfileLoadAvatarFromUser(
-      user
-    );
-
-  }
-
-  catch(error) {
-
-    console.error(
-      "Refresh profile avatar failed:",
-      error
-    );
 
     return false;
 
@@ -2410,9 +2243,6 @@ window.U9Profile = {
   refresh:
     u9ProfileLoad,
 
-  refreshAvatar:
-    u9ProfileRefreshAvatar,
-
   showMain:
     u9ProfileShowMainPage,
 
@@ -2445,6 +2275,6 @@ window.U9ProfileAvatar = {
     u9ProfileLoad,
 
   refresh:
-    u9ProfileRefreshAvatar
+    u9ProfileLoad
 
 };
