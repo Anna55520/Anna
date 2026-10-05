@@ -13,10 +13,12 @@ const profileModal =
   );
 
 
+
 const profileModalContent =
   document.getElementById(
     "U9-profile-modal-content"
   );
+
 
 
 /* =========================
@@ -29,10 +31,12 @@ const profileModalHeader =
   );
 
 
+
 const profileModalClose =
   document.getElementById(
     "U9-profile-modal-close"
   );
+
 
 
 const profileModalCloseIcon =
@@ -41,10 +45,12 @@ const profileModalCloseIcon =
   );
 
 
+
 const profileModalTitle =
   document.getElementById(
     "U9-profile-modal-title"
   );
+
 
 
 const profileModalIcon =
@@ -53,10 +59,12 @@ const profileModalIcon =
   );
 
 
+
 const profileUserButton =
   document.getElementById(
     "U9-page-header-user"
   );
+
 
 
 /* =========================
@@ -67,16 +75,20 @@ const u9ProfileMainTitle =
   "Profile";
 
 
+
 const u9ProfileMainIcon =
   "SSVG/logo/U9website.svg";
+
 
 
 const u9ProfileMainCloseIcon =
   "SSVG/account/close.svg";
 
 
+
 const u9ProfileBackIcon =
   "SSVG/account/back.svg";
+
 
 
 const u9ProfilePageTitles = {
@@ -94,8 +106,10 @@ const u9ProfilePageTitles = {
 };
 
 
+
 const u9ProfilePageIcon =
   "SSVG/account/account-edit-button.svg";
+
 
 
 /* =========================
@@ -108,10 +122,12 @@ const u9ProfileInfoLoading =
   );
 
 
+
 const u9ProfileInfo =
   document.getElementById(
     "U9-profile-info"
   );
+
 
 
 const u9ProfileUsername =
@@ -120,10 +136,12 @@ const u9ProfileUsername =
   );
 
 
+
 const u9ProfileAccount =
   document.getElementById(
     "U9-profile-account"
   );
+
 
 
 const u9ProfileBalanceTitle =
@@ -132,10 +150,12 @@ const u9ProfileBalanceTitle =
   );
 
 
+
 const u9ProfileBalanceValueRow =
   document.getElementById(
     "U9-profile-balance-value-row"
   );
+
 
 
 const u9ProfileBalance =
@@ -144,10 +164,12 @@ const u9ProfileBalance =
   );
 
 
+
 const u9ProfileCoins =
   document.getElementById(
     "U9-profile-coins"
   );
+
 
 
 const u9ProfileBalanceToggle =
@@ -156,12 +178,14 @@ const u9ProfileBalanceToggle =
   );
 
 
+
 /* =========================
    BALANCE / COINS STATE
 ========================= */
 
 let u9ProfileBalanceMode =
   "balance";
+
 
 
 /* =========================
@@ -174,6 +198,7 @@ const u9ProfileMain =
   );
 
 
+
 /* =========================
    PROFILE PAGE BUTTONS
 ========================= */
@@ -184,10 +209,12 @@ const u9ProfileButton1 =
   );
 
 
+
 const u9ProfileButton2 =
   document.getElementById(
     "U9-profile-button-2"
   );
+
 
 
 const u9ProfileButton3 =
@@ -196,10 +223,12 @@ const u9ProfileButton3 =
   );
 
 
+
 const u9ProfileButton4 =
   document.getElementById(
     "U9-profile-button-4"
   );
+
 
 
 const u9ProfileButton5 =
@@ -208,10 +237,12 @@ const u9ProfileButton5 =
   );
 
 
+
 const u9ProfileButton6 =
   document.getElementById(
     "U9-profile-button-6"
   );
+
 
 
 /* =========================
@@ -224,10 +255,12 @@ const u9ProfilePage1 =
   );
 
 
+
 const u9ProfilePage2 =
   document.getElementById(
     "U9-profile-page2"
   );
+
 
 
 const u9ProfilePage3 =
@@ -236,16 +269,19 @@ const u9ProfilePage3 =
   );
 
 
+
 const u9ProfilePage4 =
   document.getElementById(
     "U9-profile-page4"
   );
 
 
+
 const u9ProfilePage5 =
   document.getElementById(
     "U9-profile-page5"
   );
+
 
 
 const u9ProfilePages = [
@@ -263,6 +299,7 @@ const u9ProfilePages = [
 ];
 
 
+
 /* =========================
    AVATAR ELEMENTS
 ========================= */
@@ -273,10 +310,12 @@ const u9ProfileAvatarImage =
   );
 
 
+
 const u9ProfileAvatarFrame =
   document.getElementById(
     "U9-profile-avatar-frame"
   );
+
 
 
 /* =========================
@@ -287,12 +326,15 @@ const u9ProfileDefaultFrameUrl =
   "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-default";
 
 
+
 const u9ProfileFreeFrameUrl =
   "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free";
 
 
+
 const u9ProfilePaidFrameUrl =
   "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid";
+
 
 
 /* =========================
@@ -303,11 +345,13 @@ const u9ProfileDefaultAvatarSvg =
   `<svg width="199px" height="199px" viewBox="-2.56 -2.56 21.12 21.12" xmlns="http://www.w3.org/2000/svg" fill="#000000" stroke="#000000" stroke-width="0.00016"><g id="SVGRepo_bgCarrier" stroke-width="0"><rect x="-2.56" y="-2.56" width="21.12" height="21.12" rx="0" fill="#ffffff" stroke-width="0"></rect></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="m 8 1 c -1.65625 0 -3 1.34375 -3 3 s 1.34375 3 3 3 s 3 -1.34375 3 -3 s -1.34375 -3 -3 -3 z m -1.5 7 c -2.492188 0 -4.5 2.007812 -4.5 4.5 v 0.5 c 0 1.109375 0.890625 2 2 2 h 8 c 1.109375 0 2 -0.890625 2 -2 v -0.5 c 0 -2.492188 -2.007812 -4.5 -4.5 -4.5 z m 0 0" fill="#357cf1"></path></g></svg>`;
 
 
+
 const u9ProfileDefaultAvatar =
   "data:image/svg+xml;charset=UTF-8," +
   encodeURIComponent(
     u9ProfileDefaultAvatarSvg
   );
+
 
 
 /* =========================
@@ -318,12 +362,71 @@ const u9ProfileDefaultFrame =
   "/SSVG/avatar/ordinary.svg";
 
 
+
 /* =========================
    PROFILE INTERNAL PAGE STATE
 ========================= */
 
 let u9ProfileCurrentPage =
   "main";
+
+
+
+/* =========================
+   GET AUTH TOKEN
+========================= */
+
+function u9ProfileGetToken() {
+
+  try {
+
+    return localStorage.getItem(
+      "u9_token"
+    );
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "Get U9 token failed:",
+      error
+    );
+
+    return null;
+
+  }
+
+}
+
+
+
+/* =========================
+   BUILD AUTH HEADERS
+========================= */
+
+function u9ProfileAuthHeaders() {
+
+  const token =
+    u9ProfileGetToken();
+
+  const headers = {};
+
+
+
+  if (token) {
+
+    headers.Authorization =
+      `Bearer ${token}`;
+
+  }
+
+
+
+  return headers;
+
+}
+
 
 
 /* =========================
@@ -334,6 +437,7 @@ function u9ProfileResetBalanceMode() {
 
   u9ProfileBalanceMode =
     "balance";
+
 
 
   /* =========================
@@ -350,6 +454,7 @@ function u9ProfileResetBalanceMode() {
   }
 
 
+
   /* =========================
      BALANCE
   ========================= */
@@ -364,6 +469,7 @@ function u9ProfileResetBalanceMode() {
   }
 
 
+
   /* =========================
      COINS
   ========================= */
@@ -376,6 +482,7 @@ function u9ProfileResetBalanceMode() {
       true;
 
   }
+
 
 
   /* =========================
@@ -396,15 +503,12 @@ function u9ProfileResetBalanceMode() {
 }
 
 
+
 /* =========================
    TOGGLE BALANCE / COINS
 ========================= */
 
 function u9ProfileToggleBalanceCoins() {
-
-  /* =========================
-     REQUIRED ELEMENTS
-  ========================= */
 
   if (
     !u9ProfileBalanceTitle ||
@@ -416,6 +520,7 @@ function u9ProfileToggleBalanceCoins() {
     return;
 
   }
+
 
 
   /* =========================
@@ -431,16 +536,20 @@ function u9ProfileToggleBalanceCoins() {
       "coins";
 
 
+
     u9ProfileBalanceTitle.textContent =
       "Coins";
+
 
 
     u9ProfileBalance.hidden =
       true;
 
 
+
     u9ProfileCoins.hidden =
       false;
+
 
 
     u9ProfileBalanceToggle.setAttribute(
@@ -449,9 +558,11 @@ function u9ProfileToggleBalanceCoins() {
     );
 
 
+
     return;
 
   }
+
 
 
   /* =========================
@@ -462,16 +573,20 @@ function u9ProfileToggleBalanceCoins() {
     "balance";
 
 
+
   u9ProfileBalanceTitle.textContent =
     "Balance";
+
 
 
   u9ProfileBalance.hidden =
     false;
 
 
+
   u9ProfileCoins.hidden =
     true;
+
 
 
   u9ProfileBalanceToggle.setAttribute(
@@ -480,6 +595,7 @@ function u9ProfileToggleBalanceCoins() {
   );
 
 }
+
 
 
 /* =========================
@@ -499,12 +615,14 @@ if (
       event.stopPropagation();
 
 
+
       u9ProfileToggleBalanceCoins();
 
     }
   );
 
 }
+
 
 
 /* =========================
@@ -533,6 +651,7 @@ function u9ProfileSetHeader(
     }
 
 
+
     if (
       profileModalClose
     ) {
@@ -545,6 +664,7 @@ function u9ProfileSetHeader(
     }
 
 
+
     if (
       profileModalTitle
     ) {
@@ -553,6 +673,7 @@ function u9ProfileSetHeader(
         u9ProfileMainTitle;
 
     }
+
 
 
     if (
@@ -565,9 +686,11 @@ function u9ProfileSetHeader(
     }
 
 
+
     return;
 
   }
+
 
 
   /* =========================
@@ -583,10 +706,12 @@ function u9ProfileSetHeader(
     );
 
 
+
   const pageTitle =
     u9ProfilePageTitles[
       pageNumber
     ];
+
 
 
   if (
@@ -596,6 +721,7 @@ function u9ProfileSetHeader(
     return;
 
   }
+
 
 
   /* =========================
@@ -612,6 +738,7 @@ function u9ProfileSetHeader(
   }
 
 
+
   if (
     profileModalClose
   ) {
@@ -622,6 +749,7 @@ function u9ProfileSetHeader(
     );
 
   }
+
 
 
   /* =========================
@@ -638,6 +766,7 @@ function u9ProfileSetHeader(
   }
 
 
+
   /* =========================
      PAGE ICON
   ========================= */
@@ -652,6 +781,7 @@ function u9ProfileSetHeader(
   }
 
 }
+
 
 
 /* =========================
@@ -678,6 +808,7 @@ function u9ProfileHideAllPages() {
   }
 
 
+
   /* =========================
      INTERNAL PAGES
   ========================= */
@@ -694,6 +825,7 @@ function u9ProfileHideAllPages() {
       }
 
 
+
       page.classList.remove(
         "profile-page-active"
       );
@@ -707,6 +839,7 @@ function u9ProfileHideAllPages() {
 }
 
 
+
 /* =========================
    SHOW PROFILE MAIN PAGE
 ========================= */
@@ -714,6 +847,7 @@ function u9ProfileHideAllPages() {
 function u9ProfileShowMainPage() {
 
   u9ProfileHideAllPages();
+
 
 
   if (
@@ -730,13 +864,16 @@ function u9ProfileShowMainPage() {
   }
 
 
+
   u9ProfileCurrentPage =
     "main";
+
 
 
   u9ProfileSetHeader(
     "main"
   );
+
 
 
   /* =========================
@@ -746,6 +883,7 @@ function u9ProfileShowMainPage() {
   u9ProfileResetBalanceMode();
 
 }
+
 
 
 /* =========================
@@ -761,6 +899,7 @@ function u9ProfileShowPage(
       "U9-profile-page" +
       pageNumber
     );
+
 
 
   if (
@@ -779,11 +918,13 @@ function u9ProfileShowPage(
   }
 
 
+
   /* =========================
      HIDE EVERYTHING
   ========================= */
 
   u9ProfileHideAllPages();
+
 
 
   /* =========================
@@ -798,12 +939,14 @@ function u9ProfileShowPage(
   );
 
 
+
   /* =========================
      SAVE CURRENT PAGE
   ========================= */
 
   u9ProfileCurrentPage =
     "page" + pageNumber;
+
 
 
   /* =========================
@@ -815,9 +958,11 @@ function u9ProfileShowPage(
   );
 
 
+
   return true;
 
 }
+
 
 
 /* =========================
@@ -837,6 +982,7 @@ function u9ProfileShowLoading() {
   }
 
 
+
   if (
     u9ProfileInfo
   ) {
@@ -848,6 +994,7 @@ function u9ProfileShowLoading() {
   }
 
 }
+
 
 
 /* =========================
@@ -867,6 +1014,7 @@ function u9ProfileHideLoading() {
   }
 
 
+
   if (
     u9ProfileInfo
   ) {
@@ -878,6 +1026,7 @@ function u9ProfileHideLoading() {
   }
 
 }
+
 
 
 /* =========================
@@ -899,6 +1048,7 @@ function u9ProfileCanOpen() {
   }
 
 
+
   if (
     !window.U9User.isLoggedIn()
   ) {
@@ -906,6 +1056,7 @@ function u9ProfileCanOpen() {
     return false;
 
   }
+
 
 
   if (
@@ -917,9 +1068,11 @@ function u9ProfileCanOpen() {
   }
 
 
+
   return true;
 
 }
+
 
 
 /* =========================
@@ -938,6 +1091,7 @@ function openProfileModal() {
   }
 
 
+
   if (
     !u9ProfileCanOpen()
   ) {
@@ -951,11 +1105,13 @@ function openProfileModal() {
   }
 
 
+
   /* =========================
      ALWAYS OPEN MAIN
   ========================= */
 
   u9ProfileShowMainPage();
+
 
 
   /* =========================
@@ -967,6 +1123,7 @@ function openProfileModal() {
   );
 
 
+
   /* =========================
      OPEN
   ========================= */
@@ -974,6 +1131,7 @@ function openProfileModal() {
   profileModal.classList.add(
     "modal-open"
   );
+
 
 
   /* =========================
@@ -991,6 +1149,7 @@ function openProfileModal() {
   }
 
 
+
   /* =========================
      LOAD PROFILE
   ========================= */
@@ -998,9 +1157,11 @@ function openProfileModal() {
   u9ProfileLoad();
 
 
+
   return true;
 
 }
+
 
 
 /* =========================
@@ -1019,6 +1180,7 @@ function closeProfileModal() {
   }
 
 
+
   if (
     !profileModal.classList.contains(
       "modal-open"
@@ -1030,11 +1192,13 @@ function closeProfileModal() {
   }
 
 
+
   /* =========================
      RESET TO MAIN
   ========================= */
 
   u9ProfileShowMainPage();
+
 
 
   /* =========================
@@ -1046,6 +1210,7 @@ function closeProfileModal() {
   );
 
 
+
   /* =========================
      START CLOSING
   ========================= */
@@ -1053,6 +1218,7 @@ function closeProfileModal() {
   profileModal.classList.add(
     "modal-closing"
   );
+
 
 
   /* =========================
@@ -1070,8 +1236,10 @@ function closeProfileModal() {
   }
 
 
+
   let closeFinished =
     false;
+
 
 
   function finishClose() {
@@ -1085,13 +1253,16 @@ function closeProfileModal() {
     }
 
 
+
     closeFinished =
       true;
+
 
 
     profileModal.classList.remove(
       "modal-closing"
     );
+
 
 
     profileModalContent.removeEventListener(
@@ -1100,6 +1271,7 @@ function closeProfileModal() {
     );
 
   }
+
 
 
   function handleCloseAnimation(
@@ -1115,9 +1287,11 @@ function closeProfileModal() {
     }
 
 
+
     finishClose();
 
   }
+
 
 
   profileModalContent.addEventListener(
@@ -1126,15 +1300,18 @@ function closeProfileModal() {
   );
 
 
+
   setTimeout(
     finishClose,
     700
   );
 
 
+
   return true;
 
 }
+
 
 
 /* =========================
@@ -1150,6 +1327,7 @@ async function toggleProfileModal() {
     return false;
 
   }
+
 
 
   /* =========================
@@ -1179,9 +1357,11 @@ async function toggleProfileModal() {
     }
 
 
+
     return true;
 
   }
+
 
 
   /* =========================
@@ -1199,9 +1379,11 @@ async function toggleProfileModal() {
   }
 
 
+
   return openProfileModal();
 
 }
+
 
 
 /* =========================
@@ -1224,6 +1406,7 @@ if (
   );
 
 }
+
 
 
 /* =========================
@@ -1263,9 +1446,11 @@ if (
         }
 
 
+
         return;
 
       }
+
 
 
       /* =========================
@@ -1279,6 +1464,7 @@ if (
   );
 
 }
+
 
 
 /* =========================
@@ -1301,6 +1487,7 @@ if (
 }
 
 
+
 /* =========================
    PROFILE BUTTON 2
 ========================= */
@@ -1319,6 +1506,7 @@ if (
   );
 
 }
+
 
 
 /* =========================
@@ -1341,6 +1529,7 @@ if (
 }
 
 
+
 /* =========================
    PROFILE BUTTON 4
 ========================= */
@@ -1359,6 +1548,7 @@ if (
   );
 
 }
+
 
 
 /* =========================
@@ -1381,6 +1571,7 @@ if (
 }
 
 
+
 /* =========================
    PROFILE BUTTON 6
    LOGOUT
@@ -1395,6 +1586,7 @@ if (
     function(event) {
 
       event.stopPropagation();
+
 
 
       /* =========================
@@ -1436,6 +1628,7 @@ if (
 }
 
 
+
 /* =========================
    RESET AVATAR
 ========================= */
@@ -1459,6 +1652,7 @@ function u9ProfileResetAvatar() {
   }
 
 
+
   /* =========================
      FRAME
   ========================= */
@@ -1476,6 +1670,7 @@ function u9ProfileResetAvatar() {
   }
 
 }
+
 
 
 /* =========================
@@ -1499,8 +1694,10 @@ if (
       }
 
 
+
       this.dataset.u9Fallback =
         "true";
+
 
 
       this.src =
@@ -1510,6 +1707,7 @@ if (
   );
 
 }
+
 
 
 /* =========================
@@ -1533,8 +1731,10 @@ if (
       }
 
 
+
       this.dataset.u9Fallback =
         "true";
+
 
 
       this.src =
@@ -1544,6 +1744,7 @@ if (
   );
 
 }
+
 
 
 /* =========================
@@ -1577,9 +1778,11 @@ async function u9ProfileLoadFrame(
     }
 
 
+
     return true;
 
   }
+
 
 
   /* =========================
@@ -1603,13 +1806,16 @@ async function u9ProfileLoadFrame(
     }
 
 
+
     return true;
 
   }
 
 
+
   let requestUrl =
     "";
+
 
 
   /* =========================
@@ -1626,6 +1832,7 @@ async function u9ProfileLoadFrame(
   }
 
 
+
   /* =========================
      PAID FRAME
   ========================= */
@@ -1638,6 +1845,7 @@ async function u9ProfileLoadFrame(
       u9ProfilePaidFrameUrl;
 
   }
+
 
 
   /* =========================
@@ -1653,19 +1861,32 @@ async function u9ProfileLoadFrame(
   }
 
 
+
   /* =========================
      REQUEST
   ========================= */
 
   try {
 
+    const headers =
+      u9ProfileAuthHeaders();
+
+
+
     const response =
       await fetch(
         requestUrl,
         {
-          method: "GET"
+          method: "GET",
+
+          headers,
+
+          credentials: "omit",
+
+          cache: "no-store"
         }
       );
+
 
 
     /* =========================
@@ -1676,11 +1897,18 @@ async function u9ProfileLoadFrame(
       !response.ok
     ) {
 
+      console.warn(
+        "Profile frame request failed:",
+        response.status,
+        frameType
+      );
+
       u9ProfileResetAvatar();
 
       return false;
 
     }
+
 
 
     /* =========================
@@ -1691,10 +1919,12 @@ async function u9ProfileLoadFrame(
       await response.json();
 
 
+
     const frames =
       result.frames ||
       result.data?.frames ||
       [];
+
 
 
     /* =========================
@@ -1713,6 +1943,7 @@ async function u9ProfileLoadFrame(
       );
 
 
+
     /* =========================
        FRAME NOT FOUND
     ========================= */
@@ -1721,11 +1952,17 @@ async function u9ProfileLoadFrame(
       !currentFrame
     ) {
 
+      console.warn(
+        "Current profile frame not found:",
+        frameId
+      );
+
       u9ProfileResetAvatar();
 
       return false;
 
     }
+
 
 
     /* =========================
@@ -1743,6 +1980,7 @@ async function u9ProfileLoadFrame(
     }
 
 
+
     /* =========================
        LOAD REAL FRAME
     ========================= */
@@ -1758,6 +1996,7 @@ async function u9ProfileLoadFrame(
         currentFrame.svg;
 
     }
+
 
 
     return true;
@@ -1780,6 +2019,7 @@ async function u9ProfileLoadFrame(
 }
 
 
+
 /* =========================
    DISPLAY USER INFO
 ========================= */
@@ -1797,6 +2037,7 @@ function u9ProfileDisplayUser(
   }
 
 
+
   /* =========================
      USERNAME
   ========================= */
@@ -1809,6 +2050,7 @@ function u9ProfileDisplayUser(
       user.username || "";
 
   }
+
 
 
   /* =========================
@@ -1825,6 +2067,7 @@ function u9ProfileDisplayUser(
   }
 
 
+
   /* =========================
      BALANCE
   ========================= */
@@ -1837,6 +2080,7 @@ function u9ProfileDisplayUser(
       user.balance ?? "0.00";
 
   }
+
 
 
   /* =========================
@@ -1853,6 +2097,7 @@ function u9ProfileDisplayUser(
   }
 
 
+
   /* =========================
      ALWAYS START WITH BALANCE
   ========================= */
@@ -1860,6 +2105,7 @@ function u9ProfileDisplayUser(
   u9ProfileResetBalanceMode();
 
 }
+
 
 
 /* =========================
@@ -1877,6 +2123,7 @@ async function u9ProfileLoadAvatarFromUser(
   u9ProfileResetAvatar();
 
 
+
   /* =========================
      NO USER
   ========================= */
@@ -1890,6 +2137,7 @@ async function u9ProfileLoadAvatarFromUser(
   }
 
 
+
   try {
 
     /* =========================
@@ -1900,8 +2148,10 @@ async function u9ProfileLoadAvatarFromUser(
       user.avatar || null;
 
 
+
     const avatarUrl =
       avatar?.url || "";
+
 
 
     /* =========================
@@ -1922,6 +2172,7 @@ async function u9ProfileLoadAvatarFromUser(
     }
 
 
+
     /* =========================
        NO USER AVATAR
     ========================= */
@@ -1939,16 +2190,21 @@ async function u9ProfileLoadAvatarFromUser(
     }
 
 
+
     /* =========================
        USER FRAME
     ========================= */
 
     const frameType =
-      user.avatar_frame_type || "default";
+      user.avatar_frame_type ||
+      "default";
+
 
 
     const frameId =
-      user.avatar_frame_id || null;
+      user.avatar_frame_id ||
+      null;
+
 
 
     const frameLoaded =
@@ -1956,6 +2212,7 @@ async function u9ProfileLoadAvatarFromUser(
         frameType,
         frameId
       );
+
 
 
     /* =========================
@@ -1971,6 +2228,7 @@ async function u9ProfileLoadAvatarFromUser(
       return false;
 
     }
+
 
 
     return true;
@@ -1993,6 +2251,79 @@ async function u9ProfileLoadAvatarFromUser(
 }
 
 
+
+/* =========================
+   REFRESH ONLY AVATAR
+========================= */
+
+async function u9ProfileRefreshAvatar() {
+
+  if (
+    !window.U9User
+  ) {
+
+    return false;
+
+  }
+
+
+
+  if (
+    !window.U9User.isLoggedIn()
+  ) {
+
+    return false;
+
+  }
+
+
+
+  try {
+
+    /* =========================
+       GET FRESH USER
+    ========================= */
+
+    const user =
+      await window.U9User.refresh();
+
+
+
+    if (
+      !user
+    ) {
+
+      return false;
+
+    }
+
+
+
+    /* =========================
+       REFRESH AVATAR + FRAME
+    ========================= */
+
+    return await u9ProfileLoadAvatarFromUser(
+      user
+    );
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "Refresh profile avatar failed:",
+      error
+    );
+
+    return false;
+
+  }
+
+}
+
+
+
 /* =========================
    LOAD PROFILE
 ========================= */
@@ -2006,6 +2337,7 @@ async function u9ProfileLoad() {
   u9ProfileShowLoading();
 
 
+
   /* =========================
      RESET AVATAR
   ========================= */
@@ -2013,11 +2345,13 @@ async function u9ProfileLoad() {
   u9ProfileResetAvatar();
 
 
+
   /* =========================
      RESET TO MAIN
   ========================= */
 
   u9ProfileShowMainPage();
+
 
 
   /* =========================
@@ -2041,12 +2375,14 @@ async function u9ProfileLoad() {
   }
 
 
+
   /* =========================
      GET USER
   ========================= */
 
   const user =
     window.U9User.get();
+
 
 
   /* =========================
@@ -2067,6 +2403,7 @@ async function u9ProfileLoad() {
   }
 
 
+
   /* =========================
      LOAD
   ========================= */
@@ -2082,6 +2419,7 @@ async function u9ProfileLoad() {
     );
 
 
+
     /* =========================
        LOAD AVATAR + FRAME
     ========================= */
@@ -2090,6 +2428,7 @@ async function u9ProfileLoad() {
       await u9ProfileLoadAvatarFromUser(
         user
       );
+
 
 
     /* =========================
@@ -2105,11 +2444,13 @@ async function u9ProfileLoad() {
     }
 
 
+
     /* =========================
        HIDE LOADING
     ========================= */
 
     u9ProfileHideLoading();
+
 
 
     console.log(
@@ -2133,6 +2474,7 @@ async function u9ProfileLoad() {
   }
 
 }
+
 
 
 /* =========================
@@ -2165,6 +2507,7 @@ if (
           }
 
 
+
           return (
             profileModal.classList.contains(
               "modal-open"
@@ -2194,11 +2537,13 @@ else {
 }
 
 
+
 /* =========================
    INITIAL RESET
 ========================= */
 
 u9ProfileResetAvatar();
+
 
 
 /* =========================
@@ -2208,11 +2553,13 @@ u9ProfileResetAvatar();
 u9ProfileResetBalanceMode();
 
 
+
 /* =========================
    INITIAL MAIN PAGE
 ========================= */
 
 u9ProfileShowMainPage();
+
 
 
 /* =========================
@@ -2223,12 +2570,15 @@ window.openProfileModal =
   openProfileModal;
 
 
+
 window.closeProfileModal =
   closeProfileModal;
 
 
+
 window.toggleProfileModal =
   toggleProfileModal;
+
 
 
 /* =========================
@@ -2242,6 +2592,9 @@ window.U9Profile = {
 
   refresh:
     u9ProfileLoad,
+
+  refreshAvatar:
+    u9ProfileRefreshAvatar,
 
   showMain:
     u9ProfileShowMainPage,
@@ -2265,6 +2618,7 @@ window.U9Profile = {
 };
 
 
+
 /* =========================
    AVATAR GLOBAL API
 ========================= */
@@ -2275,6 +2629,6 @@ window.U9ProfileAvatar = {
     u9ProfileLoad,
 
   refresh:
-    u9ProfileLoad
+    u9ProfileRefreshAvatar
 
 };
