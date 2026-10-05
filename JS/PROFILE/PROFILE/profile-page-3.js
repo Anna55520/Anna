@@ -1,19 +1,23 @@
-/* =================================================
+/* =========================
    PROFILE PAGE 3
-   FREE AVATAR SELECT
-================================================= */
+   FREE AVATAR
+========================= */
 
 
 /* =========================
    API
 ========================= */
 
-const U9_PROFILE_PAGE3_FREE_AVATAR_API =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-free";
+
+const U9_AVATAR_FREE_API =
+"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-free";
 
 
-const U9_PROFILE_PAGE3_SET_AVATAR_API =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-set";
+const U9_AVATAR_SET_API =
+"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-set";
+
+
+
 
 
 
@@ -21,237 +25,90 @@ const U9_PROFILE_PAGE3_SET_AVATAR_API =
    ELEMENTS
 ========================= */
 
-const profilePage3Content =
-  document.getElementById(
-    "U9-profile-page3-content"
-  );
+
+const profilePage3 =
+document.getElementById(
+"U9-profile-page-3"
+);
+
+
+
+const freeAvatarContainer =
+document.getElementById(
+"U9-profile-free-avatar-list"
+);
+
+
+
+const freeAvatarStatus =
+document.getElementById(
+"U9-profile-free-avatar-status"
+);
+
+
+
 
 
 
 /* =========================
-   CURRENT AVATAR
+   TOKEN
 ========================= */
 
-let currentAvatarId = null;
 
+function getToken(){
 
-
-/* =========================
-   LOAD CURRENT AVATAR
-
-   TODO:
-   后续接你的 avatar-current API
-
-========================= */
-
-async function loadCurrentAvatar(){
-
-  /*
-    暂时为空
-
-    等你提供读取当前头像 API
-
-    这里会返回：
-
-    currentAvatarId =
-    user_avatar.avatar_id
-
-  */
+return localStorage.getItem(
+"u9_token"
+);
 
 }
 
 
 
+
+
+
+
 /* =========================
-   SET FREE AVATAR
+   AUTH HEADERS
 ========================= */
 
-async function setFreeAvatar(
-  avatarId,
-  button
-){
+
+function getAuthHeaders(){
 
 
-  try {
+const headers = {
 
+"Content-Type":
+"application/json"
 
-    button.classList.add(
-      "loading"
-    );
-
-
-    button.textContent =
-      "加载中...";
+};
 
 
 
-    const response =
-      await fetch(
-
-        U9_PROFILE_PAGE3_SET_AVATAR_API,
-
-        {
-
-          method:"POST",
-
-          credentials:"include",
-
-          headers:{
-
-            "Content-Type":
-              "application/json"
-
-          },
-
-
-          body:
-            JSON.stringify({
-
-              type:
-                "free",
-
-              avatar_id:
-                avatarId
-
-            })
-
-        }
-
-      );
+const token =
+getToken();
 
 
 
-    const result =
-      await response.json();
+if(token){
 
-
-
-    console.log(
-      "SET AVATAR RESULT:",
-      result
-    );
-
-
-
-    if(
-      !result.success
-    ){
-
-      throw new Error(
-        result.error ||
-        "Set avatar failed"
-      );
-
-    }
-
-
-
-    currentAvatarId =
-      avatarId;
-
-
-
-    updateAvatarButtons();
-
-
-
-  }
-  catch(error){
-
-
-    console.error(
-      "SET AVATAR ERROR:",
-      error
-    );
-
-
-    button.textContent =
-      "失败";
-
-
-  }
-  finally{
-
-
-    button.classList.remove(
-      "loading"
-    );
-
-
-  }
-
+headers.Authorization =
+`Bearer ${token}`;
 
 }
 
 
 
-/* =========================
-   UPDATE BUTTON STATUS
-========================= */
-
-function updateAvatarButtons(){
-
-
-  const buttons =
-    document.querySelectorAll(
-      ".U9-profile-page3-avatar-button"
-    );
-
-
-
-  buttons.forEach(
-    (button)=>{
-
-
-      const id =
-        button.dataset.avatarId;
-
-
-
-      if(
-        id === currentAvatarId
-      ){
-
-
-        button.textContent =
-          "正在使用";
-
-
-        button.classList.add(
-          "active"
-        );
-
-
-        button.disabled =
-          true;
-
-
-      }
-      else{
-
-
-        button.textContent =
-          "使用";
-
-
-        button.classList.remove(
-          "active"
-        );
-
-
-        button.disabled =
-          false;
-
-
-      }
-
-
-    }
-
-  );
-
+return headers;
 
 }
+
+
+
+
+
+
 
 
 
@@ -259,259 +116,483 @@ function updateAvatarButtons(){
    LOAD FREE AVATAR
 ========================= */
 
+
 async function loadFreeAvatar(){
 
 
-  if(
-    !profilePage3Content
-  ){
+try{
 
-    console.error(
-      "PAGE3 CONTENT NOT FOUND"
-    );
 
-    return;
+const response =
+await fetch(
 
-  }
+U9_AVATAR_FREE_API,
 
+{
 
+method:
+"GET",
 
-  try{
 
+credentials:
+"include",
 
-    const response =
-      await fetch(
 
-        U9_PROFILE_PAGE3_FREE_AVATAR_API,
+headers:
+getAuthHeaders()
 
-        {
+}
 
-          method:"GET"
+);
 
-        }
 
-      );
 
 
 
-    const result =
-      await response.json();
+const result =
+await response.json();
 
 
 
-    console.log(
-      "FREE AVATAR RESULT:",
-      result
-    );
 
 
 
-    if(
-      !result.success
-    ){
+console.log(
+"FREE AVATAR RESULT:",
+result
+);
 
-      throw new Error(
-        "Free avatar failed"
-      );
 
-    }
 
 
 
-    const avatars =
-      result.avatars || [];
 
 
+if(
+!response.ok ||
+!result.success
+){
 
-    profilePage3Content.innerHTML =
-      "";
+throw new Error(
+result.error ||
+"Unable to load avatar"
+);
 
+}
 
 
-    const list =
-      document.createElement(
-        "div"
-      );
 
 
 
-    list.className =
-      "U9-profile-page3-avatar-list";
 
+renderFreeAvatar(
+result.avatars || []
+);
 
 
-    avatars.forEach(
-      (avatar)=>{
 
-
-        const card =
-          document.createElement(
-            "div"
-          );
-
-
-
-        card.className =
-          "U9-profile-page3-avatar-card";
-
-
-
-        const img =
-          document.createElement(
-            "img"
-          );
-
-
-
-        img.className =
-          "U9-profile-page3-avatar-image";
-
-
-
-        img.src =
-          avatar.svg;
-
-
-
-        img.alt =
-          avatar.name ||
-          "avatar";
-
-
-
-        img.draggable =
-          false;
-
-
-
-        const name =
-          document.createElement(
-            "div"
-          );
-
-
-
-        name.className =
-          "U9-profile-page3-avatar-name";
-
-
-
-        name.textContent =
-          avatar.name;
-
-
-
-        const button =
-          document.createElement(
-            "button"
-          );
-
-
-
-        button.className =
-          "U9-profile-page3-avatar-button";
-
-
-
-        button.dataset.avatarId =
-          avatar.id;
-
-
-
-        button.textContent =
-          "使用";
-
-
-
-        button.addEventListener(
-          "click",
-          ()=>{
-
-
-            setFreeAvatar(
-              avatar.id,
-              button
-            );
-
-
-          }
-
-        );
-
-
-
-        card.appendChild(
-          img
-        );
-
-
-        card.appendChild(
-          name
-        );
-
-
-        card.appendChild(
-          button
-        );
-
-
-        list.appendChild(
-          card
-        );
-
-
-      }
-
-    );
-
-
-
-    profilePage3Content.appendChild(
-      list
-    );
-
-
-
-    updateAvatarButtons();
-
-
-
-  }
-  catch(error){
-
-
-    console.error(
-      "FREE AVATAR ERROR:",
-      error
-    );
-
-
-  }
 
 
 }
+
+catch(error){
+
+
+console.error(
+
+"Load free avatar error:",
+
+error
+
+);
+
+
+
+if(freeAvatarStatus){
+
+freeAvatarStatus.textContent =
+"Unable to load avatar";
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
 
 
 
 /* =========================
-   LOAD PAGE
+   RENDER AVATAR
 ========================= */
 
-async function loadProfilePage3(){
+
+function renderFreeAvatar(
+avatars
+){
 
 
-  console.log(
-    "PROFILE PAGE 3 LOADED"
-  );
+
+if(
+!freeAvatarContainer
+){
+
+return;
+
+}
 
 
-  await loadCurrentAvatar();
 
 
-  await loadFreeAvatar();
+freeAvatarContainer.innerHTML =
+"";
+
+
+
+
+
+avatars.forEach(
+
+avatar=>{
+
+
+
+const item =
+document.createElement(
+"div"
+);
+
+
+
+item.className =
+"U9-profile-free-avatar-item";
+
+
+
+item.dataset.avatarId =
+avatar.id;
+
+
+
+
+
+const image =
+document.createElement(
+"img"
+);
+
+
+
+image.className =
+"U9-profile-free-avatar-image";
+
+
+
+image.src =
+avatar.svg;
+
+
+
+image.alt =
+avatar.name || "avatar";
+
+
+
+
+
+item.appendChild(
+image
+);
+
+
+
+
+
+
+item.addEventListener(
+"click",
+()=>{
+
+
+setFreeAvatar(
+avatar.id
+);
+
 
 
 }
+
+);
+
+
+
+
+
+
+freeAvatarContainer.appendChild(
+item
+);
+
+
+
+}
+
+);
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   SET FREE AVATAR
+========================= */
+
+
+async function setFreeAvatar(
+avatarId
+){
+
+
+
+try{
+
+
+document.body.classList.add(
+"U9-avatar-loading"
+);
+
+
+
+
+
+
+const response =
+await fetch(
+
+U9_AVATAR_SET_API,
+
+{
+
+method:
+"POST",
+
+
+credentials:
+"include",
+
+
+headers:
+getAuthHeaders(),
+
+
+
+body:
+JSON.stringify({
+
+avatar_type:
+"free",
+
+
+avatar_id:
+avatarId
+
+
+})
+
+}
+
+);
+
+
+
+
+
+
+
+const result =
+await response.json();
+
+
+
+
+
+console.log(
+
+"SET AVATAR RESULT:",
+
+result
+
+);
+
+
+
+
+
+
+if(
+!response.ok ||
+!result.success
+){
+
+
+throw new Error(
+
+result.error ||
+"Set avatar failed."
+
+);
+
+
+}
+
+
+
+
+
+
+
+console.log(
+"Avatar updated"
+);
+
+
+
+
+
+
+/* =========================
+   REFRESH USER
+========================= */
+
+
+if(
+window.U9User
+){
+
+await window.U9User.refresh();
+
+}
+
+
+
+
+
+
+/* =========================
+   REFRESH AVATAR
+========================= */
+
+
+if(
+window.U9ProfileAvatar
+){
+
+await window.U9ProfileAvatar.refresh();
+
+}
+
+
+
+
+
+
+}
+
+catch(error){
+
+
+console.error(
+
+"SET AVATAR ERROR:",
+
+error
+
+);
+
+
+
+alert(
+error.message
+);
+
+
+
+}
+
+finally{
+
+
+document.body.classList.remove(
+"U9-avatar-loading"
+);
+
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   INIT
+========================= */
+
+
+function initProfilePage3(){
+
+
+
+if(
+!profilePage3
+){
+
+return;
+
+}
+
+
+
+console.log(
+"PROFILE PAGE 3 LOADED"
+);
+
+
+
+loadFreeAvatar();
+
+
+
+}
+
+
+
+
 
 
 
@@ -519,4 +600,28 @@ async function loadProfilePage3(){
    START
 ========================= */
 
-loadProfilePage3();
+
+if(
+document.readyState ===
+"loading"
+){
+
+
+document.addEventListener(
+
+"DOMContentLoaded",
+
+initProfilePage3
+
+);
+
+
+}
+
+else{
+
+
+initProfilePage3();
+
+
+}
