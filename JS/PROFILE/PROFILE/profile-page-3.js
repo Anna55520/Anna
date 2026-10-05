@@ -1,4 +1,3 @@
-JS/PROFILE/PROFILE/profile-page-3.js
 
 /* =================================================
    PROFILE PAGE 3
@@ -39,11 +38,24 @@ let currentAvatarId = null;
 
 
 /* =========================
+   GET SESSION TOKEN
+========================= */
+
+function getProfilePage3Token(){
+
+  return localStorage.getItem(
+    "u9_token"
+  );
+
+}
+
+
+
+/* =========================
    LOAD CURRENT AVATAR
 
    TODO:
    后续接你的 avatar-current API
-
 ========================= */
 
 async function loadCurrentAvatar(){
@@ -53,11 +65,10 @@ async function loadCurrentAvatar(){
 
     等你提供读取当前头像 API
 
-    这里会返回：
+    这里以后会设置：
 
     currentAvatarId =
     user_avatar.avatar_id
-
   */
 
 }
@@ -73,49 +84,38 @@ async function setFreeAvatar(
   button
 ){
 
-  try {
+  /* =========================
+     PREVENT DUPLICATE CLICK
+  ========================= */
 
-    button.classList.add(
+  if(
+    !button ||
+    button.classList.contains(
       "loading"
-    );
+    )
+  ){
 
-    button.textContent =
-      "加载中...";
+    return;
 
+  }
+
+
+
+  try{
 
     /* =========================
-       GET CURRENT SESSION
+       GET TOKEN
     ========================= */
 
-    const {
-      data: sessionData,
-      error: sessionError
-    } =
-      await supabase.auth.getSession();
+    const token =
+      getProfilePage3Token();
 
 
-    if(sessionError){
+
+    if(!token){
 
       console.error(
-        "GET SESSION ERROR:",
-        sessionError
-      );
-
-      throw new Error(
-        "无法获取登录状态"
-      );
-
-    }
-
-
-    const session =
-      sessionData?.session;
-
-
-    if(!session){
-
-      console.error(
-        "NO ACTIVE SESSION"
+        "SET AVATAR: NO SESSION TOKEN"
       );
 
       throw new Error(
@@ -125,20 +125,46 @@ async function setFreeAvatar(
     }
 
 
-    console.log(
-      "AVATAR SET SESSION:",
-      {
-        userId:
-          session.user?.id,
 
-        hasAccessToken:
-          !!session.access_token
+    /* =========================
+       BUTTON LOADING
+    ========================= */
+
+    button.classList.add(
+      "loading"
+    );
+
+
+
+    button.disabled =
+      true;
+
+
+
+    button.textContent =
+      "加载中...";
+
+
+
+    /* =========================
+       DEBUG SESSION
+    ========================= */
+
+    console.log(
+      "SET AVATAR TOKEN:",
+      {
+        exists:
+          !!token,
+
+        length:
+          token.length
       }
     );
 
 
+
     /* =========================
-       SEND REQUEST
+       REQUEST
     ========================= */
 
     const response =
@@ -148,17 +174,22 @@ async function setFreeAvatar(
 
         {
 
-          method:"POST",
+          method:
+            "POST",
 
-          credentials:"include",
+
+          credentials:
+            "include",
+
 
           headers:{
 
             "Content-Type":
               "application/json",
 
+
             "Authorization":
-              `Bearer ${session.access_token}`
+              `Bearer ${token}`
 
           },
 
@@ -179,13 +210,38 @@ async function setFreeAvatar(
       );
 
 
+
     /* =========================
-       READ RESPONSE
+       RESPONSE JSON
     ========================= */
 
-    const result =
-      await response.json();
+    let result = null;
 
+
+    try{
+
+      result =
+        await response.json();
+
+    }
+    catch(jsonError){
+
+      console.error(
+        "SET AVATAR JSON ERROR:",
+        jsonError
+      );
+
+      throw new Error(
+        `服务器返回无效数据 (${response.status})`
+      );
+
+    }
+
+
+
+    /* =========================
+       DEBUG RESULT
+    ========================= */
 
     console.log(
       "SET AVATAR HTTP STATUS:",
@@ -199,11 +255,37 @@ async function setFreeAvatar(
     );
 
 
+
     /* =========================
-       CHECK HTTP ERROR
+       AUTH ERROR
     ========================= */
 
-    if(!response.ok){
+    if(
+      response.status === 401 ||
+      response.status === 403
+    ){
+
+      console.error(
+        "SET AVATAR AUTH ERROR:",
+        result
+      );
+
+      throw new Error(
+        result?.error ||
+        "登录 Session 无效，请重新登录"
+      );
+
+    }
+
+
+
+    /* =========================
+       HTTP ERROR
+    ========================= */
+
+    if(
+      !response.ok
+    ){
 
       throw new Error(
         result?.error ||
@@ -213,37 +295,76 @@ async function setFreeAvatar(
     }
 
 
+
     /* =========================
-       CHECK API RESULT
+       API ERROR
     ========================= */
 
     if(
+      !result ||
       !result.success
     ){
 
       throw new Error(
-        result.error ||
+        result?.error ||
         "Set avatar failed"
       );
 
     }
 
 
+
     /* =========================
-       SUCCESS
+       UPDATE CURRENT AVATAR
     ========================= */
 
     currentAvatarId =
-      avatarId;
+      String(
+        avatarId
+      );
 
+
+
+    /* =========================
+       UPDATE BUTTONS
+    ========================= */
 
     updateAvatarButtons();
 
+
+
+    /* =========================
+       SUCCESS
+    ========================= */
 
     console.log(
       "AVATAR SET SUCCESS:",
       avatarId
     );
+
+
+
+    /* =========================
+       OPTIONAL PROFILE REFRESH
+    ========================= */
+
+    if(
+      window.U9Profile &&
+      typeof window.U9Profile.refresh ===
+      "function"
+    ){
+
+      /*
+        这里刷新 Profile 主资料。
+
+        如果后面的 /me API 已经会返回
+        最新 avatar，就会同步更新。
+      */
+
+      await window.U9Profile.refresh();
+
+    }
+
 
 
   }
@@ -259,12 +380,60 @@ async function setFreeAvatar(
       "失败";
 
 
+    /*
+      失败后允许重新点击
+    */
+
+    button.disabled =
+      false;
+
+
+    /*
+      短暂显示失败状态
+    */
+
+    setTimeout(
+      function(){
+
+        if(
+          button &&
+          !button.classList.contains(
+            "active"
+          )
+        ){
+
+          button.textContent =
+            "使用";
+
+        }
+
+      },
+      1500
+    );
+
+
   }
   finally{
 
     button.classList.remove(
       "loading"
     );
+
+
+    /*
+      如果当前按钮不是正在使用，
+      恢复可点击状态
+    */
+
+    if(
+      button.dataset.avatarId !==
+      String(currentAvatarId)
+    ){
+
+      button.disabled =
+        false;
+
+    }
 
   }
 
@@ -278,7 +447,6 @@ async function setFreeAvatar(
 
 function updateAvatarButtons(){
 
-
   const buttons =
     document.querySelectorAll(
       ".U9-profile-page3-avatar-button"
@@ -287,18 +455,19 @@ function updateAvatarButtons(){
 
 
   buttons.forEach(
-    (button)=>{
-
+    function(button){
 
       const id =
-        button.dataset.avatarId;
+        String(
+          button.dataset.avatarId
+        );
 
 
 
       if(
-        id === currentAvatarId
+        id ===
+        String(currentAvatarId)
       ){
-
 
         button.textContent =
           "正在使用";
@@ -312,10 +481,8 @@ function updateAvatarButtons(){
         button.disabled =
           true;
 
-
       }
       else{
-
 
         button.textContent =
           "使用";
@@ -329,14 +496,10 @@ function updateAvatarButtons(){
         button.disabled =
           false;
 
-
       }
 
-
     }
-
   );
-
 
 }
 
@@ -347,7 +510,6 @@ function updateAvatarButtons(){
 ========================= */
 
 async function loadFreeAvatar(){
-
 
   if(
     !profilePage3Content
@@ -365,6 +527,9 @@ async function loadFreeAvatar(){
 
   try{
 
+    /* =========================
+       REQUEST FREE AVATARS
+    ========================= */
 
     const response =
       await fetch(
@@ -373,13 +538,34 @@ async function loadFreeAvatar(){
 
         {
 
-          method:"GET"
+          method:
+            "GET"
 
         }
 
       );
 
 
+
+    /* =========================
+       HTTP CHECK
+    ========================= */
+
+    if(
+      !response.ok
+    ){
+
+      throw new Error(
+        `Free avatar request failed (${response.status})`
+      );
+
+    }
+
+
+
+    /* =========================
+       JSON
+    ========================= */
 
     const result =
       await response.json();
@@ -398,6 +584,7 @@ async function loadFreeAvatar(){
     ){
 
       throw new Error(
+        result.error ||
         "Free avatar failed"
       );
 
@@ -405,8 +592,13 @@ async function loadFreeAvatar(){
 
 
 
+    /* =========================
+       AVATAR LIST
+    ========================= */
+
     const avatars =
-      result.avatars || [];
+      result.avatars ||
+      [];
 
 
 
@@ -427,9 +619,12 @@ async function loadFreeAvatar(){
 
 
 
-    avatars.forEach(
-      (avatar)=>{
+    /* =========================
+       CREATE CARDS
+    ========================= */
 
+    avatars.forEach(
+      function(avatar){
 
         const card =
           document.createElement(
@@ -442,6 +637,10 @@ async function loadFreeAvatar(){
           "U9-profile-page3-avatar-card";
 
 
+
+        /* =========================
+           IMAGE
+        ========================= */
 
         const img =
           document.createElement(
@@ -471,6 +670,10 @@ async function loadFreeAvatar(){
 
 
 
+        /* =========================
+           NAME
+        ========================= */
+
         const name =
           document.createElement(
             "div"
@@ -484,9 +687,14 @@ async function loadFreeAvatar(){
 
 
         name.textContent =
-          avatar.name;
+          avatar.name ||
+          "";
 
 
+
+        /* =========================
+           BUTTON
+        ========================= */
 
         const button =
           document.createElement(
@@ -501,7 +709,9 @@ async function loadFreeAvatar(){
 
 
         button.dataset.avatarId =
-          avatar.id;
+          String(
+            avatar.id
+          );
 
 
 
@@ -510,22 +720,27 @@ async function loadFreeAvatar(){
 
 
 
+        /* =========================
+           CLICK
+        ========================= */
+
         button.addEventListener(
           "click",
-          ()=>{
-
+          function(){
 
             setFreeAvatar(
               avatar.id,
               button
             );
 
-
           }
-
         );
 
 
+
+        /* =========================
+           APPEND
+        ========================= */
 
         card.appendChild(
           img
@@ -546,18 +761,24 @@ async function loadFreeAvatar(){
           card
         );
 
-
       }
-
     );
 
 
+
+    /* =========================
+       APPEND LIST
+    ========================= */
 
     profilePage3Content.appendChild(
       list
     );
 
 
+
+    /* =========================
+       UPDATE BUTTONS
+    ========================= */
 
     updateAvatarButtons();
 
@@ -566,15 +787,12 @@ async function loadFreeAvatar(){
   }
   catch(error){
 
-
     console.error(
       "FREE AVATAR ERROR:",
       error
     );
 
-
   }
-
 
 }
 
@@ -586,17 +804,25 @@ async function loadFreeAvatar(){
 
 async function loadProfilePage3(){
 
-
   console.log(
     "PROFILE PAGE 3 LOADED"
   );
 
 
+
+  /* =========================
+     LOAD CURRENT AVATAR
+  ========================= */
+
   await loadCurrentAvatar();
 
 
-  await loadFreeAvatar();
 
+  /* =========================
+     LOAD FREE AVATARS
+  ========================= */
+
+  await loadFreeAvatar();
 
 }
 
