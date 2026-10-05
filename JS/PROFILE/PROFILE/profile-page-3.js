@@ -1,3 +1,4 @@
+
 /* =========================================================
    PROFILE PAGE 3
    Avatar / Free Avatar Frame / Paid Avatar Frame
@@ -348,21 +349,21 @@ function createPage3UI() {
   const avatarTab =
     createPage3Tab(
       "avatar",
-      "头像"
+      "Avatar"
     );
 
 
   const freeFrameTab =
     createPage3Tab(
       "free-frame",
-      "免费头像框"
+      "Free Avatar Frame"
     );
 
 
   const paidFrameTab =
     createPage3Tab(
       "paid-frame",
-      "付费头像框"
+      "Paid Avatar Frame"
     );
 
 
@@ -615,7 +616,7 @@ function requirePage3Login(
 
   showPage3Message(
     panel,
-    "请先登录后再使用此功能。",
+    "Please log in before using this feature.",
     "error"
   );
 
@@ -650,7 +651,7 @@ async function renderFreeAvatars(
     "U9-profile-page3-loading";
 
   loading.textContent =
-    "正在加载头像...";
+    "Loading avatars...";
 
 
   panel.appendChild(
@@ -681,7 +682,7 @@ async function renderFreeAvatars(
 
       throw new Error(
         result?.message ||
-        "加载头像失败"
+        "Failed to load avatars."
       );
 
     }
@@ -702,7 +703,7 @@ async function renderFreeAvatars(
 
       showPage3Message(
         panel,
-        "暂无免费头像。",
+        "No free avatars available.",
         "empty"
       );
 
@@ -800,8 +801,8 @@ async function renderFreeAvatars(
           String(
             avatar?.id
           )
-            ? "正在使用"
-            : "使用";
+            ? "Using"
+            : "Use";
 
 
         if (
@@ -863,7 +864,7 @@ async function renderFreeAvatars(
     showPage3Message(
       panel,
       error?.message ||
-      "免费头像加载失败。",
+      "Failed to load free avatars.",
       "error"
     );
 
@@ -895,7 +896,7 @@ async function setFreeAvatar(
   if (!token) {
 
     alert(
-      "请先登录。"
+      "Please log in first."
     );
 
     return;
@@ -913,7 +914,7 @@ async function setFreeAvatar(
       true;
 
     button.textContent =
-      "处理中...";
+      "Processing...";
 
   }
 
@@ -961,7 +962,7 @@ async function setFreeAvatar(
     ) {
 
       throw new Error(
-        "登录状态已失效，请重新登录。"
+        "Your login session has expired. Please log in again."
       );
 
     }
@@ -971,7 +972,7 @@ async function setFreeAvatar(
 
       throw new Error(
         result?.message ||
-        "头像设置失败"
+        "Failed to set avatar."
       );
 
     }
@@ -983,7 +984,7 @@ async function setFreeAvatar(
 
       throw new Error(
         result?.message ||
-        "头像设置失败"
+        "Failed to set avatar."
       );
 
     }
@@ -1018,7 +1019,7 @@ async function setFreeAvatar(
 
     alert(
       error?.message ||
-      "头像设置失败，请稍后重试。"
+      "Failed to set avatar. Please try again later."
     );
 
 
@@ -1078,7 +1079,7 @@ function updateAvatarButtons() {
       if (active) {
 
         button.textContent =
-          "正在使用";
+          "Using";
 
       }
 
@@ -1089,7 +1090,7 @@ function updateAvatarButtons() {
       ) {
 
         button.textContent =
-          "使用";
+          "Use";
 
       }
 
@@ -1124,7 +1125,7 @@ async function renderFreeFrames(
     "U9-profile-page3-loading";
 
   loading.textContent =
-    "正在加载免费头像框...";
+    "Loading free avatar frames...";
 
 
   panel.appendChild(
@@ -1155,7 +1156,7 @@ async function renderFreeFrames(
 
       throw new Error(
         result?.message ||
-        "加载免费头像框失败"
+        "Failed to load free avatar frames."
       );
 
     }
@@ -1176,7 +1177,7 @@ async function renderFreeFrames(
 
       showPage3Message(
         panel,
-        "暂无免费头像框。",
+        "No free avatar frames available.",
         "empty"
       );
 
@@ -1228,7 +1229,7 @@ async function renderFreeFrames(
     showPage3Message(
       panel,
       error?.message ||
-      "免费头像框加载失败。",
+      "Failed to load free avatar frames.",
       "error"
     );
 
@@ -1250,7 +1251,7 @@ async function loadPaidFrames() {
   if (!token) {
 
     throw new Error(
-      "请先登录后查看付费头像框。"
+      "Please log in to view paid avatar frames."
     );
 
   }
@@ -1293,7 +1294,7 @@ async function loadPaidFrames() {
   ) {
 
     throw new Error(
-      "登录状态已失效，请重新登录。"
+      "Your login session has expired. Please log in again."
     );
 
   }
@@ -1303,7 +1304,7 @@ async function loadPaidFrames() {
 
     throw new Error(
       result?.message ||
-      "加载付费头像框失败"
+      "Failed to load paid avatar frames."
     );
 
   }
@@ -1315,7 +1316,7 @@ async function loadPaidFrames() {
 
     throw new Error(
       result?.message ||
-      "加载付费头像框失败"
+      "Failed to load paid avatar frames."
     );
 
   }
@@ -1370,7 +1371,7 @@ async function renderPaidFrames(
     "U9-profile-page3-loading";
 
   loading.textContent =
-    "正在加载付费头像框...";
+    "Loading paid avatar frames...";
 
 
   panel.appendChild(
@@ -1390,7 +1391,7 @@ async function renderPaidFrames(
 
       showPage3Message(
         panel,
-        "暂无付费头像框。",
+        "No paid avatar frames available.",
         "empty"
       );
 
@@ -1442,7 +1443,7 @@ async function renderPaidFrames(
     showPage3Message(
       panel,
       error?.message ||
-      "付费头像框加载失败。",
+      "Failed to load paid avatar frames.",
       "error"
     );
 
@@ -1542,7 +1543,7 @@ function createFrameCard(
     price.textContent =
       Number.isFinite(coins)
         ? `${coins} Coins`
-        : "付费头像框";
+        : "Paid Avatar Frame";
 
 
     card.appendChild(
@@ -1589,7 +1590,7 @@ function createFrameCard(
     if (equipped) {
 
       button.textContent =
-        "正在使用";
+        "Using";
 
       button.classList.add(
         "active"
@@ -1603,7 +1604,7 @@ function createFrameCard(
     else {
 
       button.textContent =
-        "使用";
+        "Use";
 
       button.addEventListener(
         "click",
@@ -1640,7 +1641,7 @@ function createFrameCard(
     if (equipped) {
 
       button.textContent =
-        "正在使用";
+        "Using";
 
       button.classList.add(
         "active"
@@ -1654,7 +1655,7 @@ function createFrameCard(
     else if (owned) {
 
       button.textContent =
-        "使用";
+        "Use";
 
       button.classList.add(
         "use"
@@ -1686,8 +1687,8 @@ function createFrameCard(
 
       button.textContent =
         Number.isFinite(coins)
-          ? `购买 ${coins}`
-          : "购买";
+          ? `Buy ${coins}`
+          : "Buy";
 
 
       button.classList.add(
@@ -1746,7 +1747,7 @@ async function equipFrame(
   if (!token) {
 
     alert(
-      "请先登录。"
+      "Please log in first."
     );
 
     return;
@@ -1764,7 +1765,7 @@ async function equipFrame(
       true;
 
     button.textContent =
-      "处理中...";
+      "Processing...";
 
   }
 
@@ -1824,7 +1825,7 @@ async function equipFrame(
 
       throw new Error(
         result?.message ||
-        "登录状态已失效，请重新登录。"
+        "Your login session has expired. Please log in again."
       );
 
     }
@@ -1834,7 +1835,7 @@ async function equipFrame(
 
       throw new Error(
         result?.message ||
-        "头像框使用失败"
+        "Failed to equip avatar frame."
       );
 
     }
@@ -1846,7 +1847,7 @@ async function equipFrame(
 
       throw new Error(
         result?.message ||
-        "头像框使用失败"
+        "Failed to equip avatar frame."
       );
 
     }
@@ -1939,7 +1940,7 @@ async function equipFrame(
 
     alert(
       error?.message ||
-      "头像框使用失败，请稍后重试。"
+      "Failed to equip avatar frame. Please try again later."
     );
 
 
@@ -1999,7 +2000,7 @@ function updateFrameButtons() {
       if (active) {
 
         button.textContent =
-          "正在使用";
+          "Using";
 
         button.disabled =
           true;
@@ -2035,7 +2036,7 @@ async function purchasePaidFrame(
   if (!token) {
 
     alert(
-      "请先登录。"
+      "Please log in first."
     );
 
     return;
@@ -2061,7 +2062,7 @@ async function purchasePaidFrame(
   if (!frame) {
 
     alert(
-      "找不到这个头像框。"
+      "Avatar frame not found."
     );
 
     return;
@@ -2077,8 +2078,8 @@ async function purchasePaidFrame(
 
   const confirmMessage =
     Number.isFinite(price)
-      ? `确定要购买「${frame?.name || "头像框"}」吗？\n需要 ${price} Coins。`
-      : `确定要购买「${frame?.name || "头像框"}」吗？`;
+      ? `Are you sure you want to purchase "${frame?.name || "Avatar Frame"}"?\nIt costs ${price} Coins.`
+      : `Are you sure you want to purchase "${frame?.name || "Avatar Frame"}"?`;
 
 
   const confirmed =
@@ -2104,7 +2105,7 @@ async function purchasePaidFrame(
       true;
 
     button.textContent =
-      "购买中...";
+      "Purchasing...";
 
   }
 
@@ -2158,7 +2159,7 @@ async function purchasePaidFrame(
 
       throw new Error(
         result?.message ||
-        "登录状态已失效，请重新登录。"
+        "Your login session has expired. Please log in again."
       );
 
     }
@@ -2168,7 +2169,7 @@ async function purchasePaidFrame(
 
       throw new Error(
         result?.message ||
-        "头像框购买失败"
+        "Failed to purchase avatar frame."
       );
 
     }
@@ -2180,7 +2181,7 @@ async function purchasePaidFrame(
 
       throw new Error(
         result?.message ||
-        "头像框购买失败"
+        "Failed to purchase avatar frame."
       );
 
     }
@@ -2272,7 +2273,7 @@ async function purchasePaidFrame(
 
     alert(
       error?.message ||
-      "头像框购买失败，请稍后重试。"
+      "Failed to purchase avatar frame. Please try again later."
     );
 
 
