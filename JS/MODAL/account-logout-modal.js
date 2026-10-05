@@ -4,8 +4,9 @@
 
 
 /* =========================
-   LOGOUT CONFIRM
+   LOGOUT CONFIRM ELEMENTS
 ========================= */
+
 
 const logoutModal =
   document.getElementById(
@@ -31,9 +32,11 @@ const logoutCountdown =
   );
 
 
+
 /* =========================
-   SETTING PAGE LOGOUT BUTTON
+   SETTING LOGOUT BUTTON
 ========================= */
+
 
 const accountSettingLogout =
   document.getElementById(
@@ -41,528 +44,559 @@ const accountSettingLogout =
   );
 
 
+
+
 /* =========================
    TIMER
 ========================= */
 
+
 let logoutTimer =
-  null;
+null;
 
 
-/* =========================
-   LOGOUT PROCESS
-========================= */
 
 let logoutProcessing =
-  false;
+false;
+
+
 
 
 /* =========================
    OPEN LOGOUT CONFIRM
 ========================= */
 
-function openLogoutConfirm() {
 
-  if (
-    !logoutModal ||
-    !logoutYes ||
-    !logoutCountdown
-  ) {
-
-    return;
-
-  }
+function openLogoutConfirm(){
 
 
-  logoutModal.style.display =
-    "flex";
+if(
+!logoutModal ||
+!logoutYes ||
+!logoutCountdown
+){
 
-
-  /* =========================
-     RESET PROCESS
-  ========================= */
-
-  logoutProcessing =
-    false;
-
-
-  logoutYes.disabled =
-    true;
-
-
-  logoutYes.classList.remove(
-    "loading"
-  );
-
-
-  let count =
-    5;
-
-
-  logoutCountdown.textContent =
-    count;
-
-
-  logoutYes.textContent =
-    `Yes (${count})`;
-
-
-  /* =========================
-     CLEAR OLD TIMER
-  ========================= */
-
-  if (
-    logoutTimer
-  ) {
-
-    clearInterval(
-      logoutTimer
-    );
-
-
-    logoutTimer =
-      null;
-
-  }
-
-
-  /* =========================
-     COUNTDOWN
-  ========================= */
-
-  logoutTimer =
-    setInterval(
-      () => {
-
-        count--;
-
-
-        /* =========================
-           COUNTDOWN TEXT
-        ========================= */
-
-        if (
-          count > 0
-        ) {
-
-          logoutCountdown.textContent =
-            count;
-
-
-          logoutYes.textContent =
-            `Yes (${count})`;
-
-        }
-
-
-        /* =========================
-           COUNTDOWN FINISHED
-        ========================= */
-
-        if (
-          count <= 0
-        ) {
-
-          clearInterval(
-            logoutTimer
-          );
-
-
-          logoutTimer =
-            null;
-
-
-          logoutYes.textContent =
-            "Yes";
-
-
-          logoutYes.disabled =
-            false;
-
-
-          logoutYes.classList.add(
-            "ready"
-          );
-
-        }
-
-      },
-      1000
-    );
+return;
 
 }
 
 
-/* =========================
-   SETTING PAGE LOGOUT BUTTON
-========================= */
 
-if (
-  accountSettingLogout
-) {
-
-  accountSettingLogout.addEventListener(
-    "click",
-    (event) => {
-
-      event.stopPropagation();
+logoutModal.style.display =
+"flex";
 
 
-      if (
-        typeof closeAccountSetting ===
-        "function"
-      ) {
 
-        closeAccountSetting();
-
-      }
+logoutProcessing =
+false;
 
 
-      openLogoutConfirm();
 
-    }
-  );
-
-}
+logoutYes.disabled =
+true;
 
 
-/* =========================
-   NO
-========================= */
 
-if (
-  logoutNo
-) {
-
-  logoutNo.addEventListener(
-    "click",
-    () => {
-
-      logoutModal.style.display =
-        "none";
+logoutYes.classList.remove(
+"loading",
+"ready"
+);
 
 
-      logoutProcessing =
-        false;
+
+let count =
+5;
 
 
-      if (
-        logoutYes
-      ) {
 
-        logoutYes.disabled =
-          true;
+logoutCountdown.textContent =
+count;
 
 
-        logoutYes.classList.remove(
-          "loading",
-          "ready"
-        );
 
-      }
+logoutYes.textContent =
+`Yes (${count})`;
 
 
-      if (
-        logoutTimer
-      ) {
-
-        clearInterval(
-          logoutTimer
-        );
 
 
-        logoutTimer =
-          null;
+if(
+logoutTimer
+){
 
-      }
+clearInterval(
+logoutTimer
+);
 
-    }
-  );
+
+logoutTimer =
+null;
 
 }
 
 
+
+
+
+logoutTimer =
+setInterval(
+()=>{
+
+
+count--;
+
+
+
+if(
+count > 0
+){
+
+logoutCountdown.textContent =
+count;
+
+
+logoutYes.textContent =
+`Yes (${count})`;
+
+}
+
+
+
+
+
+if(
+count <= 0
+){
+
+clearInterval(
+logoutTimer
+);
+
+
+
+logoutTimer =
+null;
+
+
+
+logoutYes.textContent =
+"Yes";
+
+
+
+logoutYes.disabled =
+false;
+
+
+
+logoutYes.classList.add(
+"ready"
+);
+
+
+
+}
+
+
+
+},
+1000
+);
+
+
+
+}
+
+
+
+
+
+
 /* =========================
-   YES
+   OPEN FROM SETTING PAGE
 ========================= */
 
-if (
-  logoutYes
-) {
 
-  logoutYes.addEventListener(
-    "click",
-    async () => {
+if(
+accountSettingLogout
+){
 
-      /* =========================
-         PREVENT REPEAT CLICK
-      ========================= */
+accountSettingLogout.addEventListener(
+"click",
+(event)=>{
 
-      if (
-        logoutYes.disabled ||
-        logoutProcessing
-      ) {
 
-        return;
+event.stopPropagation();
 
-      }
 
 
-      /* =========================
-         START LOGOUT
-      ========================= */
+if(
+typeof closeAccountSetting ===
+"function"
+){
 
-      logoutProcessing =
-        true;
+closeAccountSetting();
 
+}
 
-      logoutYes.disabled =
-        true;
 
 
-      logoutYes.classList.remove(
-        "ready"
-      );
+openLogoutConfirm();
 
 
-      logoutYes.classList.add(
-        "loading"
-      );
 
+}
 
-      logoutYes.textContent =
-        "Loading...";
+);
 
+}
 
-      /* =========================
-         GET SESSION TOKEN
-      ========================= */
 
-      const sessionToken =
-        localStorage.getItem(
-          "u9_session"
-        );
 
 
-      /* =========================
-         NO SESSION
-      ========================= */
 
-      if (
-        !sessionToken
-      ) {
 
-        localStorage.removeItem(
-          "u9_session"
-        );
+/* =========================
+   NO BUTTON
+========================= */
 
 
-        if (
-          logoutTimer
-        ) {
+if(
+logoutNo
+){
 
-          clearInterval(
-            logoutTimer
-          );
+logoutNo.addEventListener(
+"click",
+()=>{
 
 
-          logoutTimer =
-            null;
 
-        }
+logoutModal.style.display =
+"none";
 
 
-        logoutModal.style.display =
-          "none";
 
+logoutProcessing =
+false;
 
-        logoutProcessing =
-          false;
 
 
-        window.location.reload();
 
-        return;
+logoutYes.disabled =
+true;
 
-      }
 
 
-      /* =========================
-         LOGOUT REQUEST
-      ========================= */
+logoutYes.classList.remove(
+"loading",
+"ready"
+);
 
-      try {
 
-        const response =
-          await fetch(
-            "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/logout",
-            {
 
-              method:
-                "POST",
 
-              credentials:
-                "include",
+if(
+logoutTimer
+){
 
-              headers: {
+clearInterval(
+logoutTimer
+);
 
-                "Authorization":
-                  `Bearer ${sessionToken}`
 
-              }
+logoutTimer =
+null;
 
-            }
-          );
+}
 
 
-        const result =
-          await response.json();
 
+}
 
-        /* =========================
-           LOGOUT ERROR
-        ========================= */
+);
 
-        if (
-          !response.ok
-        ) {
+}
 
-          console.error(
-            "Logout failed:",
-            result
-          );
 
 
-          alert(
-            result.error ||
-            "Logout failed."
-          );
 
 
-          logoutProcessing =
-            false;
 
+/* =========================
+   YES BUTTON
+========================= */
 
-          logoutYes.disabled =
-            false;
 
+if(
+logoutYes
+){
 
-          logoutYes.classList.remove(
-            "loading"
-          );
+logoutYes.addEventListener(
+"click",
+async()=>{
 
 
-          logoutYes.classList.add(
-            "ready"
-          );
 
+/* =========================
+   PREVENT DOUBLE CLICK
+========================= */
 
-          logoutYes.textContent =
-            "Yes";
 
+if(
+logoutYes.disabled ||
+logoutProcessing
+){
 
-          return;
+return;
 
-        }
+}
 
 
-        /* =========================
-           REMOVE LOCAL SESSION
-        ========================= */
 
-        localStorage.removeItem(
-          "u9_session"
-        );
 
+logoutProcessing =
+true;
 
-        /* =========================
-           CLEAR TIMER
-        ========================= */
 
-        if (
-          logoutTimer
-        ) {
 
-          clearInterval(
-            logoutTimer
-          );
+logoutYes.disabled =
+true;
 
 
-          logoutTimer =
-            null;
 
-        }
+logoutYes.classList.remove(
+"ready"
+);
 
 
-        /* =========================
-           CLOSE MODAL
-        ========================= */
 
-        logoutModal.style.display =
-          "none";
+logoutYes.classList.add(
+"loading"
+);
 
 
-        /* =========================
-           DEBUG
-        ========================= */
 
-        console.log(
-          "Logout result:",
-          result
-        );
+logoutYes.textContent =
+"Loading...";
 
 
-        /* =========================
-           REFRESH PAGE
-        ========================= */
 
-        window.location.reload();
 
-      }
 
-      catch (
-        error
-      ) {
+/* =========================
+   LOGOUT REQUEST
+========================= */
 
-        console.error(
-          "Logout error:",
-          error
-        );
 
+try{
 
-        alert(
-          "Unable to connect to the server."
-        );
 
+const response =
+await fetch(
 
-        /* =========================
-           RESTORE BUTTON
-        ========================= */
+"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/logout",
 
-        logoutProcessing =
-          false;
+{
 
+method:
+"POST",
 
-        logoutYes.disabled =
-          false;
 
+/*
+ Cookie:
 
-        logoutYes.classList.remove(
-          "loading"
-        );
+ u9_session
 
+ 自动发送
 
-        logoutYes.classList.add(
-          "ready"
-        );
+*/
 
+credentials:
+"include",
 
-        logoutYes.textContent =
-          "Yes";
 
-      }
 
-    }
-  );
+headers:{
+
+"Content-Type":
+"application/json"
+
+}
+
+
+}
+
+);
+
+
+
+
+
+const result =
+await response.json();
+
+
+
+
+
+/* =========================
+   LOGOUT ERROR
+========================= */
+
+
+if(
+!response.ok
+){
+
+
+console.error(
+"Logout failed:",
+result
+);
+
+
+
+alert(
+
+result.error ||
+"Logout failed."
+
+);
+
+
+
+logoutProcessing =
+false;
+
+
+
+logoutYes.disabled =
+false;
+
+
+
+logoutYes.classList.remove(
+"loading"
+);
+
+
+
+logoutYes.classList.add(
+"ready"
+);
+
+
+
+logoutYes.textContent =
+"Yes";
+
+
+
+return;
+
+}
+
+
+
+
+
+
+
+/* =========================
+   CLEAR USER STATE
+========================= */
+
+
+if(
+window.U9User
+){
+
+window.U9User.clear();
+
+}
+
+
+
+
+
+
+/* =========================
+   CLOSE MODAL
+========================= */
+
+
+logoutModal.style.display =
+"none";
+
+
+
+
+
+/* =========================
+   DEBUG
+========================= */
+
+
+console.log(
+"Logout result:",
+result
+);
+
+
+
+
+
+}
+
+catch(error){
+
+
+console.error(
+"Logout error:",
+error
+);
+
+
+
+alert(
+"Unable to connect to the server."
+);
+
+
+
+logoutProcessing =
+false;
+
+
+
+logoutYes.disabled =
+false;
+
+
+
+logoutYes.classList.remove(
+"loading"
+);
+
+
+
+logoutYes.classList.add(
+"ready"
+);
+
+
+
+logoutYes.textContent =
+"Yes";
+
+
+
+}
+
+
+
+}
+
+);
 
 }
