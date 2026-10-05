@@ -397,7 +397,7 @@ result.session.token
 
 localStorage.setItem(
 
-"u9_session",
+"u9_token",
 
 result.session.token
 
