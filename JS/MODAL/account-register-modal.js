@@ -1,6 +1,184 @@
 /* =========================
+   REGISTER ELEMENTS
+========================= */
+
+
+const registerButton =
+  document.getElementById(
+    "U9-page-header-register"
+  );
+
+
+const registerModal =
+  document.getElementById(
+    "U9-register-modal"
+  );
+
+
+const registerClose =
+  document.getElementById(
+    "U9-register-modal-close"
+  );
+
+
+const registerForm =
+  document.getElementById(
+    "U9-register-form"
+  );
+
+
+
+/* =========================
+   OPEN REGISTER
+========================= */
+
+
+registerButton.addEventListener(
+  "click",
+  () => {
+
+    registerModal.style.display =
+      "flex";
+
+  }
+);
+
+
+
+/* =========================
+   CLOSE REGISTER
+========================= */
+
+
+registerClose.addEventListener(
+  "click",
+  () => {
+
+    registerModal.style.display =
+      "none";
+
+  }
+);
+
+
+
+
+/* =========================
+   PASSWORD SHOW / HIDE
+========================= */
+
+
+const registerPassword =
+  document.getElementById(
+    "U9-register-password"
+  );
+
+
+const registerPasswordToggle =
+  document.getElementById(
+    "U9-register-password-toggle"
+  );
+
+
+
+registerPasswordToggle.addEventListener(
+  "click",
+  () => {
+
+
+    if(
+      registerPassword.type ===
+      "password"
+    ){
+
+      registerPassword.type =
+        "text";
+
+
+      registerPasswordToggle.textContent =
+        "Hide";
+
+
+    }else{
+
+
+      registerPassword.type =
+        "password";
+
+
+      registerPasswordToggle.textContent =
+        "Show";
+
+
+    }
+
+
+  }
+);
+
+
+
+
+/* =========================
+   CONFIRM PASSWORD
+========================= */
+
+
+const registerConfirmPassword =
+  document.getElementById(
+    "U9-register-confirm-password"
+  );
+
+
+const registerConfirmPasswordToggle =
+  document.getElementById(
+    "U9-register-confirm-password-toggle"
+  );
+
+
+
+registerConfirmPasswordToggle.addEventListener(
+  "click",
+  () => {
+
+
+    if(
+      registerConfirmPassword.type ===
+      "password"
+    ){
+
+      registerConfirmPassword.type =
+        "text";
+
+
+      registerConfirmPasswordToggle.textContent =
+        "Hide";
+
+
+    }else{
+
+
+      registerConfirmPassword.type =
+        "password";
+
+
+      registerConfirmPasswordToggle.textContent =
+        "Show";
+
+
+    }
+
+
+  }
+);
+
+
+
+
+/* =========================
    REGISTER FORM
 ========================= */
+
 
 registerForm.addEventListener(
 "submit",
@@ -8,6 +186,7 @@ async(event)=>{
 
 
 event.preventDefault();
+
 
 
 
@@ -54,13 +233,15 @@ document
 
 
 
+
 /* =========================
    PASSWORD CHECK
 ========================= */
 
 
 if(
-password !== confirmPassword
+ password !==
+ confirmPassword
 ){
 
 alert(
@@ -74,12 +255,12 @@ return;
 
 
 
-try{
-
-
 /* =========================
-   REGISTER API
+   REGISTER REQUEST
 ========================= */
+
+
+try{
 
 
 const response =
@@ -91,7 +272,9 @@ await fetch(
 
 method:"POST",
 
+
 credentials:"include",
+
 
 headers:{
 
@@ -121,8 +304,10 @@ password
 
 
 
+
 const result =
 await response.json();
+
 
 
 
@@ -148,7 +333,6 @@ return;
 
 
 
-
 /* =========================
    SUCCESS
 ========================= */
@@ -157,17 +341,6 @@ return;
 alert(
 "Registration successful."
 );
-
-
-
-/*
- Cookie:
-
- u9_session
-
- 浏览器自动保存
-
-*/
 
 
 
@@ -181,35 +354,22 @@ registerModal.style.display =
 
 
 
-
-/* =========================
-   AUTO LOGIN
-========================= */
-
-
 /*
- 等 Cookie 写入完成
- 再获取用户
+ Cookie:
+ u9_session
+
+ 已由浏览器自动保存
+
+ 不需要 localStorage
 */
 
-
-setTimeout(
-async()=>{
 
 
 await getCurrentUser();
 
 
-},
-300
-);
-
-
 
 }
-
-
-
 catch(error){
 
 
