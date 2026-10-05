@@ -6,17 +6,34 @@
 
 /* =================================================
    PAGE 3 TABS
+   FIXED / STICKY
 ================================================= */
 
 .U9-profile-page3-tabs {
   width: 100%;
   box-sizing: border-box;
   padding: 15px 20px 0 20px;
+
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+
+  /* =================================================
+     KEEP TABS AT TOP WHILE SCROLLING
+  ================================================= */
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  /* =================================================
+     BACKGROUND
+     防止内容滚动到 Tab 后面时透出来
+  ================================================= */
+
+  background-color: #ffffff;
 }
 
 
