@@ -1,3 +1,4 @@
+```js
 /* =========================
    LOGOUT
 ========================= */
@@ -47,11 +48,11 @@ const accountSettingLogout =
 
 
 let logoutTimer =
-null;
+  null;
 
 
 let logoutProcessing =
-false;
+  false;
 
 
 
@@ -65,135 +66,135 @@ false;
 function openLogoutConfirm(){
 
 
-if(
-!logoutModal ||
-!logoutYes ||
-!logoutCountdown
-){
+  if(
+    !logoutModal ||
+    !logoutYes ||
+    !logoutCountdown
+  ){
 
-return;
+    return;
 
-}
+  }
 
 
 
-logoutModal.style.display =
-"flex";
+  logoutModal.style.display =
+    "flex";
 
 
 
-logoutProcessing =
-false;
+  logoutProcessing =
+    false;
 
 
 
-logoutYes.disabled =
-true;
+  logoutYes.disabled =
+    true;
 
 
 
-logoutYes.classList.remove(
-"loading",
-"ready"
-);
+  logoutYes.classList.remove(
+    "loading",
+    "ready"
+  );
 
 
 
-let count =
-5;
+  let count =
+    5;
 
 
 
-logoutCountdown.textContent =
-count;
+  logoutCountdown.textContent =
+    count;
 
 
 
-logoutYes.textContent =
-`Yes (${count})`;
+  logoutYes.textContent =
+    `Yes (${count})`;
 
 
 
 
-if(
-logoutTimer
-){
+  if(
+    logoutTimer
+  ){
 
-clearInterval(
-logoutTimer
-);
+    clearInterval(
+      logoutTimer
+    );
 
 
-logoutTimer =
-null;
+    logoutTimer =
+      null;
 
-}
+  }
 
 
 
 
-logoutTimer =
-setInterval(
-()=>{
+  logoutTimer =
+    setInterval(
+      ()=>{
 
 
-count--;
+        count--;
 
 
 
-if(
-count > 0
-){
+        if(
+          count > 0
+        ){
 
-logoutCountdown.textContent =
-count;
+          logoutCountdown.textContent =
+            count;
 
 
-logoutYes.textContent =
-`Yes (${count})`;
+          logoutYes.textContent =
+            `Yes (${count})`;
 
-}
+        }
 
 
 
 
-if(
-count <= 0
-){
+        if(
+          count <= 0
+        ){
 
 
-clearInterval(
-logoutTimer
-);
+          clearInterval(
+            logoutTimer
+          );
 
 
-logoutTimer =
-null;
+          logoutTimer =
+            null;
 
 
 
-logoutYes.textContent =
-"Yes";
+          logoutYes.textContent =
+            "Yes";
 
 
 
-logoutYes.disabled =
-false;
+          logoutYes.disabled =
+            false;
 
 
 
-logoutYes.classList.add(
-"ready"
-);
+          logoutYes.classList.add(
+            "ready"
+          );
 
 
 
-}
+        }
 
 
-},
-1000
-);
+      },
+      1000
+    );
 
 
 }
@@ -208,35 +209,35 @@ logoutYes.classList.add(
 
 
 if(
-accountSettingLogout
+  accountSettingLogout
 ){
 
-accountSettingLogout.addEventListener(
-"click",
-(event)=>{
+  accountSettingLogout.addEventListener(
+    "click",
+    (event)=>{
 
 
-event.stopPropagation();
-
-
-
-if(
-typeof closeAccountSetting ===
-"function"
-){
-
-closeAccountSetting();
-
-}
+      event.stopPropagation();
 
 
 
-openLogoutConfirm();
+      if(
+        typeof closeAccountSetting ===
+        "function"
+      ){
+
+        closeAccountSetting();
+
+      }
 
 
-}
 
-);
+      openLogoutConfirm();
+
+
+    }
+
+  );
 
 
 }
@@ -253,54 +254,54 @@ openLogoutConfirm();
 
 
 if(
-logoutNo
+  logoutNo
 ){
 
-logoutNo.addEventListener(
-"click",
-()=>{
+  logoutNo.addEventListener(
+    "click",
+    ()=>{
 
 
-logoutModal.style.display =
-"none";
-
-
-
-logoutProcessing =
-false;
+      logoutModal.style.display =
+        "none";
 
 
 
-logoutYes.disabled =
-true;
+      logoutProcessing =
+        false;
 
 
 
-logoutYes.classList.remove(
-"loading",
-"ready"
-);
+      logoutYes.disabled =
+        true;
 
 
 
-if(
-logoutTimer
-){
-
-clearInterval(
-logoutTimer
-);
+      logoutYes.classList.remove(
+        "loading",
+        "ready"
+      );
 
 
-logoutTimer =
-null;
 
-}
+      if(
+        logoutTimer
+      ){
+
+        clearInterval(
+          logoutTimer
+        );
 
 
-}
+        logoutTimer =
+          null;
 
-);
+      }
+
+
+    }
+
+  );
 
 
 }
@@ -316,333 +317,344 @@ null;
 
 
 if(
-logoutYes
+  logoutYes
 ){
 
-logoutYes.addEventListener(
-"click",
-async()=>{
+  logoutYes.addEventListener(
+    "click",
+    async()=>{
 
 
 
-/* =========================
-   CHECK
-========================= */
+      /* =========================
+         CHECK
+      ========================= */
 
 
-if(
-logoutYes.disabled ||
-logoutProcessing
-){
+      if(
+        logoutYes.disabled ||
+        logoutProcessing
+      ){
 
-return;
+        return;
+
+      }
+
+
+
+      logoutProcessing =
+        true;
+
+
+
+      logoutYes.disabled =
+        true;
+
+
+
+      logoutYes.classList.remove(
+        "ready"
+      );
+
+
+
+      logoutYes.classList.add(
+        "loading"
+      );
+
+
+
+      logoutYes.textContent =
+        "Loading...";
+
+
+
+
+
+
+
+      /* =========================
+         GET TOKEN
+      ========================= */
+
+
+      const token =
+        localStorage.getItem(
+          "u9_token"
+        );
+
+
+
+
+
+      const headers = {
+
+        "Content-Type":
+          "application/json"
+
+      };
+
+
+
+
+
+      if(
+        token
+      ){
+
+        headers.Authorization =
+          `Bearer ${token}`;
+
+      }
+
+
+
+
+
+
+
+      /* =========================
+         LOGOUT API
+      ========================= */
+
+
+      try{
+
+
+        const response =
+          await fetch(
+
+            "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/logout",
+
+            {
+
+              method:
+                "POST",
+
+
+              credentials:
+                "include",
+
+
+              headers:
+                headers
+
+
+            }
+
+          );
+
+
+
+
+
+
+        const result =
+          await response.json();
+
+
+
+
+
+        /* =========================
+           ERROR
+        ========================= */
+
+
+        if(
+          !response.ok
+        ){
+
+
+          console.error(
+            "Logout failed:",
+            result
+          );
+
+
+
+          alert(
+
+            result.error ||
+            "Logout failed."
+
+          );
+
+
+
+          logoutProcessing =
+            false;
+
+
+
+          logoutYes.disabled =
+            false;
+
+
+
+          logoutYes.classList.remove(
+            "loading"
+          );
+
+
+
+          logoutYes.classList.add(
+            "ready"
+          );
+
+
+
+          logoutYes.textContent =
+            "Yes";
+
+
+
+          return;
+
+        }
+
+
+
+
+
+
+        /* =========================
+           CLEAR USER STATE
+        ========================= */
+
+
+        if(
+          window.U9User
+        ){
+
+          window.U9User.clear();
+
+        }
+
+
+
+
+
+
+
+        /* =========================
+           RESET TIMER
+        ========================= */
+
+
+        if(
+          logoutTimer
+        ){
+
+          clearInterval(
+            logoutTimer
+          );
+
+
+          logoutTimer =
+            null;
+
+        }
+
+
+
+
+
+
+
+        /* =========================
+           CLOSE MODAL
+        ========================= */
+
+
+        logoutModal.style.display =
+          "none";
+
+
+
+
+
+        logoutProcessing =
+          false;
+
+
+
+
+
+
+        console.log(
+          "Logout success:",
+          result
+        );
+
+
+
+
+
+        /* =========================
+           REFRESH PAGE
+        ========================= */
+
+        window.location.reload();
+
+
+
+
+
+      }
+
+
+
+      catch(error){
+
+
+        console.error(
+          "Logout error:",
+          error
+        );
+
+
+
+        alert(
+          "Unable to connect to the server."
+        );
+
+
+
+        logoutProcessing =
+          false;
+
+
+
+        logoutYes.disabled =
+          false;
+
+
+
+        logoutYes.classList.remove(
+          "loading"
+        );
+
+
+
+        logoutYes.classList.add(
+          "ready"
+        );
+
+
+
+        logoutYes.textContent =
+          "Yes";
+
+
+
+      }
+
+
+
+    }
+
+  );
 
 }
-
-
-
-logoutProcessing =
-true;
-
-
-
-logoutYes.disabled =
-true;
-
-
-
-logoutYes.classList.remove(
-"ready"
-);
-
-
-
-logoutYes.classList.add(
-"loading"
-);
-
-
-
-logoutYes.textContent =
-"Loading...";
-
-
-
-
-
-
-
-/* =========================
-   GET TOKEN
-========================= */
-
-
-const token =
-localStorage.getItem(
-"u9_token"
-);
-
-
-
-
-
-const headers = {
-
-"Content-Type":
-"application/json"
-
-};
-
-
-
-
-
-if(
-token
-){
-
-headers.Authorization =
-`Bearer ${token}`;
-
-}
-
-
-
-
-
-
-
-/* =========================
-   LOGOUT API
-========================= */
-
-
-try{
-
-
-const response =
-await fetch(
-
-"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/logout",
-
-{
-
-method:
-"POST",
-
-
-credentials:
-"include",
-
-
-headers:
-headers
-
-
-}
-
-);
-
-
-
-
-
-
-const result =
-await response.json();
-
-
-
-
-
-/* =========================
-   ERROR
-========================= */
-
-
-if(
-!response.ok
-){
-
-
-console.error(
-"Logout failed:",
-result
-);
-
-
-
-alert(
-
-result.error ||
-"Logout failed."
-
-);
-
-
-
-logoutProcessing =
-false;
-
-
-
-logoutYes.disabled =
-false;
-
-
-
-logoutYes.classList.remove(
-"loading"
-);
-
-
-
-logoutYes.classList.add(
-"ready"
-);
-
-
-
-logoutYes.textContent =
-"Yes";
-
-
-
-return;
-
-}
-
-
-
-
-
-
-/* =========================
-   CLEAR USER STATE
-========================= */
-
-
-if(
-window.U9User
-){
-
-window.U9User.clear();
-
-}
-
-
-
-
-
-
-
-/* =========================
-   RESET TIMER
-========================= */
-
-
-if(
-logoutTimer
-){
-
-clearInterval(
-logoutTimer
-);
-
-
-logoutTimer =
-null;
-
-}
-
-
-
-
-
-
-
-/* =========================
-   CLOSE MODAL
-========================= */
-
-
-logoutModal.style.display =
-"none";
-
-
-
-
-
-logoutProcessing =
-false;
-
-
-
-
-
-
-console.log(
-"Logout success:",
-result
-);
-
-
-
-
-
-}
-
-
-
-catch(error){
-
-
-console.error(
-"Logout error:",
-error
-);
-
-
-
-alert(
-"Unable to connect to the server."
-);
-
-
-
-logoutProcessing =
-false;
-
-
-
-logoutYes.disabled =
-false;
-
-
-
-logoutYes.classList.remove(
-"loading"
-);
-
-
-
-logoutYes.classList.add(
-"ready"
-);
-
-
-
-logoutYes.textContent =
-"Yes";
-
-
-
-}
-
-
-
-}
-
-);
-
-}
+```
