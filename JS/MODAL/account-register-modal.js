@@ -33,7 +33,10 @@ const registerForm =
 ========================= */
 
 
-if(registerButton){
+if(
+  registerButton &&
+  registerModal
+){
 
   registerButton.addEventListener(
     "click",
@@ -54,7 +57,10 @@ if(registerButton){
 ========================= */
 
 
-if(registerClose){
+if(
+  registerClose &&
+  registerModal
+){
 
   registerClose.addEventListener(
     "click",
@@ -67,6 +73,8 @@ if(registerClose){
   );
 
 }
+
+
 
 
 
@@ -88,7 +96,10 @@ const registerPasswordToggle =
 
 
 
-if(registerPasswordToggle){
+if(
+  registerPassword &&
+  registerPasswordToggle
+){
 
   registerPasswordToggle.addEventListener(
     "click",
@@ -108,7 +119,9 @@ if(registerPasswordToggle){
           "Hide";
 
 
-      }else{
+      }
+
+      else{
 
 
         registerPassword.type =
@@ -118,6 +131,7 @@ if(registerPasswordToggle){
         registerPasswordToggle.textContent =
           "Show";
 
+
       }
 
 
@@ -125,6 +139,8 @@ if(registerPasswordToggle){
   );
 
 }
+
+
 
 
 
@@ -146,7 +162,10 @@ const registerConfirmPasswordToggle =
 
 
 
-if(registerConfirmPasswordToggle){
+if(
+  registerConfirmPassword &&
+  registerConfirmPasswordToggle
+){
 
   registerConfirmPasswordToggle.addEventListener(
     "click",
@@ -166,7 +185,9 @@ if(registerConfirmPasswordToggle){
           "Hide";
 
 
-      }else{
+      }
+
+      else{
 
 
         registerConfirmPassword.type =
@@ -187,20 +208,28 @@ if(registerConfirmPasswordToggle){
 
 
 
+
+
 /* =========================
    REGISTER FORM
 ========================= */
 
 
-if(registerForm){
+if(
+  registerForm
+){
 
 
 registerForm.addEventListener(
+
 "submit",
+
 async(event)=>{
 
 
 event.preventDefault();
+
+
 
 
 
@@ -247,19 +276,22 @@ document
 
 
 
+
+
 /* =========================
    PASSWORD CHECK
 ========================= */
 
 
 if(
- password !==
- confirmPassword
+  password !==
+  confirmPassword
 ){
 
 alert(
 "Passwords do not match."
 );
+
 
 return;
 
@@ -267,8 +299,10 @@ return;
 
 
 
+
+
 /* =========================
-   REGISTER API
+   REGISTER REQUEST
 ========================= */
 
 
@@ -282,20 +316,33 @@ await fetch(
 
 {
 
-method:"POST",
 
-credentials:"include",
+method:
+
+"POST",
 
 
-headers:{
+
+credentials:
+
+"include",
+
+
+
+headers:
+
+{
 
 "Content-Type":
+
 "application/json"
 
 },
 
 
+
 body:
+
 JSON.stringify({
 
 username:
@@ -309,9 +356,12 @@ password
 
 })
 
+
 }
 
 );
+
+
 
 
 
@@ -320,24 +370,36 @@ await response.json();
 
 
 
+
+
+
+
 /* =========================
    ERROR
 ========================= */
 
 
-if(!response.ok){
+if(
+  !response.ok
+){
 
 
 alert(
+
 result.error ||
 "Registration failed."
+
 );
+
 
 
 return;
 
-
 }
+
+
+
+
 
 
 
@@ -347,15 +409,20 @@ return;
 
 
 /*
- 后端已经发送:
+================================
 
- Set-Cookie:
- u9_session
+Backend:
 
- 浏览器自动保存
+Set-Cookie:
+u9_session
 
- 不需要 localStorage
+Browser automatically saves.
+
+No localStorage.
+
+================================
 */
+
 
 
 alert(
@@ -364,53 +431,131 @@ alert(
 
 
 
+
 registerForm.reset();
 
 
 
+
+if(
+  registerModal
+){
+
 registerModal.style.display =
 "none";
 
+}
 
 
-/*
- 自动登录
 
- 使用 Cookie 获取当前用户
-*/
+
+
+
+
+/* =========================
+   WAIT COOKIE
+   SAFARI FIX
+========================= */
+
+
+await new Promise(
+resolve =>
+setTimeout(
+resolve,
+300
+)
+);
+
+
+
+
+
+
+
+/* =========================
+   UPDATE USER STATE
+========================= */
 
 
 if(
-typeof getCurrentUser ===
-"function"
+  window.U9User
 ){
 
-await getCurrentUser();
+
+await window.U9User.refresh();
+
+
+}
+
+
+
+
+
+
+/* =========================
+   UPDATE AVATAR
+========================= */
+
+
+if(
+  window.U9ProfileAvatar
+){
+
+
+await window.U9ProfileAvatar.refresh();
+
 
 }
 
 
 
+
+
+
+
+/* =========================
+   DEBUG
+========================= */
+
+
+console.log(
+"Register result:",
+result
+);
+
+
+
 }
+
+
+
 catch(error){
 
 
 console.error(
+
 "Register error:",
+
 error
+
 );
+
 
 
 alert(
+
 "Unable to connect to server."
+
 );
+
 
 
 }
 
 
 
-});
+}
 
+);
 
 }
