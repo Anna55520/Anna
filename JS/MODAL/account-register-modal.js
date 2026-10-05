@@ -1,6 +1,199 @@
 /* =========================
+   REGISTER ELEMENTS
+========================= */
+
+
+const registerButton =
+  document.getElementById(
+    "U9-page-header-register"
+  );
+
+
+const registerModal =
+  document.getElementById(
+    "U9-register-modal"
+  );
+
+
+const registerClose =
+  document.getElementById(
+    "U9-register-modal-close"
+  );
+
+
+const registerForm =
+  document.getElementById(
+    "U9-register-form"
+  );
+
+
+
+/* =========================
+   OPEN REGISTER
+========================= */
+
+
+if(registerButton){
+
+  registerButton.addEventListener(
+    "click",
+    ()=>{
+
+      registerModal.style.display =
+        "flex";
+
+    }
+  );
+
+}
+
+
+
+/* =========================
+   CLOSE REGISTER
+========================= */
+
+
+if(registerClose){
+
+  registerClose.addEventListener(
+    "click",
+    ()=>{
+
+      registerModal.style.display =
+        "none";
+
+    }
+  );
+
+}
+
+
+
+/* =========================
+   PASSWORD SHOW / HIDE
+========================= */
+
+
+const registerPassword =
+  document.getElementById(
+    "U9-register-password"
+  );
+
+
+const registerPasswordToggle =
+  document.getElementById(
+    "U9-register-password-toggle"
+  );
+
+
+
+if(registerPasswordToggle){
+
+  registerPasswordToggle.addEventListener(
+    "click",
+    ()=>{
+
+
+      if(
+        registerPassword.type ===
+        "password"
+      ){
+
+        registerPassword.type =
+          "text";
+
+
+        registerPasswordToggle.textContent =
+          "Hide";
+
+
+      }else{
+
+
+        registerPassword.type =
+          "password";
+
+
+        registerPasswordToggle.textContent =
+          "Show";
+
+      }
+
+
+    }
+  );
+
+}
+
+
+
+/* =========================
+   CONFIRM PASSWORD
+========================= */
+
+
+const registerConfirmPassword =
+  document.getElementById(
+    "U9-register-confirm-password"
+  );
+
+
+const registerConfirmPasswordToggle =
+  document.getElementById(
+    "U9-register-confirm-password-toggle"
+  );
+
+
+
+if(registerConfirmPasswordToggle){
+
+  registerConfirmPasswordToggle.addEventListener(
+    "click",
+    ()=>{
+
+
+      if(
+        registerConfirmPassword.type ===
+        "password"
+      ){
+
+        registerConfirmPassword.type =
+          "text";
+
+
+        registerConfirmPasswordToggle.textContent =
+          "Hide";
+
+
+      }else{
+
+
+        registerConfirmPassword.type =
+          "password";
+
+
+        registerConfirmPasswordToggle.textContent =
+          "Show";
+
+
+      }
+
+
+    }
+  );
+
+}
+
+
+
+/* =========================
    REGISTER FORM
 ========================= */
+
+
+if(registerForm){
+
 
 registerForm.addEventListener(
 "submit",
@@ -60,7 +253,8 @@ document
 
 
 if(
-password !== confirmPassword
+ password !==
+ confirmPassword
 ){
 
 alert(
@@ -73,13 +267,12 @@ return;
 
 
 
-
-try{
-
-
 /* =========================
    REGISTER API
 ========================= */
+
+
+try{
 
 
 const response =
@@ -92,6 +285,7 @@ await fetch(
 method:"POST",
 
 credentials:"include",
+
 
 headers:{
 
@@ -126,26 +320,24 @@ await response.json();
 
 
 
-
 /* =========================
    ERROR
 ========================= */
 
 
-if(
-!response.ok
-){
+if(!response.ok){
+
 
 alert(
 result.error ||
 "Registration failed."
 );
 
+
 return;
 
+
 }
-
-
 
 
 
@@ -154,20 +346,21 @@ return;
 ========================= */
 
 
-alert(
-"Registration successful."
-);
-
-
-
 /*
- Cookie:
+ 后端已经发送:
 
+ Set-Cookie:
  u9_session
 
  浏览器自动保存
 
+ 不需要 localStorage
 */
+
+
+alert(
+"Registration successful."
+);
 
 
 
@@ -180,36 +373,25 @@ registerModal.style.display =
 
 
 
-
-
-/* =========================
-   AUTO LOGIN
-========================= */
-
-
 /*
- 等 Cookie 写入完成
- 再获取用户
+ 自动登录
+
+ 使用 Cookie 获取当前用户
 */
 
 
-setTimeout(
-async()=>{
-
+if(
+typeof getCurrentUser ===
+"function"
+){
 
 await getCurrentUser();
-
-
-},
-300
-);
-
-
 
 }
 
 
 
+}
 catch(error){
 
 
@@ -219,11 +401,9 @@ error
 );
 
 
-
 alert(
-"Unable to connect to the server."
+"Unable to connect to server."
 );
-
 
 
 }
@@ -231,3 +411,6 @@ alert(
 
 
 });
+
+
+}
