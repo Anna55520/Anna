@@ -28,13 +28,33 @@ const headerUsername =
 
 
 
+
 /* =========================
    API
 ========================= */
 
 
 const U9_ME_API =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me";
+"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me";
+
+
+
+
+
+/* =========================
+   TOKEN
+========================= */
+
+
+function getSessionToken(){
+
+  return localStorage.getItem(
+    "u9_token"
+  );
+
+}
+
+
 
 
 
@@ -45,15 +65,17 @@ const U9_ME_API =
 
 
 let currentUser =
-  null;
+null;
 
 
 let currentUserState =
-  "UNAUTHENTICATED";
+"UNAUTHENTICATED";
 
 
 let currentUserError =
-  null;
+null;
+
+
 
 
 
@@ -63,7 +85,8 @@ let currentUserError =
 
 
 const userListeners =
-  new Set();
+new Set();
+
 
 
 
@@ -74,37 +97,35 @@ const userListeners =
 
 
 function formatUsername(
-  username
+username
 ){
 
-  if(
-    !username
-  ){
+if(!username){
 
-    return "";
-
-  }
-
-
-  if(
-    username.length <= 8
-  ){
-
-    return username;
-
-  }
-
-
-  return (
-    username.substring(
-      0,
-      8
-    )
-    +
-    "..."
-  );
+return "";
 
 }
+
+
+if(username.length <= 8){
+
+return username;
+
+}
+
+
+return (
+username.substring(
+0,
+8
+)
++
+"..."
+);
+
+
+}
+
 
 
 
@@ -115,118 +136,99 @@ function formatUsername(
 
 
 function updateHeaderUser(
-  user
+user
 ){
 
 
-  if(
-    user
-  ){
+if(user){
 
 
-    if(
-      headerRegister
-    ){
+if(headerRegister){
 
-      headerRegister.style.display =
-        "none";
+headerRegister.style.display =
+"none";
 
-    }
+}
 
 
+if(headerLogin){
 
-    if(
-      headerLogin
-    ){
+headerLogin.style.display =
+"none";
 
-      headerLogin.style.display =
-        "none";
-
-    }
+}
 
 
 
+if(headerUser){
 
-    if(
-      headerUser
-    ){
+headerUser.classList.add(
+"active"
+);
 
-      headerUser.classList.add(
-        "active"
-      );
-
-    }
+}
 
 
 
+if(headerUsername){
 
-    if(
-      headerUsername
-    ){
+headerUsername.textContent =
+formatUsername(
+user.username
+);
 
-      headerUsername.textContent =
-        formatUsername(
-          user.username
-        );
+}
 
-    }
-
-
-  }
-
-
-  else{
-
-
-    if(
-      headerRegister
-    ){
-
-      headerRegister.style.display =
-        "";
-
-    }
-
-
-
-    if(
-      headerLogin
-    ){
-
-      headerLogin.style.display =
-        "";
-
-    }
-
-
-
-    if(
-      headerUser
-    ){
-
-      headerUser.classList.remove(
-        "active"
-      );
-
-    }
-
-
-
-    if(
-      headerUsername
-    ){
-
-      headerUsername.textContent =
-        "";
-
-    }
-
-
-  }
 
 
 }
 
+
+
+else{
+
+
+if(headerRegister){
+
+headerRegister.style.display =
+"";
+
+}
+
+
+if(headerLogin){
+
+headerLogin.style.display =
+"";
+
+}
+
+
+
+if(headerUser){
+
+headerUser.classList.remove(
+"active"
+);
+
+}
+
+
+
+if(headerUsername){
+
+headerUsername.textContent =
+"";
+
+}
+
+
+
+}
+
+
+
+}
 
 
 
@@ -238,69 +240,50 @@ function updateHeaderUser(
 
 
 function setUserState(
-  state,
-  user=null,
-  error=null
+state,
+user=null,
+error=null
 ){
 
 
-  currentUserState =
-    state;
+currentUserState =
+state;
 
 
-  currentUser =
-    user;
+currentUser =
+user;
 
 
-  currentUserError =
-    error;
-
-
-
-  if(
-    state ===
-    "AUTHENTICATED"
-  ){
-
-    updateHeaderUser(
-      user
-    );
-
-  }
+currentUserError =
+error;
 
 
 
-  else if(
-    state ===
-    "UNAUTHENTICATED"
-  ){
+if(
+state==="AUTHENTICATED"
+){
 
-    updateHeaderUser(
-      null
-    );
-
-  }
-
-
-
-  else if(
-    state ===
-    "INVALID"
-  ){
-
-    updateHeaderUser(
-      null
-    );
-
-  }
-
-
-
-  notifyUserListeners();
-
+updateHeaderUser(
+user
+);
 
 }
 
+else{
+
+
+updateHeaderUser(
+null
+);
+
+}
+
+
+
+notifyUserListeners();
+
+
+}
 
 
 
@@ -314,38 +297,46 @@ function setUserState(
 function notifyUserListeners(){
 
 
-  userListeners.forEach(
-    listener=>{
+userListeners.forEach(
+
+listener=>{
 
 
-      try{
+try{
 
 
-        listener(
-          currentUser,
-          currentUserState,
-          currentUserError
-        );
+listener(
 
+currentUser,
 
-      }
-      catch(error){
+currentUserState,
 
+currentUserError
 
-        console.error(
-          "U9User listener failed:",
-          error
-        );
-
-
-      }
-
-
-    }
-  );
+);
 
 
 }
+catch(error){
+
+
+console.error(
+"U9User listener failed:",
+error
+);
+
+
+}
+
+
+}
+
+
+);
+
+
+}
+
 
 
 
@@ -359,154 +350,246 @@ async function getCurrentUser(){
 
 
 
-  setUserState(
-    "CHECKING",
-    currentUser,
-    null
-  );
+setUserState(
+"CHECKING",
+currentUser,
+null
+);
 
 
 
-  try{
+try{
 
 
-    const response =
-      await fetch(
+const token =
+getSessionToken();
 
-        U9_ME_API,
 
-        {
 
-          method:
-            "GET",
+const headers = {};
 
 
-          credentials:
-            "include"
 
+if(token){
 
-        }
 
-      );
-
-
-
-    if(
-      response.status === 401 ||
-      response.status === 403
-    ){
-
-
-      setUserState(
-        "UNAUTHENTICATED",
-        null,
-        null
-      );
-
-
-      return null;
-
-
-    }
-
-
-
-    if(
-      !response.ok
-    ){
-
-
-      const error =
-        new Error(
-          "GET /me failed"
-        );
-
-
-      setUserState(
-        "ERROR",
-        currentUser,
-        error
-      );
-
-
-      return null;
-
-
-    }
-
-
-
-
-    const result =
-      await response.json();
-
-
-
-    const user =
-      result?.user ||
-      result?.data?.user ||
-      null;
-
-
-
-
-    if(
-      !user
-    ){
-
-
-      setUserState(
-        "UNAUTHENTICATED",
-        null,
-        null
-      );
-
-
-      return null;
-
-
-    }
-
-
-
-    setUserState(
-      "AUTHENTICATED",
-      user,
-      null
-    );
-
-
-
-    return user;
-
-
-
-  }
-  catch(error){
-
-
-    console.error(
-      "Get current user failed:",
-      error
-    );
-
-
-    setUserState(
-      "ERROR",
-      currentUser,
-      error
-    );
-
-
-    return null;
-
-
-  }
+headers[
+"Authorization"
+] =
+`Bearer ${token}`;
 
 
 }
 
- 
+
+
+
+
+const response =
+await fetch(
+
+U9_ME_API,
+
+{
+
+
+method:
+"GET",
+
+
+
+credentials:
+"include",
+
+
+
+headers:
+headers
+
+
+}
+
+
+);
+
+
+
+
+
+
+if(
+response.status===401 ||
+response.status===403
+){
+
+
+
+/*
+ 清除失效 token
+
+*/
+
+localStorage.removeItem(
+"u9_token"
+);
+
+
+
+setUserState(
+
+"UNAUTHENTICATED",
+
+null,
+
+null
+
+);
+
+
+
+return null;
+
+
+}
+
+
+
+
+
+
+
+if(!response.ok){
+
+
+const error =
+new Error(
+"GET /me failed"
+);
+
+
+
+setUserState(
+
+"ERROR",
+
+currentUser,
+
+error
+
+);
+
+
+
+return null;
+
+
+}
+
+
+
+
+
+
+const result =
+await response.json();
+
+
+
+
+
+const user =
+result?.user ||
+result?.data?.user ||
+null;
+
+
+
+
+
+if(!user){
+
+
+setUserState(
+
+"UNAUTHENTICATED",
+
+null,
+
+null
+
+);
+
+
+
+return null;
+
+
+}
+
+
+
+
+
+setUserState(
+
+"AUTHENTICATED",
+
+user,
+
+null
+
+);
+
+
+
+return user;
+
+
+
+}
+
+catch(error){
+
+
+
+console.error(
+
+"Get current user failed:",
+
+error
+
+);
+
+
+
+setUserState(
+
+"ERROR",
+
+currentUser,
+
+error
+
+);
+
+
+
+return null;
+
+
+}
+
+
+
+}
+
+
+
+
+
+
+
+
 /* =========================
    GET USER
 ========================= */
@@ -514,7 +597,7 @@ async function getCurrentUser(){
 
 function getUser(){
 
-  return currentUser;
+return currentUser;
 
 }
 
@@ -529,7 +612,7 @@ function getUser(){
 
 function getUserState(){
 
-  return currentUserState;
+return currentUserState;
 
 }
 
@@ -544,14 +627,21 @@ function getUserState(){
 
 function isLoggedIn(){
 
-  return (
-    currentUserState ===
-    "AUTHENTICATED"
-    &&
-    !!currentUser
-  );
+return (
+
+currentUserState ===
+"AUTHENTICATED"
+
+&&
+
+!!currentUser
+
+);
+
 
 }
+
+
 
 
 
@@ -564,10 +654,13 @@ function isLoggedIn(){
 
 function isChecking(){
 
-  return (
-    currentUserState ===
-    "CHECKING"
-  );
+return (
+
+currentUserState ===
+"CHECKING"
+
+);
+
 
 }
 
@@ -580,21 +673,16 @@ function isChecking(){
 ========================= */
 
 
-/*
-   Cookie 模式
-
-   HttpOnly Cookie
-   JS 无法读取
-
-   所以只代表浏览器存在登录环境
-*/
-
 function hasSession(){
 
-  return (
-    currentUserState ===
-    "AUTHENTICATED"
-  );
+
+return (
+
+currentUserState ===
+"AUTHENTICATED"
+
+);
+
 
 }
 
@@ -608,33 +696,36 @@ function hasSession(){
 
 
 function subscribeUser(
-  listener
+listener
 ){
 
-  if(
-    typeof listener !==
-    "function"
-  ){
 
-    return function(){};
+if(
+typeof listener !==
+"function"
+){
 
-  }
+return ()=>{};
 
-
-
-  userListeners.add(
-    listener
-  );
+}
 
 
 
-  return function(){
+userListeners.add(
+listener
+);
 
-    userListeners.delete(
-      listener
-    );
 
-  };
+
+return function(){
+
+
+userListeners.delete(
+listener
+);
+
+
+};
 
 
 }
@@ -643,51 +734,49 @@ function subscribeUser(
 
 
 
+
 /* =========================
-   REFRESH USER
+   REFRESH
 ========================= */
 
 
 async function refreshUser(){
 
-  return await getCurrentUser();
+return await getCurrentUser();
 
 }
+
 
 
 
 
 
 /* =========================
-   LOGOUT
+   LOGOUT CLEAR
 ========================= */
 
-
-/*
-   注意:
-
-   Cookie 是 HttpOnly
-
-   不能 localStorage.remove
-
-   真正删除需要调用
-   /logout Edge Function
-
-*/
 
 function clearCurrentUser(){
 
 
-  setUserState(
-    "UNAUTHENTICATED",
-    null,
-    null
-  );
+localStorage.removeItem(
+"u9_token"
+);
+
+
+
+setUserState(
+
+"UNAUTHENTICATED",
+
+null,
+
+null
+
+);
 
 
 }
-
-
 
 
 
@@ -701,54 +790,41 @@ function clearCurrentUser(){
 window.U9User = {
 
 
-  get:
-
-    getUser,
-
+get:
+getUser,
 
 
-  refresh:
-
-    refreshUser,
-
+refresh:
+refreshUser,
 
 
-  isLoggedIn:
-
-    isLoggedIn,
-
+isLoggedIn:
+isLoggedIn,
 
 
-  isChecking:
-
-    isChecking,
-
+isChecking:
+isChecking,
 
 
-  hasSession:
-
-    hasSession,
-
+hasSession:
+hasSession,
 
 
-  getState:
-
-    getUserState,
-
+getState:
+getUserState,
 
 
-  subscribe:
-
-    subscribeUser,
-
+subscribe:
+subscribeUser,
 
 
-  clear:
+clear:
+clearCurrentUser
 
-    clearCurrentUser
 
 
 };
+
 
 
 
