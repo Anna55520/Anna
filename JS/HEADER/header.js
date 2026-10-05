@@ -27,31 +27,22 @@ const headerUsername =
   );
 
 
+
 /* =========================
    API
 ========================= */
+
 
 const U9_ME_API =
   "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me";
 
 
-const U9_SESSION_KEY =
-  "u9_session";
 
 
 /* =========================
    USER STATE
 ========================= */
 
-/*
-   Possible states:
-
-   UNAUTHENTICATED
-   CHECKING
-   AUTHENTICATED
-   INVALID
-   ERROR
-*/
 
 let currentUser =
   null;
@@ -65,37 +56,77 @@ let currentUserError =
   null;
 
 
+
 /* =========================
-   USER LISTENERS
+   LISTENERS
 ========================= */
+
 
 const userListeners =
   new Set();
+
+
+
+
+/* =========================
+   USERNAME FORMAT
+========================= */
+
+
+function formatUsername(
+  username
+){
+
+  if(
+    !username
+  ){
+
+    return "";
+
+  }
+
+
+  if(
+    username.length <= 8
+  ){
+
+    return username;
+
+  }
+
+
+  return (
+    username.substring(
+      0,
+      8
+    )
+    +
+    "..."
+  );
+
+}
+
+
 
 
 /* =========================
    UPDATE HEADER
 ========================= */
 
+
 function updateHeaderUser(
   user
-) {
+){
 
-  /* =========================
-     LOGGED IN
-  ========================= */
 
-  if (
+  if(
     user
-  ) {
+  ){
 
-    /*
-       HIDE REGISTER
-    */
 
-    if (
+    if(
       headerRegister
-    ) {
+    ){
 
       headerRegister.style.display =
         "none";
@@ -103,13 +134,10 @@ function updateHeaderUser(
     }
 
 
-    /*
-       HIDE LOGIN
-    */
 
-    if (
+    if(
       headerLogin
-    ) {
+    ){
 
       headerLogin.style.display =
         "none";
@@ -117,13 +145,11 @@ function updateHeaderUser(
     }
 
 
-    /*
-       SHOW USER
-    */
 
-    if (
+
+    if(
       headerUser
-    ) {
+    ){
 
       headerUser.classList.add(
         "active"
@@ -132,35 +158,29 @@ function updateHeaderUser(
     }
 
 
-    /*
-       USERNAME
-    */
 
-    if (
+
+    if(
       headerUsername
-    ) {
+    ){
 
       headerUsername.textContent =
-        user.username || "";
+        formatUsername(
+          user.username
+        );
 
     }
+
 
   }
 
 
-  /* =========================
-     LOGGED OUT
-  ========================= */
+  else{
 
-  else {
 
-    /*
-       SHOW REGISTER
-    */
-
-    if (
+    if(
       headerRegister
-    ) {
+    ){
 
       headerRegister.style.display =
         "";
@@ -168,13 +188,10 @@ function updateHeaderUser(
     }
 
 
-    /*
-       SHOW LOGIN
-    */
 
-    if (
+    if(
       headerLogin
-    ) {
+    ){
 
       headerLogin.style.display =
         "";
@@ -182,13 +199,10 @@ function updateHeaderUser(
     }
 
 
-    /*
-       HIDE USER
-    */
 
-    if (
+    if(
       headerUser
-    ) {
+    ){
 
       headerUser.classList.remove(
         "active"
@@ -197,81 +211,38 @@ function updateHeaderUser(
     }
 
 
-    /*
-       CLEAR USERNAME
-    */
 
-    if (
+    if(
       headerUsername
-    ) {
+    ){
 
       headerUsername.textContent =
         "";
 
     }
 
+
   }
 
-}
-
-
-/* =========================
-   NOTIFY USER LISTENERS
-========================= */
-
-function notifyUserListeners() {
-
-  const user =
-    currentUser;
-
-
-  const state =
-    currentUserState;
-
-
-  const error =
-    currentUserError;
-
-
-  userListeners.forEach(
-    listener => {
-
-      try {
-
-        listener(
-          user,
-          state,
-          error
-        );
-
-      }
-
-      catch (
-        error
-      ) {
-
-        console.error(
-          "U9User listener failed:",
-          error
-        );
-
-      }
-
-    }
-  );
 
 }
+
+
+
+
 
 
 /* =========================
    SET USER STATE
 ========================= */
 
+
 function setUserState(
   state,
-  user = null,
-  error = null
-) {
+  user=null,
+  error=null
+){
+
 
   currentUserState =
     state;
@@ -285,16 +256,11 @@ function setUserState(
     error;
 
 
-  /*
-     Update Header UI
-     only when authenticated
-     or unauthenticated.
-  */
 
-  if (
+  if(
     state ===
     "AUTHENTICATED"
-  ) {
+  ){
 
     updateHeaderUser(
       user
@@ -303,10 +269,11 @@ function setUserState(
   }
 
 
-  else if (
+
+  else if(
     state ===
     "UNAUTHENTICATED"
-  ) {
+  ){
 
     updateHeaderUser(
       null
@@ -315,10 +282,11 @@ function setUserState(
   }
 
 
-  else if (
+
+  else if(
     state ===
     "INVALID"
-  ) {
+  ){
 
     updateHeaderUser(
       null
@@ -326,120 +294,70 @@ function setUserState(
 
   }
 
-
-  /*
-     CHECKING / ERROR
-
-     Do not force logout UI
-     here.
-
-     This is important because
-     a network error does NOT
-     mean the session is invalid.
-  */
 
 
   notifyUserListeners();
 
+
 }
+
+
+
+
 
 
 /* =========================
-   GET SESSION TOKEN
+   NOTIFY
 ========================= */
 
-function getSessionToken() {
 
-  try {
-
-    return localStorage.getItem(
-      U9_SESSION_KEY
-    );
-
-  }
-
-  catch (
-    error
-  ) {
-
-    console.error(
-      "Get U9 session failed:",
-      error
-    );
+function notifyUserListeners(){
 
 
-    return null;
+  userListeners.forEach(
+    listener=>{
 
-  }
+
+      try{
+
+
+        listener(
+          currentUser,
+          currentUserState,
+          currentUserError
+        );
+
+
+      }
+      catch(error){
+
+
+        console.error(
+          "U9User listener failed:",
+          error
+        );
+
+
+      }
+
+
+    }
+  );
+
 
 }
 
 
-/* =========================
-   REMOVE SESSION
-========================= */
-
-function removeSession() {
-
-  try {
-
-    localStorage.removeItem(
-      U9_SESSION_KEY
-    );
-
-  }
-
-  catch (
-    error
-  ) {
-
-    console.error(
-      "Remove U9 session failed:",
-      error
-    );
-
-  }
-
-}
 
 
 /* =========================
    CHECK CURRENT USER
 ========================= */
 
-async function getCurrentUser() {
 
-  /*
-     GET SESSION
-  */
-
-  const sessionToken =
-    getSessionToken();
+async function getCurrentUser(){
 
 
-  /* =========================
-     NO SESSION
-  ========================= */
-
-  if (
-    !sessionToken
-  ) {
-
-    setUserState(
-      "UNAUTHENTICATED",
-      null,
-      null
-    );
-
-
-    return null;
-
-  }
-
-
-  /* =========================
-     CHECKING
-  ========================= */
 
   setUserState(
     "CHECKING",
@@ -448,11 +366,9 @@ async function getCurrentUser() {
   );
 
 
-  try {
 
-    /* =========================
-       REQUEST /ME
-    ========================= */
+  try{
+
 
     const response =
       await fetch(
@@ -464,51 +380,22 @@ async function getCurrentUser() {
           method:
             "GET",
 
-          headers: {
 
-            "Authorization":
-              `Bearer ${sessionToken}`
+          credentials:
+            "include"
 
-          }
 
         }
 
       );
 
 
-    /* =========================
-       INVALID SESSION
-    ========================= */
 
-    if (
-      response.status ===
-      401 ||
+    if(
+      response.status === 401 ||
+      response.status === 403
+    ){
 
-      response.status ===
-      403
-    ) {
-
-      /*
-         Only remove the session
-         when the server clearly
-         says the authentication
-         is invalid.
-      */
-
-      removeSession();
-
-
-      setUserState(
-        "INVALID",
-        null,
-        null
-      );
-
-
-      /*
-         After invalid session,
-         treat the user as logged out.
-      */
 
       setUserState(
         "UNAUTHENTICATED",
@@ -519,34 +406,21 @@ async function getCurrentUser() {
 
       return null;
 
+
     }
 
 
-    /* =========================
-       OTHER SERVER ERROR
-    ========================= */
 
-    if (
+    if(
       !response.ok
-    ) {
+    ){
+
 
       const error =
         new Error(
-          `GET /me failed: ${response.status}`
+          "GET /me failed"
         );
 
-
-      console.error(
-        "Get current user failed:",
-        error
-      );
-
-
-      /*
-         Do NOT delete session.
-
-         The session may still be valid.
-      */
 
       setUserState(
         "ERROR",
@@ -557,20 +431,16 @@ async function getCurrentUser() {
 
       return null;
 
+
     }
 
 
-    /* =========================
-       JSON
-    ========================= */
+
 
     const result =
       await response.json();
 
 
-    /* =========================
-       USER
-    ========================= */
 
     const user =
       result?.user ||
@@ -578,49 +448,26 @@ async function getCurrentUser() {
       null;
 
 
-    /* =========================
-       NO USER
-    ========================= */
 
-    if (
+
+    if(
       !user
-    ) {
+    ){
 
-      const error =
-        new Error(
-          "GET /me returned no user."
-        );
-
-
-      console.error(
-        "Get current user failed:",
-        error
-      );
-
-
-      /*
-         Do NOT delete session.
-
-         A malformed response is
-         not enough evidence that
-         the session is invalid.
-      */
 
       setUserState(
-        "ERROR",
-        currentUser,
-        error
+        "UNAUTHENTICATED",
+        null,
+        null
       );
 
 
       return null;
 
+
     }
 
 
-    /* =========================
-       AUTHENTICATED
-    ========================= */
 
     setUserState(
       "AUTHENTICATED",
@@ -629,33 +476,20 @@ async function getCurrentUser() {
     );
 
 
+
     return user;
 
+
+
   }
+  catch(error){
 
-
-  /* =========================
-     NETWORK / FETCH ERROR
-  ========================= */
-
-  catch (
-    error
-  ) {
 
     console.error(
       "Get current user failed:",
       error
     );
 
-
-    /*
-       IMPORTANT:
-
-       Network failure does NOT mean
-       the session is invalid.
-
-       Keep u9_session.
-    */
 
     setUserState(
       "ERROR",
@@ -666,53 +500,69 @@ async function getCurrentUser() {
 
     return null;
 
+
   }
+
 
 }
 
-
+ 
 /* =========================
-   GET CURRENT USER
+   GET USER
 ========================= */
 
-function getUser() {
+
+function getUser(){
 
   return currentUser;
 
 }
 
 
+
+
+
 /* =========================
-   GET USER STATE
+   GET STATE
 ========================= */
 
-function getUserState() {
+
+function getUserState(){
 
   return currentUserState;
 
 }
 
 
+
+
+
 /* =========================
-   CHECK LOGGED IN
+   LOGIN CHECK
 ========================= */
 
-function isLoggedIn() {
+
+function isLoggedIn(){
 
   return (
     currentUserState ===
-    "AUTHENTICATED" &&
+    "AUTHENTICATED"
+    &&
     !!currentUser
   );
 
 }
 
 
+
+
+
 /* =========================
-   CHECKING USER
+   CHECKING
 ========================= */
 
-function isChecking() {
+
+function isChecking(){
 
   return (
     currentUserState ===
@@ -722,33 +572,54 @@ function isChecking() {
 }
 
 
+
+
+
 /* =========================
-   CHECK SESSION
+   SESSION CHECK
 ========================= */
 
-function hasSession() {
 
-  return !!getSessionToken();
+/*
+   Cookie 模式
+
+   HttpOnly Cookie
+   JS 无法读取
+
+   所以只代表浏览器存在登录环境
+*/
+
+function hasSession(){
+
+  return (
+    currentUserState ===
+    "AUTHENTICATED"
+  );
 
 }
+
+
+
 
 
 /* =========================
    SUBSCRIBE
 ========================= */
 
+
 function subscribeUser(
   listener
-) {
+){
 
-  if (
+  if(
     typeof listener !==
     "function"
-  ) {
+  ){
 
-    return function() {};
+    return function(){};
 
   }
+
 
 
   userListeners.add(
@@ -756,11 +627,8 @@ function subscribeUser(
   );
 
 
-  /*
-     Return unsubscribe function
-  */
 
-  return function() {
+  return function(){
 
     userListeners.delete(
       listener
@@ -768,27 +636,46 @@ function subscribeUser(
 
   };
 
+
 }
+
+
+
 
 
 /* =========================
    REFRESH USER
 ========================= */
 
-async function refreshUser() {
+
+async function refreshUser(){
 
   return await getCurrentUser();
 
 }
 
 
+
+
+
 /* =========================
-   LOGOUT USER
+   LOGOUT
 ========================= */
 
-function clearCurrentUser() {
 
-  removeSession();
+/*
+   注意:
+
+   Cookie 是 HttpOnly
+
+   不能 localStorage.remove
+
+   真正删除需要调用
+   /logout Edge Function
+
+*/
+
+function clearCurrentUser(){
 
 
   setUserState(
@@ -797,83 +684,80 @@ function clearCurrentUser() {
     null
   );
 
+
 }
+
+
+
+
+
 
 
 /* =========================
    EXPORT
 ========================= */
 
+
 window.U9User = {
 
-  /*
-     Current user
-  */
 
   get:
+
     getUser,
 
 
-  /*
-     Refresh /me
-  */
 
   refresh:
+
     refreshUser,
 
 
-  /*
-     Login state
-  */
 
   isLoggedIn:
+
     isLoggedIn,
 
 
-  /*
-     Checking state
-  */
 
   isChecking:
+
     isChecking,
 
 
-  /*
-     Has local session
-  */
 
   hasSession:
+
     hasSession,
 
 
-  /*
-     Current state
-  */
 
   getState:
+
     getUserState,
 
 
-  /*
-     Subscribe to changes
-  */
 
   subscribe:
+
     subscribeUser,
 
 
-  /*
-     Clear session + user
-  */
 
   clear:
+
     clearCurrentUser
 
+
 };
+
+
+
+
 
 
 /* =========================
    INIT
 ========================= */
+
 
 getCurrentUser();
