@@ -1,55 +1,16 @@
-/* =================================================
 
+/* =================================================
    PROFILE PAGE 3
 
-
-   IMPORTANT:
-
-   DO NOT MODIFY PROFILE HEADER HERE.
-
-
-   The following elements are controlled by:
-
-   CSS/PROFILE/PROFILE/profile.css
-
-
-   Header:
-
-   #U9-profile-modal-header
-
-   #U9-profile-modal-close
-
-   #U9-profile-modal-title
-
-   #U9-profile-modal-icon
-
-
-   This file only controls:
-
-   #U9-profile-page3
-
-   #U9-profile-page3-content
-
-   Page 3 own elements.
-
-
+   AVATAR
+   FREE AVATAR FRAME
+   PAID AVATAR FRAME
 ================================================= */
 
 
 /* =================================================
-
-   PROFILE PAGE 3
-
-   ONLY PAGE 3
-
+   PAGE
 ================================================= */
-
-
-/* =========================
-
-   WINDOW
-
-========================= */
 
 #U9-profile-page3 {
 
@@ -63,14 +24,13 @@
 
 
 
-/* =========================
 
+
+/* =================================================
    CONTENT
-
-========================= */
+================================================= */
 
 #U9-profile-page3-content {
-
 
   width:100%;
 
@@ -78,20 +38,119 @@
 
   padding:20px;
 
+}
+
+
+
+
+
+/* =================================================
+   TABS
+================================================= */
+
+.U9-profile-page3-tabs {
+
+  width:100%;
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  margin-bottom:20px;
+
+  overflow-x:auto;
+
+  scrollbar-width:none;
+
+}
+
+
+.U9-profile-page3-tabs::-webkit-scrollbar {
+
+  display:none;
 
 }
 
 
 
-/* =========================
 
+
+/* =================================================
+   TAB
+================================================= */
+
+.U9-profile-page3-tab {
+
+  height:38px;
+
+  padding:0 18px;
+
+  border:none;
+
+  border-radius:20px;
+
+  background:#eeeeee;
+
+  color:#555;
+
+  font-size:14px;
+
+  white-space:nowrap;
+
+  cursor:pointer;
+
+  transition:.2s;
+
+}
+
+
+.U9-profile-page3-tab:hover {
+
+  opacity:.85;
+
+}
+
+
+
+
+
+/* =================================================
+   TAB ACTIVE
+================================================= */
+
+.U9-profile-page3-tab.active {
+
+  background:#2762ea;
+
+  color:#ffffff;
+
+}
+
+
+
+
+
+/* =================================================
+   LIST CONTAINER
+================================================= */
+
+.U9-profile-page3-list-container {
+
+  width:100%;
+
+}
+
+
+
+
+
+/* =================================================
    AVATAR LIST
-
-========================= */
-
+================================================= */
 
 .U9-profile-page3-avatar-list {
-
 
   width:100%;
 
@@ -101,28 +160,27 @@
 
   gap:20px;
 
-
 }
 
 
 
-/* =========================
 
-   CARD
 
-========================= */
-
+/* =================================================
+   AVATAR CARD
+================================================= */
 
 .U9-profile-page3-avatar-card {
 
-
   width:120px;
 
-  height:170px;
+  min-height:170px;
+
+  padding:12px;
 
   border-radius:16px;
 
-  background:white;
+  background:#ffffff;
 
   display:flex;
 
@@ -134,20 +192,19 @@
 
   gap:10px;
 
+  box-sizing:border-box;
 
 }
 
 
 
-/* =========================
 
-   IMAGE
 
-========================= */
-
+/* =================================================
+   AVATAR IMAGE
+================================================= */
 
 .U9-profile-page3-avatar-image {
-
 
   width:80px;
 
@@ -155,137 +212,491 @@
 
   object-fit:contain;
 
-
 }
 
 
 
-/* =========================
 
-   NAME
 
-========================= */
-
+/* =================================================
+   AVATAR NAME
+================================================= */
 
 .U9-profile-page3-avatar-name {
-
 
   font-size:14px;
 
   color:#333;
 
+  text-align:center;
+
+  max-width:100%;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+
+  white-space:nowrap;
 
 }
 
 
 
-/* =========================
 
-   BUTTON
 
-========================= */
-
+/* =================================================
+   AVATAR BUTTON
+================================================= */
 
 .U9-profile-page3-avatar-button {
-
 
   width:90px;
 
   height:32px;
 
-
   border:none;
 
   border-radius:20px;
 
-
   background:#2762ea;
 
-  color:white;
-
+  color:#ffffff;
 
   font-size:14px;
 
-
   cursor:pointer;
 
-
-  transition:
-    .2s;
-
+  transition:.2s;
 
 }
-
-
-
-/* =========================
-
-   BUTTON HOVER
-
-========================= */
 
 
 .U9-profile-page3-avatar-button:hover {
 
-
   opacity:.85;
-
 
 }
 
 
 
-/* =========================
 
-   ACTIVE
 
-   正在使用
-
-========================= */
-
+/* =================================================
+   AVATAR ACTIVE
+================================================= */
 
 .U9-profile-page3-avatar-button.active {
-
 
   background:#e5e5e5;
 
   color:#555;
 
-
 }
 
 
 
-/* =========================
 
-   LOADING
 
-========================= */
-
+/* =================================================
+   AVATAR LOADING
+================================================= */
 
 .U9-profile-page3-avatar-button.loading {
-
 
   opacity:.5;
 
   pointer-events:none;
 
+}
+
+
+
+
+
+/* =================================================
+   AVATAR DISABLED
+================================================= */
+
+.U9-profile-page3-avatar-button:disabled {
+
+  cursor:default;
 
 }
 
 
 
-/* =========================
-
-   DISABLED
-
-========================= */
 
 
-.U9-profile-page3-avatar-button:disabled {
+/* =================================================
+   FRAME LIST
+================================================= */
 
+.U9-profile-page3-frame-list {
+
+  width:100%;
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:20px;
+
+}
+
+
+
+
+
+/* =================================================
+   FRAME CARD
+================================================= */
+
+.U9-profile-page3-frame-card {
+
+  width:150px;
+
+  min-height:205px;
+
+  padding:14px;
+
+  border-radius:18px;
+
+  background:#ffffff;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:9px;
+
+  box-sizing:border-box;
+
+  position:relative;
+
+  transition:.2s;
+
+}
+
+
+
+
+
+/* =================================================
+   FRAME CARD HOVER
+================================================= */
+
+.U9-profile-page3-frame-card:hover {
+
+  transform:translateY(-2px);
+
+}
+
+
+
+
+
+/* =================================================
+   FRAME EQUIPPED
+================================================= */
+
+.U9-profile-page3-frame-card.equipped {
+
+  box-shadow:
+    0 0 0 2px #2762ea inset;
+
+}
+
+
+
+
+
+/* =================================================
+   FRAME IMAGE BOX
+================================================= */
+
+.U9-profile-page3-frame-image-box {
+
+  width:100px;
+
+  height:100px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+}
+
+
+
+
+
+/* =================================================
+   FRAME IMAGE
+================================================= */
+
+.U9-profile-page3-frame-image {
+
+  width:100px;
+
+  height:100px;
+
+  object-fit:contain;
+
+}
+
+
+
+
+
+/* =================================================
+   FRAME NAME
+================================================= */
+
+.U9-profile-page3-frame-name {
+
+  width:100%;
+
+  font-size:14px;
+
+  color:#333;
+
+  text-align:center;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+
+  white-space:nowrap;
+
+}
+
+
+
+
+
+/* =================================================
+   FRAME PRICE
+================================================= */
+
+.U9-profile-page3-frame-price {
+
+  font-size:13px;
+
+  color:#777;
+
+  text-align:center;
+
+}
+
+
+
+
+
+/* =================================================
+   FRAME BUTTON
+================================================= */
+
+.U9-profile-page3-frame-button {
+
+  width:100px;
+
+  height:34px;
+
+  border:none;
+
+  border-radius:20px;
+
+  background:#2762ea;
+
+  color:#ffffff;
+
+  font-size:14px;
+
+  cursor:pointer;
+
+  transition:.2s;
+
+}
+
+
+.U9-profile-page3-frame-button:hover {
+
+  opacity:.85;
+
+}
+
+
+
+
+
+/* =================================================
+   FRAME ACTIVE
+================================================= */
+
+.U9-profile-page3-frame-button.active {
+
+  background:#e5e5e5;
+
+  color:#555;
+
+}
+
+
+
+
+
+/* =================================================
+   FRAME LOADING
+================================================= */
+
+.U9-profile-page3-frame-button.loading {
+
+  opacity:.5;
+
+  pointer-events:none;
+
+}
+
+
+
+
+
+/* =================================================
+   FRAME DISABLED
+================================================= */
+
+.U9-profile-page3-frame-button:disabled {
 
   cursor:default;
 
+}
+
+
+
+
+
+/* =================================================
+   LOADING
+================================================= */
+
+.U9-profile-page3-loading {
+
+  width:100%;
+
+  min-height:120px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  color:#777;
+
+  font-size:14px;
+
+}
+
+
+
+
+
+/* =================================================
+   EMPTY
+================================================= */
+
+.U9-profile-page3-empty {
+
+  width:100%;
+
+  min-height:120px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  color:#777;
+
+  font-size:14px;
+
+}
+
+
+
+
+
+/* =================================================
+   ERROR
+================================================= */
+
+.U9-profile-page3-error {
+
+  width:100%;
+
+  min-height:120px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  color:#d33;
+
+  font-size:14px;
+
+}
+
+
+
+
+
+/* =================================================
+   MOBILE
+================================================= */
+
+@media (
+  max-width:600px
+) {
+
+  #U9-profile-page3-content {
+
+    padding:15px;
+
+  }
+
+
+  .U9-profile-page3-avatar-list,
+  .U9-profile-page3-frame-list {
+
+    gap:12px;
+
+  }
+
+
+  .U9-profile-page3-avatar-card {
+
+    width:calc(
+      50% - 6px
+    );
+
+  }
+
+
+  .U9-profile-page3-frame-card {
+
+    width:calc(
+      50% - 6px
+    );
+
+  }
 
 }
