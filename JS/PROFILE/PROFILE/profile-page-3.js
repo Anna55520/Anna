@@ -951,23 +951,18 @@ function requirePage3Login(
 
 /* =========================================================
    CUSTOM AVATAR UPLOAD UI
+   PNG / JPG / JPEG / WEBP / GIF ...
+   + 1:1 CROP
 ========================================================= */
 
-function renderCustomAvatarUpload(
-  panel
-) {
+function renderCustomAvatarUpload(panel) {
 
   if (!panel) {
-
     return;
-
   }
 
-
   const uploadBox =
-    document.createElement(
-      "div"
-    );
+    document.createElement("div");
 
   uploadBox.className =
     "U9-profile-page3-upload";
@@ -978,9 +973,7 @@ function renderCustomAvatarUpload(
   ======================================================= */
 
   const title =
-    document.createElement(
-      "div"
-    );
+    document.createElement("div");
 
   title.className =
     "U9-profile-page3-upload-title";
@@ -988,10 +981,7 @@ function renderCustomAvatarUpload(
   title.textContent =
     "自定义头像";
 
-
-  uploadBox.appendChild(
-    title
-  );
+  uploadBox.appendChild(title);
 
 
   /* =======================================================
@@ -999,20 +989,15 @@ function renderCustomAvatarUpload(
   ======================================================= */
 
   const description =
-    document.createElement(
-      "div"
-    );
+    document.createElement("div");
 
   description.className =
     "U9-profile-page3-upload-description";
 
   description.textContent =
-    "上传 WebP 图片，最大 2MB。每次上传后有 7 天冷却时间。";
+    "支持 PNG、JPG、JPEG、WebP、GIF 等图片。选择后可以裁剪头像，最终会自动裁剪为 1:1。最大 2MB，每次上传后有 7 天冷却时间。";
 
-
-  uploadBox.appendChild(
-    description
-  );
+  uploadBox.appendChild(description);
 
 
   /* =======================================================
@@ -1021,23 +1006,18 @@ function renderCustomAvatarUpload(
 
   if (
     currentAvatarUrl &&
-    currentAvatarType ===
-      "custom"
+    currentAvatarType === "custom"
   ) {
 
     const current =
-      document.createElement(
-        "div"
-      );
+      document.createElement("div");
 
     current.className =
       "U9-profile-page3-upload-current";
 
 
     const currentImage =
-      document.createElement(
-        "img"
-      );
+      document.createElement("img");
 
     currentImage.alt =
       "当前自定义头像";
@@ -1052,9 +1032,7 @@ function renderCustomAvatarUpload(
 
 
     const currentText =
-      document.createElement(
-        "div"
-      );
+      document.createElement("div");
 
     currentText.className =
       "U9-profile-page3-upload-current-text";
@@ -1084,19 +1062,15 @@ function renderCustomAvatarUpload(
   ) {
 
     const cooldown =
-      document.createElement(
-        "div"
-      );
+      document.createElement("div");
 
     cooldown.className =
       "U9-profile-page3-upload-cooldown";
-
 
     cooldown.textContent =
       "头像上传冷却中，还剩 " +
       formatAvatarCooldown() +
       "。";
-
 
     uploadBox.appendChild(
       cooldown
@@ -1110,15 +1084,19 @@ function renderCustomAvatarUpload(
   ======================================================= */
 
   const input =
-    document.createElement(
-      "input"
-    );
+    document.createElement("input");
 
   input.type =
     "file";
 
+  /*
+   * IMPORTANT:
+   * 不再限制 WebP。
+   *
+   * image/* = 浏览器支持的图片格式
+   */
   input.accept =
-    "image/webp,.webp";
+    "image/*";
 
   input.className =
     "U9-profile-page3-upload-input";
@@ -1134,9 +1112,7 @@ function renderCustomAvatarUpload(
   ======================================================= */
 
   const fileName =
-    document.createElement(
-      "div"
-    );
+    document.createElement("div");
 
   fileName.className =
     "U9-profile-page3-upload-file-name";
@@ -1151,13 +1127,11 @@ function renderCustomAvatarUpload(
 
 
   /* =======================================================
-     PREVIEW
+     CROPPED PREVIEW
   ======================================================= */
 
   const preview =
-    document.createElement(
-      "img"
-    );
+    document.createElement("img");
 
   preview.className =
     "U9-profile-page3-upload-preview";
@@ -1179,9 +1153,7 @@ function renderCustomAvatarUpload(
   ======================================================= */
 
   const uploadButton =
-    document.createElement(
-      "button"
-    );
+    document.createElement("button");
 
   uploadButton.type =
     "button";
@@ -1192,10 +1164,6 @@ function renderCustomAvatarUpload(
   uploadButton.textContent =
     "上传头像";
 
-
-  /*
-   * Disable immediately when cooldown exists.
-   */
 
   if (
     isAvatarUploadOnCooldown()
@@ -1218,7 +1186,7 @@ function renderCustomAvatarUpload(
 
   input.addEventListener(
     "change",
-    function() {
+    async function() {
 
       const file =
         input.files &&
@@ -1228,7 +1196,7 @@ function renderCustomAvatarUpload(
 
 
       uploadAvatarFile =
-        file;
+        null;
 
 
       if (!file) {
@@ -1244,7 +1212,6 @@ function renderCustomAvatarUpload(
         );
 
         return;
-
       }
 
 
@@ -1253,31 +1220,28 @@ function renderCustomAvatarUpload(
 
 
       /* ---------------------------------------------------
-         BASIC VALIDATION
+         FILE TYPE
       --------------------------------------------------- */
 
       if (
-        file.type !==
-          "image/webp"
+        !file.type ||
+        !file.type.startsWith("image/")
       ) {
 
         alert(
-          "只能上传 WebP 图片。"
+          "请选择图片文件，例如 PNG、JPG、JPEG、WebP 等。"
         );
 
         input.value =
           "";
 
-        uploadAvatarFile =
-          null;
-
-        preview.style.display =
-          "none";
-
         return;
-
       }
 
+
+      /* ---------------------------------------------------
+         FILE SIZE
+      --------------------------------------------------- */
 
       if (
         file.size <= 0
@@ -1290,14 +1254,7 @@ function renderCustomAvatarUpload(
         input.value =
           "";
 
-        uploadAvatarFile =
-          null;
-
-        preview.style.display =
-          "none";
-
         return;
-
       }
 
 
@@ -1307,35 +1264,91 @@ function renderCustomAvatarUpload(
       ) {
 
         alert(
-          "图片不能超过 2MB。"
+          "原始图片不能超过 2MB。"
         );
 
         input.value =
           "";
 
-        uploadAvatarFile =
-          null;
-
-        preview.style.display =
-          "none";
-
         return;
-
       }
 
 
       /* ---------------------------------------------------
-         PREVIEW
+         COOLDOWN
       --------------------------------------------------- */
 
-      const objectUrl =
+      if (
+        isAvatarUploadOnCooldown()
+      ) {
+
+        alert(
+          "头像还在冷却中，还剩 " +
+          formatAvatarCooldown() +
+          "。"
+        );
+
+        input.value =
+          "";
+
+        return;
+      }
+
+
+      /* ---------------------------------------------------
+         OPEN CROP
+      --------------------------------------------------- */
+
+      const croppedFile =
+        await openAvatarCropper(file);
+
+
+      /*
+       * 用户取消裁剪
+       */
+      if (!croppedFile) {
+
+        input.value =
+          "";
+
+        fileName.textContent =
+          "尚未选择图片";
+
+        preview.style.display =
+          "none";
+
+        preview.removeAttribute(
+          "src"
+        );
+
+        uploadAvatarFile =
+          null;
+
+        return;
+      }
+
+
+      /* ---------------------------------------------------
+         SAVE CROPPED FILE
+      --------------------------------------------------- */
+
+      uploadAvatarFile =
+        croppedFile;
+
+
+      fileName.textContent =
+        file.name +
+        " → 已裁剪";
+
+
+      const previewUrl =
         URL.createObjectURL(
-          file
+          croppedFile
         );
 
 
       preview.src =
-        objectUrl;
+        previewUrl;
 
       preview.style.display =
         "block";
@@ -1345,7 +1358,7 @@ function renderCustomAvatarUpload(
         function() {
 
           URL.revokeObjectURL(
-            objectUrl
+            previewUrl
           );
 
         };
@@ -1375,6 +1388,1306 @@ function renderCustomAvatarUpload(
   panel.appendChild(
     uploadBox
   );
+
+}
+
+
+/* =========================================================
+   AVATAR CROPPER
+   1:1 SQUARE
+========================================================= */
+
+function openAvatarCropper(file) {
+
+  return new Promise(
+    function(resolve) {
+
+      const objectUrl =
+        URL.createObjectURL(file);
+
+
+      const image =
+        new Image();
+
+
+      image.onload =
+        function() {
+
+          URL.revokeObjectURL(
+            objectUrl
+          );
+
+
+          createAvatarCropModal(
+            image,
+            resolve
+          );
+
+        };
+
+
+      image.onerror =
+        function() {
+
+          URL.revokeObjectURL(
+            objectUrl
+          );
+
+          alert(
+            "无法读取这张图片。"
+          );
+
+          resolve(null);
+
+        };
+
+
+      image.src =
+        objectUrl;
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   CREATE CROP MODAL
+========================================================= */
+
+function createAvatarCropModal(
+  image,
+  resolve
+) {
+
+  const modal =
+    document.createElement("div");
+
+  modal.className =
+    "U9-avatar-crop-modal";
+
+
+  const box =
+    document.createElement("div");
+
+  box.className =
+    "U9-avatar-crop-box";
+
+
+  /* =======================================================
+     TITLE
+  ======================================================= */
+
+  const title =
+    document.createElement("div");
+
+  title.className =
+    "U9-avatar-crop-title";
+
+  title.textContent =
+    "调整头像";
+
+  box.appendChild(
+    title
+  );
+
+
+  /* =======================================================
+     DESCRIPTION
+  ======================================================= */
+
+  const description =
+    document.createElement("div");
+
+  description.className =
+    "U9-avatar-crop-description";
+
+  description.textContent =
+    "拖动图片调整位置，使用滑块调整大小";
+
+  box.appendChild(
+    description
+  );
+
+
+  /* =======================================================
+     CROP AREA
+  ======================================================= */
+
+  const cropArea =
+    document.createElement("div");
+
+  cropArea.className =
+    "U9-avatar-crop-area";
+
+
+  const canvas =
+    document.createElement("canvas");
+
+  canvas.className =
+    "U9-avatar-crop-canvas";
+
+  canvas.width =
+    512;
+
+  canvas.height =
+    512;
+
+
+  cropArea.appendChild(
+    canvas
+  );
+
+
+  box.appendChild(
+    cropArea
+  );
+
+
+  const ctx =
+    canvas.getContext("2d");
+
+
+  /* =======================================================
+     IMAGE STATE
+  ======================================================= */
+
+  const canvasSize =
+    512;
+
+
+  const imageRatio =
+    image.width /
+    image.height;
+
+
+  let scale =
+    Math.max(
+      canvasSize / image.width,
+      canvasSize / image.height
+    );
+
+
+  const minScale =
+    scale;
+
+
+  let maxScale =
+    minScale * 4;
+
+
+  let offsetX =
+    (canvasSize -
+      image.width * scale) / 2;
+
+
+  let offsetY =
+    (canvasSize -
+      image.height * scale) / 2;
+
+
+  let dragging =
+    false;
+
+
+  let startX =
+    0;
+
+
+  let startY =
+    0;
+
+
+  let startOffsetX =
+    0;
+
+
+  let startOffsetY =
+    0;
+
+
+  /* =======================================================
+     DRAW
+  ======================================================= */
+
+  function draw() {
+
+    ctx.clearRect(
+      0,
+      0,
+      canvasSize,
+      canvasSize
+    );
+
+
+    /*
+     * Background
+     */
+    ctx.fillStyle =
+      "#ffffff";
+
+    ctx.fillRect(
+      0,
+      0,
+      canvasSize,
+      canvasSize
+    );
+
+
+    /*
+     * Draw image
+     */
+    ctx.drawImage(
+      image,
+      offsetX,
+      offsetY,
+      image.width * scale,
+      image.height * scale
+    );
+
+
+    /*
+     * Crop border
+     */
+    ctx.save();
+
+    ctx.strokeStyle =
+      "#ffffff";
+
+    ctx.lineWidth =
+      4;
+
+    ctx.strokeRect(
+      2,
+      2,
+      canvasSize - 4,
+      canvasSize - 4
+    );
+
+    ctx.restore();
+
+  }
+
+
+  /* =======================================================
+     ZOOM
+  ======================================================= */
+
+  const zoom =
+    document.createElement("input");
+
+  zoom.type =
+    "range";
+
+  zoom.min =
+    String(minScale);
+
+  zoom.max =
+    String(maxScale);
+
+  zoom.step =
+    String(minScale / 100);
+
+  zoom.value =
+    String(scale);
+
+  zoom.className =
+    "U9-avatar-crop-zoom";
+
+
+  box.appendChild(
+    zoom
+  );
+
+
+  zoom.addEventListener(
+    "input",
+    function() {
+
+      const oldScale =
+        scale;
+
+
+      scale =
+        Number(
+          zoom.value
+        );
+
+
+      /*
+       * Keep image centered
+       * while zooming.
+       */
+      const centerX =
+        canvasSize / 2;
+
+      const centerY =
+        canvasSize / 2;
+
+
+      offsetX =
+        centerX -
+        (
+          centerX -
+          offsetX
+        ) *
+        (
+          scale /
+          oldScale
+        );
+
+
+      offsetY =
+        centerY -
+        (
+          centerY -
+          offsetY
+        ) *
+        (
+          scale /
+          oldScale
+        );
+
+
+      constrainCrop();
+
+      draw();
+
+    }
+  );
+
+
+  /* =======================================================
+     KEEP IMAGE INSIDE CROP
+  ======================================================= */
+
+  function constrainCrop() {
+
+    const width =
+      image.width *
+      scale;
+
+    const height =
+      image.height *
+      scale;
+
+
+    /*
+     * Image must completely
+     * cover the square.
+     */
+
+    if (
+      width <= canvasSize
+    ) {
+
+      offsetX =
+        (canvasSize -
+          width) / 2;
+
+    }
+
+    else {
+
+      const minX =
+        canvasSize -
+        width;
+
+      const maxX =
+        0;
+
+
+      if (
+        offsetX < minX
+      ) {
+
+        offsetX =
+          minX;
+
+      }
+
+
+      if (
+        offsetX > maxX
+      ) {
+
+        offsetX =
+          maxX;
+
+      }
+
+    }
+
+
+    if (
+      height <= canvasSize
+    ) {
+
+      offsetY =
+        (canvasSize -
+          height) / 2;
+
+    }
+
+    else {
+
+      const minY =
+        canvasSize -
+        height;
+
+      const maxY =
+        0;
+
+
+      if (
+        offsetY < minY
+      ) {
+
+        offsetY =
+          minY;
+
+      }
+
+
+      if (
+        offsetY > maxY
+      ) {
+
+        offsetY =
+          maxY;
+
+      }
+
+    }
+
+  }
+
+
+  /* =======================================================
+     MOUSE DRAG
+  ======================================================= */
+
+  canvas.addEventListener(
+    "mousedown",
+    function(event) {
+
+      dragging =
+        true;
+
+
+      startX =
+        event.clientX;
+
+
+      startY =
+        event.clientY;
+
+
+      startOffsetX =
+        offsetX;
+
+
+      startOffsetY =
+        offsetY;
+
+
+      canvas.classList.add(
+        "dragging"
+      );
+
+    }
+  );
+
+
+  window.addEventListener(
+    "mousemove",
+    function(event) {
+
+      if (!dragging) {
+        return;
+      }
+
+
+      offsetX =
+        startOffsetX +
+        (
+          event.clientX -
+          startX
+        );
+
+
+      offsetY =
+        startOffsetY +
+        (
+          event.clientY -
+          startY
+        );
+
+
+      constrainCrop();
+
+      draw();
+
+    }
+  );
+
+
+  window.addEventListener(
+    "mouseup",
+    function() {
+
+      dragging =
+        false;
+
+
+      canvas.classList.remove(
+        "dragging"
+      );
+
+    }
+  );
+
+
+  /* =======================================================
+     TOUCH DRAG
+  ======================================================= */
+
+  canvas.addEventListener(
+    "touchstart",
+    function(event) {
+
+      if (
+        !event.touches.length
+      ) {
+        return;
+      }
+
+
+      const touch =
+        event.touches[0];
+
+
+      dragging =
+        true;
+
+
+      startX =
+        touch.clientX;
+
+
+      startY =
+        touch.clientY;
+
+
+      startOffsetX =
+        offsetX;
+
+
+      startOffsetY =
+        offsetY;
+
+    },
+    {
+      passive: true
+    }
+  );
+
+
+  canvas.addEventListener(
+    "touchmove",
+    function(event) {
+
+      if (
+        !dragging ||
+        !event.touches.length
+      ) {
+        return;
+      }
+
+
+      const touch =
+        event.touches[0];
+
+
+      offsetX =
+        startOffsetX +
+        (
+          touch.clientX -
+          startX
+        );
+
+
+      offsetY =
+        startOffsetY +
+        (
+          touch.clientY -
+          startY
+        );
+
+
+      constrainCrop();
+
+      draw();
+
+      event.preventDefault();
+
+    },
+    {
+      passive: false
+    }
+  );
+
+
+  canvas.addEventListener(
+    "touchend",
+    function() {
+
+      dragging =
+        false;
+
+    }
+  );
+
+
+  /* =======================================================
+     BUTTONS
+  ======================================================= */
+
+  const buttons =
+    document.createElement("div");
+
+  buttons.className =
+    "U9-avatar-crop-buttons";
+
+
+  const cancelButton =
+    document.createElement("button");
+
+  cancelButton.type =
+    "button";
+
+  cancelButton.className =
+    "U9-avatar-crop-cancel";
+
+  cancelButton.textContent =
+    "取消";
+
+
+  const confirmButton =
+    document.createElement("button");
+
+  confirmButton.type =
+    "button";
+
+  confirmButton.className =
+    "U9-avatar-crop-confirm";
+
+  confirmButton.textContent =
+    "使用这个头像";
+
+
+  buttons.appendChild(
+    cancelButton
+  );
+
+  buttons.appendChild(
+    confirmButton
+  );
+
+
+  box.appendChild(
+    buttons
+  );
+
+
+  /* =======================================================
+     CLOSE MODAL
+  ======================================================= */
+
+  function closeCrop(
+    result
+  ) {
+
+    modal.remove();
+
+    document.body.style.overflow =
+      "";
+
+    resolve(
+      result
+    );
+
+  }
+
+
+  cancelButton.addEventListener(
+    "click",
+    function() {
+
+      closeCrop(
+        null
+      );
+
+    }
+  );
+
+
+  /* =======================================================
+     EXPORT CROPPED IMAGE
+  ======================================================= */
+
+  confirmButton.addEventListener(
+    "click",
+    function() {
+
+      confirmButton.disabled =
+        true;
+
+      confirmButton.textContent =
+        "处理中...";
+
+
+      /*
+       * Export:
+       *
+       * 512 x 512
+       * WebP
+       *
+       * 所以不管用户选择 PNG、
+       * JPG、JPEG、WebP，
+       * 最后上传格式统一。
+       */
+
+      canvas.toBlob(
+        function(blob) {
+
+          if (!blob) {
+
+            confirmButton.disabled =
+              false;
+
+            confirmButton.textContent =
+              "使用这个头像";
+
+            alert(
+              "头像裁剪失败，请重新选择图片。"
+            );
+
+            return;
+
+          }
+
+
+          const croppedFile =
+            new File(
+              [blob],
+              "avatar.webp",
+              {
+                type:
+                  "image/webp",
+                lastModified:
+                  Date.now()
+              }
+            );
+
+
+          closeCrop(
+            croppedFile
+          );
+
+        },
+        "image/webp",
+        0.92
+      );
+
+    }
+  );
+
+
+  /* =======================================================
+     ESC
+  ======================================================= */
+
+  function escHandler(
+    event
+  ) {
+
+    if (
+      event.key ===
+      "Escape"
+    ) {
+
+      closeCrop(
+        null
+      );
+
+
+      document.removeEventListener(
+        "keydown",
+        escHandler
+      );
+
+    }
+
+  }
+
+
+  document.addEventListener(
+    "keydown",
+    escHandler
+  );
+
+
+  /* =======================================================
+     SHOW
+  ======================================================= */
+
+  modal.appendChild(
+    box
+  );
+
+
+  document.body.appendChild(
+    modal
+  );
+
+
+  document.body.style.overflow =
+    "hidden";
+
+
+  draw();
+
+  cropArea.style.touchAction =
+    "none";
+
+}
+
+
+/* =========================================================
+   UPLOAD CUSTOM AVATAR
+========================================================= */
+
+async function uploadCustomAvatar(
+  file,
+  button,
+  input
+) {
+
+  /* =======================================================
+     LOGIN
+  ======================================================= */
+
+  if (
+    !page3IsLoggedIn()
+  ) {
+
+    alert(
+      "请先登录。"
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     COOLDOWN
+  ======================================================= */
+
+  if (
+    isAvatarUploadOnCooldown()
+  ) {
+
+    alert(
+      "头像还在冷却中，还剩 " +
+      formatAvatarCooldown() +
+      "。"
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     FILE
+  ======================================================= */
+
+  if (!file) {
+
+    alert(
+      "请先选择并裁剪一张图片。"
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * 注意：
+   * 这里收到的 file 已经是
+   * crop 后的 avatar.webp。
+   *
+   * 所以后端仍然可以使用
+   * image/webp。
+   */
+
+  if (
+    file.type !==
+    "image/webp"
+  ) {
+
+    alert(
+      "头像裁剪结果无效，请重新选择图片。"
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     SIZE
+  ======================================================= */
+
+  if (
+    file.size <= 0
+  ) {
+
+    alert(
+      "图片文件无效。"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    file.size >
+    U9_PROFILE_PAGE3_MAX_AVATAR_SIZE
+  ) {
+
+    alert(
+      "裁剪后的头像不能超过 2MB。"
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     TOKEN
+  ======================================================= */
+
+  const token =
+    getPage3Token();
+
+
+  if (!token) {
+
+    alert(
+      "登录状态已失效，请重新登录。"
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     BUTTON
+  ======================================================= */
+
+  if (button) {
+
+    button.disabled =
+      true;
+
+    button.classList.add(
+      "loading"
+    );
+
+    button.textContent =
+      "上传中...";
+
+  }
+
+
+  try {
+
+    /* =====================================================
+       FORMDATA
+    ===================================================== */
+
+    const formData =
+      new FormData();
+
+
+    formData.append(
+      "avatar",
+      file
+    );
+
+
+    /* =====================================================
+       REQUEST
+    ===================================================== */
+
+    const response =
+      await fetch(
+        U9_PROFILE_PAGE3_UPLOAD_AVATAR_API,
+        {
+          method:
+            "POST",
+
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          },
+
+          /*
+           * IMPORTANT:
+           * 不要手动设置 Content-Type
+           */
+          body:
+            formData,
+
+          credentials:
+            "omit",
+
+          cache:
+            "no-store"
+        }
+      );
+
+
+    const result =
+      await response.json()
+        .catch(
+          () => ({})
+        );
+
+
+    console.log(
+      "CUSTOM AVATAR UPLOAD RESULT:",
+      result
+    );
+
+
+    /* =====================================================
+       AUTH ERROR
+    ===================================================== */
+
+    if (
+      response.status === 401 ||
+      response.status === 403
+    ) {
+
+      throw new Error(
+        result?.error ||
+        result?.message ||
+        "登录状态已失效，请重新登录。"
+      );
+
+    }
+
+
+    /* =====================================================
+       COOLDOWN
+    ===================================================== */
+
+    if (
+      response.status === 429
+    ) {
+
+      currentAvatarCooldownUntil =
+        result?.cooldown_until ||
+        null;
+
+
+      const remaining =
+        result?.remaining_hours;
+
+
+      throw new Error(
+        result?.error ||
+        result?.message ||
+        (
+          Number.isFinite(
+            Number(remaining)
+          )
+            ? `头像还在冷却中，还剩约 ${remaining} 小时。`
+            : "头像还在冷却中。"
+        )
+      );
+
+    }
+
+
+    /* =====================================================
+       OTHER ERROR
+    ===================================================== */
+
+    if (!response.ok) {
+
+      throw new Error(
+        result?.error ||
+        result?.message ||
+        "头像上传失败。"
+      );
+
+    }
+
+
+    if (
+      result?.success === false
+    ) {
+
+      throw new Error(
+        result?.error ||
+        result?.message ||
+        "头像上传失败。"
+      );
+
+    }
+
+
+    /* =====================================================
+       SUCCESS
+    ===================================================== */
+
+    if (
+      result?.avatar
+    ) {
+
+      currentAvatarType =
+        result.avatar.type ||
+        "custom";
+
+
+      currentAvatarId =
+        result.avatar.id ||
+        null;
+
+
+      currentAvatarUrl =
+        result.avatar.url ||
+        null;
+
+
+      currentAvatarCooldownUntil =
+        result.avatar.cooldown_until ||
+        null;
+
+    }
+
+    else {
+
+      currentAvatarType =
+        "custom";
+
+    }
+
+
+    /* =====================================================
+       REFRESH PROFILE
+    ===================================================== */
+
+    await refreshProfileAfterChange();
+
+
+    /* =====================================================
+       RESET
+    ===================================================== */
+
+    uploadAvatarFile =
+      null;
+
+
+    if (input) {
+
+      input.value =
+        "";
+
+    }
+
+
+    /* =====================================================
+       SUCCESS
+    ===================================================== */
+
+    alert(
+      "头像上传成功！7天内不能再次上传头像。"
+    );
+
+
+    /* =====================================================
+       RE-RENDER
+    ===================================================== */
+
+    const panel =
+      document.getElementById(
+        "U9-profile-page3-panel"
+      );
+
+
+    if (
+      panel &&
+      activePage3Tab ===
+        "avatar"
+    ) {
+
+      await switchPage3Tab(
+        "avatar"
+      );
+
+    }
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "CUSTOM AVATAR UPLOAD ERROR:",
+      error
+    );
+
+
+    alert(
+      error?.message ||
+      "头像上传失败，请稍后重试。"
+    );
+
+  }
+
+  finally {
+
+    if (button) {
+
+      button.classList.remove(
+        "loading"
+      );
+
+      button.disabled =
+        isAvatarUploadOnCooldown();
+
+
+      if (
+        !isAvatarUploadOnCooldown()
+      ) {
+
+        button.textContent =
+          "上传头像";
+
+      }
+
+    }
+
+  }
 
 }
 
