@@ -29,6 +29,7 @@ const headerUsername =
 
 
 
+
 /* =========================
    API
 ========================= */
@@ -37,22 +38,6 @@ const headerUsername =
 const U9_ME_API =
 "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me";
 
-
-
-
-
-/* =========================
-   TOKEN
-========================= */
-
-
-function getSessionToken(){
-
-  return localStorage.getItem(
-    "u9_token"
-  );
-
-}
 
 
 
@@ -79,6 +64,7 @@ null;
 
 
 
+
 /* =========================
    LISTENERS
 ========================= */
@@ -86,6 +72,8 @@ null;
 
 const userListeners =
 new Set();
+
+
 
 
 
@@ -100,31 +88,44 @@ function formatUsername(
 username
 ){
 
-if(!username){
+
+if(
+!username
+){
 
 return "";
 
 }
 
 
-if(username.length <= 8){
+
+if(
+username.length <= 8
+){
 
 return username;
 
 }
 
 
+
 return (
+
 username.substring(
 0,
 8
 )
+
 +
+
 "..."
+
 );
 
 
 }
+
+
 
 
 
@@ -149,6 +150,7 @@ headerRegister.style.display =
 "none";
 
 }
+
 
 
 if(headerLogin){
@@ -184,7 +186,6 @@ user.username
 }
 
 
-
 else{
 
 
@@ -194,6 +195,7 @@ headerRegister.style.display =
 "";
 
 }
+
 
 
 if(headerLogin){
@@ -234,6 +236,9 @@ headerUsername.textContent =
 
 
 
+
+
+
 /* =========================
    SET USER STATE
 ========================= */
@@ -260,12 +265,15 @@ error;
 
 
 if(
-state==="AUTHENTICATED"
+state ===
+"AUTHENTICATED"
 ){
+
 
 updateHeaderUser(
 user
 );
+
 
 }
 
@@ -276,6 +284,7 @@ updateHeaderUser(
 null
 );
 
+
 }
 
 
@@ -284,6 +293,9 @@ notifyUserListeners();
 
 
 }
+
+
+
 
 
 
@@ -317,6 +329,7 @@ currentUserError
 
 
 }
+
 catch(error){
 
 
@@ -341,6 +354,11 @@ error
 
 
 
+
+
+
+
+
 /* =========================
    CHECK CURRENT USER
 ========================= */
@@ -351,35 +369,19 @@ async function getCurrentUser(){
 
 
 setUserState(
+
 "CHECKING",
+
 currentUser,
+
 null
+
 );
 
 
 
+
 try{
-
-
-const token =
-getSessionToken();
-
-
-
-const headers = {};
-
-
-
-if(token){
-
-
-headers[
-"Authorization"
-] =
-`Bearer ${token}`;
-
-
-}
 
 
 
@@ -398,40 +400,46 @@ method:
 
 
 
+/*
+ HttpOnly Cookie
+
+ u9_session
+
+ 自动发送
+
+*/
+
 credentials:
 "include",
 
 
 
-headers:
-headers
+headers:{
 
+"Content-Type":
+"application/json"
 
 }
 
 
+}
+
 );
 
 
 
 
+
+
+/* =========================
+   NOT LOGIN
+========================= */
 
 
 if(
-response.status===401 ||
-response.status===403
+response.status === 401 ||
+response.status === 403
 ){
-
-
-
-/*
- 清除失效 token
-
-*/
-
-localStorage.removeItem(
-"u9_token"
-);
 
 
 
@@ -458,7 +466,10 @@ return null;
 
 
 
-if(!response.ok){
+
+if(
+!response.ok
+){
 
 
 const error =
@@ -490,6 +501,8 @@ return null;
 
 
 
+
+
 const result =
 await response.json();
 
@@ -499,14 +512,16 @@ await response.json();
 
 const user =
 result?.user ||
-result?.data?.user ||
 null;
 
 
 
 
 
-if(!user){
+
+if(
+!user
+){
 
 
 setUserState(
@@ -530,6 +545,8 @@ return null;
 
 
 
+
+
 setUserState(
 
 "AUTHENTICATED",
@@ -548,8 +565,9 @@ return user;
 
 }
 
-catch(error){
 
+
+catch(error){
 
 
 console.error(
@@ -590,6 +608,7 @@ return null;
 
 
 
+
 /* =========================
    GET USER
 ========================= */
@@ -600,6 +619,7 @@ function getUser(){
 return currentUser;
 
 }
+
 
 
 
@@ -620,12 +640,16 @@ return currentUserState;
 
 
 
+
+
+
 /* =========================
    LOGIN CHECK
 ========================= */
 
 
 function isLoggedIn(){
+
 
 return (
 
@@ -647,12 +671,14 @@ currentUserState ===
 
 
 
+
 /* =========================
    CHECKING
 ========================= */
 
 
 function isChecking(){
+
 
 return (
 
@@ -663,6 +689,9 @@ currentUserState ===
 
 
 }
+
+
+
 
 
 
@@ -685,6 +714,9 @@ currentUserState ===
 
 
 }
+
+
+
 
 
 
@@ -735,6 +767,8 @@ listener
 
 
 
+
+
 /* =========================
    REFRESH
 ========================= */
@@ -751,17 +785,14 @@ return await getCurrentUser();
 
 
 
+
+
 /* =========================
    LOGOUT CLEAR
 ========================= */
 
 
 function clearCurrentUser(){
-
-
-localStorage.removeItem(
-"u9_token"
-);
 
 
 
@@ -776,7 +807,11 @@ null
 );
 
 
+
 }
+
+
+
 
 
 
@@ -824,6 +859,8 @@ clearCurrentUser
 
 
 };
+
+
 
 
 
