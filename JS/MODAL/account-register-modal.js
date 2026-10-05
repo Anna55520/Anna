@@ -26,6 +26,7 @@ const registerForm =
   );
 
 
+
 /* =========================
    OPEN REGISTER
 ========================= */
@@ -41,6 +42,7 @@ registerButton.addEventListener(
 );
 
 
+
 /* =========================
    CLOSE REGISTER
 ========================= */
@@ -54,6 +56,7 @@ registerClose.addEventListener(
 
   }
 );
+
 
 
 /* =========================
@@ -77,21 +80,25 @@ registerPasswordToggle.addEventListener(
   "click",
   () => {
 
-    if (
+    if(
       registerPassword.type ===
       "password"
-    ) {
+    ){
 
       registerPassword.type =
         "text";
 
+
       registerPasswordToggle.textContent =
         "Hide";
 
-    } else {
+    }
+
+    else {
 
       registerPassword.type =
         "password";
+
 
       registerPasswordToggle.textContent =
         "Show";
@@ -100,6 +107,8 @@ registerPasswordToggle.addEventListener(
 
   }
 );
+
+
 
 
 /* =========================
@@ -123,21 +132,25 @@ registerConfirmPasswordToggle.addEventListener(
   "click",
   () => {
 
-    if (
+    if(
       registerConfirmPassword.type ===
       "password"
-    ) {
+    ){
 
       registerConfirmPassword.type =
         "text";
 
+
       registerConfirmPasswordToggle.textContent =
         "Hide";
 
-    } else {
+    }
+
+    else {
 
       registerConfirmPassword.type =
         "password";
+
 
       registerConfirmPasswordToggle.textContent =
         "Show";
@@ -148,20 +161,25 @@ registerConfirmPasswordToggle.addEventListener(
 );
 
 
+
+
 /* =========================
    REGISTER FORM
 ========================= */
 
 registerForm.addEventListener(
   "submit",
-  async (event) => {
+  async(event)=>{
+
 
     event.preventDefault();
+
 
 
     /* =========================
        GET FORM DATA
     ========================= */
+
 
     const username =
       document
@@ -170,6 +188,7 @@ registerForm.addEventListener(
         )
         .value
         .trim();
+
 
 
     const email =
@@ -181,26 +200,35 @@ registerForm.addEventListener(
         .trim();
 
 
+
     const password =
-      document.getElementById(
-        "U9-register-password"
-      ).value;
+      document
+        .getElementById(
+          "U9-register-password"
+        )
+        .value;
+
 
 
     const confirmPassword =
-      document.getElementById(
-        "U9-register-confirm-password"
-      ).value;
+      document
+        .getElementById(
+          "U9-register-confirm-password"
+        )
+        .value;
+
+
 
 
     /* =========================
        CHECK PASSWORD
     ========================= */
 
-    if (
+
+    if(
       password !==
       confirmPassword
-    ) {
+    ){
 
       alert(
         "Passwords do not match."
@@ -211,94 +239,148 @@ registerForm.addEventListener(
     }
 
 
+
+
     /* =========================
        REGISTER REQUEST
     ========================= */
 
+
     try {
+
 
       const response =
         await fetch(
+
           "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/register",
+
           {
-            method: "POST",
 
-            credentials: "include",
+            method:
+              "POST",
 
-            headers: {
+
+            /*
+              IMPORTANT
+
+              RECEIVE COOKIE
+
+            */
+
+            credentials:
+              "include",
+
+
+
+            headers:{
+
               "Content-Type":
                 "application/json"
+
             },
 
-            body: JSON.stringify({
 
-              username:
-                username,
 
-              email:
-                email,
+            body:
+              JSON.stringify({
 
-              password:
-                password
+                username:
+                  username,
 
-            })
+
+                email:
+                  email,
+
+
+                password:
+                  password
+
+              })
 
           }
+
         );
+
+
 
 
       const result =
         await response.json();
 
 
+
+
+      console.log(
+        "REGISTER RESULT:",
+        result
+      );
+
+
+
+
+
       /* =========================
          REGISTER ERROR
       ========================= */
 
-      if (!response.ok) {
+
+      if(
+        !response.ok
+      ){
 
         alert(
+
           result.error ||
           "Registration failed."
+
         );
+
 
         return;
 
       }
 
 
+
+
       /* =========================
          REGISTER SUCCESS
       ========================= */
+
 
       alert(
         "Registration successful."
       );
 
 
+
+
       registerForm.reset();
+
 
 
       registerModal.style.display =
         "none";
 
 
-      /* =========================
-         UPDATE HEADER
-      ========================= */
 
-      localStorage.setItem(
-        "u9_session",
-        result.session.token
-      );
+
+
+      /* =========================
+         UPDATE HEADER USER
+      ========================= */
 
 
       await getCurrentUser();
-      
+
+
+
+
 
       /* =========================
-        UPDATE PROFILE AVATAR
+         REFRESH AVATAR
       ========================= */
+
 
       if(
         window.U9ProfileAvatar
@@ -309,7 +391,14 @@ registerForm.addEventListener(
       }
 
 
-    } catch (error) {
+
+
+
+    }
+
+
+    catch(error){
+
 
       console.error(
         "Register error:",
@@ -317,11 +406,15 @@ registerForm.addEventListener(
       );
 
 
+
       alert(
         "Unable to connect to the server."
       );
 
+
     }
 
+
   }
+
 );
