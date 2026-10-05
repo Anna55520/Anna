@@ -18,6 +18,8 @@ const U9_PROFILE_PAGE3_SET_AVATAR_API =
 
 
 
+
+
 /* =========================
    ELEMENTS
 ========================= */
@@ -29,11 +31,15 @@ const profilePage3Content =
 
 
 
+
+
 /* =========================
    CURRENT AVATAR
 ========================= */
 
 let currentAvatarId = null;
+
+
 
 
 
@@ -51,33 +57,262 @@ function getProfilePage3Token(){
 
 
 
-/* =========================
-   LOAD CURRENT AVATAR
 
-   TODO:
-   后续接你的 avatar-current API
-========================= */
+
+/* =================================================
+   LOAD CURRENT AVATAR
+================================================= */
 
 async function loadCurrentAvatar(){
 
-  /*
-    暂时为空
+  try{
 
-    等你提供读取当前头像 API
+    /*
+       优先从 U9User 获取当前用户
+    */
 
-    这里以后会设置：
+    if(
+      window.U9User &&
+      typeof window.U9User.get ===
+      "function"
+    ){
 
-    currentAvatarId =
-    user_avatar.avatar_id
-  */
+      const user =
+        window.U9User.get();
+
+
+      if(user){
+
+        /*
+           尝试读取 avatar.id
+        */
+
+        const avatarId =
+          user?.avatar?.id ||
+          user?.avatar?.avatar_id ||
+          user?.avatar_id ||
+          null;
+
+
+        if(avatarId !== null){
+
+          currentAvatarId =
+            String(
+              avatarId
+            );
+
+        }
+
+      }
+
+    }
+
+
+
+    /*
+       DEBUG
+    */
+
+    console.log(
+      "PAGE3 CURRENT AVATAR ID:",
+      currentAvatarId
+    );
+
+
+
+    return currentAvatarId;
+
+  }
+  catch(error){
+
+    console.error(
+      "LOAD CURRENT AVATAR ERROR:",
+      error
+    );
+
+
+    return null;
+
+  }
 
 }
 
 
 
-/* =========================
+
+
+/* =================================================
+   REFRESH USER / PROFILE AFTER AVATAR SET
+================================================= */
+
+async function refreshProfileAfterAvatarChange(){
+
+  try{
+
+    console.log(
+      "REFRESHING USER AFTER AVATAR CHANGE..."
+    );
+
+
+
+    /* =========================
+       STEP 1
+       REFRESH USER FROM /me
+    ========================= */
+
+    let refreshedUser =
+      null;
+
+
+
+    if(
+      window.U9User &&
+      typeof window.U9User.refresh ===
+      "function"
+    ){
+
+      refreshedUser =
+        await window.U9User.refresh();
+
+
+
+      console.log(
+        "USER AFTER AVATAR REFRESH:",
+        refreshedUser
+      );
+
+    }
+
+
+
+    /* =========================
+       STEP 2
+       UPDATE CURRENT AVATAR ID
+    ========================= */
+
+    if(refreshedUser){
+
+      const avatarId =
+        refreshedUser?.avatar?.id ||
+        refreshedUser?.avatar?.avatar_id ||
+        refreshedUser?.avatar_id ||
+        null;
+
+
+
+      if(avatarId !== null){
+
+        currentAvatarId =
+          String(
+            avatarId
+          );
+
+      }
+
+    }
+
+
+
+    /* =========================
+       STEP 3
+       UPDATE PAGE 3 BUTTONS
+    ========================= */
+
+    updateAvatarButtons();
+
+
+
+    /* =========================
+       STEP 4
+       REFRESH PROFILE
+    ========================= */
+
+    /*
+       如果 profile.js 有专门的
+       refreshAvatar()，
+
+       优先使用它。
+
+       这样不会把 Page 3
+       强制切换回 Page 1。
+    */
+
+    if(
+      window.U9Profile &&
+      typeof window.U9Profile.refreshAvatar ===
+      "function"
+    ){
+
+      console.log(
+        "U9Profile.refreshAvatar()"
+      );
+
+
+      await window.U9Profile.refreshAvatar();
+
+
+      return true;
+
+    }
+
+
+
+    /*
+       如果暂时没有 refreshAvatar()
+
+       使用原来的 refresh()
+       作为兼容方案。
+    */
+
+    if(
+      window.U9Profile &&
+      typeof window.U9Profile.refresh ===
+      "function"
+    ){
+
+      console.log(
+        "U9Profile.refresh()"
+      );
+
+
+      await window.U9Profile.refresh();
+
+
+      return true;
+
+    }
+
+
+
+    console.warn(
+      "U9Profile refresh method not found."
+    );
+
+
+    return false;
+
+  }
+  catch(error){
+
+    console.error(
+      "REFRESH PROFILE AFTER AVATAR CHANGE ERROR:",
+      error
+    );
+
+
+    return false;
+
+  }
+
+}
+
+
+
+
+
+/* =================================================
    SET FREE AVATAR
-========================= */
+================================================= */
 
 async function setFreeAvatar(
   avatarId,
@@ -101,6 +336,8 @@ async function setFreeAvatar(
 
 
 
+
+
   try{
 
     /* =========================
@@ -118,11 +355,14 @@ async function setFreeAvatar(
         "SET AVATAR: NO SESSION TOKEN"
       );
 
+
       throw new Error(
         "登录已失效，请重新登录"
       );
 
     }
+
+
 
 
 
@@ -135,14 +375,14 @@ async function setFreeAvatar(
     );
 
 
-
     button.disabled =
       true;
 
 
-
     button.textContent =
       "加载中...";
+
+
 
 
 
@@ -160,6 +400,8 @@ async function setFreeAvatar(
           token.length
       }
     );
+
+
 
 
 
@@ -211,11 +453,15 @@ async function setFreeAvatar(
 
 
 
+
+
     /* =========================
        RESPONSE JSON
     ========================= */
 
-    let result = null;
+    let result =
+      null;
+
 
 
     try{
@@ -231,11 +477,14 @@ async function setFreeAvatar(
         jsonError
       );
 
+
       throw new Error(
         `服务器返回无效数据 (${response.status})`
       );
 
     }
+
+
 
 
 
@@ -256,6 +505,8 @@ async function setFreeAvatar(
 
 
 
+
+
     /* =========================
        AUTH ERROR
     ========================= */
@@ -270,12 +521,15 @@ async function setFreeAvatar(
         result
       );
 
+
       throw new Error(
         result?.error ||
         "登录 Session 无效，请重新登录"
       );
 
     }
+
+
 
 
 
@@ -293,6 +547,8 @@ async function setFreeAvatar(
       );
 
     }
+
+
 
 
 
@@ -314,6 +570,8 @@ async function setFreeAvatar(
 
 
 
+
+
     /* =========================
        UPDATE CURRENT AVATAR
     ========================= */
@@ -325,6 +583,8 @@ async function setFreeAvatar(
 
 
 
+
+
     /* =========================
        UPDATE BUTTONS
     ========================= */
@@ -333,8 +593,10 @@ async function setFreeAvatar(
 
 
 
+
+
     /* =========================
-       SUCCESS
+       SUCCESS LOG
     ========================= */
 
     console.log(
@@ -344,26 +606,25 @@ async function setFreeAvatar(
 
 
 
+
+
     /* =========================
-       OPTIONAL PROFILE REFRESH
+       REFRESH USER + PROFILE
     ========================= */
 
-    if(
-      window.U9Profile &&
-      typeof window.U9Profile.refresh ===
-      "function"
-    ){
+    await refreshProfileAfterAvatarChange();
 
-      /*
-        这里刷新 Profile 主资料。
 
-        如果后面的 /me API 已经会返回
-        最新 avatar，就会同步更新。
-      */
 
-      await window.U9Profile.refresh();
 
-    }
+
+    /* =========================
+       SUCCESS BUTTON
+    ========================= */
+
+    updateAvatarButtons();
+
+
 
 
 
@@ -376,20 +637,19 @@ async function setFreeAvatar(
     );
 
 
+
     button.textContent =
       "失败";
 
 
-    /*
-      失败后允许重新点击
-    */
 
     button.disabled =
       false;
 
 
+
     /*
-      短暂显示失败状态
+       失败后允许重新点击
     */
 
     setTimeout(
@@ -412,6 +672,7 @@ async function setFreeAvatar(
     );
 
 
+
   }
   finally{
 
@@ -420,9 +681,10 @@ async function setFreeAvatar(
     );
 
 
+
     /*
-      如果当前按钮不是正在使用，
-      恢复可点击状态
+       如果当前按钮不是正在使用，
+       恢复可点击状态
     */
 
     if(
@@ -441,9 +703,11 @@ async function setFreeAvatar(
 
 
 
-/* =========================
+
+
+/* =================================================
    UPDATE BUTTON STATUS
-========================= */
+================================================= */
 
 function updateAvatarButtons(){
 
@@ -454,6 +718,8 @@ function updateAvatarButtons(){
 
 
 
+
+
   buttons.forEach(
     function(button){
 
@@ -461,6 +727,8 @@ function updateAvatarButtons(){
         String(
           button.dataset.avatarId
         );
+
+
 
 
 
@@ -505,9 +773,11 @@ function updateAvatarButtons(){
 
 
 
-/* =========================
+
+
+/* =================================================
    LOAD FREE AVATAR
-========================= */
+================================================= */
 
 async function loadFreeAvatar(){
 
@@ -519,9 +789,12 @@ async function loadFreeAvatar(){
       "PAGE3 CONTENT NOT FOUND"
     );
 
+
     return;
 
   }
+
+
 
 
 
@@ -539,11 +812,16 @@ async function loadFreeAvatar(){
         {
 
           method:
-            "GET"
+            "GET",
+
+          cache:
+            "no-store"
 
         }
 
       );
+
+
 
 
 
@@ -563,6 +841,8 @@ async function loadFreeAvatar(){
 
 
 
+
+
     /* =========================
        JSON
     ========================= */
@@ -572,12 +852,20 @@ async function loadFreeAvatar(){
 
 
 
+
+
     console.log(
       "FREE AVATAR RESULT:",
       result
     );
 
 
+
+
+
+    /* =========================
+       API CHECK
+    ========================= */
 
     if(
       !result.success
@@ -592,6 +880,8 @@ async function loadFreeAvatar(){
 
 
 
+
+
     /* =========================
        AVATAR LIST
     ========================= */
@@ -602,10 +892,22 @@ async function loadFreeAvatar(){
 
 
 
+
+
+    /* =========================
+       CLEAR CONTENT
+    ========================= */
+
     profilePage3Content.innerHTML =
       "";
 
 
+
+
+
+    /* =========================
+       CREATE LIST
+    ========================= */
 
     const list =
       document.createElement(
@@ -613,9 +915,10 @@ async function loadFreeAvatar(){
       );
 
 
-
     list.className =
       "U9-profile-page3-avatar-list";
+
+
 
 
 
@@ -626,15 +929,20 @@ async function loadFreeAvatar(){
     avatars.forEach(
       function(avatar){
 
+        /* =========================
+           CARD
+        ========================= */
+
         const card =
           document.createElement(
             "div"
           );
 
 
-
         card.className =
           "U9-profile-page3-avatar-card";
+
+
 
 
 
@@ -648,15 +956,12 @@ async function loadFreeAvatar(){
           );
 
 
-
         img.className =
           "U9-profile-page3-avatar-image";
 
 
-
         img.src =
           avatar.svg;
-
 
 
         img.alt =
@@ -664,9 +969,28 @@ async function loadFreeAvatar(){
           "avatar";
 
 
-
         img.draggable =
           false;
+
+
+        /*
+           防止头像图片加载失败时
+           出现浏览器默认 broken image
+        */
+
+        img.addEventListener(
+          "error",
+          function(){
+
+            console.error(
+              "AVATAR IMAGE LOAD FAILED:",
+              avatar.svg
+            );
+
+          }
+        );
+
+
 
 
 
@@ -680,15 +1004,15 @@ async function loadFreeAvatar(){
           );
 
 
-
         name.className =
           "U9-profile-page3-avatar-name";
-
 
 
         name.textContent =
           avatar.name ||
           "";
+
+
 
 
 
@@ -702,10 +1026,8 @@ async function loadFreeAvatar(){
           );
 
 
-
         button.className =
           "U9-profile-page3-avatar-button";
-
 
 
         button.dataset.avatarId =
@@ -714,9 +1036,10 @@ async function loadFreeAvatar(){
           );
 
 
-
         button.textContent =
           "使用";
+
+
 
 
 
@@ -738,8 +1061,10 @@ async function loadFreeAvatar(){
 
 
 
+
+
         /* =========================
-           APPEND
+           APPEND CARD
         ========================= */
 
         card.appendChild(
@@ -757,6 +1082,13 @@ async function loadFreeAvatar(){
         );
 
 
+
+
+
+        /* =========================
+           APPEND LIST
+        ========================= */
+
         list.appendChild(
           card
         );
@@ -766,13 +1098,17 @@ async function loadFreeAvatar(){
 
 
 
+
+
     /* =========================
-       APPEND LIST
+       APPEND LIST TO PAGE
     ========================= */
 
     profilePage3Content.appendChild(
       list
     );
+
+
 
 
 
@@ -784,6 +1120,8 @@ async function loadFreeAvatar(){
 
 
 
+
+
   }
   catch(error){
 
@@ -792,15 +1130,30 @@ async function loadFreeAvatar(){
       error
     );
 
+
+
+    /*
+       页面显示错误
+    */
+
+    profilePage3Content.innerHTML =
+      `
+        <div class="U9-profile-page3-error">
+          加载头像失败
+        </div>
+      `;
+
   }
 
 }
 
 
 
-/* =========================
+
+
+/* =================================================
    LOAD PAGE
-========================= */
+================================================= */
 
 async function loadProfilePage3(){
 
@@ -810,11 +1163,15 @@ async function loadProfilePage3(){
 
 
 
+
+
   /* =========================
      LOAD CURRENT AVATAR
   ========================= */
 
   await loadCurrentAvatar();
+
+
 
 
 
@@ -828,8 +1185,10 @@ async function loadProfilePage3(){
 
 
 
-/* =========================
+
+
+/* =================================================
    START
-========================= */
+================================================= */
 
 loadProfilePage3();
