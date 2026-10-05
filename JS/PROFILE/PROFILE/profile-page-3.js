@@ -84,6 +84,12 @@ async function setFreeAvatar(
       "加载中...";
 
 
+    const sessionToken =
+      localStorage.getItem(
+        "u9_session"
+      );
+
+
 
     const response =
       await fetch(
@@ -98,8 +104,19 @@ async function setFreeAvatar(
 
           headers:{
 
+
             "Content-Type":
-              "application/json"
+              "application/json",
+
+
+
+            ...(sessionToken && {
+
+              Authorization:
+                `Bearer ${sessionToken}`
+
+            })
+
 
           },
 
