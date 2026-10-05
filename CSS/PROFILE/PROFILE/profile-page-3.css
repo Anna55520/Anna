@@ -36,44 +36,125 @@
 
 
 /* =================================================
-   PROFILE PAGE 3 WINDOW
+   PROFILE PAGE 3
+
+   ONLY PAGE 3
+
 ================================================= */
+
+
+/* =========================
+   WINDOW
+========================= */
 
 #U9-profile-page3 {
 
-  width: 100%;
+  width:100%;
 
-  min-height: 100%;
+  min-height:100%;
 
-  display: none;
+  display:none;
 
 }
 
 
-/* =================================================
-   PROFILE PAGE 3 CONTENT
-================================================= */
+
+/* =========================
+   CONTENT
+========================= */
 
 #U9-profile-page3-content {
 
-  width: 100%;
 
-  min-height: 300px;
+  width:100%;
 
-  background: rgb(0, 236, 201);
+  min-height:300px;
 
-  border-radius: 12px;
+  padding:20px;
 
-  display: flex;
 
-  align-items: center;
+}
 
-  justify-content: center;
 
-  color: white;
 
-  font-size: 24px;
+/* =========================
+   AVATAR LIST
+========================= */
 
-  font-weight: 600;
+
+.U9-profile-page3-avatar-list {
+
+
+  width:100%;
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:20px;
+
+}
+
+
+
+/* =========================
+   CARD
+========================= */
+
+
+.U9-profile-page3-avatar-card {
+
+
+  width:120px;
+
+  height:150px;
+
+  border-radius:16px;
+
+  background:white;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:10px;
+
+}
+
+
+
+/* =========================
+   IMAGE
+========================= */
+
+
+.U9-profile-page3-avatar-image {
+
+
+  width:80px;
+
+  height:80px;
+
+  object-fit:contain;
+
+}
+
+
+
+/* =========================
+   NAME
+========================= */
+
+
+.U9-profile-page3-avatar-name {
+
+
+  font-size:14px;
+
+  color:#333;
 
 }
