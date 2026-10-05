@@ -179,7 +179,7 @@ if(
 
 
 if(
-  loginForm
+loginForm
 ){
 
 
@@ -203,7 +203,7 @@ event.preventDefault();
 
 
 if(
-  loginProcessing
+loginProcessing
 ){
 
 return;
@@ -227,7 +227,7 @@ true;
 
 
 if(
-  loginSubmit
+loginSubmit
 ){
 
   loginSubmit.disabled =
@@ -355,7 +355,7 @@ await response.json();
 
 
 if(
-  !response.ok
+!response.ok
 ){
 
 
@@ -379,30 +379,48 @@ return;
 
 
 /* =========================
-   LOGIN SUCCESS
+   SAVE TOKEN
+
+   Safari:
+   Cookie may be blocked
+
+   Use Authorization token
+
 ========================= */
 
 
-/*
-
-Backend:
-
-Set-Cookie:
-u9_session
+if(
+result.session &&
+result.session.token
+){
 
 
-Browser:
-Chrome
-Safari
-Telegram WebView
+localStorage.setItem(
 
-自动保存
+"u9_token",
 
+result.session.token
 
-*/
+);
 
 
+console.log(
+"U9 token saved"
+);
 
+
+}
+
+
+
+
+
+
+
+
+/* =========================
+   LOGIN SUCCESS
+========================= */
 
 
 console.log(
@@ -422,7 +440,7 @@ loginForm.reset();
 
 
 if(
-  loginModal
+loginModal
 ){
 
 loginModal.style.display =
@@ -438,8 +456,7 @@ loginModal.style.display =
 
 
 /* =========================
-   WAIT COOKIE SAVE
-   Safari FIX
+   WAIT SESSION READY
 ========================= */
 
 
@@ -468,7 +485,7 @@ resolve,
 
 
 if(
-  window.U9User
+window.U9User
 ){
 
 
@@ -500,7 +517,7 @@ user
 
 
 if(
-  window.U9ProfileAvatar
+window.U9ProfileAvatar
 ){
 
 await window.U9ProfileAvatar.refresh();
@@ -550,7 +567,7 @@ false;
 
 
 if(
-  loginSubmit
+loginSubmit
 ){
 
 loginSubmit.disabled =
