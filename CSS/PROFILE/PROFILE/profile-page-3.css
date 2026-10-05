@@ -1,3 +1,4 @@
+
 /* =================================================
    PROFILE PAGE 3
 ================================================= */
@@ -80,6 +81,144 @@
 
 
 /* =================================================
+   FREE AVATAR LIST
+   SAME LAYOUT AS FRAME LIST
+================================================= */
+
+.U9-profile-page3-avatar-list {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+
+/* =================================================
+   FREE AVATAR CARD
+   SAME SIZE AS FRAME CARD
+================================================= */
+
+.U9-profile-page3-avatar-card {
+  width: 130px;
+  min-height: 185px;
+  padding: 12px;
+  box-sizing: border-box;
+  border-radius: 16px;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.06);
+}
+
+
+/* =================================================
+   FREE AVATAR IMAGE
+================================================= */
+
+.U9-profile-page3-avatar-card
+> .U9-profile-page3-avatar-image {
+  width: 100px;
+  height: 100px;
+  max-width: 100%;
+  flex: 0 0 auto;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+
+/* =================================================
+   FREE AVATAR NAME
+   SAME AS FRAME NAME
+================================================= */
+
+.U9-profile-page3-avatar-name {
+  width: 100%;
+  min-height: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-size: 14px;
+  color: #333333;
+}
+
+
+/* =================================================
+   FREE AVATAR BUTTON
+   SAME BASE STYLE AS FRAME BUTTON
+================================================= */
+
+.U9-profile-page3-avatar-button {
+  width: 100px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 18px;
+  background-color: #2762ea;
+  color: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    opacity 0.2s ease,
+    transform 0.15s ease;
+}
+
+
+/* =================================================
+   FREE AVATAR BUTTON HOVER
+================================================= */
+
+.U9-profile-page3-avatar-button:hover {
+  opacity: 0.85;
+}
+
+
+/* =================================================
+   FREE AVATAR BUTTON ACTIVE
+   SAME AS FRAME ACTIVE
+================================================= */
+
+.U9-profile-page3-avatar-button.active {
+  background-color: #e5e5e5;
+  color: #555555;
+}
+
+
+/* =================================================
+   FREE AVATAR BUTTON LOADING
+================================================= */
+
+.U9-profile-page3-avatar-button.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+
+/* =================================================
+   FREE AVATAR BUTTON DISABLED
+================================================= */
+
+.U9-profile-page3-avatar-button:disabled {
+  cursor: default;
+}
+
+
+/* =================================================
+   FREE AVATAR BUTTON PRESS
+================================================= */
+
+.U9-profile-page3-avatar-button:active {
+  transform: scale(0.96);
+}
+
+
+/* =================================================
    PAGE 3 AVATAR
 ================================================= */
 
@@ -142,7 +281,8 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  box-shadow:
+    0 2px 10px rgba(0, 0, 0, 0.06);
 }
 
 
@@ -151,7 +291,8 @@
    ONLY PAGE 3 CARD IMAGES
 ================================================= */
 
-.U9-profile-page3-frame-card > img.U9-profile-page3-frame-image {
+.U9-profile-page3-frame-card
+> img.U9-profile-page3-frame-image {
   width: 100px;
   height: 100px;
   max-width: 100%;
@@ -344,6 +485,47 @@
 
 
   /* =================================================
+     FREE AVATAR LIST
+  ================================================= */
+
+  .U9-profile-page3-avatar-list {
+    gap: 12px;
+  }
+
+
+  /* =================================================
+     FREE AVATAR CARD
+  ================================================= */
+
+  .U9-profile-page3-avatar-card {
+    width: 120px;
+    min-height: 175px;
+  }
+
+
+  /* =================================================
+     FREE AVATAR IMAGE
+  ================================================= */
+
+  .U9-profile-page3-avatar-card
+  > .U9-profile-page3-avatar-image {
+    width: 90px;
+    height: 90px;
+  }
+
+
+  /* =================================================
+     FREE AVATAR BUTTON
+  ================================================= */
+
+  .U9-profile-page3-avatar-button {
+    width: 90px;
+    height: 32px;
+    font-size: 13px;
+  }
+
+
+  /* =================================================
      PAGE 3 AVATAR
   ================================================= */
 
@@ -368,10 +550,18 @@
   }
 
 
+  /* =================================================
+     FRAME LIST
+  ================================================= */
+
   .U9-profile-page3-frame-list {
     gap: 12px;
   }
 
+
+  /* =================================================
+     FRAME CARD
+  ================================================= */
 
   .U9-profile-page3-frame-card {
     width: 120px;
@@ -383,7 +573,8 @@
      ONLY PAGE 3 FRAME IMAGES ON MOBILE
   ================================================= */
 
-  .U9-profile-page3-frame-card > img.U9-profile-page3-frame-image {
+  .U9-profile-page3-frame-card
+  > img.U9-profile-page3-frame-image {
     width: 90px;
     height: 90px;
   }
