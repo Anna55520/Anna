@@ -3,7 +3,21 @@
    PROFILE PAGE 3
    PART 1/3
    CUSTOM AVATAR
-   SELECT → MANUAL CROP → WEBP → UPLOAD
+
+   FLOW:
+   Choose Image
+        ↓
+   Manual Crop Editor
+        ↓
+   Drag / Zoom
+        ↓
+   Confirm Crop
+        ↓
+   Crop Canvas
+        ↓
+   Convert Cropped Result to WebP
+        ↓
+   Upload avatar.webp
 ========================================================= */
 
 "use strict";
@@ -18,7 +32,7 @@ const U9_PROFILE_PAGE3_UPLOAD_AVATAR_API =
 
 
 /* =========================================================
-   CONSTANTS
+   CONFIG
 ========================================================= */
 
 const U9_PROFILE_PAGE3_MAX_AVATAR_SIZE =
@@ -32,9 +46,6 @@ const U9_PROFILE_PAGE3_MIN_ZOOM =
 
 const U9_PROFILE_PAGE3_MAX_ZOOM =
   4;
-
-const U9_PROFILE_PAGE3_ZOOM_STEP =
-  0.01;
 
 
 /* =========================================================
@@ -69,9 +80,7 @@ function getPage3AvatarToken() {
       "u9_token"
     );
 
-  }
-
-  catch (error) {
+  } catch (error) {
 
     console.error(
       "PAGE3 AVATAR TOKEN ERROR:",
@@ -107,7 +116,7 @@ function page3AvatarIsLoggedIn() {
 
 
 /* =========================================================
-   LOAD AVATAR STATE
+   LOAD CURRENT AVATAR STATE
 ========================================================= */
 
 function loadPage3AvatarState(
@@ -251,18 +260,14 @@ function formatPage3AvatarCooldown() {
 
   if (days > 0) {
 
-    return (
-      `${days}d ${hours}h`
-    );
+    return `${days}d ${hours}h`;
 
   }
 
 
   if (hours > 0) {
 
-    return (
-      `${hours}h ${minutes}m`
-    );
+    return `${hours}h ${minutes}m`;
 
   }
 
@@ -273,7 +278,7 @@ function formatPage3AvatarCooldown() {
 
 
 /* =========================================================
-   REFRESH AVATAR STATE
+   REFRESH USER / AVATAR
 ========================================================= */
 
 async function refreshPage3AvatarState() {
@@ -313,9 +318,7 @@ async function refreshPage3AvatarState() {
 
     return true;
 
-  }
-
-  catch (error) {
+  } catch (error) {
 
     console.error(
       "PAGE3 AVATAR REFRESH ERROR:",
@@ -330,38 +333,15 @@ async function refreshPage3AvatarState() {
 
 
 /* =========================================================
-   MANUAL AVATAR CROPPER
+   IMAGE LOADER
 ========================================================= */
 
-function openPage3AvatarCropper(
+function loadPage3Image(
   file
 ) {
 
   return new Promise(
-    function(resolve) {
-
-      if (!file) {
-
-        resolve(null);
-
-        return;
-
-      }
-
-
-      if (
-        !file.type ||
-        !file.type.startsWith(
-          "image/"
-        )
-      ) {
-
-        resolve(null);
-
-        return;
-
-      }
-
+    function(resolve, reject) {
 
       const objectUrl =
         URL.createObjectURL(
@@ -381,23 +361,24 @@ function openPage3AvatarCropper(
           );
 
 
-          createPage3AvatarCropModal(
-            image,
-            resolve
+          resolve(
+            image
           );
 
         };
 
 
       image.onerror =
-        function() {
+        function(error) {
 
           URL.revokeObjectURL(
             objectUrl
           );
 
 
-          resolve(null);
+          reject(
+            error
+          );
 
         };
 
@@ -412,1441 +393,1469 @@ function openPage3AvatarCropper(
 
 
 /* =========================================================
-   CREATE CROP MODAL
+   MANUAL CROP EDITOR
 ========================================================= */
 
-function createPage3AvatarCropModal(
-  image,
-  resolve
+function openPage3AvatarCropper(
+  file
 ) {
 
-  let finished =
-    false;
+  return new Promise(
+    async function(resolve) {
 
+      let image;
 
-  let zoom =
-    U9_PROFILE_PAGE3_MIN_ZOOM;
+      try {
 
+        image =
+          await loadPage3Image(
+            file
+          );
 
-  let offsetX =
-    0;
+      } catch (error) {
 
-  let offsetY =
-    0;
+        console.error(
+          "PAGE3 IMAGE LOAD ERROR:",
+          error
+        );
 
+        resolve(null);
 
-  let dragging =
-    false;
+        return;
 
+      }
 
-  let dragStartX =
-    0;
 
-  let dragStartY =
-    0;
+      const imageWidth =
+        image.naturalWidth ||
+        image.width;
 
 
-  let startOffsetX =
-    0;
+      const imageHeight =
+        image.naturalHeight ||
+        image.height;
 
-  let startOffsetY =
-    0;
 
+      if (
+        !imageWidth ||
+        !imageHeight
+      ) {
 
-  const imageWidth =
-    image.naturalWidth ||
-    image.width;
+        resolve(null);
 
+        return;
 
-  const imageHeight =
-    image.naturalHeight ||
-    image.height;
+      }
 
 
-  if (
-    !imageWidth ||
-    !imageHeight
-  ) {
+      /* ===================================================
+         CROP EDITOR STATE
+      =================================================== */
 
-    resolve(null);
+      let zoom =
+        1;
 
-    return;
+      let offsetX =
+        0;
 
-  }
+      let offsetY =
+        0;
 
+      let dragging =
+        false;
 
-  /* =======================================================
-     BASE SCALE
-  ======================================================= */
+      let dragStartX =
+        0;
 
-  const baseScale =
-    Math.max(
-      U9_PROFILE_PAGE3_CROP_SIZE /
-        imageWidth,
+      let dragStartY =
+        0;
 
-      U9_PROFILE_PAGE3_CROP_SIZE /
-        imageHeight
-    );
+      let startOffsetX =
+        0;
 
+      let startOffsetY =
+        0;
 
-  /* =======================================================
-     MODAL
-  ======================================================= */
+      let completed =
+        false;
 
-  const modal =
-    document.createElement(
-      "div"
-    );
 
+      /* ===================================================
+         BASE SCALE
 
-  modal.id =
-    "U9-page3-avatar-crop-modal";
+         Make sure the entire 512 × 512 crop area
+         is covered by the image.
+      =================================================== */
 
+      const baseScale =
+        Math.max(
+          U9_PROFILE_PAGE3_CROP_SIZE /
+            imageWidth,
 
-  Object.assign(
-    modal.style,
-    {
-      position: "fixed",
-      inset: "0",
-      zIndex: "999999",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      padding: "16px",
-      boxSizing: "border-box",
-      background:
-        "rgba(0,0,0,0.78)"
-    }
-  );
+          U9_PROFILE_PAGE3_CROP_SIZE /
+            imageHeight
+        );
 
 
-  /* =======================================================
-     PANEL
-  ======================================================= */
+      const initialWidth =
+        imageWidth *
+        baseScale;
 
-  const panel =
-    document.createElement(
-      "div"
-    );
 
+      const initialHeight =
+        imageHeight *
+        baseScale;
 
-  Object.assign(
-    panel.style,
-    {
-      width:
-        "min(100%, 580px)",
-
-      maxHeight:
-        "calc(100vh - 32px)",
-
-      overflowY:
-        "auto",
-
-      background:
-        "#ffffff",
-
-      borderRadius:
-        "18px",
-
-      padding:
-        "20px",
-
-      boxSizing:
-        "border-box",
-
-      boxShadow:
-        "0 20px 60px rgba(0,0,0,0.35)"
-    }
-  );
-
-
-  modal.appendChild(
-    panel
-  );
-
-
-  /* =======================================================
-     TITLE
-  ======================================================= */
-
-  const title =
-    document.createElement(
-      "div"
-    );
-
-
-  title.textContent =
-    "Crop Avatar";
-
-
-  Object.assign(
-    title.style,
-    {
-      fontSize:
-        "20px",
-
-      fontWeight:
-        "700",
-
-      color:
-        "#111111",
-
-      marginBottom:
-        "6px"
-    }
-  );
-
-
-  panel.appendChild(
-    title
-  );
-
-
-  /* =======================================================
-     DESCRIPTION
-  ======================================================= */
-
-  const description =
-    document.createElement(
-      "div"
-    );
-
-
-  description.textContent =
-    "Drag the image to position it. Use the slider to zoom.";
-
-
-  Object.assign(
-    description.style,
-    {
-      fontSize:
-        "14px",
-
-      lineHeight:
-        "1.5",
-
-      color:
-        "#666666",
-
-      marginBottom:
-        "16px"
-    }
-  );
-
-
-  panel.appendChild(
-    description
-  );
-
-
-  /* =======================================================
-     CROP AREA
-  ======================================================= */
-
-  const cropWrapper =
-    document.createElement(
-      "div"
-    );
-
-
-  Object.assign(
-    cropWrapper.style,
-    {
-      width:
-        "100%",
-
-      display:
-        "flex",
-
-      justifyContent:
-        "center",
-
-      marginBottom:
-        "18px"
-    }
-  );
-
-
-  panel.appendChild(
-    cropWrapper
-  );
-
-
-  const cropArea =
-    document.createElement(
-      "div"
-    );
-
-
-  Object.assign(
-    cropArea.style,
-    {
-      position:
-        "relative",
-
-      width:
-        `${U9_PROFILE_PAGE3_CROP_SIZE}px`,
-
-      height:
-        `${U9_PROFILE_PAGE3_CROP_SIZE}px`,
-
-      maxWidth:
-        "100%",
-
-      maxHeight:
-        "70vh",
-
-      aspectRatio:
-        "1 / 1",
-
-      overflow:
-        "hidden",
-
-      background:
-        "#111111",
-
-      borderRadius:
-        "12px",
-
-      cursor:
-        "grab",
-
-      touchAction:
-        "none",
-
-      userSelect:
-        "none"
-    }
-  );
-
-
-  cropWrapper.appendChild(
-    cropArea
-  );
-
-
-  /* =======================================================
-     CANVAS
-  ======================================================= */
-
-  const canvas =
-    document.createElement(
-      "canvas"
-    );
-
-
-  canvas.width =
-    U9_PROFILE_PAGE3_CROP_SIZE;
-
-
-  canvas.height =
-    U9_PROFILE_PAGE3_CROP_SIZE;
-
-
-  Object.assign(
-    canvas.style,
-    {
-      display:
-        "block",
-
-      width:
-        "100%",
-
-      height:
-        "100%",
-
-      pointerEvents:
-        "none"
-    }
-  );
-
-
-  cropArea.appendChild(
-    canvas
-  );
-
-
-  const ctx =
-    canvas.getContext(
-      "2d"
-    );
-
-
-  if (!ctx) {
-
-    resolve(null);
-
-    return;
-
-  }
-
-
-  /* =======================================================
-     CIRCULAR OVERLAY
-  ======================================================= */
-
-  const overlay =
-    document.createElement(
-      "div"
-    );
-
-
-  Object.assign(
-    overlay.style,
-    {
-      position:
-        "absolute",
-
-      inset:
-        "0",
-
-      pointerEvents:
-        "none",
-
-      border:
-        "2px solid rgba(255,255,255,0.95)",
-
-      borderRadius:
-        "50%",
-
-      boxShadow:
-        "0 0 0 9999px rgba(0,0,0,0.30)",
-
-      boxSizing:
-        "border-box"
-    }
-  );
-
-
-  cropArea.appendChild(
-    overlay
-  );
-
-
-  /* =======================================================
-     INITIAL POSITION
-  ======================================================= */
-
-  const initialWidth =
-    imageWidth *
-    baseScale;
-
-
-  const initialHeight =
-    imageHeight *
-    baseScale;
-
-
-  offsetX =
-    (
-      U9_PROFILE_PAGE3_CROP_SIZE -
-      initialWidth
-    ) / 2;
-
-
-  offsetY =
-    (
-      U9_PROFILE_PAGE3_CROP_SIZE -
-      initialHeight
-    ) / 2;
-
-
-  /* =======================================================
-     CONSTRAIN POSITION
-  ======================================================= */
-
-  function constrainPosition() {
-
-    const scale =
-      baseScale *
-      zoom;
-
-
-    const width =
-      imageWidth *
-      scale;
-
-
-    const height =
-      imageHeight *
-      scale;
-
-
-    const minX =
-      U9_PROFILE_PAGE3_CROP_SIZE -
-      width;
-
-
-    const minY =
-      U9_PROFILE_PAGE3_CROP_SIZE -
-      height;
-
-
-    if (
-      width <=
-      U9_PROFILE_PAGE3_CROP_SIZE
-    ) {
 
       offsetX =
         (
           U9_PROFILE_PAGE3_CROP_SIZE -
-          width
+          initialWidth
         ) / 2;
 
-    }
-
-    else {
-
-      offsetX =
-        Math.min(
-          0,
-          Math.max(
-            minX,
-            offsetX
-          )
-        );
-
-    }
-
-
-    if (
-      height <=
-      U9_PROFILE_PAGE3_CROP_SIZE
-    ) {
 
       offsetY =
         (
           U9_PROFILE_PAGE3_CROP_SIZE -
+          initialHeight
+        ) / 2;
+
+
+      /* ===================================================
+         MODAL
+      =================================================== */
+
+      const modal =
+        document.createElement(
+          "div"
+        );
+
+
+      modal.id =
+        "U9-profile-page3-avatar-cropper";
+
+
+      Object.assign(
+        modal.style,
+        {
+          position:
+            "fixed",
+
+          inset:
+            "0",
+
+          zIndex:
+            "999999",
+
+          display:
+            "flex",
+
+          alignItems:
+            "center",
+
+          justifyContent:
+            "center",
+
+          padding:
+            "16px",
+
+          boxSizing:
+            "border-box",
+
+          background:
+            "rgba(0, 0, 0, 0.82)"
+        }
+      );
+
+
+      /* ===================================================
+         EDITOR PANEL
+      =================================================== */
+
+      const editor =
+        document.createElement(
+          "div"
+        );
+
+
+      Object.assign(
+        editor.style,
+        {
+          width:
+            "min(560px, 100%)",
+
+          maxHeight:
+            "calc(100vh - 32px)",
+
+          overflowY:
+            "auto",
+
+          boxSizing:
+            "border-box",
+
+          padding:
+            "20px",
+
+          background:
+            "#ffffff",
+
+          borderRadius:
+            "18px",
+
+          boxShadow:
+            "0 20px 70px rgba(0,0,0,0.45)"
+        }
+      );
+
+
+      modal.appendChild(
+        editor
+      );
+
+
+      /* ===================================================
+         TITLE
+      =================================================== */
+
+      const title =
+        document.createElement(
+          "div"
+        );
+
+
+      title.textContent =
+        "Edit Avatar";
+
+
+      Object.assign(
+        title.style,
+        {
+          fontSize:
+            "21px",
+
+          fontWeight:
+            "700",
+
+          color:
+            "#111111",
+
+          marginBottom:
+            "6px"
+        }
+      );
+
+
+      editor.appendChild(
+        title
+      );
+
+
+      /* ===================================================
+         INSTRUCTION
+      =================================================== */
+
+      const instruction =
+        document.createElement(
+          "div"
+        );
+
+
+      instruction.textContent =
+        "Drag the image to adjust the position. Use the zoom control to adjust the size.";
+
+
+      Object.assign(
+        instruction.style,
+        {
+          fontSize:
+            "14px",
+
+          lineHeight:
+            "1.5",
+
+          color:
+            "#666666",
+
+          marginBottom:
+            "18px"
+        }
+      );
+
+
+      editor.appendChild(
+        instruction
+      );
+
+
+      /* ===================================================
+         CROP VIEWPORT
+      =================================================== */
+
+      const viewportWrapper =
+        document.createElement(
+          "div"
+        );
+
+
+      Object.assign(
+        viewportWrapper.style,
+        {
+          width:
+            "100%",
+
+          display:
+            "flex",
+
+          justifyContent:
+            "center",
+
+          marginBottom:
+            "18px"
+        }
+      );
+
+
+      editor.appendChild(
+        viewportWrapper
+      );
+
+
+      const viewport =
+        document.createElement(
+          "div"
+        );
+
+
+      Object.assign(
+        viewport.style,
+        {
+          position:
+            "relative",
+
+          width:
+            "min(512px, 100%)",
+
+          aspectRatio:
+            "1 / 1",
+
+          overflow:
+            "hidden",
+
+          background:
+            "#111111",
+
+          borderRadius:
+            "12px",
+
+          cursor:
+            "grab",
+
+          touchAction:
+            "none",
+
+          userSelect:
+            "none"
+        }
+      );
+
+
+      viewportWrapper.appendChild(
+        viewport
+      );
+
+
+      /* ===================================================
+         CANVAS
+      =================================================== */
+
+      const canvas =
+        document.createElement(
+          "canvas"
+        );
+
+
+      canvas.width =
+        U9_PROFILE_PAGE3_CROP_SIZE;
+
+
+      canvas.height =
+        U9_PROFILE_PAGE3_CROP_SIZE;
+
+
+      Object.assign(
+        canvas.style,
+        {
+          width:
+            "100%",
+
+          height:
+            "100%",
+
+          display:
+            "block",
+
+          pointerEvents:
+            "none"
+        }
+      );
+
+
+      viewport.appendChild(
+        canvas
+      );
+
+
+      const ctx =
+        canvas.getContext(
+          "2d"
+        );
+
+
+      if (!ctx) {
+
+        resolve(null);
+
+        return;
+
+      }
+
+
+      /* ===================================================
+         CROP CIRCLE
+      =================================================== */
+
+      const cropCircle =
+        document.createElement(
+          "div"
+        );
+
+
+      Object.assign(
+        cropCircle.style,
+        {
+          position:
+            "absolute",
+
+          inset:
+            "0",
+
+          borderRadius:
+            "50%",
+
+          border:
+            "2px solid rgba(255,255,255,0.95)",
+
+          boxShadow:
+            "0 0 0 9999px rgba(0,0,0,0.38)",
+
+          pointerEvents:
+            "none",
+
+          boxSizing:
+            "border-box"
+        }
+      );
+
+
+      viewport.appendChild(
+        cropCircle
+      );
+
+
+      /* ===================================================
+         DRAW
+      =================================================== */
+
+      function constrainPosition() {
+
+        const scale =
+          baseScale *
+          zoom;
+
+
+        const width =
+          imageWidth *
+          scale;
+
+
+        const height =
+          imageHeight *
+          scale;
+
+
+        const minX =
+          U9_PROFILE_PAGE3_CROP_SIZE -
+          width;
+
+
+        const minY =
+          U9_PROFILE_PAGE3_CROP_SIZE -
+          height;
+
+
+        if (
+          width <=
+          U9_PROFILE_PAGE3_CROP_SIZE
+        ) {
+
+          offsetX =
+            (
+              U9_PROFILE_PAGE3_CROP_SIZE -
+              width
+            ) / 2;
+
+        } else {
+
+          offsetX =
+            Math.min(
+              0,
+              Math.max(
+                minX,
+                offsetX
+              )
+            );
+
+        }
+
+
+        if (
+          height <=
+          U9_PROFILE_PAGE3_CROP_SIZE
+        ) {
+
+          offsetY =
+            (
+              U9_PROFILE_PAGE3_CROP_SIZE -
+              height
+            ) / 2;
+
+        } else {
+
+          offsetY =
+            Math.min(
+              0,
+              Math.max(
+                minY,
+                offsetY
+              )
+            );
+
+        }
+
+      }
+
+
+      function draw() {
+
+        constrainPosition();
+
+
+        ctx.clearRect(
+          0,
+          0,
+          U9_PROFILE_PAGE3_CROP_SIZE,
+          U9_PROFILE_PAGE3_CROP_SIZE
+        );
+
+
+        ctx.fillStyle =
+          "#111111";
+
+
+        ctx.fillRect(
+          0,
+          0,
+          U9_PROFILE_PAGE3_CROP_SIZE,
+          U9_PROFILE_PAGE3_CROP_SIZE
+        );
+
+
+        const scale =
+          baseScale *
+          zoom;
+
+
+        const width =
+          imageWidth *
+          scale;
+
+
+        const height =
+          imageHeight *
+          scale;
+
+
+        ctx.drawImage(
+          image,
+          offsetX,
+          offsetY,
+          width,
           height
-        ) / 2;
-
-    }
-
-    else {
-
-      offsetY =
-        Math.min(
-          0,
-          Math.max(
-            minY,
-            offsetY
-          )
         );
 
-    }
+      }
 
-  }
 
+      /* ===================================================
+         ZOOM CONTROL
+      =================================================== */
 
-  /* =======================================================
-     DRAW
-  ======================================================= */
-
-  function drawCrop() {
-
-    constrainPosition();
-
-
-    ctx.clearRect(
-      0,
-      0,
-      U9_PROFILE_PAGE3_CROP_SIZE,
-      U9_PROFILE_PAGE3_CROP_SIZE
-    );
-
-
-    ctx.fillStyle =
-      "#111111";
-
-
-    ctx.fillRect(
-      0,
-      0,
-      U9_PROFILE_PAGE3_CROP_SIZE,
-      U9_PROFILE_PAGE3_CROP_SIZE
-    );
-
-
-    const scale =
-      baseScale *
-      zoom;
-
-
-    const width =
-      imageWidth *
-      scale;
-
-
-    const height =
-      imageHeight *
-      scale;
-
-
-    ctx.drawImage(
-      image,
-      offsetX,
-      offsetY,
-      width,
-      height
-    );
-
-  }
-
-
-  /* =======================================================
-     ZOOM
-  ======================================================= */
-
-  const zoomContainer =
-    document.createElement(
-      "div"
-    );
-
-
-  Object.assign(
-    zoomContainer.style,
-    {
-      marginBottom:
-        "18px"
-    }
-  );
-
-
-  panel.appendChild(
-    zoomContainer
-  );
-
-
-  const zoomHeader =
-    document.createElement(
-      "div"
-    );
-
-
-  Object.assign(
-    zoomHeader.style,
-    {
-      display:
-        "flex",
-
-      alignItems:
-        "center",
-
-      justifyContent:
-        "space-between",
-
-      marginBottom:
-        "8px"
-    }
-  );
-
-
-  zoomContainer.appendChild(
-    zoomHeader
-  );
-
-
-  const zoomLabel =
-    document.createElement(
-      "span"
-    );
-
-
-  zoomLabel.textContent =
-    "Zoom";
-
-
-  Object.assign(
-    zoomLabel.style,
-    {
-      fontSize:
-        "14px",
-
-      fontWeight:
-        "600",
-
-      color:
-        "#222222"
-    }
-  );
-
-
-  zoomHeader.appendChild(
-    zoomLabel
-  );
-
-
-  const zoomValue =
-    document.createElement(
-      "span"
-    );
-
-
-  zoomValue.textContent =
-    "100%";
-
-
-  Object.assign(
-    zoomValue.style,
-    {
-      fontSize:
-        "13px",
-
-      color:
-        "#666666"
-    }
-  );
-
-
-  zoomHeader.appendChild(
-    zoomValue
-  );
-
-
-  const zoomInput =
-    document.createElement(
-      "input"
-    );
-
-
-  zoomInput.type =
-    "range";
-
-
-  zoomInput.min =
-    String(
-      U9_PROFILE_PAGE3_MIN_ZOOM
-    );
-
-
-  zoomInput.max =
-    String(
-      U9_PROFILE_PAGE3_MAX_ZOOM
-    );
-
-
-  zoomInput.step =
-    String(
-      U9_PROFILE_PAGE3_ZOOM_STEP
-    );
-
-
-  zoomInput.value =
-    String(
-      zoom
-    );
-
-
-  zoomInput.style.width =
-    "100%";
-
-
-  zoomContainer.appendChild(
-    zoomInput
-  );
-
-
-  zoomInput.addEventListener(
-    "input",
-    function() {
-
-      const previousZoom =
-        zoom;
-
-
-      zoom =
-        Number(
-          zoomInput.value
+      const zoomSection =
+        document.createElement(
+          "div"
         );
 
 
-      const center =
-        U9_PROFILE_PAGE3_CROP_SIZE /
-        2;
+      editor.appendChild(
+        zoomSection
+      );
 
 
-      const previousScale =
-        baseScale *
-        previousZoom;
+      const zoomTop =
+        document.createElement(
+          "div"
+        );
 
 
-      const newScale =
-        baseScale *
-        zoom;
+      Object.assign(
+        zoomTop.style,
+        {
+          display:
+            "flex",
+
+          alignItems:
+            "center",
+
+          justifyContent:
+            "space-between",
+
+          marginBottom:
+            "8px"
+        }
+      );
 
 
-      const imageCenterX =
-        (
-          center -
-          offsetX
-        ) /
-        previousScale;
+      zoomSection.appendChild(
+        zoomTop
+      );
 
 
-      const imageCenterY =
-        (
-          center -
-          offsetY
-        ) /
-        previousScale;
+      const zoomLabel =
+        document.createElement(
+          "span"
+        );
 
 
-      offsetX =
-        center -
-        imageCenterX *
-        newScale;
+      zoomLabel.textContent =
+        "Zoom";
 
 
-      offsetY =
-        center -
-        imageCenterY *
-        newScale;
+      Object.assign(
+        zoomLabel.style,
+        {
+          fontSize:
+            "14px",
+
+          fontWeight:
+            "600",
+
+          color:
+            "#222222"
+        }
+      );
+
+
+      zoomTop.appendChild(
+        zoomLabel
+      );
+
+
+      const zoomValue =
+        document.createElement(
+          "span"
+        );
 
 
       zoomValue.textContent =
-        `${Math.round(
-          zoom * 100
-        )}%`;
+        "100%";
 
 
-      drawCrop();
+      Object.assign(
+        zoomValue.style,
+        {
+          fontSize:
+            "13px",
 
-    }
-  );
-
-
-  /* =======================================================
-     MOUSE DRAG
-  ======================================================= */
-
-  function startMouseDrag(
-    event
-  ) {
-
-    if (
-      event.button !== 0
-    ) {
-      return;
-    }
-
-
-    dragging =
-      true;
-
-
-    cropArea.style.cursor =
-      "grabbing";
-
-
-    dragStartX =
-      event.clientX;
-
-
-    dragStartY =
-      event.clientY;
-
-
-    startOffsetX =
-      offsetX;
-
-
-    startOffsetY =
-      offsetY;
-
-
-    event.preventDefault();
-
-  }
-
-
-  function moveMouseDrag(
-    event
-  ) {
-
-    if (!dragging) {
-      return;
-    }
-
-
-    offsetX =
-      startOffsetX +
-      (
-        event.clientX -
-        dragStartX
+          color:
+            "#666666"
+        }
       );
 
 
-    offsetY =
-      startOffsetY +
-      (
-        event.clientY -
-        dragStartY
+      zoomTop.appendChild(
+        zoomValue
       );
 
 
-    drawCrop();
-
-  }
-
-
-  function stopMouseDrag() {
-
-    dragging =
-      false;
+      const zoomInput =
+        document.createElement(
+          "input"
+        );
 
 
-    cropArea.style.cursor =
-      "grab";
-
-  }
+      zoomInput.type =
+        "range";
 
 
-  cropArea.addEventListener(
-    "mousedown",
-    startMouseDrag
-  );
+      zoomInput.min =
+        String(
+          U9_PROFILE_PAGE3_MIN_ZOOM
+        );
 
 
-  window.addEventListener(
-    "mousemove",
-    moveMouseDrag
-  );
+      zoomInput.max =
+        String(
+          U9_PROFILE_PAGE3_MAX_ZOOM
+        );
 
 
-  window.addEventListener(
-    "mouseup",
-    stopMouseDrag
-  );
+      zoomInput.step =
+        "0.01";
 
 
-  /* =======================================================
-     TOUCH DRAG
-  ======================================================= */
-
-  function getTouch(
-    event
-  ) {
-
-    if (
-      !event.touches ||
-      !event.touches.length
-    ) {
-
-      return null;
-
-    }
+      zoomInput.value =
+        String(
+          zoom
+        );
 
 
-    return event.touches[0];
+      zoomInput.style.width =
+        "100%";
 
-  }
+
+      zoomSection.appendChild(
+        zoomInput
+      );
 
 
-  function startTouchDrag(
-    event
-  ) {
+      zoomInput.addEventListener(
+        "input",
+        function() {
 
-    const touch =
-      getTouch(
+          const oldZoom =
+            zoom;
+
+
+          const newZoom =
+            Number(
+              zoomInput.value
+            );
+
+
+          const center =
+            U9_PROFILE_PAGE3_CROP_SIZE /
+            2;
+
+
+          const oldScale =
+            baseScale *
+            oldZoom;
+
+
+          const newScale =
+            baseScale *
+            newZoom;
+
+
+          /*
+           * Keep the image point under
+           * the crop center while zooming.
+           */
+
+          const imagePointX =
+            (
+              center -
+              offsetX
+            ) /
+            oldScale;
+
+
+          const imagePointY =
+            (
+              center -
+              offsetY
+            ) /
+            oldScale;
+
+
+          offsetX =
+            center -
+            imagePointX *
+            newScale;
+
+
+          offsetY =
+            center -
+            imagePointY *
+            newScale;
+
+
+          zoom =
+            newZoom;
+
+
+          zoomValue.textContent =
+            `${Math.round(
+              zoom * 100
+            )}%`;
+
+
+          draw();
+
+        }
+      );
+
+
+      /* ===================================================
+         MOUSE DRAG
+      =================================================== */
+
+      viewport.addEventListener(
+        "mousedown",
+        function(event) {
+
+          if (
+            event.button !== 0
+          ) {
+            return;
+          }
+
+
+          dragging =
+            true;
+
+
+          dragStartX =
+            event.clientX;
+
+
+          dragStartY =
+            event.clientY;
+
+
+          startOffsetX =
+            offsetX;
+
+
+          startOffsetY =
+            offsetY;
+
+
+          viewport.style.cursor =
+            "grabbing";
+
+
+          event.preventDefault();
+
+        }
+      );
+
+
+      function mouseMove(
         event
-      );
+      ) {
 
+        if (!dragging) {
+          return;
+        }
 
-    if (!touch) {
-      return;
-    }
 
+        offsetX =
+          startOffsetX +
+          (
+            event.clientX -
+            dragStartX
+          );
 
-    dragging =
-      true;
 
+        offsetY =
+          startOffsetY +
+          (
+            event.clientY -
+            dragStartY
+          );
 
-    dragStartX =
-      touch.clientX;
 
+        draw();
 
-    dragStartY =
-      touch.clientY;
-
-
-    startOffsetX =
-      offsetX;
-
-
-    startOffsetY =
-      offsetY;
-
-
-    event.preventDefault();
-
-  }
-
-
-  function moveTouchDrag(
-    event
-  ) {
-
-    if (!dragging) {
-      return;
-    }
-
-
-    const touch =
-      getTouch(
-        event
-      );
-
-
-    if (!touch) {
-      return;
-    }
-
-
-    offsetX =
-      startOffsetX +
-      (
-        touch.clientX -
-        dragStartX
-      );
-
-
-    offsetY =
-      startOffsetY +
-      (
-        touch.clientY -
-        dragStartY
-      );
-
-
-    drawCrop();
-
-
-    event.preventDefault();
-
-  }
-
-
-  function stopTouchDrag() {
-
-    dragging =
-      false;
-
-  }
-
-
-  cropArea.addEventListener(
-    "touchstart",
-    startTouchDrag,
-    {
-      passive: false
-    }
-  );
-
-
-  cropArea.addEventListener(
-    "touchmove",
-    moveTouchDrag,
-    {
-      passive: false
-    }
-  );
-
-
-  cropArea.addEventListener(
-    "touchend",
-    stopTouchDrag
-  );
-
-
-  cropArea.addEventListener(
-    "touchcancel",
-    stopTouchDrag
-  );
-
-
-  /* =======================================================
-     BUTTONS
-  ======================================================= */
-
-  const buttonRow =
-    document.createElement(
-      "div"
-    );
-
-
-  Object.assign(
-    buttonRow.style,
-    {
-      display:
-        "flex",
-
-      justifyContent:
-        "flex-end",
-
-      gap:
-        "10px",
-
-      flexWrap:
-        "wrap"
-    }
-  );
-
-
-  panel.appendChild(
-    buttonRow
-  );
-
-
-  const cancelButton =
-    document.createElement(
-      "button"
-    );
-
-
-  cancelButton.type =
-    "button";
-
-
-  cancelButton.textContent =
-    "Cancel";
-
-
-  Object.assign(
-    cancelButton.style,
-    {
-      border:
-        "1px solid #d7d7d7",
-
-      background:
-        "#ffffff",
-
-      color:
-        "#222222",
-
-      padding:
-        "10px 18px",
-
-      borderRadius:
-        "10px",
-
-      fontSize:
-        "14px",
-
-      fontWeight:
-        "600",
-
-      cursor:
-        "pointer"
-    }
-  );
-
-
-  buttonRow.appendChild(
-    cancelButton
-  );
-
-
-  const confirmButton =
-    document.createElement(
-      "button"
-    );
-
-
-  confirmButton.type =
-    "button";
-
-
-  confirmButton.textContent =
-    "Use This Avatar";
-
-
-  Object.assign(
-    confirmButton.style,
-    {
-      border:
-        "none",
-
-      background:
-        "#111111",
-
-      color:
-        "#ffffff",
-
-      padding:
-        "10px 18px",
-
-      borderRadius:
-        "10px",
-
-      fontSize:
-        "14px",
-
-      fontWeight:
-        "600",
-
-      cursor:
-        "pointer"
-    }
-  );
-
-
-  buttonRow.appendChild(
-    confirmButton
-  );
-
-
-  /* =======================================================
-     CLEANUP
-  ======================================================= */
-
-  function cleanup() {
-
-    window.removeEventListener(
-      "mousemove",
-      moveMouseDrag
-    );
-
-
-    window.removeEventListener(
-      "mouseup",
-      stopMouseDrag
-    );
-
-
-    document.removeEventListener(
-      "keydown",
-      handleCropKeyDown
-    );
-
-
-    if (
-      modal.parentNode
-    ) {
-
-      modal.parentNode.removeChild(
-        modal
-      );
-
-    }
-
-  }
-
-
-  function finish(
-    value
-  ) {
-
-    if (finished) {
-      return;
-    }
-
-
-    finished =
-      true;
-
-
-    cleanup();
-
-
-    resolve(
-      value
-    );
-
-  }
-
-
-  function cancelCrop() {
-
-    finish(
-      null
-    );
-
-  }
-
-
-  cancelButton.addEventListener(
-    "click",
-    cancelCrop
-  );
-
-
-  /* =======================================================
-     CROP → WEBP
-     
-     IMPORTANT:
-     The original image is NOT changed before cropping.
-     
-     First:
-       1. Manual position
-       2. Manual zoom
-       3. Render 512 × 512 crop
-     
-     Then:
-       4. Convert cropped canvas to WebP
-       5. Create avatar.webp
-  ======================================================= */
-
-  confirmButton.addEventListener(
-    "click",
-    function() {
-
-      if (finished) {
-        return;
       }
 
 
-      confirmButton.disabled =
-        true;
+      function mouseUp() {
+
+        dragging =
+          false;
+
+
+        viewport.style.cursor =
+          "grab";
+
+      }
+
+
+      window.addEventListener(
+        "mousemove",
+        mouseMove
+      );
+
+
+      window.addEventListener(
+        "mouseup",
+        mouseUp
+      );
+
+
+      /* ===================================================
+         TOUCH DRAG
+      =================================================== */
+
+      viewport.addEventListener(
+        "touchstart",
+        function(event) {
+
+          const touch =
+            event.touches[0];
+
+
+          if (!touch) {
+            return;
+          }
+
+
+          dragging =
+            true;
+
+
+          dragStartX =
+            touch.clientX;
+
+
+          dragStartY =
+            touch.clientY;
+
+
+          startOffsetX =
+            offsetX;
+
+
+          startOffsetY =
+            offsetY;
+
+
+          event.preventDefault();
+
+        },
+        {
+          passive:
+            false
+        }
+      );
+
+
+      viewport.addEventListener(
+        "touchmove",
+        function(event) {
+
+          if (!dragging) {
+            return;
+          }
+
+
+          const touch =
+            event.touches[0];
+
+
+          if (!touch) {
+            return;
+          }
+
+
+          offsetX =
+            startOffsetX +
+            (
+              touch.clientX -
+              dragStartX
+            );
+
+
+          offsetY =
+            startOffsetY +
+            (
+              touch.clientY -
+              dragStartY
+            );
+
+
+          draw();
+
+
+          event.preventDefault();
+
+        },
+        {
+          passive:
+            false
+        }
+      );
+
+
+      viewport.addEventListener(
+        "touchend",
+        function() {
+
+          dragging =
+            false;
+
+        }
+      );
+
+
+      viewport.addEventListener(
+        "touchcancel",
+        function() {
+
+          dragging =
+            false;
+
+        }
+      );
+
+
+      /* ===================================================
+         BUTTON AREA
+      =================================================== */
+
+      const buttons =
+        document.createElement(
+          "div"
+        );
+
+
+      Object.assign(
+        buttons.style,
+        {
+          display:
+            "flex",
+
+          justifyContent:
+            "flex-end",
+
+          gap:
+            "10px",
+
+          marginTop:
+            "20px",
+
+          flexWrap:
+            "wrap"
+        }
+      );
+
+
+      editor.appendChild(
+        buttons
+      );
+
+
+      /* ===================================================
+         CANCEL
+      =================================================== */
+
+      const cancelButton =
+        document.createElement(
+          "button"
+        );
+
+
+      cancelButton.type =
+        "button";
+
+
+      cancelButton.textContent =
+        "Cancel";
+
+
+      Object.assign(
+        cancelButton.style,
+        {
+          border:
+            "1px solid #d5d5d5",
+
+          background:
+            "#ffffff",
+
+          color:
+            "#222222",
+
+          borderRadius:
+            "10px",
+
+          padding:
+            "10px 18px",
+
+          fontSize:
+            "14px",
+
+          fontWeight:
+            "600",
+
+          cursor:
+            "pointer"
+        }
+      );
+
+
+      buttons.appendChild(
+        cancelButton
+      );
+
+
+      /* ===================================================
+         CONFIRM CROP
+      =================================================== */
+
+      const confirmButton =
+        document.createElement(
+          "button"
+        );
+
+
+      confirmButton.type =
+        "button";
 
 
       confirmButton.textContent =
-        "Processing...";
+        "Confirm Crop";
 
 
-      drawCrop();
+      Object.assign(
+        confirmButton.style,
+        {
+          border:
+            "none",
 
+          background:
+            "#111111",
 
-      canvas.toBlob(
-        function(blob) {
+          color:
+            "#ffffff",
 
-          if (!blob) {
+          borderRadius:
+            "10px",
 
-            confirmButton.disabled =
-              false;
+          padding:
+            "10px 18px",
 
-            confirmButton.textContent =
-              "Use This Avatar";
+          fontSize:
+            "14px",
 
+          fontWeight:
+            "600",
 
-            window.alert(
-              "Unable to create the cropped image."
-            );
-
-
-            return;
-
-          }
-
-
-          if (
-            blob.size >
-            U9_PROFILE_PAGE3_MAX_AVATAR_SIZE
-          ) {
-
-            confirmButton.disabled =
-              false;
-
-            confirmButton.textContent =
-              "Use This Avatar";
-
-
-            window.alert(
-              "The cropped avatar is larger than 2 MB. Please try a different image or reduce the zoom."
-            );
-
-
-            return;
-
-          }
-
-
-          const croppedFile =
-            new File(
-              [blob],
-              "avatar.webp",
-              {
-                type:
-                  "image/webp",
-
-                lastModified:
-                  Date.now()
-              }
-            );
-
-
-          finish(
-            croppedFile
-          );
-
-        },
-
-        "image/webp",
-
-        0.92
-
+          cursor:
+            "pointer"
+        }
       );
 
-    }
-  );
+
+      buttons.appendChild(
+        confirmButton
+      );
 
 
-  /* =======================================================
-     ESC
-  ======================================================= */
+      /* ===================================================
+         CLEANUP
+      =================================================== */
 
-  function handleCropKeyDown(
-    event
-  ) {
+      function cleanup() {
 
-    if (
-      event.key ===
-        "Escape"
-    ) {
-
-      cancelCrop();
-
-    }
-
-  }
+        window.removeEventListener(
+          "mousemove",
+          mouseMove
+        );
 
 
-  document.addEventListener(
-    "keydown",
-    handleCropKeyDown
-  );
+        window.removeEventListener(
+          "mouseup",
+          mouseUp
+        );
 
 
-  /* =======================================================
-     BACKDROP CLICK
-  ======================================================= */
+        document.removeEventListener(
+          "keydown",
+          handleEscape
+        );
 
-  modal.addEventListener(
-    "mousedown",
-    function(event) {
 
-      if (
-        event.target ===
-        modal
-      ) {
+        if (
+          modal.parentNode
+        ) {
 
-        cancelCrop();
+          modal.parentNode.removeChild(
+            modal
+          );
+
+        }
 
       }
 
+
+      function finish(
+        result
+      ) {
+
+        if (completed) {
+          return;
+        }
+
+
+        completed =
+          true;
+
+
+        cleanup();
+
+
+        resolve(
+          result
+        );
+
+      }
+
+
+      /* ===================================================
+         CANCEL
+      =================================================== */
+
+      function cancel() {
+
+        finish(
+          null
+        );
+
+      }
+
+
+      cancelButton.addEventListener(
+        "click",
+        cancel
+      );
+
+
+      /* ===================================================
+         ESC
+      =================================================== */
+
+      function handleEscape(
+        event
+      ) {
+
+        if (
+          event.key ===
+          "Escape"
+        ) {
+
+          cancel();
+
+        }
+
+      }
+
+
+      document.addEventListener(
+        "keydown",
+        handleEscape
+      );
+
+
+      /* ===================================================
+         CONFIRM CROP
+
+         IMPORTANT:
+
+         Nothing is converted to WebP before this point.
+
+         The user's manual position and zoom are used
+         to create the final 512 × 512 crop.
+      =================================================== */
+
+      confirmButton.addEventListener(
+        "click",
+        function() {
+
+          if (completed) {
+            return;
+          }
+
+
+          confirmButton.disabled =
+            true;
+
+
+          cancelButton.disabled =
+            true;
+
+
+          confirmButton.textContent =
+            "Processing...";
+
+
+          /* ===============================================
+             DRAW EXACT MANUAL POSITION
+          =============================================== */
+
+          draw();
+
+
+          /* ===============================================
+             CONVERT ONLY AFTER MANUAL CROP
+          =============================================== */
+
+          canvas.toBlob(
+            function(blob) {
+
+              if (!blob) {
+
+                confirmButton.disabled =
+                  false;
+
+                cancelButton.disabled =
+                  false;
+
+                confirmButton.textContent =
+                  "Confirm Crop";
+
+
+                window.alert(
+                  "Unable to create the cropped image."
+                );
+
+
+                return;
+
+              }
+
+
+              /* =========================================
+                 WEBP SIZE CHECK
+              ========================================= */
+
+              if (
+                blob.size >
+                U9_PROFILE_PAGE3_MAX_AVATAR_SIZE
+              ) {
+
+                confirmButton.disabled =
+                  false;
+
+                cancelButton.disabled =
+                  false;
+
+                confirmButton.textContent =
+                  "Confirm Crop";
+
+
+                window.alert(
+                  "The cropped image is larger than 2 MB. Please zoom out or choose another image."
+                );
+
+
+                return;
+
+              }
+
+
+              /* =========================================
+                 CREATE FINAL WEBP FILE
+              ========================================= */
+
+              const webpFile =
+                new File(
+                  [blob],
+                  "avatar.webp",
+                  {
+                    type:
+                      "image/webp",
+
+                    lastModified:
+                      Date.now()
+                  }
+                );
+
+
+              /* =========================================
+                 RETURN CROPPED WEBP
+              ========================================= */
+
+              finish(
+                webpFile
+              );
+
+            },
+
+            "image/webp",
+
+            0.92
+          );
+
+        }
+      );
+
+
+      /* ===================================================
+         CLOSE WHEN CLICKING BACKDROP
+      =================================================== */
+
+      modal.addEventListener(
+        "mousedown",
+        function(event) {
+
+          if (
+            event.target ===
+            modal
+          ) {
+
+            cancel();
+
+          }
+
+        }
+      );
+
+
+      /* ===================================================
+         INITIAL DRAW
+      =================================================== */
+
+      draw();
+
+
+      /* ===================================================
+         SHOW EDITOR
+      =================================================== */
+
+      document.body.appendChild(
+        modal
+      );
+
     }
-  );
-
-
-  /* =======================================================
-     INITIAL DRAW
-  ======================================================= */
-
-  drawCrop();
-
-
-  /* =======================================================
-     SHOW MODAL
-  ======================================================= */
-
-  document.body.appendChild(
-    modal
   );
 
 }
 
 
 /* =========================================================
-   HANDLE IMAGE SELECTION
+   SELECT IMAGE
 ========================================================= */
 
 async function handlePage3AvatarFile(
@@ -1859,6 +1868,10 @@ async function handlePage3AvatarFile(
   }
 
 
+  /* =======================================================
+     IMAGE VALIDATION
+  ======================================================= */
+
   if (
     !file.type ||
     !file.type.startsWith(
@@ -1867,7 +1880,7 @@ async function handlePage3AvatarFile(
   ) {
 
     window.alert(
-      "Please choose a valid image file."
+      "Please choose an image file."
     );
 
     return null;
@@ -1887,6 +1900,10 @@ async function handlePage3AvatarFile(
 
   }
 
+
+  /* =======================================================
+     COOLDOWN
+  ======================================================= */
 
   if (
     isPage3AvatarUploadOnCooldown()
@@ -1910,29 +1927,29 @@ async function handlePage3AvatarFile(
 
   try {
 
-    /* ================================================
-       OPEN MANUAL CROP
-    ================================================= */
+    /* =====================================================
+       OPEN MANUAL EDITOR
+    ===================================================== */
 
-    const croppedFile =
+    const croppedWebP =
       await openPage3AvatarCropper(
         file
       );
 
 
-    if (!croppedFile) {
+    if (!croppedWebP) {
 
       return null;
 
     }
 
 
-    /* ================================================
-       FINAL FILE IS WEBP
-    ================================================= */
+    /* =====================================================
+       VERIFY FINAL RESULT
+    ===================================================== */
 
     if (
-      croppedFile.type !==
+      croppedWebP.type !==
       "image/webp"
     ) {
 
@@ -1946,12 +1963,12 @@ async function handlePage3AvatarFile(
 
 
     if (
-      croppedFile.size >
+      croppedWebP.size >
       U9_PROFILE_PAGE3_MAX_AVATAR_SIZE
     ) {
 
       window.alert(
-        "The cropped avatar must be 2 MB or smaller."
+        "The final WebP image must be 2 MB or smaller."
       );
 
       return null;
@@ -1959,19 +1976,23 @@ async function handlePage3AvatarFile(
     }
 
 
+    /* =====================================================
+       SAVE FILE
+    ===================================================== */
+
     page3UploadAvatarFile =
-      croppedFile;
+      croppedWebP;
 
 
-    /* ================================================
-       PREVIEW
-    ================================================= */
+    /* =====================================================
+       SHOW PREVIEW
+    ===================================================== */
 
     if (previewElement) {
 
       const previewUrl =
         URL.createObjectURL(
-          croppedFile
+          croppedWebP
         );
 
 
@@ -1995,11 +2016,9 @@ async function handlePage3AvatarFile(
     }
 
 
-    return croppedFile;
+    return croppedWebP;
 
-  }
-
-  catch (error) {
+  } catch (error) {
 
     console.error(
       "PAGE3 AVATAR CROP ERROR:",
@@ -2008,7 +2027,7 @@ async function handlePage3AvatarFile(
 
 
     window.alert(
-      "Unable to crop the selected image."
+      "Unable to edit the selected image."
     );
 
 
@@ -2029,6 +2048,10 @@ async function uploadPage3CustomAvatar(
   input = null
 ) {
 
+  /* =======================================================
+     LOGIN
+  ======================================================= */
+
   if (
     !page3AvatarIsLoggedIn()
   ) {
@@ -2042,10 +2065,14 @@ async function uploadPage3CustomAvatar(
   }
 
 
+  /* =======================================================
+     FILE
+  ======================================================= */
+
   if (!file) {
 
     window.alert(
-      "Please choose and crop an image first."
+      "Please choose and edit an image first."
     );
 
     return false;
@@ -2054,7 +2081,7 @@ async function uploadPage3CustomAvatar(
 
 
   /* =======================================================
-     FINAL FILE MUST BE WEBP
+     WEBP CHECK
   ======================================================= */
 
   if (
@@ -2063,7 +2090,7 @@ async function uploadPage3CustomAvatar(
   ) {
 
     window.alert(
-      "The cropped avatar must be a WebP image."
+      "The edited avatar must be a WebP image."
     );
 
     return false;
@@ -2098,6 +2125,10 @@ async function uploadPage3CustomAvatar(
   }
 
 
+  /* =======================================================
+     COOLDOWN
+  ======================================================= */
+
   if (
     isPage3AvatarUploadOnCooldown()
   ) {
@@ -2117,6 +2148,10 @@ async function uploadPage3CustomAvatar(
 
   }
 
+
+  /* =======================================================
+     TOKEN
+  ======================================================= */
 
   const token =
     getPage3AvatarToken();
@@ -2202,9 +2237,7 @@ async function uploadPage3CustomAvatar(
       data =
         await response.json();
 
-    }
-
-    catch (
+    } catch (
       jsonError
     ) {
 
@@ -2215,7 +2248,7 @@ async function uploadPage3CustomAvatar(
 
 
     /* =====================================================
-       HTTP ERROR
+       ERROR
     ===================================================== */
 
     if (
@@ -2306,7 +2339,7 @@ async function uploadPage3CustomAvatar(
 
 
     /* =====================================================
-       API SUCCESS CHECK
+       SUCCESS
     ===================================================== */
 
     if (
@@ -2336,7 +2369,7 @@ async function uploadPage3CustomAvatar(
 
 
     /* =====================================================
-       SAVE AVATAR STATE
+       SAVE AVATAR
     ===================================================== */
 
     const avatar =
@@ -2377,7 +2410,7 @@ async function uploadPage3CustomAvatar(
 
 
     /* =====================================================
-       REFRESH USER / PROFILE
+       REFRESH GLOBAL USER
     ===================================================== */
 
     await refreshPage3AvatarState();
@@ -2390,9 +2423,7 @@ async function uploadPage3CustomAvatar(
 
     return true;
 
-  }
-
-  catch (error) {
+  } catch (error) {
 
     console.error(
       "PAGE3 CUSTOM AVATAR UPLOAD ERROR:",
@@ -2407,9 +2438,7 @@ async function uploadPage3CustomAvatar(
 
     return false;
 
-  }
-
-  finally {
+  } finally {
 
     if (button) {
 
@@ -2428,7 +2457,7 @@ async function uploadPage3CustomAvatar(
 
 
 /* =========================================================
-   RENDER CUSTOM AVATAR UPLOAD UI
+   RENDER CUSTOM AVATAR UI
 ========================================================= */
 
 function renderPage3CustomAvatarUpload(
@@ -2504,7 +2533,7 @@ function renderPage3CustomAvatarUpload(
 
 
   description.textContent =
-    "Choose an image, manually crop it to a square, then upload it as a 512 × 512 WebP avatar. Maximum final size: 2 MB.";
+    "Choose an image, edit the crop manually, then convert the cropped result to WebP and upload it.";
 
 
   uploadBox.appendChild(
@@ -2513,7 +2542,7 @@ function renderPage3CustomAvatarUpload(
 
 
   /* =======================================================
-     CURRENT AVATAR
+     CURRENT CUSTOM AVATAR
   ======================================================= */
 
   if (
@@ -2605,9 +2634,7 @@ function renderPage3CustomAvatarUpload(
       cooldown.style.display =
         "";
 
-    }
-
-    else {
+    } else {
 
       cooldown.textContent =
         "";
@@ -2694,7 +2721,7 @@ function renderPage3CustomAvatarUpload(
 
 
   preview.alt =
-    "Cropped avatar preview";
+    "Edited avatar preview";
 
 
   preview.style.display =
@@ -2769,7 +2796,7 @@ function renderPage3CustomAvatarUpload(
 
 
   /* =======================================================
-     CHOOSE IMAGE
+     CHOOSE
   ======================================================= */
 
   chooseButton.addEventListener(
@@ -2798,7 +2825,7 @@ function renderPage3CustomAvatarUpload(
 
 
   /* =======================================================
-     FILE CHANGE
+     FILE SELECTED
   ======================================================= */
 
   input.addEventListener(
@@ -2835,10 +2862,6 @@ function renderPage3CustomAvatarUpload(
           "No image selected";
 
 
-        chooseButton.textContent =
-          "Choose Image";
-
-
         return;
 
       }
@@ -2852,11 +2875,11 @@ function renderPage3CustomAvatarUpload(
         true;
 
 
-      uploadButton.disabled =
-        true;
+      /* ================================================
+         THIS OPENS THE MANUAL EDITOR
+      ================================================= */
 
-
-      const croppedFile =
+      const croppedWebP =
         await handlePage3AvatarFile(
           file,
           preview
@@ -2867,7 +2890,7 @@ function renderPage3CustomAvatarUpload(
         isPage3AvatarUploadOnCooldown();
 
 
-      if (!croppedFile) {
+      if (!croppedWebP) {
 
         input.value =
           "";
@@ -2886,21 +2909,24 @@ function renderPage3CustomAvatarUpload(
       }
 
 
+      /* ================================================
+         EDITING COMPLETE
+      ================================================= */
+
       fileName.textContent =
-        file.name +
-        " → Cropped → WebP";
+        "Image edited → WebP ready";
 
 
       chooseButton.textContent =
         "Choose Another Image";
 
 
-      preview.style.display =
-        "block";
-
-
       uploadButton.disabled =
         false;
+
+
+      preview.style.display =
+        "block";
 
     }
   );
@@ -2917,7 +2943,7 @@ function renderPage3CustomAvatarUpload(
       if (!page3UploadAvatarFile) {
 
         window.alert(
-          "Please choose and crop an image first."
+          "Please choose and edit an image first."
         );
 
 
@@ -2950,25 +2976,20 @@ function renderPage3CustomAvatarUpload(
 
 
         fileName.textContent =
-          "Avatar uploaded";
+          "Avatar uploaded successfully";
 
 
         chooseButton.textContent =
           "Choose Another Image";
 
 
-        updateCooldown();
+        uploadButton.disabled =
+          true;
 
 
         chooseButton.disabled =
           true;
 
-        uploadButton.disabled =
-          true;
-
-      }
-
-      else {
 
         updateCooldown();
 
@@ -3074,7 +3095,7 @@ window.U9ProfilePage3AvatarCropper = {
 
 
 /* =========================================================
-   AUTO STATE LOAD
+   INITIAL STATE
 ========================================================= */
 
 loadPage3AvatarState();
