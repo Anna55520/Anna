@@ -1,188 +1,81 @@
 /* =================================================
-
    PROFILE PAGE 3
-
-
-   IMPORTANT:
-
-   DO NOT MODIFY PROFILE HEADER HERE.
-
-
-   The following elements are controlled by:
-
-   CSS/PROFILE/PROFILE/profile.css
-
-
-   Header:
-
-   #U9-profile-modal-header
-
-   #U9-profile-modal-close
-
-   #U9-profile-modal-title
-
-   #U9-profile-modal-icon
-
-
-   This file only controls:
-
-   #U9-profile-page3
-
-   #U9-profile-page3-content
-
-   Page 3 own elements.
-
-
+   FREE AVATAR LOAD + RENDER
 ================================================= */
 
 
+/* =========================
+   API
+========================= */
 
-/* =================================================
-   PROFILE PAGE 3 WINDOW
-================================================= */
+const U9_PROFILE_PAGE3_FREE_AVATAR_API =
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-free";
 
-#U9-profile-page3 {
 
-  width:100%;
 
-  min-height:100%;
+/* =========================
+   LOAD FREE AVATAR
+========================= */
 
-  display:none;
+async function loadFreeAvatarTest() {
 
-}
 
+  try {
 
 
-/* =================================================
-   PROFILE PAGE 3 CONTENT
+    const response =
+      await fetch(
+        U9_PROFILE_PAGE3_FREE_AVATAR_API,
+        {
+          method:
+            "GET"
+        }
+      );
 
-   FREE AVATAR WINDOW
 
-================================================= */
+    const result =
+      await response.json();
 
-#U9-profile-page3-content {
 
-  width:100%;
 
-  min-height:300px;
+    console.log(
+      "FREE AVATAR RESULT:",
+      result
+    );
 
-  padding:20px;
 
 
-  display:grid;
+    if (
+      result.success
+    ) {
 
-  grid-template-columns:
-    repeat(4, 1fr);
 
+      console.log(
+        "FREE AVATAR LIST:",
+        result.avatars
+      );
 
-  gap:20px;
 
 
-  background:#ffffff;
+      renderFreeAvatars(
+        result.avatars
+      );
 
-  border-radius:12px;
 
+    }
 
-  box-sizing:border-box;
 
-}
 
+  }
 
 
-/* =================================================
-   FREE AVATAR ITEM
+  catch(error) {
 
-================================================= */
 
-.U9-profile-page3-avatar-item {
-
-  width:100%;
-
-  aspect-ratio:1 / 1;
-
-
-  border-radius:50%;
-
-
-  background:#f5f5f5;
-
-
-  border:2px solid #eeeeee;
-
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-
-  overflow:hidden;
-
-
-  cursor:pointer;
-
-
-  transition:
-    transform .2s ease,
-    border-color .2s ease;
-
-}
-
-
-
-/* hover */
-
-.U9-profile-page3-avatar-item:hover {
-
-  transform:scale(1.05);
-
-  border-color:#2762ea;
-
-}
-
-
-
-/* =================================================
-   SVG IMAGE
-
-================================================= */
-
-.U9-profile-page3-avatar-item img {
-
-  width:100%;
-
-  height:100%;
-
-
-  object-fit:contain;
-
-}
-
-
-
-/* =================================================
-   MOBILE
-
-   2 avatars per row
-
-================================================= */
-
-@media(
-  max-width:600px
-){
-
-  #U9-profile-page3-content {
-
-
-    grid-template-columns:
-      repeat(2, 1fr);
-
-
-    gap:16px;
-
-
-    padding:16px;
+    console.error(
+      "FREE AVATAR ERROR:",
+      error
+    );
 
 
   }
@@ -192,24 +85,148 @@
 
 
 
-/* =================================================
-   SMALL MOBILE
 
-================================================= */
+/* =========================
+   RENDER FREE AVATAR
+========================= */
 
-@media(
-  max-width:360px
-){
-
-  #U9-profile-page3-content {
+function renderFreeAvatars(
+  avatars
+) {
 
 
-    gap:12px;
+  const container =
+    document.getElementById(
+      "U9-profile-page3-content"
+    );
 
-    padding:12px;
+
+
+  if(
+    !container
+  ) {
+
+
+    console.error(
+      "PAGE 3 CONTENT NOT FOUND"
+    );
+
+
+    return;
 
 
   }
 
 
+
+  container.innerHTML = "";
+
+
+
+
+  avatars.forEach(
+    (avatar)=>{
+
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        "U9-profile-page3-avatar-item";
+
+
+
+
+      const img =
+        document.createElement(
+          "img"
+        );
+
+
+
+      /*
+        Supabase svg 字段
+        直接读取
+      */
+
+      const svgBlob =
+        new Blob(
+          [
+            avatar.svg
+          ],
+          {
+            type:
+              "image/svg+xml"
+          }
+        );
+
+
+
+      const svgUrl =
+        URL.createObjectURL(
+          svgBlob
+        );
+
+
+
+      img.src =
+        svgUrl;
+
+
+
+      img.alt =
+        avatar.name;
+
+
+
+      item.appendChild(
+        img
+      );
+
+
+
+      container.appendChild(
+        item
+      );
+
+
+
+    }
+  );
+
+
 }
+
+
+
+
+/* =========================
+   PAGE 3 LOAD
+========================= */
+
+async function loadProfilePage3() {
+
+
+  console.log(
+    "PROFILE PAGE 3 LOADED"
+  );
+
+
+
+  await loadFreeAvatarTest();
+
+
+}
+
+
+
+
+
+/* =========================
+   AUTO LOAD
+========================= */
+
+loadProfilePage3();
