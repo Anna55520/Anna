@@ -27,6 +27,19 @@ const loginForm =
   );
 
 
+const loginSubmit =
+  document.getElementById(
+    "U9-login-submit"
+  );
+
+
+
+let loginProcessing =
+false;
+
+
+
+
 
 /* =========================
    OPEN LOGIN
@@ -34,20 +47,25 @@ const loginForm =
 
 
 if(
-  loginButton
+loginButton &&
+loginModal
 ){
 
-  loginButton.addEventListener(
-    "click",
-    () => {
+loginButton.addEventListener(
+"click",
+()=>{
 
-      loginModal.style.display =
-        "flex";
-
-    }
-  );
+loginModal.style.display =
+"flex";
 
 }
+
+);
+
+}
+
+
+
 
 
 
@@ -57,20 +75,25 @@ if(
 
 
 if(
-  loginClose
+loginClose &&
+loginModal
 ){
 
-  loginClose.addEventListener(
-    "click",
-    () => {
+loginClose.addEventListener(
+"click",
+()=>{
 
-      loginModal.style.display =
-        "none";
-
-    }
-  );
+loginModal.style.display =
+"none";
 
 }
+
+);
+
+}
+
+
+
 
 
 
@@ -81,61 +104,65 @@ if(
 
 
 const loginPassword =
-  document.getElementById(
-    "U9-login-password"
-  );
+document.getElementById(
+"U9-login-password"
+);
 
 
 const loginPasswordToggle =
-  document.getElementById(
-    "U9-login-password-toggle"
-  );
+document.getElementById(
+"U9-login-password-toggle"
+);
 
 
 
 if(
-  loginPassword &&
-  loginPasswordToggle
+loginPassword &&
+loginPasswordToggle
 ){
 
-  loginPasswordToggle.addEventListener(
-    "click",
-    () => {
+loginPasswordToggle.addEventListener(
+"click",
+()=>{
 
 
-      if(
-        loginPassword.type ===
-        "password"
-      ){
+if(
+loginPassword.type ===
+"password"
+){
 
-        loginPassword.type =
-          "text";
-
-
-        loginPasswordToggle.textContent =
-          "Hide";
+loginPassword.type =
+"text";
 
 
-      }
+loginPasswordToggle.textContent =
+"Hide";
 
-      else{
-
-
-        loginPassword.type =
-          "password";
-
-
-        loginPasswordToggle.textContent =
-          "Show";
-
-
-      }
-
-
-    }
-  );
 
 }
+
+else{
+
+
+loginPassword.type =
+"password";
+
+
+loginPasswordToggle.textContent =
+"Show";
+
+
+}
+
+
+}
+
+);
+
+}
+
+
+
 
 
 
@@ -146,8 +173,9 @@ if(
 
 
 if(
-  loginForm
+loginForm
 ){
+
 
 loginForm.addEventListener(
 "submit",
@@ -155,6 +183,53 @@ async(event)=>{
 
 
 event.preventDefault();
+
+
+
+
+
+/* =========================
+   PREVENT DOUBLE CLICK
+========================= */
+
+
+if(
+loginProcessing
+){
+
+return;
+
+}
+
+
+loginProcessing =
+true;
+
+
+
+
+
+if(
+loginSubmit
+){
+
+loginSubmit.disabled =
+true;
+
+
+loginSubmit.classList.add(
+"loading"
+);
+
+
+loginSubmit.textContent =
+"Loading...";
+
+}
+
+
+
+
 
 
 
@@ -167,19 +242,22 @@ event.preventDefault();
 const email =
 document
 .getElementById(
-  "U9-login-email"
+"U9-login-email"
 )
 .value
-.trim();
+.trim()
+.toLowerCase();
 
 
 
 const password =
 document
 .getElementById(
-  "U9-login-password"
+"U9-login-password"
 )
 .value;
+
+
 
 
 
@@ -199,13 +277,11 @@ await fetch(
 
 {
 
+
 method:
 "POST",
 
 
-/*
- Cookie 自动保存
-*/
 
 credentials:
 "include",
@@ -249,14 +325,18 @@ await response.json();
 
 
 
+
+
+
 /* =========================
-   LOGIN ERROR
+   LOGIN FAILED
 ========================= */
 
 
 if(
 !response.ok
 ){
+
 
 alert(
 
@@ -273,15 +353,27 @@ return;
 
 
 
+
+
+
+
 /* =========================
    LOGIN SUCCESS
 ========================= */
 
 
-alert(
-"Login successful."
-);
+/*
 
+Browser:
+
+Set-Cookie
+
+u9_session
+
+自动保存
+
+
+*/
 
 
 loginForm.reset();
@@ -294,30 +386,10 @@ loginModal.style.display =
 
 
 
-/*
- =========================
-
- u9_session Cookie
-
- 已由浏览器自动保存
-
- 不需要:
-
- localStorage.setItem()
-
- 不需要:
-
- Authorization Token
-
- =========================
-*/
-
-
-
 
 
 /* =========================
-   UPDATE USER STATE
+   UPDATE USER
 ========================= */
 
 
@@ -325,15 +397,27 @@ if(
 window.U9User
 ){
 
+
+const user =
 await window.U9User.refresh();
+
+
+
+console.log(
+"Current user:",
+user
+);
+
 
 }
 
 
 
 
+
+
 /* =========================
-   UPDATE PROFILE AVATAR
+   UPDATE AVATAR
 ========================= */
 
 
@@ -344,6 +428,8 @@ window.U9ProfileAvatar
 await window.U9ProfileAvatar.refresh();
 
 }
+
+
 
 
 
@@ -361,6 +447,7 @@ result
 
 
 
+
 }
 
 
@@ -369,18 +456,14 @@ catch(error){
 
 
 console.error(
-
 "Login error:",
 error
-
 );
 
 
 
 alert(
-
 "Unable to connect to the server."
-
 );
 
 
@@ -389,6 +472,40 @@ alert(
 
 
 
-});
+finally{
+
+
+loginProcessing =
+false;
+
+
+
+if(
+loginSubmit
+){
+
+loginSubmit.disabled =
+false;
+
+
+loginSubmit.classList.remove(
+"loading"
+);
+
+
+loginSubmit.textContent =
+"Login";
+
+}
+
+
+}
+
+
+
+}
+
+);
+
 
 }
