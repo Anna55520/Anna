@@ -77,3 +77,50 @@
   font-weight: 600;
 
 }
+
+#U9-profile-page3-content {
+
+  width:100%;
+
+  padding:20px;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap:20px;
+
+}
+
+
+/* avatar box */
+
+.U9-free-avatar-item {
+
+  aspect-ratio:1 / 1;
+
+  border-radius:50%;
+
+  border:2px solid #eee;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  overflow:hidden;
+
+}
+
+
+.U9-free-avatar-item img {
+
+  width:100%;
+
+  height:100%;
+
+  object-fit:contain;
+
+}
