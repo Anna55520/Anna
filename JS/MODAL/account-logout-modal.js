@@ -33,11 +33,6 @@ const logoutCountdown =
 
 
 
-/* =========================
-   SETTING LOGOUT BUTTON
-========================= */
-
-
 const accountSettingLogout =
   document.getElementById(
     "Account-U9-account-logout"
@@ -378,6 +373,46 @@ logoutYes.textContent =
 
 
 /* =========================
+   GET TOKEN
+========================= */
+
+
+const token =
+localStorage.getItem(
+"u9_token"
+);
+
+
+
+
+
+const headers = {
+
+"Content-Type":
+"application/json"
+
+};
+
+
+
+
+
+if(
+token
+){
+
+headers.Authorization =
+`Bearer ${token}`;
+
+}
+
+
+
+
+
+
+
+/* =========================
    LOGOUT API
 ========================= */
 
@@ -396,26 +431,12 @@ method:
 "POST",
 
 
-/*
- Cookie:
-
- u9_session
-
- 自动发送
-
-*/
-
 credentials:
 "include",
 
 
-
-headers:{
-
-"Content-Type":
-"application/json"
-
-}
+headers:
+headers
 
 
 }
@@ -513,6 +534,8 @@ window.U9User.clear();
 
 
 
+
+
 /* =========================
    RESET TIMER
 ========================= */
@@ -556,11 +579,6 @@ false;
 
 
 
-
-
-/* =========================
-   DEBUG
-========================= */
 
 
 console.log(
