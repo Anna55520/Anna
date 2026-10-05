@@ -1,8 +1,8 @@
-
 /* =================================================
    PROFILE PAGE 3
 
    AVATAR
+   CUSTOM AVATAR
    FREE AVATAR FRAME
    PAID AVATAR FRAME
 ================================================= */
@@ -20,10 +20,9 @@
 
   display:none;
 
+  box-sizing:border-box;
+
 }
-
-
-
 
 
 /* =================================================
@@ -38,14 +37,14 @@
 
   padding:20px;
 
+  box-sizing:border-box;
+
 }
-
-
-
 
 
 /* =================================================
    TABS
+   FIXED / STICKY
 ================================================= */
 
 .U9-profile-page3-tabs {
@@ -56,16 +55,36 @@
 
   align-items:center;
 
+  justify-content:center;
+
   gap:10px;
 
   margin-bottom:20px;
 
   overflow-x:auto;
 
+  overflow-y:hidden;
+
   scrollbar-width:none;
+
+  position:sticky;
+
+  top:0;
+
+  z-index:100;
+
+  padding:10px 0;
+
+  background:#ffffff;
+
+  box-sizing:border-box;
 
 }
 
+
+/* -------------------------------------------------
+   HIDE SCROLLBAR
+------------------------------------------------- */
 
 .U9-profile-page3-tabs::-webkit-scrollbar {
 
@@ -74,7 +93,15 @@
 }
 
 
+/* -------------------------------------------------
+   TAB INNER ALIGNMENT
+------------------------------------------------- */
 
+.U9-profile-page3-tabs > * {
+
+  flex-shrink:0;
+
+}
 
 
 /* =================================================
@@ -101,19 +128,28 @@
 
   cursor:pointer;
 
-  transition:.2s;
+  transition:
+    background .2s ease,
+    color .2s ease,
+    opacity .2s ease,
+    transform .2s ease;
+
+  flex-shrink:0;
 
 }
 
+
+/* =================================================
+   TAB HOVER
+================================================= */
 
 .U9-profile-page3-tab:hover {
 
   opacity:.85;
 
+  transform:translateY(-1px);
+
 }
-
-
-
 
 
 /* =================================================
@@ -129,7 +165,15 @@
 }
 
 
+/* =================================================
+   TAB ACTIVE HOVER
+================================================= */
 
+.U9-profile-page3-tab.active:hover {
+
+  opacity:1;
+
+}
 
 
 /* =================================================
@@ -143,7 +187,316 @@
 }
 
 
+/* =================================================
+   AVATAR SECTION
+================================================= */
 
+.U9-profile-page3-avatar-section {
+
+  width:100%;
+
+}
+
+
+/* =================================================
+   CUSTOM AVATAR UPLOAD
+================================================= */
+
+.U9-profile-page3-upload {
+
+  width:100%;
+
+  margin-bottom:25px;
+
+  padding:20px;
+
+  border-radius:18px;
+
+  background:#ffffff;
+
+  border:1px solid #eeeeee;
+
+  box-sizing:border-box;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:12px;
+
+}
+
+
+/* =================================================
+   UPLOAD TITLE
+================================================= */
+
+.U9-profile-page3-upload-title {
+
+  width:100%;
+
+  font-size:18px;
+
+  font-weight:600;
+
+  color:#222;
+
+  text-align:center;
+
+}
+
+
+/* =================================================
+   UPLOAD DESCRIPTION
+================================================= */
+
+.U9-profile-page3-upload-description {
+
+  width:100%;
+
+  max-width:500px;
+
+  font-size:13px;
+
+  line-height:1.6;
+
+  color:#777;
+
+  text-align:center;
+
+}
+
+
+/* =================================================
+   CURRENT CUSTOM AVATAR
+================================================= */
+
+.U9-profile-page3-upload-current {
+
+  width:100%;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:8px;
+
+  margin-top:4px;
+
+}
+
+
+/* =================================================
+   CURRENT AVATAR TEXT
+================================================= */
+
+.U9-profile-page3-upload-current-text {
+
+  font-size:13px;
+
+  color:#555;
+
+  text-align:center;
+
+}
+
+
+/* =================================================
+   UPLOAD INPUT
+================================================= */
+
+.U9-profile-page3-upload-input {
+
+  width:100%;
+
+  max-width:360px;
+
+  box-sizing:border-box;
+
+  padding:10px;
+
+  border:1px solid #dddddd;
+
+  border-radius:10px;
+
+  background:#fafafa;
+
+  color:#555;
+
+  font-size:13px;
+
+  cursor:pointer;
+
+}
+
+
+/* =================================================
+   UPLOAD INPUT HOVER
+================================================= */
+
+.U9-profile-page3-upload-input:hover {
+
+  border-color:#2762ea;
+
+}
+
+
+/* =================================================
+   UPLOAD FILE NAME
+================================================= */
+
+.U9-profile-page3-upload-file-name {
+
+  width:100%;
+
+  max-width:360px;
+
+  min-height:20px;
+
+  font-size:13px;
+
+  color:#777;
+
+  text-align:center;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+
+  white-space:nowrap;
+
+}
+
+
+/* =================================================
+   UPLOAD PREVIEW
+================================================= */
+
+.U9-profile-page3-upload-preview {
+
+  width:100px;
+
+  height:100px;
+
+  object-fit:cover;
+
+  border-radius:50%;
+
+  background:#f5f5f5;
+
+  border:1px solid #eeeeee;
+
+  box-sizing:border-box;
+
+}
+
+
+/* =================================================
+   UPLOAD BUTTON
+================================================= */
+
+.U9-profile-page3-upload-button {
+
+  min-width:120px;
+
+  height:36px;
+
+  padding:0 20px;
+
+  border:none;
+
+  border-radius:20px;
+
+  background:#2762ea;
+
+  color:#ffffff;
+
+  font-size:14px;
+
+  cursor:pointer;
+
+  transition:
+    background .2s ease,
+    opacity .2s ease,
+    transform .2s ease;
+
+}
+
+
+/* =================================================
+   UPLOAD BUTTON HOVER
+================================================= */
+
+.U9-profile-page3-upload-button:hover {
+
+  opacity:.88;
+
+  transform:translateY(-1px);
+
+}
+
+
+/* =================================================
+   UPLOAD BUTTON LOADING
+================================================= */
+
+.U9-profile-page3-upload-button.loading {
+
+  opacity:.5;
+
+  pointer-events:none;
+
+}
+
+
+/* =================================================
+   UPLOAD BUTTON DISABLED
+================================================= */
+
+.U9-profile-page3-upload-button:disabled {
+
+  cursor:default;
+
+  opacity:.5;
+
+}
+
+
+/* =================================================
+   UPLOAD COOLDOWN
+================================================= */
+
+.U9-profile-page3-upload-cooldown {
+
+  width:100%;
+
+  max-width:500px;
+
+  padding:10px 14px;
+
+  border-radius:10px;
+
+  background:#fff4e5;
+
+  color:#9a6500;
+
+  font-size:13px;
+
+  line-height:1.5;
+
+  text-align:center;
+
+  box-sizing:border-box;
+
+}
 
 
 /* =================================================
@@ -158,12 +511,11 @@
 
   flex-wrap:wrap;
 
+  justify-content:flex-start;
+
   gap:20px;
 
 }
-
-
-
 
 
 /* =================================================
@@ -197,9 +549,6 @@
 }
 
 
-
-
-
 /* =================================================
    AVATAR IMAGE
 ================================================= */
@@ -213,9 +562,6 @@
   object-fit:contain;
 
 }
-
-
-
 
 
 /* =================================================
@@ -241,9 +587,6 @@
 }
 
 
-
-
-
 /* =================================================
    AVATAR BUTTON
 ================================================= */
@@ -266,19 +609,25 @@
 
   cursor:pointer;
 
-  transition:.2s;
+  transition:
+    background .2s ease,
+    opacity .2s ease,
+    transform .2s ease;
 
 }
 
+
+/* =================================================
+   AVATAR BUTTON HOVER
+================================================= */
 
 .U9-profile-page3-avatar-button:hover {
 
   opacity:.85;
 
+  transform:translateY(-1px);
+
 }
-
-
-
 
 
 /* =================================================
@@ -294,9 +643,6 @@
 }
 
 
-
-
-
 /* =================================================
    AVATAR LOADING
 ================================================= */
@@ -310,9 +656,6 @@
 }
 
 
-
-
-
 /* =================================================
    AVATAR DISABLED
 ================================================= */
@@ -322,9 +665,6 @@
   cursor:default;
 
 }
-
-
-
 
 
 /* =================================================
@@ -339,12 +679,11 @@
 
   flex-wrap:wrap;
 
+  justify-content:flex-start;
+
   gap:20px;
 
 }
-
-
-
 
 
 /* =================================================
@@ -377,12 +716,11 @@
 
   position:relative;
 
-  transition:.2s;
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease;
 
 }
-
-
-
 
 
 /* =================================================
@@ -396,9 +734,6 @@
 }
 
 
-
-
-
 /* =================================================
    FRAME EQUIPPED
 ================================================= */
@@ -409,9 +744,6 @@
     0 0 0 2px #2762ea inset;
 
 }
-
-
-
 
 
 /* =================================================
@@ -433,9 +765,6 @@
 }
 
 
-
-
-
 /* =================================================
    FRAME IMAGE
 ================================================= */
@@ -449,9 +778,6 @@
   object-fit:contain;
 
 }
-
-
-
 
 
 /* =================================================
@@ -477,9 +803,6 @@
 }
 
 
-
-
-
 /* =================================================
    FRAME PRICE
 ================================================= */
@@ -493,9 +816,6 @@
   text-align:center;
 
 }
-
-
-
 
 
 /* =================================================
@@ -520,19 +840,47 @@
 
   cursor:pointer;
 
-  transition:.2s;
+  transition:
+    background .2s ease,
+    opacity .2s ease,
+    transform .2s ease;
 
 }
 
+
+/* =================================================
+   FRAME BUTTON HOVER
+================================================= */
 
 .U9-profile-page3-frame-button:hover {
 
   opacity:.85;
 
+  transform:translateY(-1px);
+
 }
 
 
+/* =================================================
+   FRAME BUY
+================================================= */
 
+.U9-profile-page3-frame-button.buy {
+
+  background:#2762ea;
+
+}
+
+
+/* =================================================
+   FRAME USE
+================================================= */
+
+.U9-profile-page3-frame-button.use {
+
+  background:#2762ea;
+
+}
 
 
 /* =================================================
@@ -548,9 +896,6 @@
 }
 
 
-
-
-
 /* =================================================
    FRAME LOADING
 ================================================= */
@@ -564,9 +909,6 @@
 }
 
 
-
-
-
 /* =================================================
    FRAME DISABLED
 ================================================= */
@@ -578,7 +920,64 @@
 }
 
 
+/* =================================================
+   MESSAGE
+================================================= */
 
+.U9-profile-page3-message {
+
+  width:100%;
+
+  min-height:100px;
+
+  padding:20px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  box-sizing:border-box;
+
+  font-size:14px;
+
+  text-align:center;
+
+}
+
+
+/* =================================================
+   MESSAGE INFO
+================================================= */
+
+.U9-profile-page3-message.info {
+
+  color:#777;
+
+}
+
+
+/* =================================================
+   MESSAGE ERROR
+================================================= */
+
+.U9-profile-page3-message.error {
+
+  color:#d33;
+
+}
+
+
+/* =================================================
+   MESSAGE EMPTY
+================================================= */
+
+.U9-profile-page3-message.empty {
+
+  color:#777;
+
+}
 
 
 /* =================================================
@@ -604,11 +1003,8 @@
 }
 
 
-
-
-
 /* =================================================
-   EMPTY
+   EMPTY LEGACY
 ================================================= */
 
 .U9-profile-page3-empty {
@@ -630,11 +1026,8 @@
 }
 
 
-
-
-
 /* =================================================
-   ERROR
+   ERROR LEGACY
 ================================================= */
 
 .U9-profile-page3-error {
@@ -656,9 +1049,6 @@
 }
 
 
-
-
-
 /* =================================================
    MOBILE
 ================================================= */
@@ -667,12 +1057,101 @@
   max-width:600px
 ) {
 
+
+  /* -------------------------------------------------
+     CONTENT
+  ------------------------------------------------- */
+
   #U9-profile-page3-content {
 
     padding:15px;
 
   }
 
+
+  /* -------------------------------------------------
+     TABS
+  ------------------------------------------------- */
+
+  .U9-profile-page3-tabs {
+
+    justify-content:flex-start;
+
+    gap:8px;
+
+    padding:10px 0;
+
+    margin-bottom:15px;
+
+  }
+
+
+  .U9-profile-page3-tab {
+
+    height:36px;
+
+    padding:0 15px;
+
+    font-size:13px;
+
+  }
+
+
+  /* -------------------------------------------------
+     UPLOAD
+  ------------------------------------------------- */
+
+  .U9-profile-page3-upload {
+
+    padding:16px;
+
+    margin-bottom:20px;
+
+    border-radius:15px;
+
+  }
+
+
+  .U9-profile-page3-upload-title {
+
+    font-size:16px;
+
+  }
+
+
+  .U9-profile-page3-upload-description {
+
+    font-size:12px;
+
+  }
+
+
+  .U9-profile-page3-upload-input {
+
+    max-width:100%;
+
+  }
+
+
+  .U9-profile-page3-upload-file-name {
+
+    max-width:100%;
+
+  }
+
+
+  .U9-profile-page3-upload-button {
+
+    width:100%;
+
+    max-width:220px;
+
+  }
+
+
+  /* -------------------------------------------------
+     AVATAR / FRAME LIST
+  ------------------------------------------------- */
 
   .U9-profile-page3-avatar-list,
   .U9-profile-page3-frame-list {
@@ -681,6 +1160,10 @@
 
   }
 
+
+  /* -------------------------------------------------
+     AVATAR CARD
+  ------------------------------------------------- */
 
   .U9-profile-page3-avatar-card {
 
@@ -691,11 +1174,55 @@
   }
 
 
+  /* -------------------------------------------------
+     FRAME CARD
+  ------------------------------------------------- */
+
   .U9-profile-page3-frame-card {
 
     width:calc(
       50% - 6px
     );
+
+  }
+
+
+}
+
+
+/* =================================================
+   VERY SMALL MOBILE
+================================================= */
+
+@media (
+  max-width:360px
+) {
+
+
+  .U9-profile-page3-avatar-card {
+
+    width:100%;
+
+  }
+
+
+  .U9-profile-page3-frame-card {
+
+    width:100%;
+
+  }
+
+
+  .U9-profile-page3-tabs {
+
+    gap:6px;
+
+  }
+
+
+  .U9-profile-page3-tab {
+
+    padding:0 13px;
 
   }
 
