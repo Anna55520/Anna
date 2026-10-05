@@ -1,23 +1,19 @@
-/* =========================
+/* =================================================
    PROFILE PAGE 3
-   FREE AVATAR
-========================= */
+   FREE AVATAR SELECT
+================================================= */
 
 
 /* =========================
    API
 ========================= */
 
-
-const U9_AVATAR_FREE_API =
-"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-free";
-
-
-const U9_AVATAR_SET_API =
-"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-set";
+const U9_PROFILE_PAGE3_FREE_AVATAR_API =
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-free";
 
 
-
+const U9_PROFILE_PAGE3_SET_AVATAR_API =
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-set";
 
 
 
@@ -25,338 +21,44 @@ const U9_AVATAR_SET_API =
    ELEMENTS
 ========================= */
 
-
-const profilePage3 =
-document.getElementById(
-"U9-profile-page-3"
-);
-
-
-
-const freeAvatarContainer =
-document.getElementById(
-"U9-profile-free-avatar-list"
-);
-
-
-
-const freeAvatarStatus =
-document.getElementById(
-"U9-profile-free-avatar-status"
-);
-
-
-
+const profilePage3Content =
+  document.getElementById(
+    "U9-profile-page3-content"
+  );
 
 
 
 /* =========================
-   TOKEN
+   CURRENT AVATAR
 ========================= */
 
-
-function getToken(){
-
-return localStorage.getItem(
-"u9_token"
-);
-
-}
-
-
-
-
+let currentAvatarId = null;
 
 
 
 /* =========================
-   AUTH HEADERS
+   LOAD CURRENT AVATAR
+
+   TODO:
+   后续接你的 avatar-current API
+
 ========================= */
 
+async function loadCurrentAvatar(){
 
-function getAuthHeaders(){
+  /*
+    暂时为空
 
+    等你提供读取当前头像 API
 
-const headers = {
+    这里会返回：
 
-"Content-Type":
-"application/json"
+    currentAvatarId =
+    user_avatar.avatar_id
 
-};
-
-
-
-const token =
-getToken();
-
-
-
-if(token){
-
-headers.Authorization =
-`Bearer ${token}`;
+  */
 
 }
-
-
-
-return headers;
-
-}
-
-
-
-
-
-
-
-
-
-/* =========================
-   LOAD FREE AVATAR
-========================= */
-
-
-async function loadFreeAvatar(){
-
-
-try{
-
-
-const response =
-await fetch(
-
-U9_AVATAR_FREE_API,
-
-{
-
-method:
-"GET",
-
-
-credentials:
-"include",
-
-
-headers:
-getAuthHeaders()
-
-}
-
-);
-
-
-
-
-
-const result =
-await response.json();
-
-
-
-
-
-
-console.log(
-"FREE AVATAR RESULT:",
-result
-);
-
-
-
-
-
-
-
-if(
-!response.ok ||
-!result.success
-){
-
-throw new Error(
-result.error ||
-"Unable to load avatar"
-);
-
-}
-
-
-
-
-
-
-renderFreeAvatar(
-result.avatars || []
-);
-
-
-
-
-
-}
-
-catch(error){
-
-
-console.error(
-
-"Load free avatar error:",
-
-error
-
-);
-
-
-
-if(freeAvatarStatus){
-
-freeAvatarStatus.textContent =
-"Unable to load avatar";
-
-}
-
-
-
-}
-
-
-
-}
-
-
-
-
-
-
-
-
-
-/* =========================
-   RENDER AVATAR
-========================= */
-
-
-function renderFreeAvatar(
-avatars
-){
-
-
-
-if(
-!freeAvatarContainer
-){
-
-return;
-
-}
-
-
-
-
-freeAvatarContainer.innerHTML =
-"";
-
-
-
-
-
-avatars.forEach(
-
-avatar=>{
-
-
-
-const item =
-document.createElement(
-"div"
-);
-
-
-
-item.className =
-"U9-profile-free-avatar-item";
-
-
-
-item.dataset.avatarId =
-avatar.id;
-
-
-
-
-
-const image =
-document.createElement(
-"img"
-);
-
-
-
-image.className =
-"U9-profile-free-avatar-image";
-
-
-
-image.src =
-avatar.svg;
-
-
-
-image.alt =
-avatar.name || "avatar";
-
-
-
-
-
-item.appendChild(
-image
-);
-
-
-
-
-
-
-item.addEventListener(
-"click",
-()=>{
-
-
-setFreeAvatar(
-avatar.id
-);
-
-
-
-}
-
-);
-
-
-
-
-
-
-freeAvatarContainer.appendChild(
-item
-);
-
-
-
-}
-
-);
-
-
-
-}
-
-
-
-
-
-
 
 
 
@@ -364,235 +66,452 @@ item
    SET FREE AVATAR
 ========================= */
 
-
 async function setFreeAvatar(
-avatarId
+  avatarId,
+  button
 ){
 
 
-
-try{
-
-
-document.body.classList.add(
-"U9-avatar-loading"
-);
+  try {
 
 
+    button.classList.add(
+      "loading"
+    );
 
 
-
-
-const response =
-await fetch(
-
-U9_AVATAR_SET_API,
-
-{
-
-method:
-"POST",
-
-
-credentials:
-"include",
-
-
-headers:
-getAuthHeaders(),
+    button.textContent =
+      "加载中...";
 
 
 
-body:
-JSON.stringify({
+    const response =
+      await fetch(
 
-avatar_type:
-"free",
+        U9_PROFILE_PAGE3_SET_AVATAR_API,
+
+        {
+
+          method:"POST",
+
+          credentials:"include",
+
+          headers:{
+
+            "Content-Type":
+              "application/json"
+
+          },
 
 
-avatar_id:
-avatarId
+          body:
+            JSON.stringify({
+
+              type:
+                "free",
+
+              avatar_id:
+                avatarId
+
+            })
+
+        }
+
+      );
 
 
-})
+
+    const result =
+      await response.json();
+
+
+
+    console.log(
+      "SET AVATAR RESULT:",
+      result
+    );
+
+
+
+    if(
+      !result.success
+    ){
+
+      throw new Error(
+        result.error ||
+        "Set avatar failed"
+      );
+
+    }
+
+
+
+    currentAvatarId =
+      avatarId;
+
+
+
+    updateAvatarButtons();
+
+
+
+  }
+  catch(error){
+
+
+    console.error(
+      "SET AVATAR ERROR:",
+      error
+    );
+
+
+    button.textContent =
+      "失败";
+
+
+  }
+  finally{
+
+
+    button.classList.remove(
+      "loading"
+    );
+
+
+  }
+
 
 }
-
-);
-
-
-
-
-
-
-
-const result =
-await response.json();
-
-
-
-
-
-console.log(
-
-"SET AVATAR RESULT:",
-
-result
-
-);
-
-
-
-
-
-
-if(
-!response.ok ||
-!result.success
-){
-
-
-throw new Error(
-
-result.error ||
-"Set avatar failed."
-
-);
-
-
-}
-
-
-
-
-
-
-
-console.log(
-"Avatar updated"
-);
-
-
-
 
 
 
 /* =========================
-   REFRESH USER
+   UPDATE BUTTON STATUS
 ========================= */
 
+function updateAvatarButtons(){
 
-if(
-window.U9User
-){
 
-await window.U9User.refresh();
+  const buttons =
+    document.querySelectorAll(
+      ".U9-profile-page3-avatar-button"
+    );
+
+
+
+  buttons.forEach(
+    (button)=>{
+
+
+      const id =
+        button.dataset.avatarId;
+
+
+
+      if(
+        id === currentAvatarId
+      ){
+
+
+        button.textContent =
+          "正在使用";
+
+
+        button.classList.add(
+          "active"
+        );
+
+
+        button.disabled =
+          true;
+
+
+      }
+      else{
+
+
+        button.textContent =
+          "使用";
+
+
+        button.classList.remove(
+          "active"
+        );
+
+
+        button.disabled =
+          false;
+
+
+      }
+
+
+    }
+
+  );
+
 
 }
-
-
-
 
 
 
 /* =========================
-   REFRESH AVATAR
+   LOAD FREE AVATAR
 ========================= */
 
+async function loadFreeAvatar(){
 
-if(
-window.U9ProfileAvatar
-){
 
-await window.U9ProfileAvatar.refresh();
+  if(
+    !profilePage3Content
+  ){
+
+    console.error(
+      "PAGE3 CONTENT NOT FOUND"
+    );
+
+    return;
+
+  }
+
+
+
+  try{
+
+
+    const response =
+      await fetch(
+
+        U9_PROFILE_PAGE3_FREE_AVATAR_API,
+
+        {
+
+          method:"GET"
+
+        }
+
+      );
+
+
+
+    const result =
+      await response.json();
+
+
+
+    console.log(
+      "FREE AVATAR RESULT:",
+      result
+    );
+
+
+
+    if(
+      !result.success
+    ){
+
+      throw new Error(
+        "Free avatar failed"
+      );
+
+    }
+
+
+
+    const avatars =
+      result.avatars || [];
+
+
+
+    profilePage3Content.innerHTML =
+      "";
+
+
+
+    const list =
+      document.createElement(
+        "div"
+      );
+
+
+
+    list.className =
+      "U9-profile-page3-avatar-list";
+
+
+
+    avatars.forEach(
+      (avatar)=>{
+
+
+        const card =
+          document.createElement(
+            "div"
+          );
+
+
+
+        card.className =
+          "U9-profile-page3-avatar-card";
+
+
+
+        const img =
+          document.createElement(
+            "img"
+          );
+
+
+
+        img.className =
+          "U9-profile-page3-avatar-image";
+
+
+
+        img.src =
+          avatar.svg;
+
+
+
+        img.alt =
+          avatar.name ||
+          "avatar";
+
+
+
+        img.draggable =
+          false;
+
+
+
+        const name =
+          document.createElement(
+            "div"
+          );
+
+
+
+        name.className =
+          "U9-profile-page3-avatar-name";
+
+
+
+        name.textContent =
+          avatar.name;
+
+
+
+        const button =
+          document.createElement(
+            "button"
+          );
+
+
+
+        button.className =
+          "U9-profile-page3-avatar-button";
+
+
+
+        button.dataset.avatarId =
+          avatar.id;
+
+
+
+        button.textContent =
+          "使用";
+
+
+
+        button.addEventListener(
+          "click",
+          ()=>{
+
+
+            setFreeAvatar(
+              avatar.id,
+              button
+            );
+
+
+          }
+
+        );
+
+
+
+        card.appendChild(
+          img
+        );
+
+
+        card.appendChild(
+          name
+        );
+
+
+        card.appendChild(
+          button
+        );
+
+
+        list.appendChild(
+          card
+        );
+
+
+      }
+
+    );
+
+
+
+    profilePage3Content.appendChild(
+      list
+    );
+
+
+
+    updateAvatarButtons();
+
+
+
+  }
+  catch(error){
+
+
+    console.error(
+      "FREE AVATAR ERROR:",
+      error
+    );
+
+
+  }
+
 
 }
-
-
-
-
-
-
-}
-
-catch(error){
-
-
-console.error(
-
-"SET AVATAR ERROR:",
-
-error
-
-);
-
-
-
-alert(
-error.message
-);
-
-
-
-}
-
-finally{
-
-
-document.body.classList.remove(
-"U9-avatar-loading"
-);
-
-
-
-}
-
-
-
-}
-
-
-
-
-
-
 
 
 
 /* =========================
-   INIT
+   LOAD PAGE
 ========================= */
 
-
-function initProfilePage3(){
-
+async function loadProfilePage3(){
 
 
-if(
-!profilePage3
-){
-
-return;
-
-}
+  console.log(
+    "PROFILE PAGE 3 LOADED"
+  );
 
 
-
-console.log(
-"PROFILE PAGE 3 LOADED"
-);
+  await loadCurrentAvatar();
 
 
-
-loadFreeAvatar();
-
+  await loadFreeAvatar();
 
 
 }
-
-
-
-
 
 
 
@@ -600,28 +519,4 @@ loadFreeAvatar();
    START
 ========================= */
 
-
-if(
-document.readyState ===
-"loading"
-){
-
-
-document.addEventListener(
-
-"DOMContentLoaded",
-
-initProfilePage3
-
-);
-
-
-}
-
-else{
-
-
-initProfilePage3();
-
-
-}
+loadProfilePage3();
