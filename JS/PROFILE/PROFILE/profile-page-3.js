@@ -1,21 +1,37 @@
 /* =================================================
    PROFILE PAGE 3
-   FREE AVATAR LOAD + RENDER
+
+   LOAD FREE AVATAR
+
+   DATA SOURCE:
+
+   Supabase Edge Function
+
+   /avatar-free
+
+
+   avatar_free.svg
+
+   is STORAGE URL
+
+   NOT SVG CODE
+
+
 ================================================= */
 
 
-/* =========================
+/* =================================================
    API
-========================= */
+================================================= */
 
 const U9_PROFILE_PAGE3_FREE_AVATAR_API =
   "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-free";
 
 
 
-/* =========================
+/* =================================================
    LOAD FREE AVATAR
-========================= */
+================================================= */
 
 async function loadFreeAvatarTest() {
 
@@ -25,12 +41,16 @@ async function loadFreeAvatarTest() {
 
     const response =
       await fetch(
+
         U9_PROFILE_PAGE3_FREE_AVATAR_API,
+
         {
           method:
             "GET"
         }
+
       );
+
 
 
     const result =
@@ -45,9 +65,9 @@ async function loadFreeAvatarTest() {
 
 
 
-    if (
+    if(
       result.success
-    ) {
+    ){
 
 
       console.log(
@@ -69,7 +89,7 @@ async function loadFreeAvatarTest() {
   }
 
 
-  catch(error) {
+  catch(error){
 
 
     console.error(
@@ -85,14 +105,13 @@ async function loadFreeAvatarTest() {
 
 
 
-
-/* =========================
+/* =================================================
    RENDER FREE AVATAR
-========================= */
+================================================= */
 
 function renderFreeAvatars(
   avatars
-) {
+){
 
 
   const container =
@@ -104,7 +123,7 @@ function renderFreeAvatars(
 
   if(
     !container
-  ) {
+  ){
 
 
     console.error(
@@ -119,8 +138,8 @@ function renderFreeAvatars(
 
 
 
-  container.innerHTML = "";
-
+  container.innerHTML =
+    "";
 
 
 
@@ -128,10 +147,15 @@ function renderFreeAvatars(
     (avatar)=>{
 
 
+      /* =========================
+         ITEM
+      ========================= */
+
       const item =
         document.createElement(
           "div"
         );
+
 
 
       item.className =
@@ -140,6 +164,15 @@ function renderFreeAvatars(
 
 
 
+      /* =========================
+         IMAGE
+
+         avatar.svg
+
+         = Storage URL
+
+      ========================= */
+
       const img =
         document.createElement(
           "img"
@@ -147,38 +180,47 @@ function renderFreeAvatars(
 
 
 
-      /*
-        Supabase svg 字段
-        直接读取
-      */
-
-      const svgBlob =
-        new Blob(
-          [
-            avatar.svg
-          ],
-          {
-            type:
-              "image/svg+xml"
-          }
-        );
-
-
-
-      const svgUrl =
-        URL.createObjectURL(
-          svgBlob
-        );
-
-
-
       img.src =
-        svgUrl;
+        avatar.svg;
 
 
 
       img.alt =
         avatar.name;
+
+
+
+      img.loading =
+        "lazy";
+
+
+
+      img.onload =
+        ()=>{
+
+
+          console.log(
+            "SVG LOADED:",
+            avatar.name
+          );
+
+
+        };
+
+
+
+      img.onerror =
+        ()=>{
+
+
+          console.error(
+            "SVG LOAD ERROR:",
+            avatar.svg
+          );
+
+
+        };
+
 
 
 
@@ -203,11 +245,11 @@ function renderFreeAvatars(
 
 
 
-/* =========================
+/* =================================================
    PAGE 3 LOAD
-========================= */
+================================================= */
 
-async function loadProfilePage3() {
+async function loadProfilePage3(){
 
 
   console.log(
@@ -223,10 +265,8 @@ async function loadProfilePage3() {
 
 
 
-
-
-/* =========================
+/* =================================================
    AUTO LOAD
-========================= */
+================================================= */
 
 loadProfilePage3();
