@@ -1,4 +1,5 @@
 /* =================================================
+
    PROFILE PAGE 3
 
 
@@ -36,6 +37,7 @@
 
 
 /* =================================================
+
    PROFILE PAGE 3
 
    ONLY PAGE 3
@@ -44,7 +46,9 @@
 
 
 /* =========================
+
    WINDOW
+
 ========================= */
 
 #U9-profile-page3 {
@@ -60,7 +64,9 @@
 
 
 /* =========================
+
    CONTENT
+
 ========================= */
 
 #U9-profile-page3-content {
@@ -78,7 +84,9 @@
 
 
 /* =========================
+
    AVATAR LIST
+
 ========================= */
 
 
@@ -93,12 +101,15 @@
 
   gap:20px;
 
+
 }
 
 
 
 /* =========================
+
    CARD
+
 ========================= */
 
 
@@ -107,7 +118,7 @@
 
   width:120px;
 
-  height:150px;
+  height:170px;
 
   border-radius:16px;
 
@@ -123,12 +134,15 @@
 
   gap:10px;
 
+
 }
 
 
 
 /* =========================
+
    IMAGE
+
 ========================= */
 
 
@@ -141,12 +155,15 @@
 
   object-fit:contain;
 
+
 }
 
 
 
 /* =========================
+
    NAME
+
 ========================= */
 
 
@@ -156,5 +173,119 @@
   font-size:14px;
 
   color:#333;
+
+
+}
+
+
+
+/* =========================
+
+   BUTTON
+
+========================= */
+
+
+.U9-profile-page3-avatar-button {
+
+
+  width:90px;
+
+  height:32px;
+
+
+  border:none;
+
+  border-radius:20px;
+
+
+  background:#2762ea;
+
+  color:white;
+
+
+  font-size:14px;
+
+
+  cursor:pointer;
+
+
+  transition:
+    .2s;
+
+
+}
+
+
+
+/* =========================
+
+   BUTTON HOVER
+
+========================= */
+
+
+.U9-profile-page3-avatar-button:hover {
+
+
+  opacity:.85;
+
+
+}
+
+
+
+/* =========================
+
+   ACTIVE
+
+   正在使用
+
+========================= */
+
+
+.U9-profile-page3-avatar-button.active {
+
+
+  background:#e5e5e5;
+
+  color:#555;
+
+
+}
+
+
+
+/* =========================
+
+   LOADING
+
+========================= */
+
+
+.U9-profile-page3-avatar-button.loading {
+
+
+  opacity:.5;
+
+  pointer-events:none;
+
+
+}
+
+
+
+/* =========================
+
+   DISABLED
+
+========================= */
+
+
+.U9-profile-page3-avatar-button:disabled {
+
+
+  cursor:default;
+
 
 }
