@@ -1,272 +1,123 @@
 /* =================================================
    PROFILE PAGE 3
 
-   LOAD FREE AVATAR
-
-   DATA SOURCE:
-
-   Supabase Edge Function
-
-   /avatar-free
-
-
-   avatar_free.svg
-
-   is STORAGE URL
-
-   NOT SVG CODE
-
+   ONLY PAGE 3
 
 ================================================= */
 
 
-/* =================================================
-   API
-================================================= */
+/* =========================
+   WINDOW
+========================= */
 
-const U9_PROFILE_PAGE3_FREE_AVATAR_API =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-free";
+#U9-profile-page3 {
 
+  width:100%;
 
+  min-height:100%;
 
-/* =================================================
-   LOAD FREE AVATAR
-================================================= */
+  display:none;
 
-async function loadFreeAvatarTest() {
-
-
-  try {
-
-
-    const response =
-      await fetch(
-
-        U9_PROFILE_PAGE3_FREE_AVATAR_API,
-
-        {
-          method:
-            "GET"
-        }
-
-      );
+}
 
 
 
-    const result =
-      await response.json();
+/* =========================
+   CONTENT
+========================= */
+
+#U9-profile-page3-content {
 
 
+  width:100%;
 
-    console.log(
-      "FREE AVATAR RESULT:",
-      result
-    );
+  min-height:300px;
 
-
-
-    if(
-      result.success
-    ){
-
-
-      console.log(
-        "FREE AVATAR LIST:",
-        result.avatars
-      );
-
-
-
-      renderFreeAvatars(
-        result.avatars
-      );
-
-
-    }
-
-
-
-  }
-
-
-  catch(error){
-
-
-    console.error(
-      "FREE AVATAR ERROR:",
-      error
-    );
-
-
-  }
+  padding:20px;
 
 
 }
 
 
 
-/* =================================================
-   RENDER FREE AVATAR
-================================================= */
+/* =========================
+   AVATAR LIST
+========================= */
 
-function renderFreeAvatars(
-  avatars
-){
 
+.U9-profile-page3-avatar-list {
 
-  const container =
-    document.getElementById(
-      "U9-profile-page3-content"
-    );
 
+  width:100%;
 
+  display:flex;
 
-  if(
-    !container
-  ){
+  flex-wrap:wrap;
 
-
-    console.error(
-      "PAGE 3 CONTENT NOT FOUND"
-    );
-
-
-    return;
-
-
-  }
-
-
-
-  container.innerHTML =
-    "";
-
-
-
-  avatars.forEach(
-    (avatar)=>{
-
-
-      /* =========================
-         ITEM
-      ========================= */
-
-      const item =
-        document.createElement(
-          "div"
-        );
-
-
-
-      item.className =
-        "U9-profile-page3-avatar-item";
-
-
-
-
-      /* =========================
-         IMAGE
-
-         avatar.svg
-
-         = Storage URL
-
-      ========================= */
-
-      const img =
-        document.createElement(
-          "img"
-        );
-
-
-
-      img.src =
-        avatar.svg;
-
-
-
-      img.alt =
-        avatar.name;
-
-
-
-      img.loading =
-        "lazy";
-
-
-
-      img.onload =
-        ()=>{
-
-
-          console.log(
-            "SVG LOADED:",
-            avatar.name
-          );
-
-
-        };
-
-
-
-      img.onerror =
-        ()=>{
-
-
-          console.error(
-            "SVG LOAD ERROR:",
-            avatar.svg
-          );
-
-
-        };
-
-
-
-
-      item.appendChild(
-        img
-      );
-
-
-
-      container.appendChild(
-        item
-      );
-
-
-
-    }
-  );
-
+  gap:20px;
 
 }
 
 
 
-
-/* =================================================
-   PAGE 3 LOAD
-================================================= */
-
-async function loadProfilePage3(){
+/* =========================
+   CARD
+========================= */
 
 
-  console.log(
-    "PROFILE PAGE 3 LOADED"
-  );
+.U9-profile-page3-avatar-card {
 
 
+  width:120px;
 
-  await loadFreeAvatarTest();
+  height:150px;
 
+  border-radius:16px;
+
+  background:white;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  justify-content:center;
+
+  gap:10px;
 
 }
 
 
 
-/* =================================================
-   AUTO LOAD
-================================================= */
+/* =========================
+   IMAGE
+========================= */
 
-loadProfilePage3();
+
+.U9-profile-page3-avatar-image {
+
+
+  width:80px;
+
+  height:80px;
+
+  object-fit:contain;
+
+}
+
+
+
+/* =========================
+   NAME
+========================= */
+
+
+.U9-profile-page3-avatar-name {
+
+
+  font-size:14px;
+
+  color:#333;
+
+}
