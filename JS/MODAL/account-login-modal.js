@@ -47,20 +47,21 @@ false;
 
 
 if(
-loginButton &&
-loginModal
+  loginButton &&
+  loginModal
 ){
 
-loginButton.addEventListener(
-"click",
-()=>{
+  loginButton.addEventListener(
+    "click",
+    ()=>{
 
-loginModal.style.display =
-"flex";
 
-}
+      loginModal.style.display =
+        "flex";
 
-);
+
+    }
+  );
 
 }
 
@@ -75,22 +76,24 @@ loginModal.style.display =
 
 
 if(
-loginClose &&
-loginModal
+  loginClose &&
+  loginModal
 ){
 
-loginClose.addEventListener(
-"click",
-()=>{
+  loginClose.addEventListener(
+    "click",
+    ()=>{
 
-loginModal.style.display =
-"none";
+
+      loginModal.style.display =
+        "none";
+
+
+    }
+  );
 
 }
 
-);
-
-}
 
 
 
@@ -105,61 +108,64 @@ loginModal.style.display =
 
 const loginPassword =
 document.getElementById(
-"U9-login-password"
+  "U9-login-password"
 );
+
 
 
 const loginPasswordToggle =
 document.getElementById(
-"U9-login-password-toggle"
+  "U9-login-password-toggle"
 );
 
 
 
-if(
-loginPassword &&
-loginPasswordToggle
-){
-
-loginPasswordToggle.addEventListener(
-"click",
-()=>{
-
 
 if(
-loginPassword.type ===
-"password"
+  loginPassword &&
+  loginPasswordToggle
 ){
 
-loginPassword.type =
-"text";
+  loginPasswordToggle.addEventListener(
+    "click",
+    ()=>{
 
 
-loginPasswordToggle.textContent =
-"Hide";
+      if(
+        loginPassword.type ===
+        "password"
+      ){
 
+
+        loginPassword.type =
+          "text";
+
+
+        loginPasswordToggle.textContent =
+          "Hide";
+
+
+      }
+
+      else{
+
+
+        loginPassword.type =
+          "password";
+
+
+        loginPasswordToggle.textContent =
+          "Show";
+
+
+      }
+
+
+    }
+  );
 
 }
 
-else{
-
-
-loginPassword.type =
-"password";
-
-
-loginPasswordToggle.textContent =
-"Show";
-
-
-}
-
-
-}
-
-);
-
-}
 
 
 
@@ -173,16 +179,19 @@ loginPasswordToggle.textContent =
 
 
 if(
-loginForm
+  loginForm
 ){
 
 
 loginForm.addEventListener(
+
 "submit",
+
 async(event)=>{
 
 
 event.preventDefault();
+
 
 
 
@@ -194,12 +203,13 @@ event.preventDefault();
 
 
 if(
-loginProcessing
+  loginProcessing
 ){
 
 return;
 
 }
+
 
 
 loginProcessing =
@@ -209,23 +219,31 @@ true;
 
 
 
+
+
+/* =========================
+   BUTTON LOADING
+========================= */
+
+
 if(
-loginSubmit
+  loginSubmit
 ){
 
-loginSubmit.disabled =
-true;
+  loginSubmit.disabled =
+    true;
 
 
-loginSubmit.classList.add(
-"loading"
-);
+  loginSubmit.classList.add(
+    "loading"
+  );
 
 
-loginSubmit.textContent =
-"Loading...";
+  loginSubmit.textContent =
+    "Loading...";
 
 }
+
 
 
 
@@ -242,7 +260,7 @@ loginSubmit.textContent =
 const email =
 document
 .getElementById(
-"U9-login-email"
+  "U9-login-email"
 )
 .value
 .trim()
@@ -253,9 +271,10 @@ document
 const password =
 document
 .getElementById(
-"U9-login-password"
+  "U9-login-password"
 )
 .value;
+
 
 
 
@@ -318,6 +337,8 @@ password
 
 
 
+
+
 const result =
 await response.json();
 
@@ -329,12 +350,12 @@ await response.json();
 
 
 /* =========================
-   LOGIN FAILED
+   LOGIN ERROR
 ========================= */
 
 
 if(
-!response.ok
+  !response.ok
 ){
 
 
@@ -364,11 +385,16 @@ return;
 
 /*
 
-Browser:
+Backend:
 
-Set-Cookie
-
+Set-Cookie:
 u9_session
+
+
+Browser:
+Chrome
+Safari
+Telegram WebView
 
 自动保存
 
@@ -376,12 +402,35 @@ u9_session
 */
 
 
+
+
+
+console.log(
+"Login success:",
+result
+);
+
+
+
+
+
+
 loginForm.reset();
 
 
 
+
+
+if(
+  loginModal
+){
+
 loginModal.style.display =
 "none";
+
+}
+
+
 
 
 
@@ -389,12 +438,37 @@ loginModal.style.display =
 
 
 /* =========================
-   UPDATE USER
+   WAIT COOKIE SAVE
+   Safari FIX
+========================= */
+
+
+await new Promise(
+
+resolve=>
+
+setTimeout(
+resolve,
+500
+)
+
+);
+
+
+
+
+
+
+
+
+
+/* =========================
+   REFRESH USER
 ========================= */
 
 
 if(
-window.U9User
+  window.U9User
 ){
 
 
@@ -409,6 +483,7 @@ user
 );
 
 
+
 }
 
 
@@ -416,63 +491,55 @@ user
 
 
 
+
+
+
 /* =========================
-   UPDATE AVATAR
+   REFRESH AVATAR
 ========================= */
 
 
 if(
-window.U9ProfileAvatar
+  window.U9ProfileAvatar
 ){
 
 await window.U9ProfileAvatar.refresh();
 
+
 }
 
 
-
-
-
-
-
-/* =========================
-   DEBUG
-========================= */
-
-
-console.log(
-"Login result:",
-result
-);
 
 
 
 
 }
-
-
 
 catch(error){
 
 
 console.error(
+
 "Login error:",
+
 error
+
 );
 
 
 
 alert(
+
 "Unable to connect to the server."
+
 );
 
 
 
 }
 
-
-
 finally{
+
 
 
 loginProcessing =
@@ -480,12 +547,15 @@ false;
 
 
 
+
+
 if(
-loginSubmit
+  loginSubmit
 ){
 
 loginSubmit.disabled =
 false;
+
 
 
 loginSubmit.classList.remove(
@@ -493,10 +563,15 @@ loginSubmit.classList.remove(
 );
 
 
+
 loginSubmit.textContent =
 "Login";
 
+
 }
+
+
+
 
 
 }
