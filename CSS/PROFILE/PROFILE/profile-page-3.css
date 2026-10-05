@@ -1,17 +1,55 @@
-```css
 /* =================================================
+
    PROFILE PAGE 3
 
-   AVATAR
-   CUSTOM AVATAR
-   FREE AVATAR FRAME
-   PAID AVATAR FRAME
+
+   IMPORTANT:
+
+   DO NOT MODIFY PROFILE HEADER HERE.
+
+
+   The following elements are controlled by:
+
+   CSS/PROFILE/PROFILE/profile.css
+
+
+   Header:
+
+   #U9-profile-modal-header
+
+   #U9-profile-modal-close
+
+   #U9-profile-modal-title
+
+   #U9-profile-modal-icon
+
+
+   This file only controls:
+
+   #U9-profile-page3
+
+   #U9-profile-page3-content
+
+   Page 3 own elements.
+
+
 ================================================= */
 
 
 /* =================================================
-   PAGE
+
+   PROFILE PAGE 3
+
+   ONLY PAGE 3
+
 ================================================= */
+
+
+/* =========================
+
+   WINDOW
+
+========================= */
 
 #U9-profile-page3 {
 
@@ -21,16 +59,18 @@
 
   display:none;
 
-  box-sizing:border-box;
-
 }
 
 
-/* =================================================
+
+/* =========================
+
    CONTENT
-================================================= */
+
+========================= */
 
 #U9-profile-page3-content {
+
 
   width:100%;
 
@@ -38,473 +78,20 @@
 
   padding:20px;
 
-  box-sizing:border-box;
 
 }
 
 
-/* =================================================
-   TABS
-   FIXED / STICKY
-================================================= */
 
-.U9-profile-page3-tabs {
+/* =========================
 
-  width:100%;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:10px;
-
-  margin-bottom:20px;
-
-  overflow-x:auto;
-
-  overflow-y:hidden;
-
-  scrollbar-width:none;
-
-  position:sticky;
-
-  top:0;
-
-  z-index:100;
-
-  padding:10px 0;
-
-  background:#ffffff;
-
-  box-sizing:border-box;
-
-}
-
-
-/* =================================================
-   HIDE SCROLLBAR
-================================================= */
-
-.U9-profile-page3-tabs::-webkit-scrollbar {
-
-  display:none;
-
-}
-
-
-/* =================================================
-   TAB INNER ALIGNMENT
-================================================= */
-
-.U9-profile-page3-tabs > * {
-
-  flex-shrink:0;
-
-}
-
-
-/* =================================================
-   TAB
-================================================= */
-
-.U9-profile-page3-tab {
-
-  height:38px;
-
-  padding:0 18px;
-
-  border:none;
-
-  border-radius:20px;
-
-  background:#eeeeee;
-
-  color:#555;
-
-  font-size:14px;
-
-  white-space:nowrap;
-
-  cursor:pointer;
-
-  transition:
-    background .2s ease,
-    color .2s ease,
-    opacity .2s ease,
-    transform .2s ease;
-
-  flex-shrink:0;
-
-}
-
-
-/* =================================================
-   TAB HOVER
-================================================= */
-
-.U9-profile-page3-tab:hover {
-
-  opacity:.85;
-
-  transform:translateY(-1px);
-
-}
-
-
-/* =================================================
-   TAB ACTIVE
-================================================= */
-
-.U9-profile-page3-tab.active {
-
-  background:#2762ea;
-
-  color:#ffffff;
-
-}
-
-
-/* =================================================
-   TAB ACTIVE HOVER
-================================================= */
-
-.U9-profile-page3-tab.active:hover {
-
-  opacity:1;
-
-}
-
-
-/* =================================================
-   LIST CONTAINER
-================================================= */
-
-.U9-profile-page3-list-container {
-
-  width:100%;
-
-}
-
-
-/* =================================================
-   AVATAR SECTION
-================================================= */
-
-.U9-profile-page3-avatar-section {
-
-  width:100%;
-
-}
-
-
-/* =================================================
-   CUSTOM AVATAR UPLOAD
-================================================= */
-
-.U9-profile-page3-upload {
-
-  width:100%;
-
-  margin-bottom:25px;
-
-  padding:20px;
-
-  border-radius:18px;
-
-  background:#ffffff;
-
-  border:1px solid #eeeeee;
-
-  box-sizing:border-box;
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:12px;
-
-}
-
-
-/* =================================================
-   UPLOAD TITLE
-================================================= */
-
-.U9-profile-page3-upload-title {
-
-  width:100%;
-
-  font-size:18px;
-
-  font-weight:600;
-
-  color:#222;
-
-  text-align:center;
-
-}
-
-
-/* =================================================
-   UPLOAD DESCRIPTION
-================================================= */
-
-.U9-profile-page3-upload-description {
-
-  width:100%;
-
-  max-width:500px;
-
-  font-size:13px;
-
-  line-height:1.6;
-
-  color:#777;
-
-  text-align:center;
-
-}
-
-
-/* =================================================
-   CURRENT CUSTOM AVATAR
-================================================= */
-
-.U9-profile-page3-upload-current {
-
-  width:100%;
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:8px;
-
-  margin-top:4px;
-
-}
-
-
-/* =================================================
-   CURRENT AVATAR TEXT
-================================================= */
-
-.U9-profile-page3-upload-current-text {
-
-  font-size:13px;
-
-  color:#555;
-
-  text-align:center;
-
-}
-
-
-/* =================================================
-   UPLOAD INPUT
-================================================= */
-
-.U9-profile-page3-upload-input {
-
-  width:100%;
-
-  max-width:360px;
-
-  box-sizing:border-box;
-
-  padding:10px;
-
-  border:1px solid #dddddd;
-
-  border-radius:10px;
-
-  background:#fafafa;
-
-  color:#555;
-
-  font-size:13px;
-
-  cursor:pointer;
-
-}
-
-
-/* =================================================
-   UPLOAD INPUT HOVER
-================================================= */
-
-.U9-profile-page3-upload-input:hover {
-
-  border-color:#2762ea;
-
-}
-
-
-/* =================================================
-   UPLOAD FILE NAME
-================================================= */
-
-.U9-profile-page3-upload-file-name {
-
-  width:100%;
-
-  max-width:360px;
-
-  min-height:20px;
-
-  font-size:13px;
-
-  color:#777;
-
-  text-align:center;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
-
-  white-space:nowrap;
-
-}
-
-
-/* =================================================
-   UPLOAD PREVIEW
-================================================= */
-
-.U9-profile-page3-upload-preview {
-
-  width:100px;
-
-  height:100px;
-
-  object-fit:cover;
-
-  border-radius:50%;
-
-  background:#f5f5f5;
-
-  border:1px solid #eeeeee;
-
-  box-sizing:border-box;
-
-}
-
-
-/* =================================================
-   UPLOAD BUTTON
-================================================= */
-
-.U9-profile-page3-upload-button {
-
-  min-width:120px;
-
-  height:36px;
-
-  padding:0 20px;
-
-  border:none;
-
-  border-radius:20px;
-
-  background:#2762ea;
-
-  color:#ffffff;
-
-  font-size:14px;
-
-  cursor:pointer;
-
-  transition:
-    background .2s ease,
-    opacity .2s ease,
-    transform .2s ease;
-
-}
-
-
-/* =================================================
-   UPLOAD BUTTON HOVER
-================================================= */
-
-.U9-profile-page3-upload-button:hover {
-
-  opacity:.88;
-
-  transform:translateY(-1px);
-
-}
-
-
-/* =================================================
-   UPLOAD BUTTON LOADING
-================================================= */
-
-.U9-profile-page3-upload-button.loading {
-
-  opacity:.5;
-
-  pointer-events:none;
-
-}
-
-
-/* =================================================
-   UPLOAD BUTTON DISABLED
-================================================= */
-
-.U9-profile-page3-upload-button:disabled {
-
-  cursor:default;
-
-  opacity:.5;
-
-}
-
-
-/* =================================================
-   UPLOAD COOLDOWN
-================================================= */
-
-.U9-profile-page3-upload-cooldown {
-
-  width:100%;
-
-  max-width:500px;
-
-  padding:10px 14px;
-
-  border-radius:10px;
-
-  background:#fff4e5;
-
-  color:#9a6500;
-
-  font-size:13px;
-
-  line-height:1.5;
-
-  text-align:center;
-
-  box-sizing:border-box;
-
-}
-
-
-/* =================================================
    AVATAR LIST
-================================================= */
+
+========================= */
+
 
 .U9-profile-page3-avatar-list {
+
 
   width:100%;
 
@@ -512,28 +99,30 @@
 
   flex-wrap:wrap;
 
-  justify-content:flex-start;
-
   gap:20px;
+
 
 }
 
 
-/* =================================================
-   AVATAR CARD
-================================================= */
+
+/* =========================
+
+   CARD
+
+========================= */
+
 
 .U9-profile-page3-avatar-card {
 
+
   width:120px;
 
-  min-height:170px;
-
-  padding:12px;
+  height:170px;
 
   border-radius:16px;
 
-  background:#ffffff;
+  background:white;
 
   display:flex;
 
@@ -545,16 +134,20 @@
 
   gap:10px;
 
-  box-sizing:border-box;
 
 }
 
 
-/* =================================================
-   AVATAR IMAGE
-================================================= */
+
+/* =========================
+
+   IMAGE
+
+========================= */
+
 
 .U9-profile-page3-avatar-image {
+
 
   width:80px;
 
@@ -562,720 +155,137 @@
 
   object-fit:contain;
 
+
 }
 
 
-/* =================================================
-   AVATAR NAME
-================================================= */
+
+/* =========================
+
+   NAME
+
+========================= */
+
 
 .U9-profile-page3-avatar-name {
+
 
   font-size:14px;
 
   color:#333;
 
-  text-align:center;
-
-  max-width:100%;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
-
-  white-space:nowrap;
 
 }
 
 
-/* =================================================
-   AVATAR BUTTON
-================================================= */
+
+/* =========================
+
+   BUTTON
+
+========================= */
+
 
 .U9-profile-page3-avatar-button {
+
 
   width:90px;
 
   height:32px;
 
+
   border:none;
 
   border-radius:20px;
 
+
   background:#2762ea;
 
-  color:#ffffff;
+  color:white;
+
 
   font-size:14px;
 
+
   cursor:pointer;
 
+
   transition:
-    background .2s ease,
-    opacity .2s ease,
-    transform .2s ease;
+    .2s;
+
 
 }
 
 
-/* =================================================
-   AVATAR BUTTON HOVER
-================================================= */
+
+/* =========================
+
+   BUTTON HOVER
+
+========================= */
+
 
 .U9-profile-page3-avatar-button:hover {
 
+
   opacity:.85;
 
-  transform:translateY(-1px);
 
 }
 
 
-/* =================================================
-   AVATAR ACTIVE
-================================================= */
+
+/* =========================
+
+   ACTIVE
+
+   正在使用
+
+========================= */
+
 
 .U9-profile-page3-avatar-button.active {
 
+
   background:#e5e5e5;
 
   color:#555;
 
+
 }
 
 
-/* =================================================
-   AVATAR LOADING
-================================================= */
+
+/* =========================
+
+   LOADING
+
+========================= */
+
 
 .U9-profile-page3-avatar-button.loading {
 
+
   opacity:.5;
 
   pointer-events:none;
 
+
 }
 
 
-/* =================================================
-   AVATAR DISABLED
-================================================= */
+
+/* =========================
+
+   DISABLED
+
+========================= */
+
 
 .U9-profile-page3-avatar-button:disabled {
 
-  cursor:default;
-
-}
-
-
-/* =================================================
-   FRAME LIST
-================================================= */
-
-.U9-profile-page3-frame-list {
-
-  width:100%;
-
-  display:flex;
-
-  flex-wrap:wrap;
-
-  justify-content:flex-start;
-
-  gap:20px;
-
-}
-
-
-/* =================================================
-   FRAME CARD
-================================================= */
-
-.U9-profile-page3-frame-card {
-
-  width:150px;
-
-  min-height:205px;
-
-  padding:14px;
-
-  border-radius:18px;
-
-  background:#ffffff;
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:center;
-
-  justify-content:center;
-
-  gap:9px;
-
-  box-sizing:border-box;
-
-  position:relative;
-
-  transition:
-    transform .2s ease,
-    box-shadow .2s ease;
-
-}
-
-
-/* =================================================
-   FRAME CARD HOVER
-================================================= */
-
-.U9-profile-page3-frame-card:hover {
-
-  transform:translateY(-2px);
-
-}
-
-
-/* =================================================
-   FRAME EQUIPPED
-================================================= */
-
-.U9-profile-page3-frame-card.equipped {
-
-  box-shadow:
-    0 0 0 2px #2762ea inset;
-
-}
-
-
-/* =================================================
-   FRAME IMAGE BOX
-================================================= */
-
-.U9-profile-page3-frame-image-box {
-
-  width:100px;
-
-  height:100px;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  position:relative;
-
-}
-
-
-/* =================================================
-   FRAME AVATAR
-================================================= */
-
-.U9-profile-page3-frame-avatar {
-
-  width:76px;
-
-  height:76px;
-
-  object-fit:cover;
-
-  border-radius:50%;
-
-  position:absolute;
-
-  left:50%;
-
-  top:50%;
-
-  transform:translate(
-    -50%,
-    -50%
-  );
-
-  z-index:1;
-
-}
-
-
-/* =================================================
-   FRAME IMAGE
-================================================= */
-
-.U9-profile-page3-frame-image {
-
-  width:100px;
-
-  height:100px;
-
-  object-fit:contain;
-
-  position:relative;
-
-  z-index:2;
-
-}
-
-
-/* =================================================
-   FRAME NAME
-================================================= */
-
-.U9-profile-page3-frame-name {
-
-  width:100%;
-
-  font-size:14px;
-
-  color:#333;
-
-  text-align:center;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
-
-  white-space:nowrap;
-
-}
-
-
-/* =================================================
-   FRAME PRICE
-================================================= */
-
-.U9-profile-page3-frame-price {
-
-  font-size:13px;
-
-  color:#777;
-
-  text-align:center;
-
-}
-
-
-/* =================================================
-   FRAME BUTTON
-================================================= */
-
-.U9-profile-page3-frame-button {
-
-  width:100px;
-
-  height:34px;
-
-  border:none;
-
-  border-radius:20px;
-
-  background:#2762ea;
-
-  color:#ffffff;
-
-  font-size:14px;
-
-  cursor:pointer;
-
-  transition:
-    background .2s ease,
-    opacity .2s ease,
-    transform .2s ease;
-
-}
-
-
-/* =================================================
-   FRAME BUTTON HOVER
-================================================= */
-
-.U9-profile-page3-frame-button:hover {
-
-  opacity:.85;
-
-  transform:translateY(-1px);
-
-}
-
-
-/* =================================================
-   FRAME BUY
-================================================= */
-
-.U9-profile-page3-frame-button.buy {
-
-  background:#2762ea;
-
-}
-
-
-/* =================================================
-   FRAME USE
-================================================= */
-
-.U9-profile-page3-frame-button.use {
-
-  background:#2762ea;
-
-}
-
-
-/* =================================================
-   FRAME ACTIVE
-================================================= */
-
-.U9-profile-page3-frame-button.active {
-
-  background:#e5e5e5;
-
-  color:#555;
-
-}
-
-
-/* =================================================
-   FRAME LOADING
-================================================= */
-
-.U9-profile-page3-frame-button.loading {
-
-  opacity:.5;
-
-  pointer-events:none;
-
-}
-
-
-/* =================================================
-   FRAME DISABLED
-================================================= */
-
-.U9-profile-page3-frame-button:disabled {
 
   cursor:default;
 
-}
-
-
-/* =================================================
-   MESSAGE
-================================================= */
-
-.U9-profile-page3-message {
-
-  width:100%;
-
-  min-height:100px;
-
-  padding:20px;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  box-sizing:border-box;
-
-  font-size:14px;
-
-  text-align:center;
 
 }
-
-
-/* =================================================
-   MESSAGE INFO
-================================================= */
-
-.U9-profile-page3-message.info {
-
-  color:#777;
-
-}
-
-
-/* =================================================
-   MESSAGE ERROR
-================================================= */
-
-.U9-profile-page3-message.error {
-
-  color:#d33;
-
-}
-
-
-/* =================================================
-   MESSAGE EMPTY
-================================================= */
-
-.U9-profile-page3-message.empty {
-
-  color:#777;
-
-}
-
-
-/* =================================================
-   LOADING
-================================================= */
-
-.U9-profile-page3-loading {
-
-  width:100%;
-
-  min-height:120px;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  color:#777;
-
-  font-size:14px;
-
-}
-
-
-/* =================================================
-   EMPTY LEGACY
-================================================= */
-
-.U9-profile-page3-empty {
-
-  width:100%;
-
-  min-height:120px;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  color:#777;
-
-  font-size:14px;
-
-}
-
-
-/* =================================================
-   ERROR LEGACY
-================================================= */
-
-.U9-profile-page3-error {
-
-  width:100%;
-
-  min-height:120px;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  color:#d33;
-
-  font-size:14px;
-
-}
-
-
-/* =================================================
-   MOBILE
-================================================= */
-
-@media (
-  max-width:600px
-) {
-
-
-  /* -------------------------------------------------
-     CONTENT
-  ------------------------------------------------- */
-
-  #U9-profile-page3-content {
-
-    padding:15px;
-
-  }
-
-
-  /* -------------------------------------------------
-     TABS
-  ------------------------------------------------- */
-
-  .U9-profile-page3-tabs {
-
-    justify-content:center;
-
-    gap:8px;
-
-    padding:10px 0;
-
-    margin-bottom:15px;
-
-  }
-
-
-  .U9-profile-page3-tab {
-
-    height:36px;
-
-    padding:0 15px;
-
-    font-size:13px;
-
-  }
-
-
-  /* -------------------------------------------------
-     UPLOAD
-  ------------------------------------------------- */
-
-  .U9-profile-page3-upload {
-
-    padding:16px;
-
-    margin-bottom:20px;
-
-    border-radius:15px;
-
-  }
-
-
-  .U9-profile-page3-upload-title {
-
-    font-size:16px;
-
-  }
-
-
-  .U9-profile-page3-upload-description {
-
-    font-size:12px;
-
-  }
-
-
-  .U9-profile-page3-upload-input {
-
-    max-width:100%;
-
-  }
-
-
-  .U9-profile-page3-upload-file-name {
-
-    max-width:100%;
-
-  }
-
-
-  .U9-profile-page3-upload-button {
-
-    width:100%;
-
-    max-width:220px;
-
-  }
-
-
-  /* -------------------------------------------------
-     AVATAR / FRAME LIST
-  ------------------------------------------------- */
-
-  .U9-profile-page3-avatar-list,
-  .U9-profile-page3-frame-list {
-
-    gap:12px;
-
-  }
-
-
-  /* -------------------------------------------------
-     AVATAR CARD
-  ------------------------------------------------- */
-
-  .U9-profile-page3-avatar-card {
-
-    width:calc(
-      50% - 6px
-    );
-
-  }
-
-
-  /* -------------------------------------------------
-     FRAME CARD
-  ------------------------------------------------- */
-
-  .U9-profile-page3-frame-card {
-
-    width:calc(
-      50% - 6px
-    );
-
-  }
-
-
-}
-
-
-/* =================================================
-   VERY SMALL MOBILE
-================================================= */
-
-@media (
-  max-width:360px
-) {
-
-
-  /* -------------------------------------------------
-     AVATAR CARD
-  ------------------------------------------------- */
-
-  .U9-profile-page3-avatar-card {
-
-    width:100%;
-
-  }
-
-
-  /* -------------------------------------------------
-     FRAME CARD
-  ------------------------------------------------- */
-
-  .U9-profile-page3-frame-card {
-
-    width:100%;
-
-  }
-
-
-  /* -------------------------------------------------
-     TABS
-  ------------------------------------------------- */
-
-  .U9-profile-page3-tabs {
-
-    justify-content:center;
-
-    gap:6px;
-
-  }
-
-
-  .U9-profile-page3-tab {
-
-    padding:0 13px;
-
-  }
-
-}
-```
