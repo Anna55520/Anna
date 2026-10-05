@@ -2,6 +2,7 @@
    LOGIN ELEMENTS
 ========================= */
 
+
 const loginButton =
   document.getElementById(
     "U9-page-header-login"
@@ -26,40 +27,58 @@ const loginForm =
   );
 
 
+
 /* =========================
    OPEN LOGIN
 ========================= */
 
-loginButton.addEventListener(
-  "click",
-  () => {
 
-    loginModal.style.display =
-      "flex";
+if(
+  loginButton
+){
 
-  }
-);
+  loginButton.addEventListener(
+    "click",
+    () => {
+
+      loginModal.style.display =
+        "flex";
+
+    }
+  );
+
+}
+
 
 
 /* =========================
    CLOSE LOGIN
 ========================= */
 
-loginClose.addEventListener(
-  "click",
-  () => {
 
-    loginModal.style.display =
-      "none";
+if(
+  loginClose
+){
 
-  }
-);
+  loginClose.addEventListener(
+    "click",
+    () => {
+
+      loginModal.style.display =
+        "none";
+
+    }
+  );
+
+}
+
+
 
 
 /* =========================
-   LOGIN PASSWORD
-   SHOW / HIDE
+   PASSWORD SHOW / HIDE
 ========================= */
+
 
 const loginPassword =
   document.getElementById(
@@ -73,193 +92,303 @@ const loginPasswordToggle =
   );
 
 
-loginPasswordToggle.addEventListener(
-  "click",
-  () => {
 
-    if (
-      loginPassword.type ===
-      "password"
-    ) {
+if(
+  loginPassword &&
+  loginPasswordToggle
+){
 
-      loginPassword.type =
-        "text";
+  loginPasswordToggle.addEventListener(
+    "click",
+    () => {
 
-      loginPasswordToggle.textContent =
-        "Hide";
 
-    } else {
+      if(
+        loginPassword.type ===
+        "password"
+      ){
 
-      loginPassword.type =
-        "password";
+        loginPassword.type =
+          "text";
 
-      loginPasswordToggle.textContent =
-        "Show";
+
+        loginPasswordToggle.textContent =
+          "Hide";
+
+
+      }
+
+      else{
+
+
+        loginPassword.type =
+          "password";
+
+
+        loginPasswordToggle.textContent =
+          "Show";
+
+
+      }
+
 
     }
+  );
 
-  }
-);
+}
+
+
 
 
 /* =========================
    LOGIN FORM
 ========================= */
 
+
+if(
+  loginForm
+){
+
 loginForm.addEventListener(
-  "submit",
-  async (event) => {
-
-    event.preventDefault();
+"submit",
+async(event)=>{
 
 
-    /* =========================
-       GET FORM DATA
-    ========================= */
-
-    const email =
-      document
-        .getElementById(
-          "U9-login-email"
-        )
-        .value
-        .trim();
+event.preventDefault();
 
 
-    const password =
-      document
-        .getElementById(
-          "U9-login-password"
-        )
-        .value;
 
 
-    /* =========================
-       LOGIN REQUEST
-    ========================= */
-
-    try {
-
-      const response =
-        await fetch(
-          "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/login",
-          {
-            method: "POST",
-
-            credentials: "include",
-
-            headers: {
-              "Content-Type":
-                "application/json"
-            },
-
-            body: JSON.stringify({
-
-              email:
-                email,
-
-              password:
-                password
-
-            })
-
-          }
-        );
+/* =========================
+   GET DATA
+========================= */
 
 
-      const result =
-        await response.json();
+const email =
+document
+.getElementById(
+  "U9-login-email"
+)
+.value
+.trim();
 
 
-      /* =========================
-         LOGIN ERROR
-      ========================= */
 
-      if (!response.ok) {
-
-        alert(
-          result.error ||
-          "Login failed."
-        );
-
-        return;
-
-      }
+const password =
+document
+.getElementById(
+  "U9-login-password"
+)
+.value;
 
 
-      /* =========================
-         LOGIN SUCCESS
-      ========================= */
-
-      alert(
-        "Login successful."
-      );
 
 
-      loginForm.reset();
+/* =========================
+   LOGIN REQUEST
+========================= */
 
 
-      loginModal.style.display =
-        "none";
+try{
 
 
-      /* =========================
-         SAVE SESSION TOKEN
-      ========================= */
+const response =
+await fetch(
 
-      localStorage.setItem(
-        "u9_session",
-        result.session.token
-      );
+"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/login",
 
-      /* =========================
-      UPDATE HEADER
-      ========================= */
+{
 
-      await window.U9User.refresh();
+method:
+"POST",
 
 
-      /* =========================
-      UPDATE PROFILE AVATAR
-      ========================= */
+/*
+ Cookie 自动保存
+*/
 
-      if(
-      window.U9ProfileAvatar
-      ){
-
-      await window.U9ProfileAvatar.refresh();
-
-      }
+credentials:
+"include",
 
 
-      /* =========================
-         DEBUG
-      ========================= */
 
-      console.log(
-        "Login session:",
-        result.session
-      );
+headers:{
 
+"Content-Type":
+"application/json"
 
-    } catch (error) {
-
-      console.error(
-        "Login error:",
-        error
-      );
+},
 
 
-      alert(
-        "Unable to connect to the server."
-      );
 
-    }
+body:
+JSON.stringify({
 
-  }
+email:
+email,
+
+
+password:
+password
+
+})
+
+
+}
+
 );
 
 
 
 
 
+const result =
+await response.json();
+
+
+
+
+
+/* =========================
+   LOGIN ERROR
+========================= */
+
+
+if(
+!response.ok
+){
+
+alert(
+
+result.error ||
+"Login failed."
+
+);
+
+
+return;
+
+}
+
+
+
+
+/* =========================
+   LOGIN SUCCESS
+========================= */
+
+
+alert(
+"Login successful."
+);
+
+
+
+loginForm.reset();
+
+
+
+loginModal.style.display =
+"none";
+
+
+
+
+/*
+ =========================
+
+ u9_session Cookie
+
+ 已由浏览器自动保存
+
+ 不需要:
+
+ localStorage.setItem()
+
+ 不需要:
+
+ Authorization Token
+
+ =========================
+*/
+
+
+
+
+
+/* =========================
+   UPDATE USER STATE
+========================= */
+
+
+if(
+window.U9User
+){
+
+await window.U9User.refresh();
+
+}
+
+
+
+
+/* =========================
+   UPDATE PROFILE AVATAR
+========================= */
+
+
+if(
+window.U9ProfileAvatar
+){
+
+await window.U9ProfileAvatar.refresh();
+
+}
+
+
+
+
+
+/* =========================
+   DEBUG
+========================= */
+
+
+console.log(
+"Login result:",
+result
+);
+
+
+
+}
+
+
+
+catch(error){
+
+
+console.error(
+
+"Login error:",
+error
+
+);
+
+
+
+alert(
+
+"Unable to connect to the server."
+
+);
+
+
+
+}
+
+
+
+});
+
+}
