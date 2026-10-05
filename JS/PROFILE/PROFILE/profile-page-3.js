@@ -1,6 +1,6 @@
 /* =========================================================
    PROFILE PAGE 3
-   Avatar / Free Avatar Frame / Paid Avatar Frame
+   Avatar / Custom Avatar / Free Avatar Frame / Paid Avatar Frame
 ========================================================= */
 
 
@@ -13,6 +13,9 @@ const U9_PROFILE_PAGE3_FREE_AVATAR_API =
 
 const U9_PROFILE_PAGE3_SET_AVATAR_API =
   "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-set";
+
+const U9_PROFILE_PAGE3_UPLOAD_AVATAR_API =
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-upload";
 
 const U9_PROFILE_PAGE3_FREE_FRAME_API =
   "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free";
@@ -43,6 +46,12 @@ const profilePage3Content =
 
 let currentAvatarId = null;
 
+let currentAvatarType = "free";
+
+let currentAvatarUrl = null;
+
+let currentAvatarCooldownUntil = null;
+
 let currentFrameType = "default";
 
 let currentFrameId = null;
@@ -55,6 +64,16 @@ let activePage3Tab = "avatar";
 
 let page3Initialized = false;
 
+let uploadAvatarFile = null;
+
+
+/* =========================================================
+   CONSTANTS
+========================================================= */
+
+const U9_PROFILE_PAGE3_MAX_AVATAR_SIZE =
+  2 * 1024 * 1024;
+
 
 /* =========================================================
    TOKEN
@@ -62,9 +81,24 @@ let page3Initialized = false;
 
 function getPage3Token() {
 
-  return localStorage.getItem(
-    "u9_token"
-  );
+  try {
+
+    return localStorage.getItem(
+      "u9_token"
+    );
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "PAGE3 TOKEN ERROR:",
+      error
+    );
+
+    return null;
+
+  }
 
 }
 
@@ -77,7 +111,8 @@ function page3IsLoggedIn() {
 
   if (
     window.U9User &&
-    typeof window.U9User.isLoggedIn === "function"
+    typeof window.U9User.isLoggedIn ===
+      "function"
   ) {
 
     return window.U9User.isLoggedIn();
@@ -105,11 +140,26 @@ function escapePage3HTML(value) {
   }
 
   return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+    .replace(
+      /</g,
+      "&lt;"
+    )
+    .replace(
+      />/g,
+      "&gt;"
+    )
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+    .replace(
+      /'/g,
+      "&#039;"
+    );
 
 }
 
@@ -123,7 +173,10 @@ function setPage3ImageSource(
   source
 ) {
 
-  if (!image || !source) {
+  if (
+    !image ||
+    !source
+  ) {
 
     return;
 
@@ -131,6 +184,7 @@ function setPage3ImageSource(
 
   const value =
     String(source).trim();
+
 
   if (
     value.startsWith("<svg") ||
@@ -145,7 +199,9 @@ function setPage3ImageSource(
 
   }
 
-  image.src = value;
+
+  image.src =
+    value;
 
 }
 
@@ -158,19 +214,54 @@ function loadCurrentEquipment() {
 
   const user =
     window.U9User &&
-    typeof window.U9User.get === "function"
+    typeof window.U9User.get ===
+      "function"
       ? window.U9User.get()
       : null;
 
 
   /* -------------------------------------------------------
-     AVATAR
+     AVATAR TYPE
+  ------------------------------------------------------- */
+
+  currentAvatarType =
+    user?.avatar?.type ||
+    user?.avatar?.avatar_type ||
+    user?.avatar_type ||
+    "free";
+
+
+  /* -------------------------------------------------------
+     AVATAR ID
   ------------------------------------------------------- */
 
   currentAvatarId =
     user?.avatar?.id ||
     user?.avatar?.avatar_id ||
     user?.avatar_id ||
+    null;
+
+
+  /* -------------------------------------------------------
+     CUSTOM AVATAR URL
+  ------------------------------------------------------- */
+
+  currentAvatarUrl =
+    user?.avatar?.url ||
+    user?.avatar?.avatar_url ||
+    user?.avatar_url ||
+    null;
+
+
+  /* -------------------------------------------------------
+     COOLDOWN
+  ------------------------------------------------------- */
+
+  currentAvatarCooldownUntil =
+    user?.avatar?.cooldown_until ||
+    user?.avatar?.cooldownUntil ||
+    user?.cooldown_until ||
+    user?.avatar_cooldown_until ||
     null;
 
 
@@ -199,11 +290,190 @@ function loadCurrentEquipment() {
   console.log(
     "PAGE3 CURRENT USER DATA:",
     {
-      avatarId: currentAvatarId,
-      frameType: currentFrameType,
-      frameId: currentFrameId
+      avatarType:
+        currentAvatarType,
+
+      avatarId:
+        currentAvatarId,
+
+      avatarUrl:
+        currentAvatarUrl,
+
+      cooldownUntil:
+        currentAvatarCooldownUntil,
+
+      frameType:
+        currentFrameType,
+
+      frameId:
+        currentFrameId
     }
   );
+
+}
+
+
+/* =========================================================
+   CHECK AVATAR UPLOAD COOLDOWN
+========================================================= */
+
+function isAvatarUploadOnCooldown() {
+
+  if (
+    !currentAvatarCooldownUntil
+  ) {
+
+    return false;
+
+  }
+
+  const cooldownTime =
+    new Date(
+      currentAvatarCooldownUntil
+    ).getTime();
+
+
+  if (
+    Number.isNaN(
+      cooldownTime
+    )
+  ) {
+
+    return false;
+
+  }
+
+
+  return (
+    cooldownTime >
+    Date.now()
+  );
+
+}
+
+
+/* =========================================================
+   FORMAT COOLDOWN
+========================================================= */
+
+function formatAvatarCooldown() {
+
+  if (
+    !currentAvatarCooldownUntil
+  ) {
+
+    return "";
+
+  }
+
+
+  const cooldownTime =
+    new Date(
+      currentAvatarCooldownUntil
+    ).getTime();
+
+
+  if (
+    Number.isNaN(
+      cooldownTime
+    )
+  ) {
+
+    return "";
+
+  }
+
+
+  const remaining =
+    cooldownTime -
+    Date.now();
+
+
+  if (
+    remaining <= 0
+  ) {
+
+    return "";
+
+  }
+
+
+  const totalMinutes =
+    Math.ceil(
+      remaining /
+      (1000 * 60)
+    );
+
+
+  const days =
+    Math.floor(
+      totalMinutes /
+      (60 * 24)
+    );
+
+
+  const hours =
+    Math.floor(
+      (
+        totalMinutes %
+        (60 * 24)
+      ) /
+      60
+    );
+
+
+  const minutes =
+    totalMinutes %
+    60;
+
+
+  const parts = [];
+
+
+  if (
+    days > 0
+  ) {
+
+    parts.push(
+      `${days}天`
+    );
+
+  }
+
+
+  if (
+    hours > 0
+  ) {
+
+    parts.push(
+      `${hours}小时`
+    );
+
+  }
+
+
+  if (
+    minutes > 0 &&
+    days === 0
+  ) {
+
+    parts.push(
+      `${minutes}分钟`
+    );
+
+  }
+
+
+  if (
+    !parts.length
+  ) {
+
+    return "即将结束";
+
+  }
+
+
+  return parts.join("");
 
 }
 
@@ -225,7 +495,8 @@ async function refreshProfileAfterChange() {
 
     if (
       window.U9User &&
-      typeof window.U9User.refresh === "function"
+      typeof window.U9User.refresh ===
+        "function"
     ) {
 
       user =
@@ -240,11 +511,33 @@ async function refreshProfileAfterChange() {
 
     if (user) {
 
+      currentAvatarType =
+        user?.avatar?.type ||
+        user?.avatar?.avatar_type ||
+        user?.avatar_type ||
+        currentAvatarType;
+
+
       currentAvatarId =
         user?.avatar?.id ||
         user?.avatar?.avatar_id ||
         user?.avatar_id ||
         currentAvatarId;
+
+
+      currentAvatarUrl =
+        user?.avatar?.url ||
+        user?.avatar?.avatar_url ||
+        user?.avatar_url ||
+        currentAvatarUrl;
+
+
+      currentAvatarCooldownUntil =
+        user?.avatar?.cooldown_until ||
+        user?.avatar?.cooldownUntil ||
+        user?.cooldown_until ||
+        user?.avatar_cooldown_until ||
+        currentAvatarCooldownUntil;
 
 
       currentFrameType =
@@ -279,7 +572,8 @@ async function refreshProfileAfterChange() {
 
     if (
       window.U9Profile &&
-      typeof window.U9Profile.refreshAvatar === "function"
+      typeof window.U9Profile.refreshAvatar ===
+        "function"
     ) {
 
       await window.U9Profile.refreshAvatar();
@@ -288,7 +582,8 @@ async function refreshProfileAfterChange() {
 
     else if (
       window.U9Profile &&
-      typeof window.U9Profile.refresh === "function"
+      typeof window.U9Profile.refresh ===
+        "function"
     ) {
 
       await window.U9Profile.refresh();
@@ -300,7 +595,7 @@ async function refreshProfileAfterChange() {
 
   }
 
-  catch (error) {
+  catch(error) {
 
     console.error(
       "PAGE3 PROFILE REFRESH ERROR:",
@@ -320,7 +615,9 @@ async function refreshProfileAfterChange() {
 
 function createPage3UI() {
 
-  if (!profilePage3Content) {
+  if (
+    !profilePage3Content
+  ) {
 
     console.error(
       "U9-profile-page3-content not found."
@@ -331,7 +628,8 @@ function createPage3UI() {
   }
 
 
-  profilePage3Content.innerHTML = "";
+  profilePage3Content.innerHTML =
+    "";
 
 
   /* =======================================================
@@ -339,7 +637,9 @@ function createPage3UI() {
   ======================================================= */
 
   const tabs =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   tabs.className =
     "U9-profile-page3-tabs";
@@ -366,11 +666,17 @@ function createPage3UI() {
     );
 
 
-  tabs.appendChild(avatarTab);
+  tabs.appendChild(
+    avatarTab
+  );
 
-  tabs.appendChild(freeFrameTab);
+  tabs.appendChild(
+    freeFrameTab
+  );
 
-  tabs.appendChild(paidFrameTab);
+  tabs.appendChild(
+    paidFrameTab
+  );
 
 
   profilePage3Content.appendChild(
@@ -383,7 +689,9 @@ function createPage3UI() {
   ======================================================= */
 
   const panel =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   panel.id =
     "U9-profile-page3-panel";
@@ -397,7 +705,8 @@ function createPage3UI() {
   );
 
 
-  page3Initialized = true;
+  page3Initialized =
+    true;
 
 }
 
@@ -412,9 +721,12 @@ function createPage3Tab(
 ) {
 
   const button =
-    document.createElement("button");
+    document.createElement(
+      "button"
+    );
 
-  button.type = "button";
+  button.type =
+    "button";
 
   button.className =
     "U9-profile-page3-tab";
@@ -428,7 +740,7 @@ function createPage3Tab(
 
   button.addEventListener(
     "click",
-    async function () {
+    async function() {
 
       await switchPage3Tab(
         tabName
@@ -456,7 +768,7 @@ function updatePage3Tabs() {
 
 
   tabs.forEach(
-    function (tab) {
+    function(tab) {
 
       const active =
         tab.dataset.tab ===
@@ -502,7 +814,8 @@ async function switchPage3Tab(
   }
 
 
-  panel.innerHTML = "";
+  panel.innerHTML =
+    "";
 
 
   /* -------------------------------------------------------
@@ -513,9 +826,21 @@ async function switchPage3Tab(
     tabName === "avatar"
   ) {
 
-    await renderFreeAvatars(
+    /*
+     * IMPORTANT:
+     * Custom avatar upload is rendered FIRST.
+     */
+
+    renderCustomAvatarUpload(
       panel
     );
+
+
+    await renderFreeAvatars(
+      panel,
+      true
+    );
+
 
     return;
 
@@ -575,11 +900,10 @@ function showPage3Message(
   }
 
 
-  panel.innerHTML = "";
-
-
   const messageElement =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   messageElement.className =
     "U9-profile-page3-message " +
@@ -626,10 +950,10 @@ function requirePage3Login(
 
 
 /* =========================================================
-   AVATAR
+   CUSTOM AVATAR UPLOAD UI
 ========================================================= */
 
-async function renderFreeAvatars(
+function renderCustomAvatarUpload(
   panel
 ) {
 
@@ -640,11 +964,887 @@ async function renderFreeAvatars(
   }
 
 
-  panel.innerHTML = "";
+  const uploadBox =
+    document.createElement(
+      "div"
+    );
+
+  uploadBox.className =
+    "U9-profile-page3-upload";
 
 
-  const loading =
-    document.createElement("div");
+  /* =======================================================
+     TITLE
+  ======================================================= */
+
+  const title =
+    document.createElement(
+      "div"
+    );
+
+  title.className =
+    "U9-profile-page3-upload-title";
+
+  title.textContent =
+    "自定义头像";
+
+
+  uploadBox.appendChild(
+    title
+  );
+
+
+  /* =======================================================
+     DESCRIPTION
+  ======================================================= */
+
+  const description =
+    document.createElement(
+      "div"
+    );
+
+  description.className =
+    "U9-profile-page3-upload-description";
+
+  description.textContent =
+    "上传 WebP 图片，最大 2MB。每次上传后有 7 天冷却时间。";
+
+
+  uploadBox.appendChild(
+    description
+  );
+
+
+  /* =======================================================
+     CURRENT CUSTOM AVATAR
+  ======================================================= */
+
+  if (
+    currentAvatarUrl &&
+    currentAvatarType ===
+      "custom"
+  ) {
+
+    const current =
+      document.createElement(
+        "div"
+      );
+
+    current.className =
+      "U9-profile-page3-upload-current";
+
+
+    const currentImage =
+      document.createElement(
+        "img"
+      );
+
+    currentImage.alt =
+      "当前自定义头像";
+
+    currentImage.src =
+      currentAvatarUrl;
+
+
+    current.appendChild(
+      currentImage
+    );
+
+
+    const currentText =
+      document.createElement(
+        "div"
+      );
+
+    currentText.className =
+      "U9-profile-page3-upload-current-text";
+
+    currentText.textContent =
+      "当前正在使用自定义头像";
+
+
+    current.appendChild(
+      currentText
+    );
+
+
+    uploadBox.appendChild(
+      current
+    );
+
+  }
+
+
+  /* =======================================================
+     COOLDOWN
+  ======================================================= */
+
+  if (
+    isAvatarUploadOnCooldown()
+  ) {
+
+    const cooldown =
+      document.createElement(
+        "div"
+      );
+
+    cooldown.className =
+      "U9-profile-page3-upload-cooldown";
+
+
+    cooldown.textContent =
+      "头像上传冷却中，还剩 " +
+      formatAvatarCooldown() +
+      "。";
+
+
+    uploadBox.appendChild(
+      cooldown
+    );
+
+  }
+
+
+  /* =======================================================
+     FILE INPUT
+  ======================================================= */
+
+  const input =
+    document.createElement(
+      "input"
+    );
+
+  input.type =
+    "file";
+
+  input.accept =
+    "image/webp,.webp";
+
+  input.className =
+    "U9-profile-page3-upload-input";
+
+
+  uploadBox.appendChild(
+    input
+  );
+
+
+  /* =======================================================
+     FILE NAME
+  ======================================================= */
+
+  const fileName =
+    document.createElement(
+      "div"
+    );
+
+  fileName.className =
+    "U9-profile-page3-upload-file-name";
+
+  fileName.textContent =
+    "尚未选择图片";
+
+
+  uploadBox.appendChild(
+    fileName
+  );
+
+
+  /* =======================================================
+     PREVIEW
+  ======================================================= */
+
+  const preview =
+    document.createElement(
+      "img"
+    );
+
+  preview.className =
+    "U9-profile-page3-upload-preview";
+
+  preview.alt =
+    "头像预览";
+
+  preview.style.display =
+    "none";
+
+
+  uploadBox.appendChild(
+    preview
+  );
+
+
+  /* =======================================================
+     UPLOAD BUTTON
+  ======================================================= */
+
+  const uploadButton =
+    document.createElement(
+      "button"
+    );
+
+  uploadButton.type =
+    "button";
+
+  uploadButton.className =
+    "U9-profile-page3-upload-button";
+
+  uploadButton.textContent =
+    "上传头像";
+
+
+  /*
+   * Disable immediately when cooldown exists.
+   */
+
+  if (
+    isAvatarUploadOnCooldown()
+  ) {
+
+    uploadButton.disabled =
+      true;
+
+  }
+
+
+  uploadBox.appendChild(
+    uploadButton
+  );
+
+
+  /* =======================================================
+     FILE CHANGE
+  ======================================================= */
+
+  input.addEventListener(
+    "change",
+    function() {
+
+      const file =
+        input.files &&
+        input.files[0]
+          ? input.files[0]
+          : null;
+
+
+      uploadAvatarFile =
+        file;
+
+
+      if (!file) {
+
+        fileName.textContent =
+          "尚未选择图片";
+
+        preview.style.display =
+          "none";
+
+        preview.removeAttribute(
+          "src"
+        );
+
+        return;
+
+      }
+
+
+      fileName.textContent =
+        file.name;
+
+
+      /* ---------------------------------------------------
+         BASIC VALIDATION
+      --------------------------------------------------- */
+
+      if (
+        file.type !==
+          "image/webp"
+      ) {
+
+        alert(
+          "只能上传 WebP 图片。"
+        );
+
+        input.value =
+          "";
+
+        uploadAvatarFile =
+          null;
+
+        preview.style.display =
+          "none";
+
+        return;
+
+      }
+
+
+      if (
+        file.size <= 0
+      ) {
+
+        alert(
+          "图片文件无效。"
+        );
+
+        input.value =
+          "";
+
+        uploadAvatarFile =
+          null;
+
+        preview.style.display =
+          "none";
+
+        return;
+
+      }
+
+
+      if (
+        file.size >
+        U9_PROFILE_PAGE3_MAX_AVATAR_SIZE
+      ) {
+
+        alert(
+          "图片不能超过 2MB。"
+        );
+
+        input.value =
+          "";
+
+        uploadAvatarFile =
+          null;
+
+        preview.style.display =
+          "none";
+
+        return;
+
+      }
+
+
+      /* ---------------------------------------------------
+         PREVIEW
+      --------------------------------------------------- */
+
+      const objectUrl =
+        URL.createObjectURL(
+          file
+        );
+
+
+      preview.src =
+        objectUrl;
+
+      preview.style.display =
+        "block";
+
+
+      preview.onload =
+        function() {
+
+          URL.revokeObjectURL(
+            objectUrl
+          );
+
+        };
+
+    }
+  );
+
+
+  /* =======================================================
+     UPLOAD CLICK
+  ======================================================= */
+
+  uploadButton.addEventListener(
+    "click",
+    async function() {
+
+      await uploadCustomAvatar(
+        uploadAvatarFile,
+        uploadButton,
+        input
+      );
+
+    }
+  );
+
+
+  panel.appendChild(
+    uploadBox
+  );
+
+}
+
+
+/* =========================================================
+   UPLOAD CUSTOM AVATAR
+========================================================= */
+
+async function uploadCustomAvatar(
+  file,
+  button,
+  input
+) {
+
+  /* =======================================================
+     LOGIN
+  ======================================================= */
+
+  if (
+    !page3IsLoggedIn()
+  ) {
+
+    alert(
+      "请先登录。"
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     COOLDOWN
+  ======================================================= */
+
+  if (
+    isAvatarUploadOnCooldown()
+  ) {
+
+    alert(
+      "头像还在冷却中，还剩 " +
+      formatAvatarCooldown() +
+      "。"
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     FILE
+  ======================================================= */
+
+  if (!file) {
+
+    alert(
+      "请先选择一张 WebP 图片。"
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     MIME
+  ======================================================= */
+
+  if (
+    file.type !==
+      "image/webp"
+  ) {
+
+    alert(
+      "只能上传 WebP 图片。"
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     SIZE
+  ======================================================= */
+
+  if (
+    file.size <= 0
+  ) {
+
+    alert(
+      "图片文件无效。"
+    );
+
+    return;
+
+  }
+
+
+  if (
+    file.size >
+      U9_PROFILE_PAGE3_MAX_AVATAR_SIZE
+  ) {
+
+    alert(
+      "图片不能超过 2MB。"
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     TOKEN
+  ======================================================= */
+
+  const token =
+    getPage3Token();
+
+
+  if (!token) {
+
+    alert(
+      "登录状态已失效，请重新登录。"
+    );
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     BUTTON
+  ======================================================= */
+
+  if (button) {
+
+    button.disabled =
+      true;
+
+    button.classList.add(
+      "loading"
+    );
+
+    button.textContent =
+      "上传中...";
+
+  }
+
+
+  try {
+
+    /* =====================================================
+       FORMDATA
+
+       IMPORTANT:
+       Field name MUST be "avatar"
+    ===================================================== */
+
+    const formData =
+      new FormData();
+
+
+    formData.append(
+      "avatar",
+      file
+    );
+
+
+    /* =====================================================
+       REQUEST
+
+       IMPORTANT:
+       DO NOT set Content-Type manually.
+
+       Browser must create:
+       multipart/form-data; boundary=...
+    ===================================================== */
+
+    const response =
+      await fetch(
+        U9_PROFILE_PAGE3_UPLOAD_AVATAR_API,
+        {
+          method: "POST",
+
+          headers: {
+            Authorization:
+              `Bearer ${token}`
+          },
+
+          body:
+            formData,
+
+          credentials:
+            "omit",
+
+          cache:
+            "no-store"
+        }
+      );
+
+
+    const result =
+      await response.json()
+        .catch(
+          () => ({})
+        );
+
+
+    console.log(
+      "CUSTOM AVATAR UPLOAD RESULT:",
+      result
+    );
+
+
+    /* =====================================================
+       AUTH ERROR
+    ===================================================== */
+
+    if (
+      response.status === 401 ||
+      response.status === 403
+    ) {
+
+      throw new Error(
+        result?.error ||
+        result?.message ||
+        "登录状态已失效，请重新登录。"
+      );
+
+    }
+
+
+    /* =====================================================
+       COOLDOWN
+    ===================================================== */
+
+    if (
+      response.status === 429
+    ) {
+
+      currentAvatarCooldownUntil =
+        result?.cooldown_until ||
+        null;
+
+
+      const remaining =
+        result?.remaining_hours;
+
+
+      throw new Error(
+        result?.error ||
+        result?.message ||
+        (
+          Number.isFinite(
+            Number(remaining)
+          )
+            ? `头像还在冷却中，还剩约 ${remaining} 小时。`
+            : "头像还在冷却中。"
+        )
+      );
+
+    }
+
+
+    /* =====================================================
+       OTHER ERROR
+    ===================================================== */
+
+    if (!response.ok) {
+
+      throw new Error(
+        result?.error ||
+        result?.message ||
+        "头像上传失败。"
+      );
+
+    }
+
+
+    if (
+      result?.success === false
+    ) {
+
+      throw new Error(
+        result?.error ||
+        result?.message ||
+        "头像上传失败。"
+      );
+
+    }
+
+
+    /* =====================================================
+       SUCCESS
+    ===================================================== */
+
+    if (
+      result?.avatar
+    ) {
+
+      currentAvatarType =
+        result.avatar.type ||
+        "custom";
+
+
+      currentAvatarId =
+        result.avatar.id ||
+        null;
+
+
+      currentAvatarUrl =
+        result.avatar.url ||
+        null;
+
+
+      currentAvatarCooldownUntil =
+        result.avatar.cooldown_until ||
+        null;
+
+    }
+
+    else {
+
+      currentAvatarType =
+        "custom";
+
+    }
+
+
+    /* =====================================================
+       REFRESH PROFILE
+    ===================================================== */
+
+    await refreshProfileAfterChange();
+
+
+    /* =====================================================
+       RESET FILE
+    ===================================================== */
+
+    uploadAvatarFile =
+      null;
+
+
+    if (input) {
+
+      input.value =
+        "";
+
+    }
+
+
+    /* =====================================================
+       SUCCESS MESSAGE
+    ===================================================== */
+
+    alert(
+      "头像上传成功！7天内不能再次上传头像。"
+    );
+
+
+    /* =====================================================
+       RE-RENDER
+    ===================================================== */
+
+    const panel =
+      document.getElementById(
+        "U9-profile-page3-panel"
+      );
+
+
+    if (
+      panel &&
+      activePage3Tab ===
+        "avatar"
+    ) {
+
+      await switchPage3Tab(
+        "avatar"
+      );
+
+    }
+
+
+  }
+
+  catch(error) {
+
+    console.error(
+      "CUSTOM AVATAR UPLOAD ERROR:",
+      error
+    );
+
+
+    alert(
+      error?.message ||
+      "头像上传失败，请稍后重试。"
+    );
+
+  }
+
+  finally {
+
+    if (button) {
+
+      button.classList.remove(
+        "loading"
+      );
+
+      button.disabled =
+        isAvatarUploadOnCooldown();
+
+
+      if (
+        !isAvatarUploadOnCooldown()
+      ) {
+
+        button.textContent =
+          "上传头像";
+
+      }
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   AVATAR
+========================================================= */
+
+async function renderFreeAvatars(
+  panel,
+  keepUpload = false
+) {
+
+  if (!panel) {
+
+    return;
+
+  }
+
+
+  /*
+   * When keepUpload=true, do NOT clear panel.
+   *
+   * The custom upload area has already been
+   * inserted at the top.
+   */
+
+  let loading = null;
+
+
+  if (!keepUpload) {
+
+    panel.innerHTML =
+      "";
+
+  }
+
+
+  loading =
+    document.createElement(
+      "div"
+    );
 
   loading.className =
     "U9-profile-page3-loading";
@@ -695,7 +1895,15 @@ async function renderFreeAvatars(
         : [];
 
 
-    panel.innerHTML = "";
+    /*
+     * Remove loading only.
+     */
+
+    if (loading) {
+
+      loading.remove();
+
+    }
 
 
     if (!avatars.length) {
@@ -711,18 +1919,39 @@ async function renderFreeAvatars(
     }
 
 
+    const title =
+      document.createElement(
+        "div"
+      );
+
+    title.className =
+      "U9-profile-page3-section-title";
+
+    title.textContent =
+      "免费头像";
+
+
+    panel.appendChild(
+      title
+    );
+
+
     const list =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     list.className =
       "U9-profile-page3-avatar-list";
 
 
     avatars.forEach(
-      function (avatar) {
+      function(avatar) {
 
         const card =
-          document.createElement("div");
+          document.createElement(
+            "div"
+          );
 
         card.className =
           "U9-profile-page3-avatar-card";
@@ -733,7 +1962,9 @@ async function renderFreeAvatars(
         ------------------------------------------------- */
 
         const image =
-          document.createElement("img");
+          document.createElement(
+            "img"
+          );
 
         image.className =
           "U9-profile-page3-avatar-image";
@@ -761,7 +1992,9 @@ async function renderFreeAvatars(
         ------------------------------------------------- */
 
         const name =
-          document.createElement("div");
+          document.createElement(
+            "div"
+          );
 
         name.className =
           "U9-profile-page3-avatar-name";
@@ -781,9 +2014,12 @@ async function renderFreeAvatars(
         ------------------------------------------------- */
 
         const button =
-          document.createElement("button");
+          document.createElement(
+            "button"
+          );
 
-        button.type = "button";
+        button.type =
+          "button";
 
         button.className =
           "U9-profile-page3-avatar-button";
@@ -793,21 +2029,20 @@ async function renderFreeAvatars(
           avatar?.id || "";
 
 
+        const active =
+          String(currentAvatarId) ===
+          String(avatar?.id) &&
+          currentAvatarType !==
+            "custom";
+
+
         button.textContent =
-          String(
-            currentAvatarId
-          ) ===
-          String(
-            avatar?.id
-          )
+          active
             ? "正在使用"
             : "使用";
 
 
-        if (
-          String(currentAvatarId) ===
-          String(avatar?.id)
-        ) {
+        if (active) {
 
           button.classList.add(
             "active"
@@ -821,7 +2056,7 @@ async function renderFreeAvatars(
 
         button.addEventListener(
           "click",
-          function () {
+          function() {
 
             setFreeAvatar(
               avatar?.id,
@@ -852,12 +2087,19 @@ async function renderFreeAvatars(
 
   }
 
-  catch (error) {
+  catch(error) {
 
     console.error(
       "FREE AVATAR ERROR:",
       error
     );
+
+
+    if (loading) {
+
+      loading.remove();
+
+    }
 
 
     showPage3Message(
@@ -934,10 +2176,20 @@ async function setFreeAvatar(
               "application/json"
           },
 
-          body: JSON.stringify({
-            type: "free",
-            avatar_id: avatarId
-          })
+          body:
+            JSON.stringify({
+              type:
+                "free",
+
+              avatar_id:
+                avatarId
+            }),
+
+          credentials:
+            "omit",
+
+          cache:
+            "no-store"
         }
       );
 
@@ -949,18 +2201,13 @@ async function setFreeAvatar(
         );
 
 
-    console.log(
-      "SET AVATAR RESULT:",
-      result
-    );
-
-
     if (
       response.status === 401 ||
       response.status === 403
     ) {
 
       throw new Error(
+        result?.message ||
         "登录状态已失效，请重新登录。"
       );
 
@@ -989,9 +2236,17 @@ async function setFreeAvatar(
     }
 
 
+    currentAvatarType =
+      "free";
+
+
     currentAvatarId =
       result?.avatar?.id ||
       avatarId;
+
+
+    currentAvatarUrl =
+      null;
 
 
     updateAvatarButtons();
@@ -1005,10 +2260,9 @@ async function setFreeAvatar(
       currentAvatarId
     );
 
-
   }
 
-  catch (error) {
+  catch(error) {
 
     console.error(
       "SET AVATAR ERROR:",
@@ -1020,7 +2274,6 @@ async function setFreeAvatar(
       error?.message ||
       "头像设置失败，请稍后重试。"
     );
-
 
   }
 
@@ -1054,7 +2307,7 @@ function updateAvatarButtons() {
 
 
   buttons.forEach(
-    function (button) {
+    function(button) {
 
       const avatarId =
         button.dataset.avatarId;
@@ -1062,7 +2315,9 @@ function updateAvatarButtons() {
 
       const active =
         String(avatarId) ===
-        String(currentAvatarId);
+          String(currentAvatarId) &&
+        currentAvatarType !==
+          "custom";
 
 
       button.classList.toggle(
@@ -1114,11 +2369,14 @@ async function renderFreeFrames(
   }
 
 
-  panel.innerHTML = "";
+  panel.innerHTML =
+    "";
 
 
   const loading =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   loading.className =
     "U9-profile-page3-loading";
@@ -1169,7 +2427,8 @@ async function renderFreeFrames(
         : [];
 
 
-    panel.innerHTML = "";
+    panel.innerHTML =
+      "";
 
 
     if (!freeFrames.length) {
@@ -1186,14 +2445,16 @@ async function renderFreeFrames(
 
 
     const list =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     list.className =
       "U9-profile-page3-frame-list";
 
 
     freeFrames.forEach(
-      function (frame) {
+      function(frame) {
 
         const card =
           createFrameCard(
@@ -1214,10 +2475,9 @@ async function renderFreeFrames(
       list
     );
 
-
   }
 
-  catch (error) {
+  catch(error) {
 
     console.error(
       "FREE FRAME ERROR:",
@@ -1262,20 +2522,16 @@ async function loadPaidFrames() {
       {
         method: "GET",
 
-        /*
-         * IMPORTANT:
-         * DO NOT use credentials:"include"
-         *
-         * Authorization header is enough.
-         * This fixes the CORS error.
-         */
-
         headers: {
           Authorization:
             `Bearer ${token}`
         },
 
-        cache: "no-store"
+        credentials:
+          "omit",
+
+        cache:
+          "no-store"
       }
     );
 
@@ -1360,11 +2616,14 @@ async function renderPaidFrames(
   }
 
 
-  panel.innerHTML = "";
+  panel.innerHTML =
+    "";
 
 
   const loading =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   loading.className =
     "U9-profile-page3-loading";
@@ -1383,7 +2642,8 @@ async function renderPaidFrames(
     await loadPaidFrames();
 
 
-    panel.innerHTML = "";
+    panel.innerHTML =
+      "";
 
 
     if (!paidFrames.length) {
@@ -1400,14 +2660,16 @@ async function renderPaidFrames(
 
 
     const list =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     list.className =
       "U9-profile-page3-frame-list";
 
 
     paidFrames.forEach(
-      function (frame) {
+      function(frame) {
 
         const card =
           createFrameCard(
@@ -1428,10 +2690,9 @@ async function renderPaidFrames(
       list
     );
 
-
   }
 
-  catch (error) {
+  catch(error) {
 
     console.error(
       "PAID FRAME ERROR:",
@@ -1461,7 +2722,9 @@ function createFrameCard(
 ) {
 
   const card =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   card.className =
     "U9-profile-page3-frame-card";
@@ -1476,7 +2739,9 @@ function createFrameCard(
   ------------------------------------------------------- */
 
   const image =
-    document.createElement("img");
+    document.createElement(
+      "img"
+    );
 
   image.className =
     "U9-profile-page3-frame-image";
@@ -1504,7 +2769,9 @@ function createFrameCard(
   ------------------------------------------------------- */
 
   const name =
-    document.createElement("div");
+    document.createElement(
+      "div"
+    );
 
   name.className =
     "U9-profile-page3-frame-name";
@@ -1524,14 +2791,18 @@ function createFrameCard(
   ------------------------------------------------------- */
 
   if (
-    frameType === "paid"
+    frameType ===
+    "paid"
   ) {
 
     const price =
-      document.createElement("div");
+      document.createElement(
+        "div"
+      );
 
     price.className =
       "U9-profile-page3-frame-price";
+
 
     const coins =
       Number(
@@ -1557,9 +2828,12 @@ function createFrameCard(
   ------------------------------------------------------- */
 
   const button =
-    document.createElement("button");
+    document.createElement(
+      "button"
+    );
 
-  button.type = "button";
+  button.type =
+    "button";
 
   button.className =
     "U9-profile-page3-frame-button";
@@ -1573,9 +2847,10 @@ function createFrameCard(
 
 
   const equipped =
-    currentFrameType === frameType &&
+    currentFrameType ===
+      frameType &&
     String(currentFrameId) ===
-    String(frame?.id);
+      String(frame?.id);
 
 
   /* =======================================================
@@ -1583,7 +2858,8 @@ function createFrameCard(
   ======================================================= */
 
   if (
-    frameType === "free"
+    frameType ===
+    "free"
   ) {
 
     if (equipped) {
@@ -1605,9 +2881,10 @@ function createFrameCard(
       button.textContent =
         "使用";
 
+
       button.addEventListener(
         "click",
-        function () {
+        function() {
 
           equipFrame(
             "free",
@@ -1628,7 +2905,8 @@ function createFrameCard(
   ======================================================= */
 
   if (
-    frameType === "paid"
+    frameType ===
+    "paid"
   ) {
 
     const owned =
@@ -1663,7 +2941,7 @@ function createFrameCard(
 
       button.addEventListener(
         "click",
-        function () {
+        function() {
 
           equipFrame(
             "paid",
@@ -1697,7 +2975,7 @@ function createFrameCard(
 
       button.addEventListener(
         "click",
-        function () {
+        function() {
 
           purchasePaidFrame(
             frame?.id,
@@ -1777,14 +3055,6 @@ async function equipFrame(
         {
           method: "POST",
 
-          /*
-           * IMPORTANT:
-           * No credentials:"include".
-           *
-           * Authentication is sent through
-           * Authorization header.
-           */
-
           headers: {
             Authorization:
               `Bearer ${token}`,
@@ -1793,13 +3063,20 @@ async function equipFrame(
               "application/json"
           },
 
-          body: JSON.stringify({
-            frame_type:
-              frameType,
+          body:
+            JSON.stringify({
+              frame_type:
+                frameType,
 
-            frame_id:
-              frameId
-          })
+              frame_id:
+                frameId
+            }),
+
+          credentials:
+            "omit",
+
+          cache:
+            "no-store"
         }
       );
 
@@ -1809,12 +3086,6 @@ async function equipFrame(
         .catch(
           () => ({})
         );
-
-
-    console.log(
-      "EQUIP FRAME RESULT:",
-      result
-    );
 
 
     if (
@@ -1868,68 +3139,44 @@ async function equipFrame(
     await refreshProfileAfterChange();
 
 
-    console.log(
-      "FRAME EQUIPPED:",
-      {
-        frameType:
-          currentFrameType,
+    /* -----------------------------------------------------
+       RE-RENDER
+    ----------------------------------------------------- */
 
-        frameId:
-          currentFrameId
-      }
-    );
+    const panel =
+      document.getElementById(
+        "U9-profile-page3-panel"
+      );
 
-
-    /*
-     * Re-render current frame page
-     * so buttons immediately update.
-     */
 
     if (
+      panel &&
       activePage3Tab ===
-      "free-frame"
+        "free-frame"
     ) {
 
-      const panel =
-        document.getElementById(
-          "U9-profile-page3-panel"
-        );
-
-      if (panel) {
-
-        await renderFreeFrames(
-          panel
-        );
-
-      }
+      await renderFreeFrames(
+        panel
+      );
 
     }
 
 
     if (
+      panel &&
       activePage3Tab ===
-      "paid-frame"
+        "paid-frame"
     ) {
 
-      const panel =
-        document.getElementById(
-          "U9-profile-page3-panel"
-        );
-
-      if (panel) {
-
-        await renderPaidFrames(
-          panel
-        );
-
-      }
+      await renderPaidFrames(
+        panel
+      );
 
     }
-
 
   }
 
-  catch (error) {
+  catch(error) {
 
     console.error(
       "EQUIP FRAME ERROR:",
@@ -1941,7 +3188,6 @@ async function equipFrame(
       error?.message ||
       "头像框使用失败，请稍后重试。"
     );
-
 
   }
 
@@ -1973,7 +3219,7 @@ function updateFrameButtons() {
 
 
   buttons.forEach(
-    function (button) {
+    function(button) {
 
       const frameType =
         button.dataset.frameType;
@@ -2045,13 +3291,15 @@ async function purchasePaidFrame(
 
   const frame =
     paidFrames.find(
-      function (item) {
+      function(item) {
 
-        return String(
-          item?.id
-        ) ===
-        String(
-          frameId
+        return (
+          String(
+            item?.id
+          ) ===
+          String(
+            frameId
+          )
         );
 
       }
@@ -2117,11 +3365,6 @@ async function purchasePaidFrame(
         {
           method: "POST",
 
-          /*
-           * IMPORTANT:
-           * No credentials:"include".
-           */
-
           headers: {
             Authorization:
               `Bearer ${token}`,
@@ -2130,10 +3373,17 @@ async function purchasePaidFrame(
               "application/json"
           },
 
-          body: JSON.stringify({
-            frame_id:
-              frameId
-          })
+          body:
+            JSON.stringify({
+              frame_id:
+                frameId
+            }),
+
+          credentials:
+            "omit",
+
+          cache:
+            "no-store"
         }
       );
 
@@ -2143,12 +3393,6 @@ async function purchasePaidFrame(
         .catch(
           () => ({})
         );
-
-
-    console.log(
-      "PURCHASE FRAME RESULT:",
-      result
-    );
 
 
     if (
@@ -2186,19 +3430,17 @@ async function purchasePaidFrame(
     }
 
 
-    /* -----------------------------------------------------
-       UPDATE LOCAL OWNERSHIP
-    ----------------------------------------------------- */
-
     const purchasedFrame =
       paidFrames.find(
-        function (item) {
+        function(item) {
 
-          return String(
-            item?.id
-          ) ===
-          String(
-            frameId
+          return (
+            String(
+              item?.id
+            ) ===
+            String(
+              frameId
+            )
           );
 
         }
@@ -2213,18 +3455,9 @@ async function purchasePaidFrame(
     }
 
 
-    console.log(
-      "FRAME PURCHASE SUCCESS:",
-      frameId
-    );
-
-
-    /*
-     * Automatically equip after purchase.
-     *
-     * This means:
-     * Buy -> immediately use
-     */
+    /* -----------------------------------------------------
+       AUTO EQUIP
+    ----------------------------------------------------- */
 
     await equipFrame(
       "paid",
@@ -2233,10 +3466,9 @@ async function purchasePaidFrame(
     );
 
 
-    /*
-     * Reload paid frames from server
-     * to make sure ownership is correct.
-     */
+    /* -----------------------------------------------------
+       RELOAD
+    ----------------------------------------------------- */
 
     await loadPaidFrames();
 
@@ -2259,10 +3491,9 @@ async function purchasePaidFrame(
 
     }
 
-
   }
 
-  catch (error) {
+  catch(error) {
 
     console.error(
       "PURCHASE FRAME ERROR:",
@@ -2274,7 +3505,6 @@ async function purchasePaidFrame(
       error?.message ||
       "头像框购买失败，请稍后重试。"
     );
-
 
   }
 
@@ -2299,7 +3529,9 @@ async function purchasePaidFrame(
 
 async function loadProfilePage3() {
 
-  if (!profilePage3Content) {
+  if (
+    !profilePage3Content
+  ) {
 
     console.error(
       "PROFILE PAGE 3 CONTENT NOT FOUND"
@@ -2313,12 +3545,13 @@ async function loadProfilePage3() {
   try {
 
     /* -----------------------------------------------------
-       LOAD CURRENT USER
+       REFRESH CURRENT USER
     ----------------------------------------------------- */
 
     if (
       window.U9User &&
-      typeof window.U9User.refresh === "function"
+      typeof window.U9User.refresh ===
+        "function"
     ) {
 
       await window.U9User.refresh();
@@ -2353,10 +3586,9 @@ async function loadProfilePage3() {
       "PROFILE PAGE 3 LOADED"
     );
 
-
   }
 
-  catch (error) {
+  catch(error) {
 
     console.error(
       "PROFILE PAGE 3 LOAD ERROR:",
