@@ -109,6 +109,34 @@
 
 /* =========================
 
+   HEADER LOADING
+
+========================= */
+
+#U9-page-header-loading {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+}
+
+
+#U9-page-header-loading img {
+
+  display: block;
+
+  width: 28px;
+
+  height: 28px;
+
+}
+
+
+/* =========================
+
    REGISTER / LOGIN BUTTON
 
 ========================= */
@@ -266,10 +294,16 @@
 
 }
 
+
 /* =========================
+
    HEADER AUTH STATE
+
 ========================= */
 
+#U9-page-header-register,
+
+#U9-page-header-login,
 
 #U9-page-header-user {
 
