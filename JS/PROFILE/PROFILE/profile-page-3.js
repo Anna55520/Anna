@@ -197,24 +197,45 @@ function loadCurrentEquipment() {
      CUSTOM AVATAR URL
   ------------------------------------------------------- */
 
+  /*
+   * IMPORTANT:
+   *
+   * user.avatar.url means the CURRENTLY EQUIPPED avatar.
+   *
+   * If the user selects a free avatar,
+   * user.avatar.url becomes the free avatar SVG.
+   *
+   * Therefore:
+   *
+   * DO NOT use:
+   * user?.avatar?.url
+   *
+   * as the custom avatar URL.
+   *
+   * The /me API provides the saved custom avatar
+   * through:
+   *
+   * user.avatar.custom_url
+   */
+
   const customAvatarUrl =
     user?.avatar_url ||
     user?.avatarUrl ||
-    user?.avatar?.url ||
-    user?.avatar?.avatar_url ||
+    user?.avatar?.custom_url ||
     user?.user_avatar?.avatar_url ||
     user?.userAvatar?.avatar_url ||
     null;
 
 
   if (
-    customAvatarUrl
+    customAvatarUrl !== null &&
+    customAvatarUrl !== undefined
   ) {
 
     currentCustomAvatarUrl =
       String(
         customAvatarUrl
-      ).trim();
+      ).trim() || null;
 
   }
 
@@ -314,11 +335,29 @@ async function refreshProfileAfterChange() {
         "default";
 
 
+      /*
+       * IMPORTANT:
+       *
+       * Only read the SAVED custom avatar URL.
+       *
+       * DO NOT use:
+       *
+       * user?.avatar?.url
+       *
+       * because that is the currently equipped avatar.
+       *
+       * When currentAvatarType === "free",
+       * avatar.url is the free avatar SVG.
+       *
+       * The saved uploaded avatar is:
+       *
+       * user.avatar.custom_url
+       */
+
       const refreshedCustomAvatarUrl =
         user?.avatar_url ||
         user?.avatarUrl ||
-        user?.avatar?.url ||
-        user?.avatar?.avatar_url ||
+        user?.avatar?.custom_url ||
         user?.user_avatar?.avatar_url ||
         user?.userAvatar?.avatar_url ||
         null;
@@ -330,18 +369,20 @@ async function refreshProfileAfterChange() {
        * When the user switches to a free avatar,
        * the database can still keep avatar_url.
        *
-       * If refresh() temporarily does not return avatar_url,
+       * If refresh() temporarily does not return
+       * the custom avatar URL,
        * DO NOT erase our existing local custom avatar URL.
        */
 
       if (
-        refreshedCustomAvatarUrl
+        refreshedCustomAvatarUrl !== null &&
+        refreshedCustomAvatarUrl !== undefined
       ) {
 
         currentCustomAvatarUrl =
           String(
             refreshedCustomAvatarUrl
-          ).trim();
+          ).trim() || null;
 
       }
 
@@ -1568,18 +1609,30 @@ async function setCustomAvatar(
 
 
     currentCustomAvatarUrl =
-      avatarUrl;
+      String(
+        avatarUrl
+      ).trim();
 
 
     /*
      * If backend returns a custom avatar URL,
      * prefer the server value.
+     *
+     * IMPORTANT:
+     *
+     * For custom avatar:
+     * result.avatar.url is safe because
+     * the current avatar itself is custom.
+     *
+     * Prefer avatar.custom_url / avatar.avatar_url
+     * first whenever available.
      */
 
     const returnedAvatarUrl =
+      result?.avatar?.custom_url ||
       result?.avatar?.avatar_url ||
-      result?.avatar?.url ||
       result?.updatedUser?.avatar_url ||
+      result?.avatar?.url ||
       null;
 
 
