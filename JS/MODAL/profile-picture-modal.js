@@ -368,6 +368,26 @@ function openProfilePictureModal() {
 
   }
 
+
+  /*
+     Move focus into the modal.
+  */
+
+  setTimeout(
+    function () {
+
+      if (
+        profilePictureModalClose
+      ) {
+
+        profilePictureModalClose.focus();
+
+      }
+
+    },
+    0
+  );
+
 }
 
 
@@ -387,6 +407,23 @@ function closeProfilePictureModal() {
   ) {
 
     return;
+
+  }
+
+
+  /*
+     Remove focus before applying aria-hidden.
+     This prevents the browser accessibility warning.
+  */
+
+  if (
+    document.activeElement &&
+    profilePictureModal.contains(
+      document.activeElement
+    )
+  ) {
+
+    document.activeElement.blur();
 
   }
 
@@ -601,8 +638,19 @@ function profilePictureImageLoaded() {
     U9_PROFILE_PICTURE_MIN_ZOOM;
 
 
-  profilePictureZoomRange.value =
-    String(profilePictureZoom);
+  /*
+     IMPORTANT:
+     Use the actual declared variable name.
+  */
+
+  if (
+    profilePictureModalZoomRange
+  ) {
+
+    profilePictureModalZoomRange.value =
+      String(profilePictureZoom);
+
+  }
 
 
   profilePictureCalculateBaseScale();
@@ -615,6 +663,8 @@ function profilePictureImageLoaded() {
   profilePictureY =
     0;
 
+
+  limitProfilePicturePosition();
 
   updateProfilePictureTransform();
 
@@ -651,7 +701,7 @@ function profilePictureImageLoaded() {
 function profilePictureCalculateBaseScale() {
 
   if (
-    !profilePictureCropArea ||
+    !profilePictureModalCropArea ||
     !profilePictureNaturalWidth ||
     !profilePictureNaturalHeight
   ) {
@@ -662,11 +712,11 @@ function profilePictureCalculateBaseScale() {
 
 
   const cropWidth =
-    profilePictureCropArea.clientWidth;
+    profilePictureModalCropArea.clientWidth;
 
 
   const cropHeight =
-    profilePictureCropArea.clientHeight;
+    profilePictureModalCropArea.clientHeight;
 
 
   const scaleX =
@@ -678,6 +728,10 @@ function profilePictureCalculateBaseScale() {
     cropHeight /
     profilePictureNaturalHeight;
 
+
+  /*
+     Cover the complete crop area.
+  */
 
   profilePictureBaseScale =
     Math.max(
@@ -721,12 +775,22 @@ function updateProfilePictureTransform() {
     getProfilePictureScale();
 
 
+  const imageWidth =
+    profilePictureNaturalWidth *
+    scale;
+
+
+  const imageHeight =
+    profilePictureNaturalHeight *
+    scale;
+
+
   profilePictureModalImage.style.width =
-    `${profilePictureNaturalWidth * scale}px`;
+    `${imageWidth}px`;
 
 
   profilePictureModalImage.style.height =
-    `${profilePictureNaturalHeight * scale}px`;
+    `${imageHeight}px`;
 
 
   profilePictureModalImage.style.left =
@@ -746,7 +810,7 @@ function updateProfilePictureTransform() {
 function limitProfilePicturePosition() {
 
   if (
-    !profilePictureCropArea ||
+    !profilePictureModalCropArea ||
     !profilePictureNaturalWidth ||
     !profilePictureNaturalHeight
   ) {
@@ -757,11 +821,11 @@ function limitProfilePicturePosition() {
 
 
   const cropWidth =
-    profilePictureCropArea.clientWidth;
+    profilePictureModalCropArea.clientWidth;
 
 
   const cropHeight =
-    profilePictureCropArea.clientHeight;
+    profilePictureModalCropArea.clientHeight;
 
 
   const scale =
@@ -836,11 +900,17 @@ function setProfilePictureZoom(
     );
 
 
+  /*
+     IMPORTANT:
+     Use profilePictureModalZoomRange,
+     not profilePictureZoomRange.
+  */
+
   if (
-    profilePictureZoomRange
+    profilePictureModalZoomRange
   ) {
 
-    profilePictureZoomRange.value =
+    profilePictureModalZoomRange.value =
       String(profilePictureZoom);
 
   }
@@ -983,9 +1053,15 @@ function startProfilePictureDrag(
     true;
 
 
-  profilePictureImageContainer.classList.add(
-    "U9-dragging"
-  );
+  if (
+    profilePictureModalImageContainer
+  ) {
+
+    profilePictureModalImageContainer.classList.add(
+      "U9-dragging"
+    );
+
+  }
 
 
   const point =
@@ -1012,12 +1088,12 @@ function startProfilePictureDrag(
 
   if (
     event.pointerId !== undefined &&
-    profilePictureCropArea.setPointerCapture
+    profilePictureModalCropArea.setPointerCapture
   ) {
 
     try {
 
-      profilePictureCropArea.setPointerCapture(
+      profilePictureModalCropArea.setPointerCapture(
         event.pointerId
       );
 
@@ -1098,20 +1174,26 @@ function endProfilePictureDrag(
     false;
 
 
-  profilePictureImageContainer.classList.remove(
-    "U9-dragging"
-  );
+  if (
+    profilePictureModalImageContainer
+  ) {
+
+    profilePictureModalImageContainer.classList.remove(
+      "U9-dragging"
+    );
+
+  }
 
 
   if (
     event &&
     event.pointerId !== undefined &&
-    profilePictureCropArea.releasePointerCapture
+    profilePictureModalCropArea.releasePointerCapture
   ) {
 
     try {
 
-      profilePictureCropArea.releasePointerCapture(
+      profilePictureModalCropArea.releasePointerCapture(
         event.pointerId
       );
 
@@ -1227,7 +1309,7 @@ function createCroppedProfilePicture() {
 
 
       if (
-        !profilePictureCropArea
+        !profilePictureModalCropArea
       ) {
 
         reject(
@@ -1242,11 +1324,11 @@ function createCroppedProfilePicture() {
 
 
       const cropWidth =
-        profilePictureCropArea.clientWidth;
+        profilePictureModalCropArea.clientWidth;
 
 
       const cropHeight =
-        profilePictureCropArea.clientHeight;
+        profilePictureModalCropArea.clientHeight;
 
 
       const cropSize =
@@ -1310,6 +1392,12 @@ function createCroppedProfilePicture() {
             scale;
 
 
+          /*
+             The image is centered inside
+             the crop area and then moved by
+             profilePictureX / profilePictureY.
+          */
+
           const imageLeft =
             (
               cropWidth -
@@ -1326,6 +1414,11 @@ function createCroppedProfilePicture() {
             profilePictureY;
 
 
+          /*
+             Convert crop coordinates back
+             into original image coordinates.
+          */
+
           const sourceX =
             Math.max(
               0,
@@ -1340,17 +1433,41 @@ function createCroppedProfilePicture() {
             ) / scale;
 
 
-          const visibleWidth =
+          const sourceRight =
             Math.min(
               imageWidth,
-              cropSize
+              cropSize -
+              imageLeft
+            );
+
+
+          const sourceBottom =
+            Math.min(
+              imageHeight,
+              cropSize -
+              imageTop
+            );
+
+
+          const visibleWidth =
+            Math.max(
+              0,
+              sourceRight -
+              Math.max(
+                0,
+                -imageLeft
+              )
             );
 
 
           const visibleHeight =
-            Math.min(
-              imageHeight,
-              cropSize
+            Math.max(
+              0,
+              sourceBottom -
+              Math.max(
+                0,
+                -imageTop
+              )
             );
 
 
@@ -1379,22 +1496,20 @@ function createCroppedProfilePicture() {
 
 
           const destinationWidth =
-            Math.min(
-              cropSize,
-              imageWidth
-            );
+            visibleWidth;
 
 
           const destinationHeight =
-            Math.min(
-              cropSize,
-              imageHeight
-            );
+            visibleHeight;
+
+
+          const outputScale =
+            U9_PROFILE_PICTURE_OUTPUT_SIZE /
+            cropSize;
 
 
           /*
-             Draw the complete crop area
-             using the actual image coordinates.
+             Draw the exact visible crop.
           */
 
           context.clearRect(
@@ -1403,11 +1518,6 @@ function createCroppedProfilePicture() {
             canvas.width,
             canvas.height
           );
-
-
-          const outputScale =
-            U9_PROFILE_PICTURE_OUTPUT_SIZE /
-            cropSize;
 
 
           context.drawImage(
@@ -1879,8 +1989,14 @@ if (
         U9_PROFILE_PICTURE_MIN_ZOOM;
 
 
-      profilePictureZoomRange.value =
-        String(profilePictureZoom);
+      if (
+        profilePictureModalZoomRange
+      ) {
+
+        profilePictureModalZoomRange.value =
+          String(profilePictureZoom);
+
+      }
 
 
       profilePictureCalculateBaseScale();
