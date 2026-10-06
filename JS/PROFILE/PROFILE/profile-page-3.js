@@ -744,16 +744,15 @@ function createSelectAvatarCard() {
     function () {
 
       if (
-        window.U9ProfilePicture &&
-        typeof window.U9ProfilePicture.open === "function"
+      window.U9ProfilePictureModal &&
+      typeof window.U9ProfilePictureModal.open === "function"
       ) {
 
-        window.U9ProfilePicture.open();
+      window.U9ProfilePictureModal.open();
 
-        return;
+      return;
 
       }
-
 
       console.error(
         "U9ProfilePicture.open() is not available."
