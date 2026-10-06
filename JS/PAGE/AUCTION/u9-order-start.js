@@ -314,28 +314,13 @@ result.round;
 
 
 if(
-result.round &&
-result.round.status==="ACTIVE"
+result.order &&
+result.order.status==="MATCHING"
 ){
-
-
-const activeOrder =
-await findActiveOrder();
-
-
-if(
-activeOrder &&
-activeOrder.status==="MATCHING"
-){
-
 
 restoreMatching(
-activeOrder
+result.order
 );
-
-
-}
-
 
 }
 
