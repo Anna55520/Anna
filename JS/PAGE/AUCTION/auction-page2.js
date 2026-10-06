@@ -427,12 +427,6 @@ async function checkOrderStatus(){
         await response.json();
 
 
-        console.log(
-            "ORDER STATUS RESULT:",
-            data
-        );
-
-
         if(
             !response.ok
         ){
@@ -636,12 +630,6 @@ function connectUserListener(){
                 ){
 
 
-                    console.log(
-                        "U9 Auction Status User Ready",
-                        user
-                    );
-
-
                     checkOrderStatus();
 
 
@@ -701,11 +689,6 @@ function initializeAuctionStatus(){
 
     initialized =
     true;
-
-
-    console.log(
-        "U9 Auction Status System Ready"
-    );
 
 
     recoverOrderState();
