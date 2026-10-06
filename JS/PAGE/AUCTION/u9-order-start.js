@@ -635,6 +635,11 @@ result
 const order =
 result.order || {};
 
+console.log(
+"[U9] Received Order:",
+order
+);
+
 const round =
 result.round || {};
 
