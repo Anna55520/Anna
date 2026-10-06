@@ -725,6 +725,12 @@ return;
 }
 
 
+console.log(
+"[U9] Restore Matching:",
+order
+);
+
+
 
 window.U9CurrentOrder =
 order;
@@ -739,11 +745,9 @@ orderButton.disabled =
 true;
 
 
-
 startMatchingCountdown(
 order.matching_ready_at
 );
-
 
 
 }
