@@ -1,4 +1,3 @@
-
 /* =========================================================
    PROFILE PICTURE MODAL
 ========================================================= */
@@ -240,6 +239,63 @@ function showProfilePictureMessage(
 
 
 /* =========================================================
+   VIEW
+   SELECT / EDITOR
+========================================================= */
+
+function showProfilePictureSelectView() {
+
+  if (
+    profilePictureModalSelect
+  ) {
+
+    profilePictureModalSelect.hidden =
+      false;
+
+  }
+
+
+  if (
+    profilePictureModalEditor
+  ) {
+
+    profilePictureModalEditor.hidden =
+      true;
+
+  }
+
+}
+
+
+/* =========================================================
+   SHOW EDITOR VIEW
+========================================================= */
+
+function showProfilePictureEditorView() {
+
+  if (
+    profilePictureModalSelect
+  ) {
+
+    profilePictureModalSelect.hidden =
+      true;
+
+  }
+
+
+  if (
+    profilePictureModalEditor
+  ) {
+
+    profilePictureModalEditor.hidden =
+      false;
+
+  }
+
+}
+
+
+/* =========================================================
    LOADING
 ========================================================= */
 
@@ -339,24 +395,12 @@ function openProfilePictureModal() {
     "hidden";
 
 
-  if (
-    profilePictureModalSelect
-  ) {
+  /*
+     Every time the modal opens,
+     start from the image selection screen.
+  */
 
-    profilePictureModalSelect.hidden =
-      false;
-
-  }
-
-
-  if (
-    profilePictureModalEditor
-  ) {
-
-    profilePictureModalEditor.hidden =
-      true;
-
-  }
+  showProfilePictureSelectView();
 
 
   if (
@@ -483,8 +527,16 @@ function selectProfilePictureFile() {
     profilePictureModalFile
   ) {
 
+    /*
+       Clear the value first.
+
+       This allows the user to select
+       the same image again.
+    */
+
     profilePictureModalFile.value =
       "";
+
 
     profilePictureModalFile.click();
 
@@ -529,6 +581,13 @@ function handleProfilePictureFileChange(
       "error"
     );
 
+    /*
+       Keep the select screen visible
+       when an invalid file is selected.
+    */
+
+    showProfilePictureSelectView();
+
     return;
 
   }
@@ -548,6 +607,23 @@ function handleProfilePictureFileChange(
 function loadProfilePictureFile(
   file
 ) {
+
+  if (!file) {
+    return;
+  }
+
+
+  /*
+     Hide any old message while
+     the new image is loading.
+  */
+
+  showProfilePictureMessage("");
+
+
+  /*
+     Remove previous object URL.
+  */
 
   if (
     profilePictureObjectURL
@@ -591,31 +667,15 @@ function loadProfilePictureFile(
       /*
          IMPORTANT
 
-         The editor is hidden when the file is selected.
+         Only switch to the editor AFTER
+         the selected image has successfully
+         loaded.
 
-         Therefore we must show the editor FIRST,
-         wait for the browser to calculate its layout,
-         and ONLY THEN calculate the image scale.
+         This guarantees that a broken image
+         will not open the crop editor.
       */
 
-      if (
-        profilePictureModalSelect
-      ) {
-
-        profilePictureModalSelect.hidden =
-          true;
-
-      }
-
-
-      if (
-        profilePictureModalEditor
-      ) {
-
-        profilePictureModalEditor.hidden =
-          false;
-
-      }
+      showProfilePictureEditorView();
 
 
       /*
@@ -650,9 +710,8 @@ function loadProfilePictureFile(
       /*
          Put the image into the editor.
 
-         We wait one animation frame so the browser
-         has already displayed the editor and calculated
-         the crop area's real width and height.
+         Wait for the browser to display the editor
+         and calculate the crop area's real size.
       */
 
       requestAnimationFrame(
@@ -697,6 +756,14 @@ function loadProfilePictureFile(
           null;
 
       }
+
+
+      /*
+         If loading fails,
+         return to the select screen.
+      */
+
+      showProfilePictureSelectView();
 
     };
 
@@ -763,6 +830,14 @@ function profilePictureImageLoaded() {
         "Unable to display this image.",
         "error"
       );
+
+
+      /*
+         If the editor image itself fails,
+         return to the selection screen.
+      */
+
+      showProfilePictureSelectView();
 
     };
 
@@ -1205,6 +1280,9 @@ function resetProfilePictureEditor() {
     profilePictureModalImage.style.top =
       "";
 
+    profilePictureModalImage.style.transform =
+      "";
+
   }
 
 
@@ -1218,24 +1296,12 @@ function resetProfilePictureEditor() {
   }
 
 
-  if (
-    profilePictureModalSelect
-  ) {
+  /*
+     Reset back to the initial
+     image selection screen.
+  */
 
-    profilePictureModalSelect.hidden =
-      false;
-
-  }
-
-
-  if (
-    profilePictureModalEditor
-  ) {
-
-    profilePictureModalEditor.hidden =
-      true;
-
-  }
+  showProfilePictureSelectView();
 
 
   if (
