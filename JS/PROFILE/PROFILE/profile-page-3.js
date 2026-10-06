@@ -43,6 +43,10 @@ const profilePage3Content =
 
 let currentAvatarId = null;
 
+let currentAvatarType = "default";
+
+let currentCustomAvatarUrl = null;
+
 let currentFrameType = "default";
 
 let currentFrameId = null;
@@ -54,14 +58,6 @@ let paidFrames = [];
 let activePage3Tab = "avatar";
 
 let page3Initialized = false;
-
-
-/* =========================================================
-   DEFAULT AVATAR
-========================================================= */
-
-const U9_PROFILE_PAGE3_DEFAULT_AVATAR =
-  "SSVG/avatar/profile.svg";
 
 
 /* =========================================================
@@ -140,12 +136,6 @@ function setPage3ImageSource(
   const value =
     String(source).trim();
 
-  if (!value) {
-
-    return;
-
-  }
-
   if (
     value.startsWith("<svg") ||
     value.startsWith("<?xml")
@@ -166,199 +156,20 @@ function setPage3ImageSource(
 
 
 /* =========================================================
-   GET CURRENT USER
-========================================================= */
-
-function getPage3CurrentUser() {
-
-  if (
-    window.U9User &&
-    typeof window.U9User.get === "function"
-  ) {
-
-    return window.U9User.get();
-
-  }
-
-  return null;
-
-}
-
-
-/* =========================================================
-   GET CURRENT USER AVATAR SOURCE
-========================================================= */
-
-function getCurrentUserAvatarSource() {
-
-  const user =
-    getPage3CurrentUser();
-
-
-  /* -------------------------------------------------------
-     DEFAULT AVATAR
-  ------------------------------------------------------- */
-
-  const defaultAvatar =
-    U9_PROFILE_PAGE3_DEFAULT_AVATAR;
-
-
-  if (!user) {
-
-    return defaultAvatar;
-
-  }
-
-
-  /* -------------------------------------------------------
-     AVATAR OBJECT
-  ------------------------------------------------------- */
-
-  const avatar =
-    user?.avatar ||
-    user?.profile?.avatar ||
-    user?.profile?.profile_avatar ||
-    user?.profile?.profileAvatar ||
-    null;
-
-
-  /* -------------------------------------------------------
-     AVATAR IS DIRECT STRING
-  ------------------------------------------------------- */
-
-  if (
-    typeof avatar === "string" &&
-    avatar.trim()
-  ) {
-
-    return avatar.trim();
-
-  }
-
-
-  /* -------------------------------------------------------
-     AVATAR OBJECT IMAGE SOURCE
-  ------------------------------------------------------- */
-
-  const avatarSource =
-    avatar?.url ||
-    avatar?.image_url ||
-    avatar?.imageUrl ||
-    avatar?.image ||
-    avatar?.src ||
-    avatar?.avatar_url ||
-    avatar?.avatarUrl ||
-    avatar?.file_url ||
-    avatar?.fileUrl ||
-    avatar?.public_url ||
-    avatar?.publicUrl ||
-    avatar?.photo_url ||
-    avatar?.photoUrl ||
-    avatar?.picture ||
-    avatar?.profile_image_url ||
-    avatar?.profileImageUrl ||
-    null;
-
-
-  if (
-    typeof avatarSource === "string" &&
-    avatarSource.trim()
-  ) {
-
-    return avatarSource.trim();
-
-  }
-
-
-  /* -------------------------------------------------------
-     USER TOP LEVEL AVATAR SOURCE
-  ------------------------------------------------------- */
-
-  const userAvatarSource =
-    user?.avatar_url ||
-    user?.avatarUrl ||
-    user?.profile_avatar_url ||
-    user?.profileAvatarUrl ||
-    user?.profile_image_url ||
-    user?.profileImageUrl ||
-    user?.photo_url ||
-    user?.photoUrl ||
-    user?.picture ||
-    user?.image_url ||
-    user?.imageUrl ||
-    user?.image ||
-    user?.avatar_src ||
-    user?.avatarSrc ||
-    null;
-
-
-  if (
-    typeof userAvatarSource === "string" &&
-    userAvatarSource.trim()
-  ) {
-
-    return userAvatarSource.trim();
-
-  }
-
-
-  /* -------------------------------------------------------
-     NO USER AVATAR
-     USE DEFAULT
-  ------------------------------------------------------- */
-
-  return defaultAvatar;
-
-}
-
-
-/* =========================================================
-   UPDATE CURRENT PROFILE AVATAR IMAGE
-========================================================= */
-
-function updateCurrentProfileAvatarImage() {
-
-  const image =
-    document.querySelector(
-      ".U9-profile-page3-avatar-card:first-child .U9-profile-page3-avatar-image"
-    );
-
-
-  if (!image) {
-
-    return;
-
-  }
-
-
-  const source =
-    getCurrentUserAvatarSource();
-
-
-  image.dataset.fallbackApplied =
-    "false";
-
-
-  setPage3ImageSource(
-    image,
-    source
-  );
-
-}
-
-
-/* =========================================================
    CURRENT USER EQUIPMENT
 ========================================================= */
 
 function loadCurrentEquipment() {
 
   const user =
-    getPage3CurrentUser();
+    window.U9User &&
+    typeof window.U9User.get === "function"
+      ? window.U9User.get()
+      : null;
 
 
   /* -------------------------------------------------------
-     AVATAR
+     AVATAR ID
   ------------------------------------------------------- */
 
   currentAvatarId =
@@ -366,6 +177,46 @@ function loadCurrentEquipment() {
     user?.avatar?.avatar_id ||
     user?.avatar_id ||
     null;
+
+
+  /* -------------------------------------------------------
+     AVATAR TYPE
+  ------------------------------------------------------- */
+
+  currentAvatarType =
+    user?.avatar_type ||
+    user?.avatarType ||
+    user?.avatar?.type ||
+    user?.avatar?.avatar_type ||
+    user?.user_avatar?.avatar_type ||
+    user?.userAvatar?.avatar_type ||
+    "default";
+
+
+  /* -------------------------------------------------------
+     CUSTOM AVATAR URL
+  ------------------------------------------------------- */
+
+  const customAvatarUrl =
+    user?.avatar_url ||
+    user?.avatarUrl ||
+    user?.avatar?.url ||
+    user?.avatar?.avatar_url ||
+    user?.user_avatar?.avatar_url ||
+    user?.userAvatar?.avatar_url ||
+    null;
+
+
+  if (
+    customAvatarUrl
+  ) {
+
+    currentCustomAvatarUrl =
+      String(
+        customAvatarUrl
+      ).trim();
+
+  }
 
 
   /* -------------------------------------------------------
@@ -396,8 +247,11 @@ function loadCurrentEquipment() {
       avatarId:
         currentAvatarId,
 
-      avatarSource:
-        getCurrentUserAvatarSource(),
+      avatarType:
+        currentAvatarType,
+
+      customAvatarUrl:
+        currentCustomAvatarUrl,
 
       frameType:
         currentFrameType,
@@ -449,6 +303,49 @@ async function refreshProfileAfterChange() {
         currentAvatarId;
 
 
+      currentAvatarType =
+        user?.avatar_type ||
+        user?.avatarType ||
+        user?.avatar?.type ||
+        user?.avatar?.avatar_type ||
+        user?.user_avatar?.avatar_type ||
+        user?.userAvatar?.avatar_type ||
+        currentAvatarType ||
+        "default";
+
+
+      const refreshedCustomAvatarUrl =
+        user?.avatar_url ||
+        user?.avatarUrl ||
+        user?.avatar?.url ||
+        user?.avatar?.avatar_url ||
+        user?.user_avatar?.avatar_url ||
+        user?.userAvatar?.avatar_url ||
+        null;
+
+
+      /*
+       * IMPORTANT:
+       *
+       * When the user switches to a free avatar,
+       * the database can still keep avatar_url.
+       *
+       * If refresh() temporarily does not return avatar_url,
+       * DO NOT erase our existing local custom avatar URL.
+       */
+
+      if (
+        refreshedCustomAvatarUrl
+      ) {
+
+        currentCustomAvatarUrl =
+          String(
+            refreshedCustomAvatarUrl
+          ).trim();
+
+      }
+
+
       currentFrameType =
         user?.avatar_frame_type ||
         user?.avatarFrameType ||
@@ -473,13 +370,6 @@ async function refreshProfileAfterChange() {
     updateAvatarButtons();
 
     updateFrameButtons();
-
-
-    /* -----------------------------------------------------
-       UPDATE PAGE 3 PROFILE AVATAR
-    ----------------------------------------------------- */
-
-    updateCurrentProfileAvatarImage();
 
 
     /* -----------------------------------------------------
@@ -612,8 +502,7 @@ function createPage3UI() {
   );
 
 
-  page3Initialized =
-    true;
+  page3Initialized = true;
 
 }
 
@@ -630,8 +519,7 @@ function createPage3Tab(
   const button =
     document.createElement("button");
 
-  button.type =
-    "button";
+  button.type = "button";
 
   button.className =
     "U9-profile-page3-tab";
@@ -715,36 +603,6 @@ async function switchPage3Tab(
   if (!panel) {
 
     return;
-
-  }
-
-
-  /* -------------------------------------------------------
-     REFRESH USER BEFORE AVATAR PAGE
-  ------------------------------------------------------- */
-
-  if (
-    tabName === "avatar" &&
-    window.U9User &&
-    typeof window.U9User.refresh === "function"
-  ) {
-
-    try {
-
-      await window.U9User.refresh();
-
-      loadCurrentEquipment();
-
-    }
-
-    catch (error) {
-
-      console.error(
-        "PAGE3 AVATAR USER REFRESH ERROR:",
-        error
-      );
-
-    }
 
   }
 
@@ -873,7 +731,7 @@ function requirePage3Login(
 
 
 /* =========================================================
-   CREATE SELECT AVATAR CARD
+   CREATE SELECT / CUSTOM AVATAR CARD
 ========================================================= */
 
 function createSelectAvatarCard() {
@@ -896,54 +754,54 @@ function createSelectAvatarCard() {
     "U9-profile-page3-avatar-image";
 
   image.alt =
-    "Profile Avatar";
+    currentCustomAvatarUrl
+      ? "Custom Avatar"
+      : "Select Avatar";
 
 
-  /* -------------------------------------------------------
-     GET CURRENT USER AVATAR
-  ------------------------------------------------------- */
+  /*
+   * If the user has uploaded a custom avatar,
+   * always show that uploaded image.
+   *
+   * Otherwise use the default profile SVG.
+   */
 
-  const avatarSource =
-    getCurrentUserAvatarSource();
+  if (
+    currentCustomAvatarUrl
+  ) {
+
+    image.src =
+      currentCustomAvatarUrl;
+
+  }
+
+  else {
+
+    image.src =
+      "SSVG/avatar/profile.svg";
+
+  }
 
 
-  setPage3ImageSource(
-    image,
-    avatarSource
-  );
-
-
-  /* -------------------------------------------------------
-     IMAGE FALLBACK
-  ------------------------------------------------------- */
-
-  image.dataset.fallbackApplied =
-    "false";
-
-
-  image.addEventListener(
-    "error",
+  image.onerror =
     function () {
 
+      /*
+       * If the custom image cannot be loaded,
+       * fall back to the default profile image.
+       */
+
       if (
-        image.dataset.fallbackApplied ===
-        "true"
+        image.src !==
+        "SSVG/avatar/profile.svg"
       ) {
 
-        return;
+        image.src =
+          "SSVG/avatar/profile.svg";
 
       }
 
-
-      image.dataset.fallbackApplied =
-        "true";
-
-
-      image.src =
-        U9_PROFILE_PAGE3_DEFAULT_AVATAR;
-
-    }
-  );
+    };
 
 
   card.appendChild(
@@ -961,8 +819,11 @@ function createSelectAvatarCard() {
   name.className =
     "U9-profile-page3-avatar-name";
 
+
   name.textContent =
-    "Profile Avatar";
+    currentCustomAvatarUrl
+      ? "Custom Avatar"
+      : "Select Avatar";
 
 
   card.appendChild(
@@ -983,49 +844,107 @@ function createSelectAvatarCard() {
   button.className =
     "U9-profile-page3-avatar-button";
 
-  button.textContent =
-    "Select Avatar";
-
 
   /*
-   * IMPORTANT:
+   * -------------------------------------------------------
+   * NO CUSTOM AVATAR
+   * -------------------------------------------------------
    *
-   * This button is NOT a free avatar button.
-   * Therefore it does not receive
-   * data-avatar-id.
-   *
-   * This prevents updateAvatarButtons()
-   * from modifying this button.
+   * Open the profile picture upload modal.
    */
 
+  if (
+    !currentCustomAvatarUrl
+  ) {
 
-  button.addEventListener(
-    "click",
-    function () {
+    button.textContent =
+      "Select Avatar";
 
-      if (
-        window.U9ProfilePictureModal &&
-        typeof window.U9ProfilePictureModal.open === "function"
-      ) {
 
-        window.U9ProfilePictureModal.open();
+    button.addEventListener(
+      "click",
+      function () {
 
-        return;
+        if (
+          window.U9ProfilePictureModal &&
+          typeof window.U9ProfilePictureModal.open === "function"
+        ) {
+
+          window.U9ProfilePictureModal.open();
+
+          return;
+
+        }
+
+
+        console.error(
+          "U9ProfilePictureModal.open() is not available."
+        );
+
+
+        alert(
+          "Profile picture is not available yet."
+        );
 
       }
+    );
+
+  }
+
+  /*
+   * -------------------------------------------------------
+   * CUSTOM AVATAR EXISTS
+   * -------------------------------------------------------
+   */
+
+  else {
+
+    button.dataset.avatarType =
+      "custom";
 
 
-      console.error(
-        "U9ProfilePictureModal.open() is not available."
+    const usingCustomAvatar =
+      currentAvatarType ===
+      "custom";
+
+
+    if (
+      usingCustomAvatar
+    ) {
+
+      button.textContent =
+        "Using";
+
+      button.classList.add(
+        "active"
       );
 
+      button.disabled =
+        true;
 
-      alert(
-        "Profile picture is not available yet."
+    }
+
+    else {
+
+      button.textContent =
+        "Use";
+
+
+      button.addEventListener(
+        "click",
+        function () {
+
+          setCustomAvatar(
+            currentCustomAvatarUrl,
+            button
+          );
+
+        }
       );
 
     }
-  );
+
+  }
 
 
   card.appendChild(
@@ -1119,7 +1038,7 @@ async function renderFreeAvatars(
 
 
     /* -----------------------------------------------------
-       SELECT AVATAR CARD
+       SELECT / CUSTOM AVATAR CARD
     ----------------------------------------------------- */
 
     list.appendChild(
@@ -1220,18 +1139,18 @@ async function renderFreeAvatars(
           ) ===
           String(
             avatar?.id
-          )
+          ) &&
+          currentAvatarType ===
+          "free"
             ? "Using"
             : "Use";
 
 
         if (
-          String(
-            currentAvatarId
-          ) ===
-          String(
-            avatar?.id
-          )
+          String(currentAvatarId) ===
+          String(avatar?.id) &&
+          currentAvatarType ===
+          "free"
         ) {
 
           button.classList.add(
@@ -1360,11 +1279,8 @@ async function setFreeAvatar(
           },
 
           body: JSON.stringify({
-            type:
-              "free",
-
-            avatar_id:
-              avatarId
+            type: "free",
+            avatar_id: avatarId
           })
         }
       );
@@ -1419,7 +1335,21 @@ async function setFreeAvatar(
 
     currentAvatarId =
       result?.avatar?.id ||
+      result?.updatedUser?.avatar_id ||
       avatarId;
+
+
+    /*
+     * IMPORTANT:
+     *
+     * DO NOT clear currentCustomAvatarUrl here.
+     *
+     * The uploaded custom avatar must remain available
+     * even when the user switches to a free avatar.
+     */
+
+    currentAvatarType =
+      "free";
 
 
     updateAvatarButtons();
@@ -1430,8 +1360,45 @@ async function setFreeAvatar(
 
     console.log(
       "AVATAR SET SUCCESS:",
-      currentAvatarId
+      {
+        avatarId:
+          currentAvatarId,
+
+        avatarType:
+          currentAvatarType,
+
+        customAvatarUrl:
+          currentCustomAvatarUrl
+      }
     );
+
+
+    /*
+     * Re-render avatar page so the first custom
+     * avatar card immediately changes from
+     * "Using" to "Use".
+     */
+
+    if (
+      activePage3Tab ===
+      "avatar"
+    ) {
+
+      const panel =
+        document.getElementById(
+          "U9-profile-page3-panel"
+        );
+
+
+      if (panel) {
+
+        await renderFreeAvatars(
+          panel
+        );
+
+      }
+
+    }
 
 
   }
@@ -1459,7 +1426,248 @@ async function setFreeAvatar(
         "loading"
       );
 
-      updateAvatarButtons();
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   SET CUSTOM AVATAR
+========================================================= */
+
+async function setCustomAvatar(
+  avatarUrl,
+  button
+) {
+
+  if (!avatarUrl) {
+
+    return;
+
+  }
+
+
+  const token =
+    getPage3Token();
+
+
+  if (!token) {
+
+    alert(
+      "Please log in first."
+    );
+
+    return;
+
+  }
+
+
+  if (button) {
+
+    button.classList.add(
+      "loading"
+    );
+
+    button.disabled =
+      true;
+
+    button.textContent =
+      "Processing...";
+
+  }
+
+
+  try {
+
+    const response =
+      await fetch(
+        U9_PROFILE_PAGE3_SET_AVATAR_API,
+        {
+          method: "POST",
+
+          headers: {
+            Authorization:
+              `Bearer ${token}`,
+
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            type:
+              "custom",
+
+            avatar_url:
+              avatarUrl
+          })
+        }
+      );
+
+
+    const result =
+      await response.json()
+        .catch(
+          () => ({})
+        );
+
+
+    console.log(
+      "SET CUSTOM AVATAR RESULT:",
+      result
+    );
+
+
+    if (
+      response.status === 401 ||
+      response.status === 403
+    ) {
+
+      throw new Error(
+        "Your login session has expired. Please log in again."
+      );
+
+    }
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        result?.message ||
+        "Failed to use custom avatar."
+      );
+
+    }
+
+
+    if (
+      result?.success === false
+    ) {
+
+      throw new Error(
+        result?.message ||
+        "Failed to use custom avatar."
+      );
+
+    }
+
+
+    /*
+     * -----------------------------------------------------
+     * UPDATE LOCAL STATE
+     * -----------------------------------------------------
+     */
+
+    currentAvatarType =
+      "custom";
+
+
+    currentAvatarId =
+      null;
+
+
+    currentCustomAvatarUrl =
+      avatarUrl;
+
+
+    /*
+     * If backend returns a custom avatar URL,
+     * prefer the server value.
+     */
+
+    const returnedAvatarUrl =
+      result?.avatar?.avatar_url ||
+      result?.avatar?.url ||
+      result?.updatedUser?.avatar_url ||
+      null;
+
+
+    if (
+      returnedAvatarUrl
+    ) {
+
+      currentCustomAvatarUrl =
+        String(
+          returnedAvatarUrl
+        ).trim();
+
+    }
+
+
+    updateAvatarButtons();
+
+
+    await refreshProfileAfterChange();
+
+
+    console.log(
+      "CUSTOM AVATAR SET SUCCESS:",
+      {
+        avatarType:
+          currentAvatarType,
+
+        avatarId:
+          currentAvatarId,
+
+        avatarUrl:
+          currentCustomAvatarUrl
+      }
+    );
+
+
+    /*
+     * Re-render avatar page.
+     */
+
+    if (
+      activePage3Tab ===
+      "avatar"
+    ) {
+
+      const panel =
+        document.getElementById(
+          "U9-profile-page3-panel"
+        );
+
+
+      if (panel) {
+
+        await renderFreeAvatars(
+          panel
+        );
+
+      }
+
+    }
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "SET CUSTOM AVATAR ERROR:",
+      error
+    );
+
+
+    alert(
+      error?.message ||
+      "Failed to use custom avatar. Please try again later."
+    );
+
+  }
+
+  finally {
+
+    if (button) {
+
+      button.classList.remove(
+        "loading"
+      );
+
+      button.disabled =
+        false;
 
     }
 
@@ -1476,24 +1684,82 @@ function updateAvatarButtons() {
 
   const buttons =
     document.querySelectorAll(
-      ".U9-profile-page3-avatar-button[data-avatar-id]"
+      ".U9-profile-page3-avatar-button"
     );
 
 
   buttons.forEach(
     function (button) {
 
+      /*
+       * ---------------------------------------------------
+       * CUSTOM AVATAR BUTTON
+       * ---------------------------------------------------
+       */
+
+      if (
+        button.dataset.avatarType ===
+        "custom"
+      ) {
+
+        const active =
+          currentAvatarType ===
+          "custom";
+
+
+        button.classList.toggle(
+          "active",
+          active
+        );
+
+
+        if (
+          active
+        ) {
+
+          button.textContent =
+            "Using";
+
+          button.disabled =
+            true;
+
+        }
+
+        else if (
+          !button.classList.contains(
+            "loading"
+          )
+        ) {
+
+          button.textContent =
+            "Use";
+
+          button.disabled =
+            false;
+
+        }
+
+
+        return;
+
+      }
+
+
+      /*
+       * ---------------------------------------------------
+       * FREE AVATAR BUTTON
+       * ---------------------------------------------------
+       */
+
       const avatarId =
         button.dataset.avatarId;
 
 
       const active =
-        String(
-          avatarId
-        ) ===
-        String(
-          currentAvatarId
-        );
+        currentAvatarType ===
+        "free" &&
+        String(avatarId) ===
+        String(currentAvatarId);
 
 
       button.classList.toggle(
@@ -1964,7 +2230,6 @@ function createFrameCard(
     price.className =
       "U9-profile-page3-frame-price";
 
-
     const coins =
       Number(
         frame?.coins_price
@@ -2008,12 +2273,8 @@ function createFrameCard(
   const equipped =
     currentFrameType ===
       frameType &&
-    String(
-      currentFrameId
-    ) ===
-    String(
-      frame?.id
-    );
+    String(currentFrameId) ===
+      String(frame?.id);
 
 
   /* =======================================================
@@ -2042,7 +2303,6 @@ function createFrameCard(
 
       button.textContent =
         "Use";
-
 
       button.addEventListener(
         "click",
@@ -2334,7 +2594,6 @@ async function equipFrame(
           "U9-profile-page3-panel"
         );
 
-
       if (panel) {
 
         await renderFreeFrames(
@@ -2356,7 +2615,6 @@ async function equipFrame(
           "U9-profile-page3-panel"
         );
 
-
       if (panel) {
 
         await renderPaidFrames(
@@ -2366,6 +2624,7 @@ async function equipFrame(
       }
 
     }
+
 
   }
 
@@ -2383,6 +2642,7 @@ async function equipFrame(
     );
 
   }
+
 
   finally {
 
@@ -2425,12 +2685,8 @@ function updateFrameButtons() {
       const active =
         currentFrameType ===
           frameType &&
-        String(
-          currentFrameId
-        ) ===
-        String(
-          frameId
-        );
+        String(currentFrameId) ===
+          String(frameId);
 
 
       button.classList.toggle(
@@ -2702,6 +2958,7 @@ async function purchasePaidFrame(
 
     }
 
+
   }
 
   catch (error) {
@@ -2807,94 +3064,6 @@ async function loadProfilePage3() {
   }
 
 }
-
-
-/* =========================================================
-   AVATAR UPDATED EVENT
-========================================================= */
-
-window.addEventListener(
-  "U9ProfileAvatarUpdated",
-  async function () {
-
-    try {
-
-      if (
-        window.U9User &&
-        typeof window.U9User.refresh === "function"
-      ) {
-
-        await window.U9User.refresh();
-
-      }
-
-
-      loadCurrentEquipment();
-
-
-      updateCurrentProfileAvatarImage();
-
-    }
-
-    catch (error) {
-
-      console.error(
-        "PAGE3 AVATAR UPDATE EVENT ERROR:",
-        error
-      );
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   PUBLIC PAGE 3 API
-========================================================= */
-
-window.U9ProfilePage3 =
-  window.U9ProfilePage3 ||
-  {};
-
-
-window.U9ProfilePage3.refreshAvatar =
-  async function () {
-
-    try {
-
-      if (
-        window.U9User &&
-        typeof window.U9User.refresh === "function"
-      ) {
-
-        await window.U9User.refresh();
-
-      }
-
-
-      loadCurrentEquipment();
-
-
-      updateCurrentProfileAvatarImage();
-
-
-      return true;
-
-    }
-
-    catch (error) {
-
-      console.error(
-        "PAGE3 AVATAR REFRESH ERROR:",
-        error
-      );
-
-      return false;
-
-    }
-
-  };
 
 
 /* =========================================================
