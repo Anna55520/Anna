@@ -200,3 +200,77 @@ document.addEventListener(
 
   }
 );
+
+
+/* =========================
+   AUCTION PAGE UI
+========================= */
+
+function updateU9AuctionUI() {
+  const roundProgress =
+    document.getElementById("U9-round-progress");
+
+  const coinsElement =
+    document.getElementById("U9-coins");
+
+  if (!roundProgress || !coinsElement) {
+    return;
+  }
+
+  /* -------------------------
+     TARGET ORDERS
+  ------------------------- */
+
+  const targetOrders =
+    window.U9RoundSettings?.default_target_orders ?? 0;
+
+  /* -------------------------
+     COMPLETED ORDERS
+     暂时固定为 0
+  ------------------------- */
+
+  const completedOrders = 0;
+
+  roundProgress.textContent =
+    `${completedOrders}/${targetOrders}`;
+
+  /* -------------------------
+     COINS
+  ------------------------- */
+
+  const coins =
+    window.U9RoundUser?.coins ?? 0;
+
+  coinsElement.textContent =
+    Number(coins).toFixed(2);
+}
+
+
+/* =========================
+   UPDATE AFTER SETTINGS LOAD
+========================= */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  async () => {
+    const result =
+      await getU9RoundSettings();
+
+    if (!result) {
+      return;
+    }
+
+    window.U9RoundSettings =
+      result.settings;
+
+    window.U9RoundUser =
+      result.user;
+
+    updateU9AuctionUI();
+
+    console.log(
+      "[U9] Round settings ready:",
+      window.U9RoundSettings
+    );
+  }
+);
