@@ -1,158 +1,119 @@
-/* =================================================
-   AUCTION PAGE 2
-   U9 ORDER STATUS SYSTEM
-   FINAL VERSION
-   ONLY: u9-order-status
-   Part 1/2
-================================================= */
-
-
 (function(){
-
-
-
-
-
-/* =================================================
-   ELEMENTS
-================================================= */
-
 
 const auctionPage =
 document.getElementById(
  "U9-page-auction"
 );
 
-
-
-
-
 const orderRoundNumber =
 document.getElementById(
  "Order-U9-Round-Number"
 );
-
-
-
-
 
 const orderRoundProgress =
 document.getElementById(
  "Order-U9-Round-Progress"
 );
 
-
-
-
-
 const orderRoundStatus =
 document.getElementById(
  "Order-U9-Round-Status"
 );
-
-
-
-
 
 const orderStatusReady =
 document.getElementById(
  "Order-U9-Status-Ready"
 );
 
-
-
-
-
 const orderStatusMatching =
 document.getElementById(
  "Order-U9-Status-Matching"
 );
-
-
-
-
 
 const orderStatusPending =
 document.getElementById(
  "Order-U9-Status-Pending"
 );
 
-
-
-
-
 const orderStatusComplete =
 document.getElementById(
  "Order-U9-Status-Complete"
 );
-
-
-
-
 
 const orderStatusCooldown =
 document.getElementById(
  "Order-U9-Status-Cooldown"
 );
 
-
-
-
-
 const orderMatching =
 document.getElementById(
  "Order-U9-Matching"
 );
-
-
-
-
 
 const orderMatchingText =
 document.getElementById(
  "Order-U9-Matching-Text"
 );
 
-
-
-
-
-
-/* =================================================
-   API
-================================================= */
-
-
 const U9_ORDER_STATUS_API =
 "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/u9-order-status";
-
-
-
-
-
-
-
-
-/* =================================================
-   TIMER
-================================================= */
-
 
 let statusTimer =
 null;
 
+function startPolling(){
 
 
+if(
+ statusTimer
+){
+
+ clearInterval(
+  statusTimer
+ );
+
+}
+
+checkOrderStatus();
+
+statusTimer =
+setInterval(
+
+function(){
+
+checkOrderStatus();
 
 
+},
+
+3000
+
+);
 
 
+}
+
+function stopPolling(){
 
 
+if(
+ statusTimer
+){
 
-/* =================================================
-   GLOBAL STATE
-================================================= */
+clearInterval(
+ statusTimer
+ );
+
+
+statusTimer =
+null;
+
+
+}
+
+
+}
+
 
 
 window.U9Auction =
@@ -165,19 +126,6 @@ window.U9Auction || {
 };
 
 
-
-
-
-
-
-
-
-
-
-
-/* =================================================
-   ROUND UPDATE
-================================================= */
 
 
 function updateRound(
@@ -236,22 +184,7 @@ if(
 
 
 
-
-
-
-
-
-
-
-
-
-/* =================================================
-   HIDE STATUS
-================================================= */
-
-
 function hideAllStatus(){
-
 
 
 const list = [
@@ -710,8 +643,6 @@ data.order;
 
 
 
-
-
 if(
  data.round
 ){
@@ -724,17 +655,25 @@ if(
 
 
 
-
-
-
-
 applyStatus(
-
  data.order.status
-
 );
 
 
+
+}
+else{
+
+
+// 没有订单
+
+window.U9Auction.order =
+null;
+
+
+applyStatus(
+ "READY"
+);
 
 
 
@@ -926,12 +865,9 @@ console.log(
 
 
 
-
-
 /*
  页面刷新恢复
 */
-
 
 recoverOrderState();
 
@@ -939,14 +875,11 @@ recoverOrderState();
 
 
 
-
 /*
- 用户状态连接
+ 用户监听
 */
 
-
 connectUserListener();
-
 
 
 
@@ -956,10 +889,7 @@ connectUserListener();
  自动轮询
 */
 
-
 startPolling();
-
-
 
 
 
