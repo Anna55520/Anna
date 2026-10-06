@@ -1,111 +1,54 @@
-/* =================================================
-   AUCTION PAGE 2
-   U9 ORDER STATUS SYSTEM
-   FINAL VERSION
-   ONLY: u9-order-status
-================================================= */
-
-
 (function(){
-
-
-
-
-
-/* =================================================
-   ELEMENTS
-================================================= */
-
 
 const auctionPage =
 document.getElementById(
     "U9-page-auction"
 );
 
-
-
-
-
 const orderRoundNumber =
 document.getElementById(
     "Order-U9-Round-Number"
 );
-
-
-
-
 
 const orderRoundProgress =
 document.getElementById(
     "Order-U9-Round-Progress"
 );
 
-
-
-
-
 const orderRoundStatus =
 document.getElementById(
     "Order-U9-Round-Status"
 );
-
-
-
-
 
 const orderStatusReady =
 document.getElementById(
     "Order-U9-Status-Ready"
 );
 
-
-
-
-
 const orderStatusMatching =
 document.getElementById(
     "Order-U9-Status-Matching"
 );
-
-
-
-
 
 const orderStatusPending =
 document.getElementById(
     "Order-U9-Status-Pending"
 );
 
-
-
-
-
 const orderStatusComplete =
 document.getElementById(
     "Order-U9-Status-Complete"
 );
-
-
-
-
 
 const orderStatusCooldown =
 document.getElementById(
     "Order-U9-Status-Cooldown"
 );
 
-
-
-
-
 const orderMatching =
 document.getElementById(
     "Order-U9-Matching"
 );
-
-
-
-
 
 const orderMatchingText =
 document.getElementById(
@@ -113,93 +56,33 @@ document.getElementById(
 );
 
 
-
-
-
-
-
-
-/* =================================================
-   API
-================================================= */
-
-
 const U9_ORDER_STATUS_API =
 "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/u9-order-status";
 
 
+let statusTimer = null;
 
+let isPolling = false;
 
+let checkingStatus = false;
 
-
-
-
-/* =================================================
-   POLLING
-================================================= */
-
-
-let statusTimer =
-null;
-
-
-
-let isPolling =
-false;
-
-
-
-let checkingStatus =
-false;
-
-
-
-
-
-let initialized =
-false;
-
-
-
-
-
-
-
-
-/* =================================================
-   GLOBAL STATE
-================================================= */
+let initialized = false;
 
 
 window.U9Auction =
 window.U9Auction || {
 
-
     order:null,
 
-
     status:"READY"
-
 
 };
 
 
 
-
-
-
-
-
-
-/* =================================================
-   UPDATE ROUND
-================================================= */
-
-
 function updateRound(
     round
 ){
-
 
     if(
         !round
@@ -208,9 +91,6 @@ function updateRound(
         return;
 
     }
-
-
-
 
 
     if(
@@ -223,9 +103,6 @@ function updateRound(
     }
 
 
-
-
-
     if(
         orderRoundProgress
     ){
@@ -234,9 +111,6 @@ function updateRound(
         `${round.completed}/${round.target}`;
 
     }
-
-
-
 
 
     if(
@@ -248,94 +122,51 @@ function updateRound(
 
     }
 
-
-
 }
 
 
 
-
-
-
-
-
-
-/* =================================================
-   HIDE ALL STATUS
-================================================= */
-
-
 function hideAllStatus(){
-
-
 
     const list = [
 
-
         orderStatusReady,
-
 
         orderStatusMatching,
 
-
         orderStatusPending,
-
 
         orderStatusComplete,
 
-
         orderStatusCooldown
 
-
     ];
-
-
-
 
 
     list.forEach(
 
         item=>{
 
-
-            if(item){
-
+            if(
+                item
+            ){
 
                 item.style.display =
                 "none";
 
-
             }
-
 
         }
 
-
     );
-
-
 
 }
 
 
 
-
-
-
-
-
-
-/* =================================================
-   STATUS DISPLAY
-================================================= */
-
-
 function showReady(){
 
-
     hideAllStatus();
-
-
 
 
     if(
@@ -348,9 +179,6 @@ function showReady(){
     }
 
 
-
-
-
     if(
         orderStatusReady
     ){
@@ -360,25 +188,13 @@ function showReady(){
 
     }
 
-
-
 }
-
-
-
-
-
-
 
 
 
 function showMatching(){
 
-
     hideAllStatus();
-
-
-
 
 
     if(
@@ -391,10 +207,6 @@ function showMatching(){
     }
 
 
-
-
-
-
     if(
         orderMatching
     ){
@@ -403,10 +215,6 @@ function showMatching(){
         "block";
 
     }
-
-
-
-
 
 
     if(
@@ -418,25 +226,13 @@ function showMatching(){
 
     }
 
-
-
 }
-
-
-
-
-
-
 
 
 
 function showPending(){
 
-
     hideAllStatus();
-
-
-
 
 
     if(
@@ -447,9 +243,6 @@ function showPending(){
         "none";
 
     }
-
-
-
 
 
     if(
@@ -461,25 +254,13 @@ function showPending(){
 
     }
 
-
-
 }
-
-
-
-
-
-
 
 
 
 function showComplete(){
 
-
     hideAllStatus();
-
-
-
 
 
     if(
@@ -492,9 +273,6 @@ function showComplete(){
     }
 
 
-
-
-
     if(
         orderStatusComplete
     ){
@@ -504,25 +282,23 @@ function showComplete(){
 
     }
 
-
-
 }
-
-
-
-
-
-
 
 
 
 function showCooldown(){
 
-
     hideAllStatus();
 
 
+    if(
+        orderMatching
+    ){
 
+        orderMatching.style.display =
+        "none";
+
+    }
 
 
     if(
@@ -534,122 +310,63 @@ function showCooldown(){
 
     }
 
-
-
 }
 
-
-
-
-
-
-
-
-
-/* =================================================
-   APPLY STATUS
-================================================= */
 
 
 function applyStatus(
     status
 ){
 
-
-
     window.U9Auction.status =
     status;
-
-
-
 
 
     switch(
         status
     ){
 
-
-
         case "MATCHING":
-
 
             showMatching();
 
-
         break;
-
-
-
 
 
         case "PENDING":
 
-
             showPending();
 
-
         break;
-
-
-
 
 
         case "COMPLETE":
 
-
             showComplete();
 
-
         break;
-
-
-
 
 
         case "COOLDOWN":
 
-
             showCooldown();
 
-
         break;
-
-
-
 
 
         default:
 
-
             showReady();
-
 
         break;
 
-
-
     }
-
-
 
 }
 
 
 
-
-
-
-
-
-
-/* =================================================
-   CHECK ORDER STATUS
-================================================= */
-
-
 async function checkOrderStatus(){
-
-
 
     if(
         checkingStatus
@@ -660,27 +377,16 @@ async function checkOrderStatus(){
     }
 
 
-
-
-
     checkingStatus =
     true;
 
 
-
-
-
     try{
-
-
 
         const token =
         localStorage.getItem(
             "u9_token"
         );
-
-
-
 
 
         if(
@@ -692,10 +398,6 @@ async function checkOrderStatus(){
         }
 
 
-
-
-
-
         const response =
         await fetch(
 
@@ -703,51 +405,32 @@ async function checkOrderStatus(){
 
             {
 
-
                 method:
                 "GET",
-
 
                 cache:
                 "no-store",
 
-
                 headers:{
-
 
                     "Authorization":
                     `Bearer ${token}`
 
-
                 }
-
 
             }
 
         );
 
 
-
-
-
-
         const data =
         await response.json();
-
-
-
-
 
 
         console.log(
             "ORDER STATUS RESULT:",
             data
         );
-
-
-
-
-
 
 
         if(
@@ -759,21 +442,12 @@ async function checkOrderStatus(){
         }
 
 
-
-
-
-
         if(
             data.order
         ){
 
-
-
             window.U9Auction.order =
             data.order;
-
-
-
 
 
             if(
@@ -787,75 +461,44 @@ async function checkOrderStatus(){
             }
 
 
-
-
-
-
             applyStatus(
                 data.order.status
             );
 
 
-
         }
         else{
 
-
-
             window.U9Auction.order =
             null;
-
 
 
             applyStatus(
                 "READY"
             );
 
-
-
         }
-
-
-
-
 
 
     }
     catch(error){
-
-
 
         console.error(
             "checkOrderStatus:",
             error
         );
 
-
-
     }
     finally{
-
-
 
         checkingStatus =
         false;
 
-
     }
-
-
 
 }
 
-
-/* =================================================
-   POLLING CONTROL
-================================================= */
-
-
 function startPolling(){
-
-
 
     if(
         isPolling
@@ -866,24 +509,25 @@ function startPolling(){
     }
 
 
+    if(
+        statusTimer
+    ){
 
+        clearInterval(
+            statusTimer
+        );
 
+        statusTimer =
+        null;
+
+    }
 
 
     isPolling =
     true;
 
 
-
-
-
-
     checkOrderStatus();
-
-
-
-
-
 
 
     statusTimer =
@@ -891,9 +535,7 @@ function startPolling(){
 
         function(){
 
-
             checkOrderStatus();
-
 
         },
 
@@ -901,28 +543,14 @@ function startPolling(){
 
     );
 
-
-
 }
-
-
-
-
-
-
 
 
 
 function stopPolling(){
 
-
-
     isPolling =
     false;
-
-
-
-
 
 
     if(
@@ -934,50 +562,21 @@ function stopPolling(){
         );
 
 
-
         statusTimer =
         null;
 
-
     }
-
-
 
 }
 
-
-
-
-
-
-
-
-
-/* =================================================
-   PAGE RECOVERY
-================================================= */
 
 
 function recoverOrderState(){
 
-
     checkOrderStatus();
-
-
 
 }
 
-
-
-
-
-
-
-
-
-/* =================================================
-   PAGE VISIBILITY
-================================================= */
 
 
 document.addEventListener(
@@ -986,18 +585,12 @@ document.addEventListener(
 
     function(){
 
-
-
         if(
             document.visibilityState ===
             "visible"
         ){
 
-
             checkOrderStatus();
-
-
-
 
 
             if(
@@ -1008,19 +601,12 @@ document.addEventListener(
 
             }
 
-
-
         }
         else{
 
-
             stopPolling();
 
-
-
         }
-
-
 
     }
 
@@ -1028,28 +614,12 @@ document.addEventListener(
 
 
 
-
-
-
-
-
-
-/* =================================================
-   USER LISTENER
-================================================= */
-
-
 function connectUserListener(){
-
-
 
     if(
         window.U9User &&
         U9User.subscribe
     ){
-
-
-
 
 
         U9User.subscribe(
@@ -1060,14 +630,10 @@ function connectUserListener(){
             ){
 
 
-
-
-
                 if(
                     state ===
                     "AUTHENTICATED"
                 ){
-
 
 
                     console.log(
@@ -1076,13 +642,7 @@ function connectUserListener(){
                     );
 
 
-
-
-
                     checkOrderStatus();
-
-
-
 
 
                     if(
@@ -1093,14 +653,7 @@ function connectUserListener(){
 
                     }
 
-
-
                 }
-
-
-
-
-
 
 
 
@@ -1110,60 +663,31 @@ function connectUserListener(){
                 ){
 
 
-
                     stopPolling();
-
-
-
 
 
                     window.U9Auction.order =
                     null;
 
 
-
-
-
                     applyStatus(
                         "READY"
                     );
 
-
-
                 }
-
-
 
 
             }
 
-
         );
 
-
-
-
     }
-
-
 
 }
 
 
 
-
-
-
-
-
-
-/* =================================================
-   INITIALIZE
-================================================= */
-
-
 function initializeAuctionStatus(){
-
 
 
     if(
@@ -1175,15 +699,8 @@ function initializeAuctionStatus(){
     }
 
 
-
-
-
     initialized =
     true;
-
-
-
-
 
 
     console.log(
@@ -1191,81 +708,40 @@ function initializeAuctionStatus(){
     );
 
 
-
-
-
-
-
-    /*
-       Refresh recovery
-    */
-
-
     recoverOrderState();
-
-
-
-
-
-
-
-
-    /*
-       User connection
-    */
 
 
     connectUserListener();
 
 
-
-
-
-
-
-
-    /*
-       Start polling
-    */
-
-
     startPolling();
-
 
 
 }
 
 
-/* =================================================
-   PUBLIC API
-================================================= */
-
 
 window.U9AuctionStatus = {
-
 
 
     check:
     checkOrderStatus,
 
 
-
     start:
     startPolling,
-
 
 
     stop:
     stopPolling
 
 
-
 };
 
-/* =================================================
-   START
-================================================= */
+
 
 initializeAuctionStatus();
+
+
 
 })();
