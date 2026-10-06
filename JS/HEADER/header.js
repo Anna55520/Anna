@@ -1,4 +1,3 @@
-
 /* =========================
    HEADER ELEMENTS
 ========================= */
@@ -25,6 +24,12 @@ const headerUser =
 const headerUsername =
   document.getElementById(
     "U9-page-header-username"
+  );
+
+
+const headerLoading =
+  document.getElementById(
+    "U9-page-header-loading"
   );
 
 
@@ -131,6 +136,61 @@ function formatUsername(
 
 
 /* =========================
+   SHOW HEADER LOADING
+========================= */
+
+
+function showHeaderLoading(){
+
+
+  if(headerLoading){
+
+    headerLoading.style.display =
+    "flex";
+
+  }
+
+
+  if(headerRegister){
+
+    headerRegister.style.display =
+    "none";
+
+  }
+
+
+  if(headerLogin){
+
+    headerLogin.style.display =
+    "none";
+
+  }
+
+
+  if(headerUser){
+
+    headerUser.classList.remove(
+      "active"
+    );
+
+  }
+
+
+  if(headerUsername){
+
+    headerUsername.textContent =
+    "";
+
+  }
+
+
+}
+
+
+
+
+
+/* =========================
    UPDATE HEADER
 ========================= */
 
@@ -141,6 +201,19 @@ function updateHeaderUser(
 
 
   if(user){
+
+
+    /* =========================
+       AUTHENTICATED
+    ========================= */
+
+
+    if(headerLoading){
+
+      headerLoading.style.display =
+      "none";
+
+    }
 
 
     if(headerRegister){
@@ -159,7 +232,6 @@ function updateHeaderUser(
     }
 
 
-
     if(headerUser){
 
       headerUser.classList.add(
@@ -167,7 +239,6 @@ function updateHeaderUser(
       );
 
     }
-
 
 
     if(headerUsername){
@@ -188,6 +259,19 @@ function updateHeaderUser(
   else{
 
 
+    /* =========================
+       UNAUTHENTICATED
+    ========================= */
+
+
+    if(headerLoading){
+
+      headerLoading.style.display =
+      "none";
+
+    }
+
+
     if(headerRegister){
 
       headerRegister.style.display =
@@ -204,7 +288,6 @@ function updateHeaderUser(
     }
 
 
-
     if(headerUser){
 
       headerUser.classList.remove(
@@ -212,7 +295,6 @@ function updateHeaderUser(
       );
 
     }
-
 
 
     if(headerUsername){
@@ -259,6 +341,11 @@ function setUserState(
 
 
 
+  /* =========================
+     AUTHENTICATED
+  ========================= */
+
+
   if(
     state ===
     "AUTHENTICATED"
@@ -270,11 +357,58 @@ function setUserState(
 
   }
 
-  else{
+
+  /* =========================
+     UNAUTHENTICATED
+  ========================= */
+
+
+  else if(
+    state ===
+    "UNAUTHENTICATED"
+  ){
 
     updateHeaderUser(
       null
     );
+
+  }
+
+
+  /* =========================
+     CHECKING
+  ========================= */
+
+
+  else if(
+    state ===
+    "CHECKING"
+  ){
+
+    showHeaderLoading();
+
+  }
+
+
+  /* =========================
+     ERROR
+  ========================= */
+
+
+  else if(
+    state ===
+    "ERROR"
+  ){
+
+    /*
+       网络错误 / API 错误
+
+       不显示 Register / Login
+
+       保持 Loading
+    */
+
+    showHeaderLoading();
 
   }
 
