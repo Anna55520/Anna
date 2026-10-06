@@ -369,10 +369,6 @@ function openProfilePictureModal() {
   }
 
 
-  /*
-     Move focus into the modal.
-  */
-
   setTimeout(
     function () {
 
@@ -484,16 +480,15 @@ function selectProfilePictureFile() {
 
 
   if (
-    profilePictureFile
+    profilePictureModalFile
   ) {
 
     profilePictureModalFile.value =
       "";
 
+    profilePictureModalFile.click();
+
   }
-
-
-  profilePictureModalFile.click();
 
 }
 
@@ -539,7 +534,9 @@ function handleProfilePictureFileChange(
   }
 
 
-  loadProfilePictureFile(file);
+  loadProfilePictureFile(
+    file
+  );
 
 }
 
@@ -580,33 +577,128 @@ function loadProfilePictureFile(
     new Image();
 
 
-  image.onload = function () {
+  image.onload =
+    function () {
 
-    profilePictureNaturalWidth =
-      image.naturalWidth;
-
-
-    profilePictureNaturalHeight =
-      image.naturalHeight;
+      profilePictureNaturalWidth =
+        image.naturalWidth;
 
 
-    profilePictureImageLoaded();
-
-  };
-
-
-  image.onerror = function () {
-
-    showProfilePictureMessage(
-      "Unable to load this image.",
-      "error"
-    );
+      profilePictureNaturalHeight =
+        image.naturalHeight;
 
 
-    profilePictureFile =
-      null;
+      /*
+         IMPORTANT
 
-  };
+         The editor is hidden when the file is selected.
+
+         Therefore we must show the editor FIRST,
+         wait for the browser to calculate its layout,
+         and ONLY THEN calculate the image scale.
+      */
+
+      if (
+        profilePictureModalSelect
+      ) {
+
+        profilePictureModalSelect.hidden =
+          true;
+
+      }
+
+
+      if (
+        profilePictureModalEditor
+      ) {
+
+        profilePictureModalEditor.hidden =
+          false;
+
+      }
+
+
+      /*
+         Clear old transform before rendering
+         the new image.
+      */
+
+      profilePictureX =
+        0;
+
+
+      profilePictureY =
+        0;
+
+
+      profilePictureZoom =
+        U9_PROFILE_PICTURE_MIN_ZOOM;
+
+
+      if (
+        profilePictureModalZoomRange
+      ) {
+
+        profilePictureModalZoomRange.value =
+          String(
+            profilePictureZoom
+          );
+
+      }
+
+
+      /*
+         Put the image into the editor.
+
+         We wait one animation frame so the browser
+         has already displayed the editor and calculated
+         the crop area's real width and height.
+      */
+
+      requestAnimationFrame(
+        function () {
+
+          requestAnimationFrame(
+            function () {
+
+              profilePictureImageLoaded();
+
+            }
+          );
+
+        }
+      );
+
+    };
+
+
+  image.onerror =
+    function () {
+
+      showProfilePictureMessage(
+        "Unable to load this image.",
+        "error"
+      );
+
+
+      profilePictureFile =
+        null;
+
+
+      if (
+        profilePictureObjectURL
+      ) {
+
+        URL.revokeObjectURL(
+          profilePictureObjectURL
+        );
+
+        profilePictureObjectURL =
+          null;
+
+      }
+
+    };
 
 
   image.src =
@@ -622,7 +714,8 @@ function loadProfilePictureFile(
 function profilePictureImageLoaded() {
 
   if (
-    !profilePictureModalImage
+    !profilePictureModalImage ||
+    !profilePictureObjectURL
   ) {
 
     return;
@@ -630,66 +723,134 @@ function profilePictureImageLoaded() {
   }
 
 
+  /*
+     Set the actual image source.
+  */
+
   profilePictureModalImage.src =
     profilePictureObjectURL;
 
 
-  profilePictureZoom =
-    U9_PROFILE_PICTURE_MIN_ZOOM;
-
-
   /*
-     IMPORTANT:
-     Use the actual declared variable name.
+     Make sure the image itself is loaded
+     before calculating its final position.
   */
 
   if (
-    profilePictureModalZoomRange
+    profilePictureModalImage.complete &&
+    profilePictureModalImage.naturalWidth > 0
   ) {
 
-    profilePictureModalZoomRange.value =
-      String(profilePictureZoom);
+    finishProfilePictureImageSetup();
+
+    return;
 
   }
 
 
-  profilePictureCalculateBaseScale();
+  profilePictureModalImage.onload =
+    function () {
+
+      finishProfilePictureImageSetup();
+
+    };
 
 
-  profilePictureX =
-    0;
+  profilePictureModalImage.onerror =
+    function () {
+
+      showProfilePictureMessage(
+        "Unable to display this image.",
+        "error"
+      );
+
+    };
+
+}
 
 
-  profilePictureY =
-    0;
+/* =========================================================
+   FINISH IMAGE SETUP
+========================================================= */
+
+function finishProfilePictureImageSetup() {
+
+  /*
+     Wait one more frame.
+
+     This is especially important on mobile
+     because the modal may still be finishing
+     its layout.
+  */
+
+  requestAnimationFrame(
+    function () {
+
+      if (
+        !profilePictureModalCropArea
+      ) {
+
+        return;
+
+      }
 
 
-  limitProfilePicturePosition();
+      /*
+         Make sure the crop area has a real size.
+      */
 
-  updateProfilePictureTransform();
-
-
-  if (
-    profilePictureModalSelect
-  ) {
-
-    profilePictureModalSelect.hidden =
-      true;
-
-  }
+      const cropWidth =
+        profilePictureModalCropArea.clientWidth;
 
 
-  if (
-    profilePictureModalEditor
-  ) {
-
-    profilePictureModalEditor.hidden =
-      false;
-
-  }
+      const cropHeight =
+        profilePictureModalCropArea.clientHeight;
 
 
-  showProfilePictureMessage("");
+      if (
+        cropWidth <= 0 ||
+        cropHeight <= 0
+      ) {
+
+        /*
+           If the browser still has not finished
+           calculating the layout, try again.
+        */
+
+        setTimeout(
+          function () {
+
+            finishProfilePictureImageSetup();
+
+          },
+          30
+        );
+
+        return;
+
+      }
+
+
+      profilePictureCalculateBaseScale();
+
+
+      profilePictureX =
+        0;
+
+
+      profilePictureY =
+        0;
+
+
+      limitProfilePicturePosition();
+
+      updateProfilePictureTransform();
+
+
+      showProfilePictureMessage("");
+
+    }
+  );
 
 }
 
@@ -719,6 +880,16 @@ function profilePictureCalculateBaseScale() {
     profilePictureModalCropArea.clientHeight;
 
 
+  if (
+    cropWidth <= 0 ||
+    cropHeight <= 0
+  ) {
+
+    return;
+
+  }
+
+
   const scaleX =
     cropWidth /
     profilePictureNaturalWidth;
@@ -731,6 +902,9 @@ function profilePictureCalculateBaseScale() {
 
   /*
      Cover the complete crop area.
+
+     This guarantees that there is never
+     an empty black area inside the crop frame.
   */
 
   profilePictureBaseScale =
@@ -763,7 +937,9 @@ function getProfilePictureScale() {
 function updateProfilePictureTransform() {
 
   if (
-    !profilePictureModalImage
+    !profilePictureModalImage ||
+    !profilePictureNaturalWidth ||
+    !profilePictureNaturalHeight
   ) {
 
     return;
@@ -785,6 +961,11 @@ function updateProfilePictureTransform() {
     scale;
 
 
+  /*
+     The image is positioned relative
+     to the center of the crop area.
+  */
+
   profilePictureModalImage.style.width =
     `${imageWidth}px`;
 
@@ -799,6 +980,10 @@ function updateProfilePictureTransform() {
 
   profilePictureModalImage.style.top =
     `calc(50% + ${profilePictureY}px)`;
+
+
+  profilePictureModalImage.style.transform =
+    "translate(-50%, -50%)";
 
 }
 
@@ -828,6 +1013,16 @@ function limitProfilePicturePosition() {
     profilePictureModalCropArea.clientHeight;
 
 
+  if (
+    cropWidth <= 0 ||
+    cropHeight <= 0
+  ) {
+
+    return;
+
+  }
+
+
   const scale =
     getProfilePictureScale();
 
@@ -845,14 +1040,20 @@ function limitProfilePicturePosition() {
   const maxX =
     Math.max(
       0,
-      (imageWidth - cropWidth) / 2
+      (
+        imageWidth -
+        cropWidth
+      ) / 2
     );
 
 
   const maxY =
     Math.max(
       0,
-      (imageHeight - cropHeight) / 2
+      (
+        imageHeight -
+        cropHeight
+      ) / 2
     );
 
 
@@ -900,18 +1101,14 @@ function setProfilePictureZoom(
     );
 
 
-  /*
-     IMPORTANT:
-     Use profilePictureModalZoomRange,
-     not profilePictureZoomRange.
-  */
-
   if (
     profilePictureModalZoomRange
   ) {
 
     profilePictureModalZoomRange.value =
-      String(profilePictureZoom);
+      String(
+        profilePictureZoom
+      );
 
   }
 
@@ -985,7 +1182,27 @@ function resetProfilePictureEditor() {
     profilePictureModalImage
   ) {
 
+    profilePictureModalImage.onload =
+      null;
+
+
+    profilePictureModalImage.onerror =
+      null;
+
+
     profilePictureModalImage.src =
+      "";
+
+    profilePictureModalImage.style.width =
+      "";
+
+    profilePictureModalImage.style.height =
+      "";
+
+    profilePictureModalImage.style.left =
+      "";
+
+    profilePictureModalImage.style.top =
       "";
 
   }
@@ -1017,6 +1234,17 @@ function resetProfilePictureEditor() {
 
     profilePictureModalEditor.hidden =
       true;
+
+  }
+
+
+  if (
+    profilePictureModalImageContainer
+  ) {
+
+    profilePictureModalImageContainer.classList.remove(
+      "U9-dragging"
+    );
 
   }
 
@@ -1088,6 +1316,7 @@ function startProfilePictureDrag(
 
   if (
     event.pointerId !== undefined &&
+    profilePictureModalCropArea &&
     profilePictureModalCropArea.setPointerCapture
   ) {
 
@@ -1188,6 +1417,7 @@ function endProfilePictureDrag(
   if (
     event &&
     event.pointerId !== undefined &&
+    profilePictureModalCropArea &&
     profilePictureModalCropArea.releasePointerCapture
   ) {
 
@@ -1338,6 +1568,21 @@ function createCroppedProfilePicture() {
         );
 
 
+      if (
+        cropSize <= 0
+      ) {
+
+        reject(
+          new Error(
+            "Crop area is not ready."
+          )
+        );
+
+        return;
+
+      }
+
+
       const image =
         new Image();
 
@@ -1393,9 +1638,8 @@ function createCroppedProfilePicture() {
 
 
           /*
-             The image is centered inside
-             the crop area and then moved by
-             profilePictureX / profilePictureY.
+             Calculate the actual image position
+             inside the crop area.
           */
 
           const imageLeft =
@@ -1415,7 +1659,7 @@ function createCroppedProfilePicture() {
 
 
           /*
-             Convert crop coordinates back
+             Convert crop coordinates
              into original image coordinates.
           */
 
@@ -1433,41 +1677,49 @@ function createCroppedProfilePicture() {
             ) / scale;
 
 
-          const sourceRight =
-            Math.min(
-              imageWidth,
-              cropSize -
+          const visibleLeft =
+            Math.max(
+              0,
               imageLeft
             );
 
 
-          const sourceBottom =
-            Math.min(
-              imageHeight,
-              cropSize -
+          const visibleTop =
+            Math.max(
+              0,
               imageTop
+            );
+
+
+          const visibleRight =
+            Math.min(
+              cropSize,
+              imageLeft +
+              imageWidth
+            );
+
+
+          const visibleBottom =
+            Math.min(
+              cropSize,
+              imageTop +
+              imageHeight
             );
 
 
           const visibleWidth =
             Math.max(
               0,
-              sourceRight -
-              Math.max(
-                0,
-                -imageLeft
-              )
+              visibleRight -
+              visibleLeft
             );
 
 
           const visibleHeight =
             Math.max(
               0,
-              sourceBottom -
-              Math.max(
-                0,
-                -imageTop
-              )
+              visibleBottom -
+              visibleTop
             );
 
 
@@ -1482,25 +1734,11 @@ function createCroppedProfilePicture() {
 
 
           const destinationX =
-            Math.max(
-              0,
-              imageLeft
-            );
+            visibleLeft;
 
 
           const destinationY =
-            Math.max(
-              0,
-              imageTop
-            );
-
-
-          const destinationWidth =
-            visibleWidth;
-
-
-          const destinationHeight =
-            visibleHeight;
+            visibleTop;
 
 
           const outputScale =
@@ -1509,7 +1747,7 @@ function createCroppedProfilePicture() {
 
 
           /*
-             Draw the exact visible crop.
+             Draw the exact crop.
           */
 
           context.clearRect(
@@ -1538,21 +1776,18 @@ function createCroppedProfilePicture() {
             destinationY *
               outputScale,
 
-            destinationWidth *
+            visibleWidth *
               outputScale,
 
-            destinationHeight *
+            visibleHeight *
               outputScale
 
           );
 
 
           /*
-             Convert the cropped result
-             into WebP.
-
-             The upload API currently expects
-             the avatar as an image upload.
+             The upload API currently receives
+             the cropped avatar as WebP.
           */
 
           canvas.toBlob(
@@ -1994,10 +2229,18 @@ if (
       ) {
 
         profilePictureModalZoomRange.value =
-          String(profilePictureZoom);
+          String(
+            profilePictureZoom
+          );
 
       }
 
+
+      /*
+         Recalculate the base scale
+         using the current crop area's
+         real dimensions.
+      */
 
       profilePictureCalculateBaseScale();
 
@@ -2130,6 +2373,11 @@ if (
     "pointerleave",
     function (event) {
 
+      /*
+         Keep the drag active even when
+         the pointer briefly leaves the area.
+      */
+
       if (
         profilePictureDragging
       ) {
@@ -2216,11 +2464,22 @@ window.addEventListener(
     }
 
 
-    profilePictureCalculateBaseScale();
+    /*
+       Wait for the new mobile/desktop layout
+       to finish before recalculating.
+    */
 
-    limitProfilePicturePosition();
+    requestAnimationFrame(
+      function () {
 
-    updateProfilePictureTransform();
+        profilePictureCalculateBaseScale();
+
+        limitProfilePicturePosition();
+
+        updateProfilePictureTransform();
+
+      }
+    );
 
   }
 );
