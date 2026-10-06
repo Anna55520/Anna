@@ -329,9 +329,15 @@
 
   position: relative;
 
-  width: 100%;
+  width: 320px;
 
-  aspect-ratio: 1 / 1;
+  height: 320px;
+
+  max-width: 100%;
+
+  max-height: 100%;
+
+  margin: 0 auto;
 
   overflow: hidden;
 
@@ -343,8 +349,14 @@
 
   user-select: none;
 
+  box-sizing: border-box;
+
 }
 
+
+/* =========================================================
+   IMAGE CONTAINER
+========================================================= */
 
 #U9-profile-picture-modal-image-container {
 
@@ -377,6 +389,10 @@
 }
 
 
+/* =========================================================
+   IMAGE
+========================================================= */
+
 #U9-profile-picture-modal-image {
 
   position: absolute;
@@ -401,6 +417,8 @@
   pointer-events: none;
 
   user-select: none;
+
+  -webkit-user-drag: none;
 
 }
 
@@ -441,7 +459,11 @@
 
   gap: 10px;
 
-  margin-top: 18px;
+  width: 320px;
+
+  max-width: 100%;
+
+  margin: 18px auto 0;
 
 }
 
@@ -488,6 +510,8 @@
 
   width: 100%;
 
+  min-width: 0;
+
   cursor: pointer;
 
 }
@@ -503,7 +527,11 @@
 
   gap: 10px;
 
-  margin-top: 18px;
+  width: 320px;
+
+  max-width: 100%;
+
+  margin: 18px auto 0;
 
 }
 
@@ -511,6 +539,8 @@
 #U9-profile-picture-modal-editor-actions button {
 
   flex: 1;
+
+  min-width: 0;
 
   min-height: 42px;
 
@@ -692,18 +722,210 @@
   }
 
 
+  /* =======================================================
+     MOBILE CROP AREA
+  ======================================================= */
+
+  #U9-profile-picture-modal-crop-area {
+
+    width: 280px;
+
+    height: 280px;
+
+    max-width: 100%;
+
+    max-height: none;
+
+    border-radius: 10px;
+
+  }
+
+
+  /* =======================================================
+     MOBILE ZOOM
+  ======================================================= */
+
+  #U9-profile-picture-modal-zoom {
+
+    width: 280px;
+
+    max-width: 100%;
+
+    margin-top: 14px;
+
+  }
+
+
+  #U9-profile-picture-modal-zoom-out,
+  #U9-profile-picture-modal-zoom-in {
+
+    flex: 0 0 34px;
+
+    width: 34px;
+
+    height: 34px;
+
+    font-size: 20px;
+
+  }
+
+
+  /* =======================================================
+     MOBILE ACTIONS
+  ======================================================= */
+
   #U9-profile-picture-modal-editor-actions {
 
+    width: 280px;
+
+    max-width: 100%;
+
     gap: 7px;
+
+    margin-top: 14px;
 
   }
 
 
   #U9-profile-picture-modal-editor-actions button {
 
+    min-height: 40px;
+
     padding: 0 8px;
 
     font-size: 13px;
+
+  }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 400px) {
+
+  #U9-profile-picture-modal-content {
+
+    width: 94vw;
+
+    max-height: 94vh;
+
+  }
+
+
+  #U9-profile-picture-modal-body {
+
+    padding: 14px;
+
+  }
+
+
+  #U9-profile-picture-modal-crop-area {
+
+    width: 250px;
+
+    height: 250px;
+
+    max-width: 100%;
+
+  }
+
+
+  #U9-profile-picture-modal-zoom {
+
+    width: 250px;
+
+    max-width: 100%;
+
+  }
+
+
+  #U9-profile-picture-modal-editor-actions {
+
+    width: 250px;
+
+    max-width: 100%;
+
+  }
+
+
+  #U9-profile-picture-modal-editor-actions button {
+
+    font-size: 12px;
+
+    padding: 0 6px;
+
+  }
+
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 340px) {
+
+  #U9-profile-picture-modal-content {
+
+    width: 96vw;
+
+    max-height: 95vh;
+
+    border-radius: 12px;
+
+  }
+
+
+  #U9-profile-picture-modal-body {
+
+    padding: 12px;
+
+  }
+
+
+  #U9-profile-picture-modal-crop-area {
+
+    width: 220px;
+
+    height: 220px;
+
+    max-width: 100%;
+
+  }
+
+
+  #U9-profile-picture-modal-zoom {
+
+    width: 220px;
+
+    max-width: 100%;
+
+    gap: 7px;
+
+  }
+
+
+  #U9-profile-picture-modal-editor-actions {
+
+    width: 220px;
+
+    max-width: 100%;
+
+    gap: 5px;
+
+  }
+
+
+  #U9-profile-picture-modal-editor-actions button {
+
+    min-height: 38px;
+
+    padding: 0 4px;
+
+    font-size: 11px;
 
   }
 
