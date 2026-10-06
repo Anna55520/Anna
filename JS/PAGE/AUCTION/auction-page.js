@@ -828,9 +828,6 @@
                u9_session Cookie fallback。
             */
 
-            credentials:
-              "include"
-
           }
 
         );
