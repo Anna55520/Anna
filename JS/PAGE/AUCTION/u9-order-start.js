@@ -369,6 +369,21 @@ error
 ========================================================= */
 
 
+/* =========================================================
+   FIND ACTIVE ORDER
+
+   Used after refresh
+
+   IMPORTANT:
+   DO NOT call u9-order-start here.
+
+   u9-order-start = CREATE ORDER
+
+   u9-round-status = QUERY STATUS
+
+========================================================= */
+
+
 async function findActiveOrder(){
 
 
@@ -390,10 +405,12 @@ try{
 
 const response =
 await fetch(
-U9_ORDER_START_URL,
+
+U9_ROUND_STATUS_URL,
+
 {
 
-method:"POST",
+method:"GET",
 
 headers:{
 
@@ -406,7 +423,10 @@ headers:{
 },
 
 credentials:
-"include"
+"include",
+
+cache:
+"no-store"
 
 }
 
@@ -419,9 +439,19 @@ await response.json();
 
 
 
+console.log(
+"[U9] Active Order Check:",
+result
+);
+
+
+
 if(
-result &&
-result.error==="ORDER_ALREADY_ACTIVE"
+
+result.success &&
+
+result.order
+
 ){
 
 return result.order;
@@ -436,6 +466,15 @@ return null;
 
 }
 catch(error){
+
+
+console.error(
+
+"[U9] Find active order error:",
+
+error
+
+);
 
 
 return null;
