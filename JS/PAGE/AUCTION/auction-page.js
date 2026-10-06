@@ -6,6 +6,7 @@
 (function () {
 
 
+
   /* =========================
      ELEMENTS
   ========================= */
@@ -16,10 +17,12 @@
     );
 
 
+
   const shopPage =
     document.getElementById(
       "U9-page-shop"
     );
+
 
 
   const auctionPage =
@@ -28,16 +31,19 @@
     );
 
 
+
   const test1Page =
     document.getElementById(
       "U9-page-test1"
     );
 
 
+
   const test2Page =
     document.getElementById(
       "U9-page-test2"
     );
+
 
 
   /* =========================
@@ -50,10 +56,12 @@
     );
 
 
+
   const orderRoundProgress =
     document.getElementById(
       "Order-U9-Round-Progress"
     );
+
 
 
   const orderRoundStatus =
@@ -62,10 +70,12 @@
     );
 
 
+
   const orderCoinsValue =
     document.getElementById(
       "Order-U9-Coins-Value"
     );
+
 
 
   const orderStartButton =
@@ -74,10 +84,12 @@
     );
 
 
+
   const orderStatusReady =
     document.getElementById(
       "Order-U9-Status-Ready"
     );
+
 
 
   const orderStatusMatching =
@@ -86,10 +98,12 @@
     );
 
 
+
   const orderStatusPending =
     document.getElementById(
       "Order-U9-Status-Pending"
     );
+
 
 
   const orderStatusComplete =
@@ -98,10 +112,12 @@
     );
 
 
+
   const orderStatusCooldown =
     document.getElementById(
       "Order-U9-Status-Cooldown"
     );
+
 
 
   const orderMatching =
@@ -110,10 +126,12 @@
     );
 
 
+
   const orderMatchingText =
     document.getElementById(
       "Order-U9-Matching-Text"
     );
+
 
 
   const orderMatchingTime =
@@ -122,18 +140,25 @@
     );
 
 
+
   const orderError =
     document.getElementById(
       "Order-U9-Error"
     );
 
 
+
   /* =========================
      API
   ========================= */
 
+  const U9_ME_API =
+    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me";
+
+
   const U9_ORDER_START_API =
     "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/u9-order-start";
+
 
 
   /* =========================
@@ -141,6 +166,7 @@
   ========================= */
 
   function hideOrderStatus() {
+
 
 
     if (
@@ -153,6 +179,7 @@
     }
 
 
+
     if (
       orderStatusMatching
     ) {
@@ -161,6 +188,7 @@
         "none";
 
     }
+
 
 
     if (
@@ -173,6 +201,7 @@
     }
 
 
+
     if (
       orderStatusComplete
     ) {
@@ -181,6 +210,7 @@
         "none";
 
     }
+
 
 
     if (
@@ -193,7 +223,9 @@
     }
 
 
+
   }
+
 
 
   /* =========================
@@ -203,7 +235,9 @@
   function showReadyStatus() {
 
 
+
     hideOrderStatus();
+
 
 
     if (
@@ -216,7 +250,9 @@
     }
 
 
+
   }
+
 
 
   /* =========================
@@ -226,7 +262,9 @@
   function showMatchingStatus() {
 
 
+
     hideOrderStatus();
+
 
 
     if (
@@ -239,6 +277,7 @@
     }
 
 
+
     if (
       orderMatching
     ) {
@@ -249,7 +288,9 @@
     }
 
 
+
   }
+
 
 
   /* =========================
@@ -257,6 +298,7 @@
   ========================= */
 
   function hideMatching() {
+
 
 
     if (
@@ -269,7 +311,9 @@
     }
 
 
+
   }
+
 
 
   /* =========================
@@ -277,6 +321,7 @@
   ========================= */
 
   function clearOrderError() {
+
 
 
     if (
@@ -289,7 +334,9 @@
     }
 
 
+
   }
+
 
 
   /* =========================
@@ -299,6 +346,7 @@
   function showOrderError(
     message
   ) {
+
 
 
     if (
@@ -311,7 +359,9 @@
     }
 
 
+
   }
+
 
 
   /* =========================
@@ -321,10 +371,12 @@
   function getSessionToken() {
 
 
+
     const token =
       localStorage.getItem(
         "u9_token"
       );
+
 
 
     if (
@@ -336,9 +388,11 @@
     }
 
 
+
     return token;
 
   }
+
 
 
   /* =========================
@@ -350,6 +404,7 @@
   ) {
 
 
+
     if (
       !orderCoinsValue
     ) {
@@ -359,10 +414,12 @@
     }
 
 
+
     const numericCoins =
       Number(
         coins
       );
+
 
 
     if (
@@ -372,11 +429,12 @@
     ) {
 
       orderCoinsValue.textContent =
-        "0";
+        "0.00";
 
       return;
 
     }
+
 
 
     orderCoinsValue.textContent =
@@ -385,6 +443,7 @@
       );
 
   }
+
 
 
   /* =========================
@@ -396,6 +455,7 @@
   ) {
 
 
+
     if (
       !round
     ) {
@@ -403,6 +463,7 @@
       return;
 
     }
+
 
 
     if (
@@ -415,6 +476,7 @@
     }
 
 
+
     if (
       orderRoundProgress
     ) {
@@ -423,6 +485,7 @@
         `${round.completed} / ${round.target}`;
 
     }
+
 
 
     if (
@@ -435,7 +498,234 @@
     }
 
 
+
   }
+
+
+
+  /* =========================
+     LOAD CURRENT USER
+  ========================= */
+
+  async function loadCurrentUser() {
+
+
+    const token =
+      getSessionToken();
+
+
+    /* =========================
+       NO TOKEN
+    ========================= */
+
+    if (
+      !token
+    ) {
+
+      setCoins(
+        0
+      );
+
+      return false;
+
+    }
+
+
+    try {
+
+
+      /* =========================
+         ME REQUEST
+      ========================= */
+
+      const response =
+        await fetch(
+
+          U9_ME_API,
+
+          {
+
+            method:
+              "GET",
+
+            headers: {
+
+              "Authorization":
+                `Bearer ${token}`
+
+            }
+
+          }
+
+        );
+
+
+      /* =========================
+         READ RESPONSE
+      ========================= */
+
+      let data =
+        null;
+
+
+      try {
+
+        data =
+          await response.json();
+
+      }
+
+      catch (
+        jsonError
+      ) {
+
+        data =
+          null;
+
+      }
+
+
+      /* =========================
+         AUTH ERROR
+      ========================= */
+
+      if (
+        response.status ===
+        401 ||
+        response.status ===
+        403
+      ) {
+
+        localStorage.removeItem(
+          "u9_token"
+        );
+
+
+        setCoins(
+          0
+        );
+
+
+        showOrderError(
+          "Session expired. Please login again."
+        );
+
+
+        return false;
+
+      }
+
+
+      /* =========================
+         OTHER ERROR
+      ========================= */
+
+      if (
+        !response.ok
+      ) {
+
+        console.error(
+          "u9 /me error:",
+          response.status,
+          data
+        );
+
+
+        return false;
+
+      }
+
+
+      /* =========================
+         GET USER OBJECT
+      ========================= */
+
+      let user =
+        null;
+
+
+      if (
+        data &&
+        data.user
+      ) {
+
+        user =
+          data.user;
+
+      }
+
+      else if (
+        data &&
+        data.data &&
+        data.data.user
+      ) {
+
+        user =
+          data.data.user;
+
+      }
+
+      else if (
+        data &&
+        data.id
+      ) {
+
+        user =
+          data;
+
+      }
+
+
+      /* =========================
+         UPDATE COINS
+      ========================= */
+
+      if (
+        user &&
+        user.coins !==
+        undefined
+      ) {
+
+        setCoins(
+          user.coins
+        );
+
+      }
+
+      else if (
+        data &&
+        data.coins !==
+        undefined
+      ) {
+
+        setCoins(
+          data.coins
+        );
+
+      }
+
+
+      return true;
+
+    }
+
+    catch (
+      error
+    ) {
+
+
+      console.error(
+        "u9 /me error:",
+        error
+      );
+
+
+      return false;
+
+    }
+
+  }
+
 
 
   /* =========================
@@ -447,6 +737,7 @@
   ) {
 
 
+
     if (
       !readyAt
     ) {
@@ -456,10 +747,12 @@
     }
 
 
+
     const readyTime =
       new Date(
         readyAt
       ).getTime();
+
 
 
     if (
@@ -473,8 +766,10 @@
     }
 
 
+
     const now =
       Date.now();
+
 
 
     const remaining =
@@ -489,9 +784,11 @@
       );
 
 
+
     return `${remaining}s`;
 
   }
+
 
 
   /* =========================
@@ -503,6 +800,7 @@
   ) {
 
 
+
     if (
       !orderMatchingTime
     ) {
@@ -512,10 +810,12 @@
     }
 
 
+
     const text =
       formatMatchingTime(
         readyAt
       );
+
 
 
     if (
@@ -530,6 +830,7 @@
   }
 
 
+
   /* =========================
      MATCHING TIMER
   ========================= */
@@ -538,9 +839,11 @@
     null;
 
 
+
   function startMatchingTimer(
     readyAt
   ) {
+
 
 
     if (
@@ -557,9 +860,11 @@
     }
 
 
+
     updateMatchingTime(
       readyAt
     );
+
 
 
     matchingTimer =
@@ -614,6 +919,7 @@
 
             }
 
+
           }
 
 
@@ -626,11 +932,13 @@
   }
 
 
+
   /* =========================
      STOP MATCHING TIMER
   ========================= */
 
   function stopMatchingTimer() {
+
 
 
     if (
@@ -646,7 +954,10 @@
 
     }
 
+
+
   }
+
 
 
   /* =========================
@@ -719,6 +1030,7 @@
 
 
   }
+
 
 
   /* =========================
@@ -818,15 +1130,7 @@
               "Content-Type":
                 "application/json"
 
-            },
-
-            /*
-               Authorization 是主要认证方式。
-
-               credentials include
-               保留是为了兼容现有
-               u9_session Cookie fallback。
-            */
+            }
 
           }
 
@@ -875,6 +1179,7 @@
           localStorage.removeItem(
             "u9_token"
           );
+
 
           showOrderError(
             "Session expired. Please login again."
@@ -1017,7 +1322,6 @@
         data.order.matchingReadyAt
       ) {
 
-
         startMatchingTimer(
           data.order.matchingReadyAt
         );
@@ -1072,11 +1376,13 @@
   }
 
 
+
   /* =========================
      OPEN AUCTION PAGE
   ========================= */
 
-  function openAuctionPage() {
+  async function openAuctionPage() {
+
 
     if (
       !auctionPage
@@ -1138,7 +1444,15 @@
     resetOrderUI();
 
 
+    /* =========================
+       LOAD CURRENT USER
+    ========================= */
+
+    await loadCurrentUser();
+
+
   }
+
 
 
   /* =========================
@@ -1146,6 +1460,7 @@
   ========================= */
 
   function initializeAuctionPage() {
+
 
     if (
       !auctionPage
@@ -1185,7 +1500,9 @@
 
     }
 
+
   }
+
 
 
   /* =========================
@@ -1196,11 +1513,13 @@
     openAuctionPage;
 
 
+
   /* =========================
      START AUCTION PAGE
   ========================= */
 
   initializeAuctionPage();
+
 
 
 })();
