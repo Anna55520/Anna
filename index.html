@@ -1194,6 +1194,284 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
   </div>
 
   <!-- =================================================
+      PROFILE PICTURE MODAL
+  ================================================= -->
+
+  <div
+  id="U9-profile-picture-modal"
+  aria-hidden="true"
+  >
+
+
+  <div
+      id="U9-profile-picture-modal-overlay"
+  ></div>
+
+
+  <div
+      id="U9-profile-picture-modal-content"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="U9-profile-picture-modal-title"
+  >
+
+
+      <!-- =================================
+          HEADER
+      ================================= -->
+
+      <div
+      id="U9-profile-picture-modal-header"
+      >
+
+
+      <button
+          id="U9-profile-picture-modal-close"
+          type="button"
+          aria-label="Close"
+      >
+          ×
+      </button>
+
+
+      <div
+          id="U9-profile-picture-modal-title"
+      >
+          Profile Picture
+      </div>
+
+
+      <div
+          id="U9-profile-picture-modal-header-space"
+      ></div>
+
+
+      </div>
+
+
+      <!-- =================================
+          BODY
+      ================================= -->
+
+      <div
+      id="U9-profile-picture-modal-body"
+      >
+
+
+      <!-- =================================
+          SELECT AREA
+      ================================= -->
+
+      <div
+          id="U9-profile-picture-modal-select"
+      >
+
+
+          <div
+          id="U9-profile-picture-modal-select-icon"
+          >
+          <img
+              src="SSVG/account/account-edit-button.svg"
+              alt=""
+              aria-hidden="true"
+          >
+          </div>
+
+
+          <div
+          id="U9-profile-picture-modal-select-title"
+          >
+          Choose a picture
+          </div>
+
+
+          <div
+          id="U9-profile-picture-modal-select-description"
+          >
+          PNG, JPG, JPEG, GIF, WEBP, SVG and other image formats
+          </div>
+
+
+          <button
+          id="U9-profile-picture-modal-select-button"
+          type="button"
+          >
+          Select Image
+          </button>
+
+
+          <input
+          id="U9-profile-picture-modal-file"
+          type="file"
+          accept="image/*"
+          hidden
+          >
+
+
+      </div>
+
+
+      <!-- =================================
+          EDIT AREA
+      ================================= -->
+
+      <div
+          id="U9-profile-picture-modal-editor"
+          hidden
+      >
+
+
+          <!-- CROP AREA -->
+
+          <div
+          id="U9-profile-picture-modal-crop-area"
+          >
+
+
+          <div
+              id="U9-profile-picture-modal-image-container"
+          >
+
+              <img
+              id="U9-profile-picture-modal-image"
+              src=""
+              alt="Profile picture preview"
+              draggable="false"
+              >
+
+          </div>
+
+
+          <div
+              id="U9-profile-picture-modal-crop-frame"
+              aria-hidden="true"
+          ></div>
+
+
+          </div>
+
+
+          <!-- ZOOM -->
+
+          <div
+          id="U9-profile-picture-modal-zoom"
+          >
+
+
+          <button
+              id="U9-profile-picture-modal-zoom-out"
+              type="button"
+              aria-label="Zoom out"
+          >
+              −
+          </button>
+
+
+          <input
+              id="U9-profile-picture-modal-zoom-range"
+              type="range"
+              min="1"
+              max="3"
+              step="0.01"
+              value="1"
+              aria-label="Zoom"
+          >
+
+
+          <button
+              id="U9-profile-picture-modal-zoom-in"
+              type="button"
+              aria-label="Zoom in"
+          >
+              +
+          </button>
+
+
+          </div>
+
+
+          <!-- ACTIONS -->
+
+          <div
+          id="U9-profile-picture-modal-editor-actions"
+          >
+
+
+          <button
+              id="U9-profile-picture-modal-reset"
+              type="button"
+          >
+              Reset
+          </button>
+
+
+          <button
+              id="U9-profile-picture-modal-change"
+              type="button"
+          >
+              Change Image
+          </button>
+
+
+          <button
+              id="U9-profile-picture-modal-confirm"
+              type="button"
+          >
+              Confirm
+          </button>
+
+
+          </div>
+
+
+      </div>
+
+
+      <!-- =================================
+          LOADING
+      ================================= -->
+
+      <div
+          id="U9-profile-picture-modal-loading"
+          hidden
+      >
+
+
+          <img
+          src="SSVG/logo/loading.svg"
+          alt="Loading"
+          >
+
+
+          <div
+          id="U9-profile-picture-modal-loading-text"
+          >
+          Uploading...
+          </div>
+
+
+      </div>
+
+
+      <!-- =================================
+          MESSAGE
+      ================================= -->
+
+      <div
+          id="U9-profile-picture-modal-message"
+          role="status"
+          aria-live="polite"
+      ></div>
+
+
+      </div>
+
+
+  </div>
+
+  </div>
+
+  <!-- =================================================
       JS
   ================================================= -->
 
