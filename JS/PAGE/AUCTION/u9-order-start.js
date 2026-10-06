@@ -791,11 +791,58 @@ return;
 }
 
 
+/*
+ Fix Supabase timestamp
+
+ 2026-10-06 19:41:24.624+00
+
+ convert to ISO
+
+*/
+
+let timeString =
+matchingReadyAt;
+
+
+if(
+timeString.includes(" ") &&
+!timeString.includes("T")
+){
+
+timeString =
+timeString.replace(
+" ",
+"T"
+);
+
+}
+
+
 
 const ready =
 new Date(
-matchingReadyAt
+timeString
 ).getTime();
+
+
+
+if(
+Number.isNaN(ready)
+){
+
+console.error(
+"[U9] Invalid matching time:",
+matchingReadyAt
+);
+
+
+orderButton.textContent =
+"Matching...";
+
+
+return;
+
+}
 
 
 
@@ -813,7 +860,7 @@ Date.now()
 
 
 
-if(remain>0){
+if(remain > 0){
 
 
 orderButton.textContent =
@@ -842,7 +889,6 @@ true;
 
 
 update();
-
 
 
 matchingTimer =
