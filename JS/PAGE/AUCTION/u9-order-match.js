@@ -106,7 +106,7 @@ async function getU9RoundSettings() {
 
 
     /* =========================
-       SUCCESS
+       SUCCESS VALIDATION
     ========================= */
 
     if (
@@ -124,6 +124,10 @@ async function getU9RoundSettings() {
     }
 
 
+    /* =========================
+       DEBUG
+    ========================= */
+
     console.log(
       "[U9] Round Settings:",
       result.settings
@@ -137,7 +141,6 @@ async function getU9RoundSettings() {
 
 
     return result;
-
 
   }
   catch (error) {
@@ -155,13 +158,63 @@ async function getU9RoundSettings() {
 
 
 /* =========================
+   UPDATE AUCTION COINS
+========================= */
+
+function updateU9AuctionCoins() {
+
+  const coinsElement =
+    document.getElementById(
+      "U9-coins"
+    );
+
+
+  if (!coinsElement) {
+
+    return;
+
+  }
+
+
+  const coins =
+    window.U9RoundUser?.coins ?? 0;
+
+
+  const numericCoins =
+    Number(coins);
+
+
+  if (
+    Number.isFinite(
+      numericCoins
+    )
+  ) {
+
+    coinsElement.textContent =
+      numericCoins.toFixed(2);
+
+  }
+  else {
+
+    coinsElement.textContent =
+      "0.00";
+
+  }
+
+}
+
+
+/* =========================
    GLOBAL U9 API
 ========================= */
 
 window.U9OrderMatch = {
 
   getSettings:
-    getU9RoundSettings
+    getU9RoundSettings,
+
+  updateCoins:
+    updateU9AuctionCoins
 
 };
 
@@ -185,92 +238,43 @@ document.addEventListener(
     }
 
 
-    window.U9RoundSettings =
-      result.settings;
-
+    /* =========================
+       SAVE USER
+    ========================= */
 
     window.U9RoundUser =
       result.user;
 
+
+    /* =========================
+       SAVE SETTINGS
+    ========================= */
+
+    window.U9RoundSettings =
+      result.settings;
+
+
+    /* =========================
+       UPDATE COINS ONLY
+    ========================= */
+
+    updateU9AuctionCoins();
+
+
+    /* =========================
+       DEBUG
+    ========================= */
 
     console.log(
       "[U9] Round settings ready:",
       window.U9RoundSettings
     );
 
-  }
-);
-
-
-/* =========================
-   AUCTION PAGE UI
-========================= */
-
-function updateU9AuctionUI() {
-  const roundProgress =
-    document.getElementById("U9-round-progress");
-
-  const coinsElement =
-    document.getElementById("U9-coins");
-
-  if (!roundProgress || !coinsElement) {
-    return;
-  }
-
-  /* -------------------------
-     TARGET ORDERS
-  ------------------------- */
-
-  const targetOrders =
-    window.U9RoundSettings?.default_target_orders ?? 0;
-
-  /* -------------------------
-     COMPLETED ORDERS
-     暂时固定为 0
-  ------------------------- */
-
-  const completedOrders = 0;
-
-  roundProgress.textContent =
-    `${completedOrders}/${targetOrders}`;
-
-  /* -------------------------
-     COINS
-  ------------------------- */
-
-  const coins =
-    window.U9RoundUser?.coins ?? 0;
-
-  coinsElement.textContent =
-    Number(coins).toFixed(2);
-}
-
-
-/* =========================
-   UPDATE AFTER SETTINGS LOAD
-========================= */
-
-document.addEventListener(
-  "DOMContentLoaded",
-  async () => {
-    const result =
-      await getU9RoundSettings();
-
-    if (!result) {
-      return;
-    }
-
-    window.U9RoundSettings =
-      result.settings;
-
-    window.U9RoundUser =
-      result.user;
-
-    updateU9AuctionUI();
 
     console.log(
-      "[U9] Round settings ready:",
-      window.U9RoundSettings
+      "[U9] Auction coins ready:",
+      window.U9RoundUser?.coins
     );
+
   }
 );
