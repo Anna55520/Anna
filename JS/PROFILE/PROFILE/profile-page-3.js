@@ -627,6 +627,158 @@ function requirePage3Login(
 
 
 /* =========================================================
+   CREATE SELECT AVATAR CARD
+========================================================= */
+
+function createSelectAvatarCard() {
+
+  const card =
+    document.createElement("div");
+
+  card.className =
+    "U9-profile-page3-avatar-card";
+
+
+  /* -------------------------------------------------------
+     IMAGE
+  ------------------------------------------------------- */
+
+  const image =
+    document.createElement("img");
+
+  image.className =
+    "U9-profile-page3-avatar-image";
+
+  image.alt =
+    "Select Avatar";
+
+
+  image.src =
+    "data:image/svg+xml;charset=UTF-8," +
+    encodeURIComponent(`
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 100 100"
+      >
+        <circle
+          cx="50"
+          cy="50"
+          r="48"
+          fill="#eeeeee"
+        />
+        <circle
+          cx="50"
+          cy="38"
+          r="16"
+          fill="#999999"
+        />
+        <path
+          d="M22 82
+             C22 64 34 55 50 55
+             C66 55 78 64 78 82
+             Z"
+          fill="#999999"
+        />
+        <circle
+          cx="76"
+          cy="76"
+          r="18"
+          fill="#2762ea"
+        />
+        <path
+          d="M76 67
+             V85
+             M67 76
+             H85"
+          stroke="#ffffff"
+          stroke-width="4"
+          stroke-linecap="round"
+        />
+      </svg>
+    `);
+
+
+  card.appendChild(
+    image
+  );
+
+
+  /* -------------------------------------------------------
+     NAME
+  ------------------------------------------------------- */
+
+  const name =
+    document.createElement("div");
+
+  name.className =
+    "U9-profile-page3-avatar-name";
+
+  name.textContent =
+    "Select Avatar";
+
+
+  card.appendChild(
+    name
+  );
+
+
+  /* -------------------------------------------------------
+     BUTTON
+  ------------------------------------------------------- */
+
+  const button =
+    document.createElement("button");
+
+  button.type =
+    "button";
+
+  button.className =
+    "U9-profile-page3-avatar-button";
+
+  button.textContent =
+    "Select Avatar";
+
+
+  button.addEventListener(
+    "click",
+    function () {
+
+      if (
+        window.U9ProfilePicture &&
+        typeof window.U9ProfilePicture.open === "function"
+      ) {
+
+        window.U9ProfilePicture.open();
+
+        return;
+
+      }
+
+
+      console.error(
+        "U9ProfilePicture.open() is not available."
+      );
+
+
+      alert(
+        "Profile picture is not available yet."
+      );
+
+    }
+  );
+
+
+  card.appendChild(
+    button
+  );
+
+
+  return card;
+
+}
+
+
+/* =========================================================
    AVATAR
 ========================================================= */
 
@@ -699,24 +851,31 @@ async function renderFreeAvatars(
     panel.innerHTML = "";
 
 
-    if (!avatars.length) {
-
-      showPage3Message(
-        panel,
-        "No free avatars available.",
-        "empty"
-      );
-
-      return;
-
-    }
-
-
     const list =
       document.createElement("div");
 
     list.className =
       "U9-profile-page3-avatar-list";
+
+
+    /* -----------------------------------------------------
+       SELECT AVATAR CARD
+    ----------------------------------------------------- */
+
+    list.appendChild(
+      createSelectAvatarCard()
+    );
+
+
+    if (!avatars.length) {
+
+      panel.appendChild(
+        list
+      );
+
+      return;
+
+    }
 
 
     avatars.forEach(
