@@ -20,6 +20,321 @@
 
 
 /* =========================
+   ORDER MAIN
+========================= */
+
+#Order-U9-Main {
+
+  position: relative;
+
+  width: 100%;
+
+  max-width: 600px;
+
+  margin: 0 auto;
+
+  padding: 30px 20px;
+
+  box-sizing: border-box;
+
+}
+
+
+/* =========================
+   ORDER ROUND
+========================= */
+
+#Order-U9-Round {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-bottom: 20px;
+
+}
+
+
+#Order-U9-Round-Number {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  font-size: 24px;
+
+  font-weight: 700;
+
+}
+
+
+#Order-U9-Round-Progress {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-top: 5px;
+
+  font-size: 18px;
+
+}
+
+
+#Order-U9-Round-Status {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-top: 5px;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+}
+
+
+/* =========================
+   ORDER COINS
+========================= */
+
+#Order-U9-Coins {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-bottom: 20px;
+
+}
+
+
+#Order-U9-Coins-Label {
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+}
+
+
+#Order-U9-Coins-Value {
+
+  margin-top: 5px;
+
+  font-size: 22px;
+
+  font-weight: 700;
+
+}
+
+
+/* =========================
+   START ORDER
+========================= */
+
+#Order-U9-Start {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-bottom: 20px;
+
+}
+
+
+#Order-U9-Start-Button {
+
+  width: 100%;
+
+  min-height: 45px;
+
+  padding: 10px 15px;
+
+  box-sizing: border-box;
+
+  cursor: pointer;
+
+}
+
+
+#Order-U9-Start-Button:disabled {
+
+  cursor: not-allowed;
+
+  opacity: 0.6;
+
+}
+
+
+/* =========================
+   ORDER STATUS
+========================= */
+
+#Order-U9-Status {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-bottom: 20px;
+
+}
+
+
+#Order-U9-Status-Ready,
+#Order-U9-Status-Matching,
+#Order-U9-Status-Pending,
+#Order-U9-Status-Complete,
+#Order-U9-Status-Cooldown {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+}
+
+
+/* =========================
+   ORDER MATCHING
+========================= */
+
+#Order-U9-Matching {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-bottom: 20px;
+
+}
+
+
+#Order-U9-Matching-Text {
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+}
+
+
+#Order-U9-Matching-Time {
+
+  margin-top: 8px;
+
+  font-size: 20px;
+
+  font-weight: 700;
+
+}
+
+
+/* =========================
+   ORDER PRODUCT
+========================= */
+
+#Order-U9-Product {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-bottom: 20px;
+
+}
+
+
+#Order-U9-Product-Name {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+}
+
+
+#Order-U9-Product-Image {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+}
+
+
+#Order-U9-Product-Price {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+}
+
+
+#Order-U9-Product-Profit {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+}
+
+
+/* =========================
+   ORDER ACTION
+========================= */
+
+#Order-U9-Action {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-bottom: 20px;
+
+}
+
+
+#Order-U9-Complete-Button,
+#Order-U9-Add-Coins-Button {
+
+  width: 100%;
+
+  min-height: 45px;
+
+  padding: 10px 15px;
+
+  box-sizing: border-box;
+
+  margin-bottom: 10px;
+
+  cursor: pointer;
+
+}
+
+
+/* =========================
+   ORDER ERROR
+========================= */
+
+#Order-U9-Error {
+
+  width: 100%;
+
+  box-sizing: border-box;
+
+  margin-top: 10px;
+
+  min-height: 20px;
+
+}
+
+
+/* =========================
    MOBILE
 ========================= */
 
@@ -32,6 +347,29 @@
     min-height: calc(100vh - 115px);
 
     margin-top: 115px;
+
+  }
+
+
+  #Order-U9-Main {
+
+    width: 100%;
+
+    padding: 20px 15px;
+
+  }
+
+
+  #Order-U9-Round-Number {
+
+    font-size: 22px;
+
+  }
+
+
+  #Order-U9-Coins-Value {
+
+    font-size: 20px;
 
   }
 
