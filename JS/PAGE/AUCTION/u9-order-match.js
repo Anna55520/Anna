@@ -1,30 +1,24 @@
 
+// ============================================================
+// U9 ORDER MATCH
+// 获取 u9_round_settings
+// ============================================================
+
 const U9_ORDER_MATCH_URL =
   "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/u9-order-match";
 
-/**
- * 获取 U9 Round Settings
- *
- * 返回：
- * {
- *   success: true,
- *   settings: {
- *     default_target_orders: 3,
- *     matching_min_seconds: 5,
- *     matching_max_seconds: 10,
- *     cooldown_seconds: 10,
- *     minimum_start_coins: 50,
- *     enabled: true
- *   }
- * }
- */
-export async function getU9RoundSettings() {
+
+// ============================================================
+// 获取 U9 Round Settings
+// ============================================================
+
+async function getU9RoundSettings() {
   try {
     const response = await fetch(U9_ORDER_MATCH_URL, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
-      },
+        "Content-Type": "application/json"
+      }
     });
 
     const data = await response.json();
@@ -37,24 +31,62 @@ export async function getU9RoundSettings() {
       );
     }
 
+    console.log(
+      "[U9] Round Settings Loaded:",
+      data.settings
+    );
+
     return data.settings;
+
   } catch (error) {
-    console.error("[u9-order-match] Failed to get settings:", error);
+
+    console.error(
+      "[U9] Failed to load round settings:",
+      error
+    );
+
     throw error;
   }
 }
 
-/**
- * 加载 U9 Settings
- *
- * 页面需要使用时调用：
- *
- * const settings = await loadU9RoundSettings();
- */
-export async function loadU9RoundSettings() {
+
+// ============================================================
+// 加载并保存到 window
+// ============================================================
+
+async function loadU9RoundSettings() {
+
   const settings = await getU9RoundSettings();
 
-  console.log("[u9-order-match] Round Settings:", settings);
+  // 给其他前端 JS 使用
+  window.U9RoundSettings = settings;
+
+  console.log(
+    "[U9] Settings available:",
+    window.U9RoundSettings
+  );
 
   return settings;
 }
+
+
+// ============================================================
+// 页面加载后自动获取
+// ============================================================
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+  try {
+
+    await loadU9RoundSettings();
+
+  } catch (error) {
+
+    console.error(
+      "[U9] Round settings initialization failed:",
+      error
+    );
+
+  }
+
+});
