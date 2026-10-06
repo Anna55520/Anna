@@ -1,235 +1,321 @@
+/* =================================================
+   AUCTION PAGE 2
+   U9 ORDER STATUS SYSTEM
+   FINAL VERSION
+   ONLY: u9-order-status
+================================================= */
+
+
 (function(){
+
+
+
+
+
+/* =================================================
+   ELEMENTS
+================================================= */
+
 
 const auctionPage =
 document.getElementById(
- "U9-page-auction"
+    "U9-page-auction"
 );
+
+
+
+
 
 const orderRoundNumber =
 document.getElementById(
- "Order-U9-Round-Number"
+    "Order-U9-Round-Number"
 );
+
+
+
+
 
 const orderRoundProgress =
 document.getElementById(
- "Order-U9-Round-Progress"
+    "Order-U9-Round-Progress"
 );
+
+
+
+
 
 const orderRoundStatus =
 document.getElementById(
- "Order-U9-Round-Status"
+    "Order-U9-Round-Status"
 );
+
+
+
+
 
 const orderStatusReady =
 document.getElementById(
- "Order-U9-Status-Ready"
+    "Order-U9-Status-Ready"
 );
+
+
+
+
 
 const orderStatusMatching =
 document.getElementById(
- "Order-U9-Status-Matching"
+    "Order-U9-Status-Matching"
 );
+
+
+
+
 
 const orderStatusPending =
 document.getElementById(
- "Order-U9-Status-Pending"
+    "Order-U9-Status-Pending"
 );
+
+
+
+
 
 const orderStatusComplete =
 document.getElementById(
- "Order-U9-Status-Complete"
+    "Order-U9-Status-Complete"
 );
+
+
+
+
 
 const orderStatusCooldown =
 document.getElementById(
- "Order-U9-Status-Cooldown"
+    "Order-U9-Status-Cooldown"
 );
+
+
+
+
 
 const orderMatching =
 document.getElementById(
- "Order-U9-Matching"
+    "Order-U9-Matching"
 );
+
+
+
+
 
 const orderMatchingText =
 document.getElementById(
- "Order-U9-Matching-Text"
+    "Order-U9-Matching-Text"
 );
+
+
+
+
+
+
+
+
+/* =================================================
+   API
+================================================= */
+
 
 const U9_ORDER_STATUS_API =
 "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/u9-order-status";
 
+
+
+
+
+
+
+
+/* =================================================
+   POLLING
+================================================= */
+
+
 let statusTimer =
 null;
 
-function startPolling(){
 
 
-if(
- statusTimer
-){
-
- clearInterval(
-  statusTimer
- );
-
-}
-
-checkOrderStatus();
-
-statusTimer =
-setInterval(
-
-function(){
-
-checkOrderStatus();
+let isPolling =
+false;
 
 
-},
 
-3000
-
-);
+let checkingStatus =
+false;
 
 
-}
-
-function stopPolling(){
 
 
-if(
- statusTimer
-){
 
-clearInterval(
- statusTimer
- );
+let initialized =
+false;
 
 
-statusTimer =
-null;
 
 
-}
 
 
-}
 
+
+/* =================================================
+   GLOBAL STATE
+================================================= */
 
 
 window.U9Auction =
 window.U9Auction || {
 
- order:null,
 
- status:"READY"
+    order:null,
+
+
+    status:"READY"
+
 
 };
 
 
 
 
+
+
+
+
+
+/* =================================================
+   UPDATE ROUND
+================================================= */
+
+
 function updateRound(
- round
+    round
 ){
 
 
-if(
- !round
-){
+    if(
+        !round
+    ){
 
- return;
+        return;
+
+    }
+
+
+
+
+
+    if(
+        orderRoundNumber
+    ){
+
+        orderRoundNumber.textContent =
+        `Round ${round.roundNumber}`;
+
+    }
+
+
+
+
+
+    if(
+        orderRoundProgress
+    ){
+
+        orderRoundProgress.textContent =
+        `${round.completed}/${round.target}`;
+
+    }
+
+
+
+
+
+    if(
+        orderRoundStatus
+    ){
+
+        orderRoundStatus.textContent =
+        round.status;
+
+    }
+
+
 
 }
 
 
 
 
-if(
- orderRoundNumber
-){
-
- orderRoundNumber.textContent =
- `Round ${round.roundNumber}`;
-
-}
 
 
 
 
-if(
- orderRoundProgress
-){
 
- orderRoundProgress.textContent =
- `${round.completed}/${round.target}`;
-
-}
-
-
-
-
-if(
- orderRoundStatus
-){
-
- orderRoundStatus.textContent =
- round.status;
-
-}
-
-
-
-}
-
-
+/* =================================================
+   HIDE ALL STATUS
+================================================= */
 
 
 function hideAllStatus(){
 
 
-const list = [
 
- orderStatusReady,
-
- orderStatusMatching,
-
- orderStatusPending,
-
- orderStatusComplete,
-
- orderStatusCooldown
-
-];
+    const list = [
 
 
+        orderStatusReady,
+
+
+        orderStatusMatching,
+
+
+        orderStatusPending,
+
+
+        orderStatusComplete,
+
+
+        orderStatusCooldown
+
+
+    ];
 
 
 
-list.forEach(
-
- item=>{
 
 
-  if(item){
+    list.forEach(
 
-   item.style.display =
-   "none";
-
-  }
+        item=>{
 
 
- }
+            if(item){
 
 
-);
+                item.style.display =
+                "none";
+
+
+            }
+
+
+        }
+
+
+    );
 
 
 
 }
-
-
-
-
 
 
 
@@ -247,18 +333,32 @@ list.forEach(
 function showReady(){
 
 
-hideAllStatus();
+    hideAllStatus();
 
 
 
-if(
- orderStatusReady
-){
 
- orderStatusReady.style.display =
- "block";
+    if(
+        orderMatching
+    ){
 
-}
+        orderMatching.style.display =
+        "none";
+
+    }
+
+
+
+
+
+    if(
+        orderStatusReady
+    ){
+
+        orderStatusReady.style.display =
+        "block";
+
+    }
 
 
 
@@ -275,42 +375,48 @@ if(
 function showMatching(){
 
 
-hideAllStatus();
-
-
-
-if(
- orderStatusMatching
-){
-
- orderStatusMatching.style.display =
- "block";
-
-}
+    hideAllStatus();
 
 
 
 
-if(
- orderMatching
-){
 
- orderMatching.style.display =
- "block";
+    if(
+        orderStatusMatching
+    ){
 
-}
+        orderStatusMatching.style.display =
+        "block";
+
+    }
 
 
 
 
-if(
- orderMatchingText
-){
 
- orderMatchingText.textContent =
- "Matching...";
 
-}
+    if(
+        orderMatching
+    ){
+
+        orderMatching.style.display =
+        "block";
+
+    }
+
+
+
+
+
+
+    if(
+        orderMatchingText
+    ){
+
+        orderMatchingText.textContent =
+        "Matching...";
+
+    }
 
 
 
@@ -327,30 +433,33 @@ if(
 function showPending(){
 
 
-hideAllStatus();
-
-
-
-if(
- orderMatching
-){
-
- orderMatching.style.display =
- "none";
-
-}
+    hideAllStatus();
 
 
 
 
-if(
- orderStatusPending
-){
 
- orderStatusPending.style.display =
- "block";
+    if(
+        orderMatching
+    ){
 
-}
+        orderMatching.style.display =
+        "none";
+
+    }
+
+
+
+
+
+    if(
+        orderStatusPending
+    ){
+
+        orderStatusPending.style.display =
+        "block";
+
+    }
 
 
 
@@ -367,30 +476,33 @@ if(
 function showComplete(){
 
 
-hideAllStatus();
-
-
-
-if(
- orderMatching
-){
-
- orderMatching.style.display =
- "none";
-
-}
+    hideAllStatus();
 
 
 
 
-if(
- orderStatusComplete
-){
 
- orderStatusComplete.style.display =
- "block";
+    if(
+        orderMatching
+    ){
 
-}
+        orderMatching.style.display =
+        "none";
+
+    }
+
+
+
+
+
+    if(
+        orderStatusComplete
+    ){
+
+        orderStatusComplete.style.display =
+        "block";
+
+    }
 
 
 
@@ -407,25 +519,24 @@ if(
 function showCooldown(){
 
 
-hideAllStatus();
+    hideAllStatus();
 
 
 
-if(
- orderStatusCooldown
-){
 
- orderStatusCooldown.style.display =
- "block";
+
+    if(
+        orderStatusCooldown
+    ){
+
+        orderStatusCooldown.style.display =
+        "block";
+
+    }
+
+
 
 }
-
-
-
-}
-
-
-
 
 
 
@@ -441,78 +552,83 @@ if(
 
 
 function applyStatus(
- status
+    status
 ){
 
 
 
-window.U9Auction.status =
-status;
+    window.U9Auction.status =
+    status;
 
 
 
 
-switch(
- status
-){
+
+    switch(
+        status
+    ){
 
 
 
-case "MATCHING":
+        case "MATCHING":
 
 
-showMatching();
+            showMatching();
 
 
-break;
-
-
-
-
-case "PENDING":
-
-
-showPending();
-
-
-break;
+        break;
 
 
 
 
-case "COMPLETE":
+
+        case "PENDING":
 
 
-showComplete();
+            showPending();
 
 
-break;
-
-
-
-
-case "COOLDOWN":
-
-
-showCooldown();
-
-
-break;
+        break;
 
 
 
 
-default:
+
+        case "COMPLETE":
 
 
-showReady();
+            showComplete();
 
 
-break;
+        break;
 
 
 
-}
+
+
+        case "COOLDOWN":
+
+
+            showCooldown();
+
+
+        break;
+
+
+
+
+
+        default:
+
+
+            showReady();
+
+
+        break;
+
+
+
+    }
 
 
 
@@ -535,192 +651,325 @@ async function checkOrderStatus(){
 
 
 
-try{
+    if(
+        checkingStatus
+    ){
+
+        return;
+
+    }
 
 
 
-const token =
-localStorage.getItem(
- "u9_token"
-);
+
+
+    checkingStatus =
+    true;
 
 
 
 
 
-if(
- !token
-){
+    try{
 
- return;
+
+
+        const token =
+        localStorage.getItem(
+            "u9_token"
+        );
+
+
+
+
+
+        if(
+            !token
+        ){
+
+            return;
+
+        }
+
+
+
+
+
+
+        const response =
+        await fetch(
+
+            U9_ORDER_STATUS_API,
+
+            {
+
+
+                method:
+                "GET",
+
+
+                cache:
+                "no-store",
+
+
+                headers:{
+
+
+                    "Authorization":
+                    `Bearer ${token}`
+
+
+                }
+
+
+            }
+
+        );
+
+
+
+
+
+
+        const data =
+        await response.json();
+
+
+
+
+
+
+        console.log(
+            "ORDER STATUS RESULT:",
+            data
+        );
+
+
+
+
+
+
+
+        if(
+            !response.ok
+        ){
+
+            return;
+
+        }
+
+
+
+
+
+
+        if(
+            data.order
+        ){
+
+
+
+            window.U9Auction.order =
+            data.order;
+
+
+
+
+
+            if(
+                data.round
+            ){
+
+                updateRound(
+                    data.round
+                );
+
+            }
+
+
+
+
+
+
+            applyStatus(
+                data.order.status
+            );
+
+
+
+        }
+        else{
+
+
+
+            window.U9Auction.order =
+            null;
+
+
+
+            applyStatus(
+                "READY"
+            );
+
+
+
+        }
+
+
+
+
+
+
+    }
+    catch(error){
+
+
+
+        console.error(
+            "checkOrderStatus:",
+            error
+        );
+
+
+
+    }
+    finally{
+
+
+
+        checkingStatus =
+        false;
+
+
+    }
+
+
 
 }
 
-
-
-
-
-
-
-const response =
-await fetch(
-
- U9_ORDER_STATUS_API,
-
- {
-
-  method:"GET",
-
-  cache:"no-store",
-
-  headers:{
-
-   "Authorization":
-   `Bearer ${token}`
-
-  }
-
-
- }
-
-);
-
-
-
-
-
-
-
-
-const data =
-await response.json();
-
-
-
-
-
-
-
-
-
-console.log(
- "ORDER STATUS RESULT:",
- data
-);
-
-
-
-
-
-
-
-
-
-if(
- !response.ok
-){
-
- return;
-
-}
-
-
-
-
-
-
-
-
-
-if(
- data.order
-){
-
-
-
-window.U9Auction.order =
-data.order;
-
-
-
-if(
- data.round
-){
-
- updateRound(
-  data.round
- );
-
-}
-
-
-
-applyStatus(
- data.order.status
-);
-
-
-
-}
-else{
-
-
-// 没有订单
-
-window.U9Auction.order =
-null;
-
-
-applyStatus(
- "READY"
-);
-
-
-
-}
-
-
-
-}
-catch(error){
-
-
-
-console.error(
- "checkOrderStatus:",
- error
-);
-
-
-
-}
-
-
-
-}
 
 /* =================================================
-   AUCTION PAGE 2
-   U9 ORDER STATUS SYSTEM
-   FINAL VERSION
-   Part 2/2
+   POLLING CONTROL
 ================================================= */
 
 
+function startPolling(){
+
+
+
+    if(
+        isPolling
+    ){
+
+        return;
+
+    }
+
+
+
+
+
+
+    isPolling =
+    true;
+
+
+
+
+
+
+    checkOrderStatus();
+
+
+
+
+
+
+
+    statusTimer =
+    setInterval(
+
+        function(){
+
+
+            checkOrderStatus();
+
+
+        },
+
+        3000
+
+    );
+
+
+
+}
+
+
+
+
+
+
+
+
+
+function stopPolling(){
+
+
+
+    isPolling =
+    false;
+
+
+
+
+
+
+    if(
+        statusTimer
+    ){
+
+        clearInterval(
+            statusTimer
+        );
+
+
+
+        statusTimer =
+        null;
+
+
+    }
+
+
+
+}
+
+
+
+
+
+
+
+
 
 /* =================================================
-   OPEN PAGE RECOVERY
+   PAGE RECOVERY
 ================================================= */
 
 
 function recoverOrderState(){
 
 
-  checkOrderStatus();
+    checkOrderStatus();
 
 
 
 }
+
+
+
+
 
 
 
@@ -733,30 +982,51 @@ function recoverOrderState(){
 
 document.addEventListener(
 
-"visibilitychange",
+    "visibilitychange",
 
-function(){
-
-
-
-if(
- document.visibilityState ===
- "visible"
-){
+    function(){
 
 
 
- checkOrderStatus();
+        if(
+            document.visibilityState ===
+            "visible"
+        ){
+
+
+            checkOrderStatus();
 
 
 
-}
+
+
+            if(
+                !isPolling
+            ){
+
+                startPolling();
+
+            }
 
 
 
-}
+        }
+        else{
+
+
+            stopPolling();
+
+
+
+        }
+
+
+
+    }
 
 );
+
+
 
 
 
@@ -773,70 +1043,107 @@ function connectUserListener(){
 
 
 
-if(
- window.U9User &&
- U9User.subscribe
-){
-
-
-
-U9User.subscribe(
-
-function(
- user,
- state
-){
-
-
-
-if(
- state ===
- "AUTHENTICATED"
-){
-
-
-
-console.log(
- "U9 Auction Status User Ready",
- user
-);
-
-
-
-checkOrderStatus();
-
-
-
-}
+    if(
+        window.U9User &&
+        U9User.subscribe
+    ){
 
 
 
 
 
-if(
- state ===
- "UNAUTHENTICATED"
-){
+        U9User.subscribe(
+
+            function(
+                user,
+                state
+            ){
 
 
 
-stopPolling();
+
+
+                if(
+                    state ===
+                    "AUTHENTICATED"
+                ){
 
 
 
-}
+                    console.log(
+                        "U9 Auction Status User Ready",
+                        user
+                    );
 
 
 
-}
+
+
+                    checkOrderStatus();
 
 
 
-);
+
+
+                    if(
+                        !isPolling
+                    ){
+
+                        startPolling();
+
+                    }
 
 
 
-}
+                }
+
+
+
+
+
+
+
+
+                if(
+                    state ===
+                    "UNAUTHENTICATED"
+                ){
+
+
+
+                    stopPolling();
+
+
+
+
+
+                    window.U9Auction.order =
+                    null;
+
+
+
+
+
+                    applyStatus(
+                        "READY"
+                    );
+
+
+
+                }
+
+
+
+
+            }
+
+
+        );
+
+
+
+
+    }
 
 
 
@@ -851,7 +1158,7 @@ stopPolling();
 
 
 /* =================================================
-   INIT
+   INITIALIZE
 ================================================= */
 
 
@@ -859,48 +1166,74 @@ function initializeAuctionStatus(){
 
 
 
-console.log(
- "U9 Auction Status System Ready"
-);
+    if(
+        initialized
+    ){
 
+        return;
 
-
-/*
- 页面刷新恢复
-*/
-
-recoverOrderState();
+    }
 
 
 
 
 
-/*
- 用户监听
-*/
-
-connectUserListener();
+    initialized =
+    true;
 
 
 
 
 
-/*
- 自动轮询
-*/
 
-startPolling();
+    console.log(
+        "U9 Auction Status System Ready"
+    );
+
+
+
+
+
+
+
+    /*
+       Refresh recovery
+    */
+
+
+    recoverOrderState();
+
+
+
+
+
+
+
+
+    /*
+       User connection
+    */
+
+
+    connectUserListener();
+
+
+
+
+
+
+
+
+    /*
+       Start polling
+    */
+
+
+    startPolling();
 
 
 
 }
-
-
-
-
-
-
-
 
 
 /* =================================================
@@ -911,35 +1244,28 @@ startPolling();
 window.U9AuctionStatus = {
 
 
- check:
- checkOrderStatus,
+
+    check:
+    checkOrderStatus,
 
 
- start:
- startPolling,
+
+    start:
+    startPolling,
 
 
- stop:
- stopPolling
+
+    stop:
+    stopPolling
+
 
 
 };
-
-
-
-
-
-
-
-
 
 /* =================================================
    START
 ================================================= */
 
-
 initializeAuctionStatus();
-
-
 
 })();
