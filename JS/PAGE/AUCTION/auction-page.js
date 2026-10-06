@@ -1,10 +1,13 @@
 /* =================================================
    AUCTION PAGE
    U9 ORDER SYSTEM
+   FINAL VERSION
+   ONLY: u9-order-start
    Part 1/2
 ================================================= */
 
 (function () {
+
 
 
 /* =================================================
@@ -95,27 +98,6 @@ document.getElementById(
 
 
 
-const orderStatusPending =
-document.getElementById(
-  "Order-U9-Status-Pending"
-);
-
-
-
-const orderStatusComplete =
-document.getElementById(
-  "Order-U9-Status-Complete"
-);
-
-
-
-const orderStatusCooldown =
-document.getElementById(
-  "Order-U9-Status-Cooldown"
-);
-
-
-
 const orderMatching =
 document.getElementById(
   "Order-U9-Matching"
@@ -159,18 +141,28 @@ const U9_ME_API =
 
 
 
+
 /* =================================================
-   CURRENT ORDER DATA
+   GLOBAL STATE
 ================================================= */
-
-
-let currentOrder =
-null;
-
 
 
 let matchingTimer =
 null;
+
+
+
+window.U9Auction =
+window.U9Auction || {
+
+  order:null,
+
+  status:"READY"
+
+};
+
+
+
 
 
 
@@ -183,50 +175,47 @@ null;
 
 
 function setCoins(
-  coins
+ coins
 ){
 
 
-  if(
-    !orderCoinsValue
-  ){
+ if(
+  !orderCoinsValue
+ ){
 
-    return;
+  return;
 
-  }
-
-
-
-  const value =
-  Number(
-    coins
-  );
+ }
 
 
 
-  if(
-    !Number.isFinite(
-      value
-    )
-  ){
-
-    orderCoinsValue.textContent =
-    "0.00";
+ const value =
+ Number(coins);
 
 
-    return;
 
-  }
-
-
+ if(
+  !Number.isFinite(value)
+ ){
 
   orderCoinsValue.textContent =
-  value.toFixed(
-    2
-  );
+  "0.00";
+
+  return;
+
+ }
+
+
+
+ orderCoinsValue.textContent =
+ value.toFixed(2);
+
 
 
 }
+
+
+
 
 
 
@@ -239,18 +228,18 @@ function setCoins(
 
 
 function showError(
-  message
+ message
 ){
 
 
-  if(
-    orderError
-  ){
+ if(
+  orderError
+ ){
 
-    orderError.textContent =
-    message;
+  orderError.textContent =
+  message;
 
-  }
+ }
 
 
 }
@@ -262,17 +251,20 @@ function showError(
 function clearError(){
 
 
-  if(
-    orderError
-  ){
+ if(
+  orderError
+ ){
 
-    orderError.textContent =
-    "";
+  orderError.textContent =
+  "";
 
-  }
+ }
 
 
 }
+
+
+
 
 
 
@@ -280,147 +272,133 @@ function clearError(){
 
 
 /* =================================================
-   USER LOAD
+   LOAD USER
 ================================================= */
 
 
 async function loadAuctionUser(){
 
 
-  try{
+try{
 
 
-    /*
-       优先使用 header.js
-    */
+ if(
+  window.U9User &&
+  U9User.get()
+ ){
 
 
-    if(
-      window.U9User &&
-      U9User.get()
-    ){
+  const user =
+  U9User.get();
 
 
-      const user =
-      U9User.get();
+  setCoins(
+   user.coins
+  );
 
 
+  return user;
 
-      setCoins(
-        user.coins
-      );
 
+ }
 
 
-      return user;
 
 
-    }
 
+ const token =
+ localStorage.getItem(
+  "u9_token"
+ );
 
 
 
 
 
-    /*
-       Safari fallback
-    */
-
-
-    const token =
-    localStorage.getItem(
-      "u9_token"
-    );
-
-
-
-    if(
-      !token
-    ){
-
-      return null;
-
-    }
-
-
-
-
-
-    const response =
-    await fetch(
-
-      U9_ME_API,
-
-      {
-
-        method:
-        "GET",
-
-        cache:
-        "no-store",
-
-        headers:{
-
-          "Authorization":
-          `Bearer ${token}`
-
-        }
-
-      }
-
-    );
-
-
-
-
-
-
-    const data =
-    await response.json();
-
-
-
-
-
-    if(
-      response.ok &&
-      data.user
-    ){
-
-
-      setCoins(
-        data.user.coins
-      );
-
-
-
-      return data.user;
-
-
-    }
-
-
-
-
-  }
-
-  catch(error){
-
-
-    console.error(
-      "loadAuctionUser:",
-      error
-    );
-
-
-  }
-
-
+ if(
+  !token
+ ){
 
   return null;
 
+ }
+
+
+
+
+
+ const response =
+ await fetch(
+
+  U9_ME_API,
+
+  {
+
+   method:"GET",
+
+   cache:"no-store",
+
+   headers:{
+
+    "Authorization":
+    `Bearer ${token}`
+
+   }
+
+  }
+
+ );
+
+
+
+
+
+ const data =
+ await response.json();
+
+
+
+
+
+ if(
+  response.ok &&
+  data.user
+ ){
+
+
+  setCoins(
+   data.user.coins
+  );
+
+
+  return data.user;
+
+
+ }
+
+
 
 }
+catch(error){
+
+
+ console.error(
+  "loadAuctionUser:",
+  error
+ );
+
+
+}
+
+
+
+return null;
+
+
+}
+
+
+
 
 
 
@@ -433,53 +411,57 @@ async function loadAuctionUser(){
 
 
 function updateRound(
-  round
+ round
 ){
 
 
-  if(
-    !round
-  ){
+if(
+ !round
+){
 
-    return;
+ return;
 
-  }
-
-
-
-  if(
-    orderRoundNumber
-  ){
-
-    orderRoundNumber.textContent =
-    `Round ${round.roundNumber}`;
-
-  }
+}
 
 
 
-  if(
-    orderRoundProgress
-  ){
+if(
+ orderRoundNumber
+){
 
-    orderRoundProgress.textContent =
-    `${round.completed}/${round.target}`;
+ orderRoundNumber.textContent =
+ `Round ${round.roundNumber}`;
 
-  }
+}
 
 
 
-  if(
-    orderRoundStatus
-  ){
+if(
+ orderRoundProgress
+){
 
-    orderRoundStatus.textContent =
-    round.status;
+ orderRoundProgress.textContent =
+ `${round.completed}/${round.target}`;
 
-  }
+}
+
+
+
+if(
+ orderRoundStatus
+){
+
+ orderRoundStatus.textContent =
+ round.status;
+
+}
+
 
 
 }
+
+
+
 
 
 
@@ -487,95 +469,58 @@ function updateRound(
 
 
 /* =================================================
-   STATUS CONTROL
+   SHOW MATCHING
 ================================================= */
-
-
-function hideAllStatus(){
-
-
-  const list = [
-
-    orderStatusReady,
-
-    orderStatusMatching,
-
-    orderStatusPending,
-
-    orderStatusComplete,
-
-    orderStatusCooldown
-
-  ];
-
-
-
-  list.forEach(
-    item => {
-
-      if(item){
-
-        item.style.display =
-        "none";
-
-      }
-
-    }
-
-  );
-
-
-}
-
-
-
 
 
 function showMatching(){
 
 
-  hideAllStatus();
+if(
+ orderStatusReady
+){
 
-
-
-  if(
-    orderStatusMatching
-  ){
-
-    orderStatusMatching.style.display =
-    "block";
-
-  }
-
-
-
-  if(
-    orderMatching
-  ){
-
-    orderMatching.style.display =
-    "block";
-
-  }
-
-
-
-  if(
-    orderMatchingText
-  ){
-
-    orderMatchingText.textContent =
-    "Matching...";
-
-  }
-
+ orderStatusReady.style.display =
+ "none";
 
 }
 
 
 
+if(
+ orderStatusMatching
+){
+
+ orderStatusMatching.style.display =
+ "block";
+
+}
 
 
+
+if(
+ orderMatching
+){
+
+ orderMatching.style.display =
+ "block";
+
+}
+
+
+
+if(
+ orderMatchingText
+){
+
+ orderMatchingText.textContent =
+ "Matching...";
+
+}
+
+
+
+}
 
 /* =================================================
    MATCHING TIMER
@@ -583,96 +528,128 @@ function showMatching(){
 
 
 function startMatchingTimer(
-  readyAt
+ readyAt
 ){
 
 
-  if(
-    matchingTimer
-  ){
+ if(
+  matchingTimer
+ ){
 
-    clearInterval(
-      matchingTimer
-    );
+  clearInterval(
+   matchingTimer
+  );
 
-  }
-
-
-
-  function update(){
-
-
-    const target =
-    new Date(
-      readyAt
-    ).getTime();
+ }
 
 
 
-    const now =
-    Date.now();
+ function update(){
+
+
+  const target =
+  new Date(
+   readyAt
+  ).getTime();
 
 
 
-    const seconds =
-    Math.max(
-      0,
-      Math.ceil(
-        (target-now)/1000
-      )
-    );
+  const now =
+  Date.now();
 
 
 
-    if(
-      orderMatchingTime
-    ){
+  const seconds =
+  Math.max(
 
-      orderMatchingTime.textContent =
-      `${seconds}s`;
+   0,
 
-    }
+   Math.ceil(
+    (target-now)/1000
+   )
 
-
-
-    if(
-      seconds <= 0
-    ){
-
-      clearInterval(
-        matchingTimer
-      );
-
-
-      if(
-        orderMatchingTime
-      ){
-
-        orderMatchingTime.textContent =
-        "Ready";
-
-      }
-
-
-    }
-
-
-  }
-
-
-
-  update();
-
-
-
-  matchingTimer =
-  setInterval(
-    update,
-    500
   );
 
 
+
+
+
+  if(
+   orderMatchingTime
+  ){
+
+   orderMatchingTime.textContent =
+   `${seconds}s`;
+
+  }
+
+
+
+
+
+  if(
+   seconds <= 0
+  ){
+
+
+   clearInterval(
+    matchingTimer
+   );
+
+
+
+   if(
+    orderMatchingTime
+   ){
+
+    orderMatchingTime.textContent =
+    "Ready";
+
+   }
+
+
+   /*
+      交给 auction-page2.js
+      继续查询状态
+
+      不在这里处理
+      PENDING / COMPLETE
+   */
+
+
+  }
+
+
+
+ }
+
+
+
+
+ update();
+
+
+
+ matchingTimer =
+ setInterval(
+
+  update,
+
+  500
+
+ );
+
+
+
 }
+
+
+
+
+
+
+
+
 
 /* =================================================
    START ORDER
@@ -682,326 +659,368 @@ function startMatchingTimer(
 async function startOrder(){
 
 
-  clearError();
 
+ clearError();
 
 
-  if(
-    orderStartButton
-  ){
 
-    orderStartButton.disabled =
-    true;
+ if(
+  orderStartButton
+ ){
 
-  }
+  orderStartButton.disabled =
+  true;
 
+ }
 
 
 
 
-  try{
 
+try{
 
 
-    /*
-       确保用户存在
-    */
 
+let user =
+null;
 
-    let user =
-    null;
 
 
+if(
+ window.U9User &&
+ U9User.get()
+){
 
-    if(
-      window.U9User &&
-      U9User.get()
-    ){
 
-      user =
-      U9User.get();
-
-    }
-    else{
-
-      user =
-      await loadAuctionUser();
-
-    }
-
-
-
-
-
-    if(
-      !user
-    ){
-
-
-      showError(
-        "Please login first."
-      );
-
-
-      return;
-
-
-    }
-
-
-
-
-
-
-
-    const token =
-    localStorage.getItem(
-      "u9_token"
-    );
-
-
-
-
-    if(
-      !token
-    ){
-
-
-      showError(
-        "Session missing."
-      );
-
-
-      return;
-
-
-    }
-
-
-
-
-
-
-
-    const response =
-    await fetch(
-
-      U9_ORDER_START_API,
-
-      {
-
-
-        method:
-        "POST",
-
-
-
-        headers:{
-
-
-          "Authorization":
-          `Bearer ${token}`,
-
-
-
-          "Content-Type":
-          "application/json"
-
-
-        }
-
-
-      }
-
-    );
-
-
-
-
-
-
-
-    const data =
-    await response.json();
-
-
-
-
-
-
-    console.log(
-      "ORDER START RESULT:",
-      data
-    );
-
-
-
-
-
-
-
-    if(
-      !response.ok
-    ){
-
-
-      showError(
-
-        data.error ||
-        "Order start failed."
-
-      );
-
-
-      return;
-
-
-    }
-
-
-
-
-
-
-
-    /*
-       保存当前订单
-    */
-
-
-    if(
-      data.order
-    ){
-
-      currentOrder =
-      data.order;
-
-    }
-
-
-
-
-
-
-
-    /*
-       更新 Coins
-    */
-
-
-    if(
-      data.coins !== undefined
-    ){
-
-      setCoins(
-        data.coins
-      );
-
-    }
-
-
-
-
-
-
-
-
-    /*
-       更新 Round
-    */
-
-
-    if(
-      data.round
-    ){
-
-      updateRound(
-        data.round
-      );
-
-    }
-
-
-
-
-
-
-
-    /*
-       显示 Matching
-    */
-
-
-    showMatching();
-
-
-
-
-
-
-
-
-    /*
-       开始倒计时
-    */
-
-
-    if(
-      data.order &&
-      data.order.matchingReadyAt
-    ){
-
-
-      startMatchingTimer(
-
-        data.order.matchingReadyAt
-
-      );
-
-
-    }
-
-
-
-
-
-  }
-
-
-  catch(error){
-
-
-    console.error(
-      "startOrder error:",
-      error
-    );
-
-
-    showError(
-      "Network error."
-    );
-
-
-  }
-
-
-  finally{
-
-
-    if(
-      orderStartButton
-    ){
-
-      orderStartButton.disabled =
-      false;
-
-    }
-
-
-  }
+ user =
+ U9User.get();
 
 
 }
+else{
+
+
+ user =
+ await loadAuctionUser();
+
+
+}
+
+
+
+
+
+
+if(
+ !user
+){
+
+
+ showError(
+  "Please login first."
+ );
+
+
+ return;
+
+
+}
+
+
+
+
+
+
+
+
+const token =
+localStorage.getItem(
+ "u9_token"
+);
+
+
+
+
+
+if(
+ !token
+){
+
+
+ showError(
+  "Session missing."
+ );
+
+
+ return;
+
+
+}
+
+
+
+
+
+
+
+
+
+const response =
+await fetch(
+
+ U9_ORDER_START_API,
+
+ {
+
+  method:"POST",
+
+
+  headers:{
+
+
+   "Authorization":
+   `Bearer ${token}`,
+
+
+   "Content-Type":
+   "application/json"
+
+
+  }
+
+
+ }
+
+);
+
+
+
+
+
+
+
+
+const data =
+await response.json();
+
+
+
+
+
+
+
+
+console.log(
+ "ORDER START RESULT:",
+ data
+);
+
+
+
+
+
+
+
+
+if(
+ !response.ok
+){
+
+
+ showError(
+
+  data.error ||
+  "Order start failed."
+
+ );
+
+
+ return;
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   SAVE ORDER
+========================= */
+
+
+if(
+ data.order
+){
+
+
+ currentOrder =
+ data.order;
+
+
+
+ window.U9Auction.order =
+ data.order;
+
+
+
+ window.U9Auction.status =
+ data.order.status;
+
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   UPDATE COINS
+========================= */
+
+
+if(
+ data.coins !== undefined
+){
+
+
+ setCoins(
+  data.coins
+ );
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   UPDATE ROUND
+========================= */
+
+
+if(
+ data.round
+){
+
+
+ updateRound(
+  data.round
+ );
+
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================
+   SHOW MATCHING
+========================= */
+
+
+showMatching();
+
+
+
+
+
+
+
+
+
+/* =========================
+   START COUNTDOWN
+========================= */
+
+
+if(
+ data.order &&
+ data.order.matchingReadyAt
+){
+
+
+ startMatchingTimer(
+
+  data.order.matchingReadyAt
+
+ );
+
+
+}
+
+
+
+
+
+
+
+
+
+}
+catch(error){
+
+
+
+console.error(
+ "startOrder error:",
+ error
+);
+
+
+
+
+showError(
+ "Network error."
+);
+
+
+
+}
+finally{
+
+
+
+if(
+ orderStartButton
+){
+
+ orderStartButton.disabled =
+ false;
+
+}
+
+
+
+}
+
+
+
+}
+
+
+
+
+
 
 
 
@@ -1010,109 +1029,49 @@ async function startOrder(){
 
 
 /* =================================================
-   RESET PAGE
+   RESET
 ================================================= */
 
 
-function resetOrderPage(){
+function resetAuction(){
 
 
 
-  if(
-    matchingTimer
-  ){
-
-    clearInterval(
-      matchingTimer
-    );
+if(
+ matchingTimer
+){
 
 
-    matchingTimer =
-    null;
-
-  }
+clearInterval(
+ matchingTimer
+);
 
 
 
-
-  currentOrder =
-  null;
-
+matchingTimer =
+null;
 
 
-
-
-  hideAllStatus();
+}
 
 
 
 
 
-  if(
-    orderMatching
-  ){
 
-    orderMatching.style.display =
-    "none";
-
-  }
+window.U9Auction.order =
+null;
 
 
+window.U9Auction.status =
+"READY";
 
-
-
-  if(
-    orderMatchingTime
-  ){
-
-    orderMatchingTime.textContent =
-    "";
-
-  }
-
-
-
-
-
-  if(
-    orderRoundNumber
-  ){
-
-    orderRoundNumber.textContent =
-    "";
-
-  }
-
-
-
-
-
-  if(
-    orderRoundProgress
-  ){
-
-    orderRoundProgress.textContent =
-    "";
-
-  }
-
-
-
-
-
-  if(
-    orderRoundStatus
-  ){
-
-    orderRoundStatus.textContent =
-    "";
-
-  }
 
 
 
 
 }
+
 
 
 
@@ -1129,49 +1088,40 @@ function resetOrderPage(){
 function openAuctionPage(){
 
 
-  if(
-    !auctionPage
-  ){
 
-    return;
+if(
+ !auctionPage
+){
 
-  }
+ return;
 
-
-
-
-
-
-  if(
-    homePage
-  ){
-
-    homePage.style.display =
-    "none";
-
-  }
+}
 
 
 
 
 
-  if(
-    shopPage
-  ){
+if(
+ homePage
+){
 
-    shopPage.style.display =
-    "none";
+ homePage.style.display =
+ "none";
 
-  }
-
-
+}
 
 
 
 
 
-  auctionPage.style.display =
-  "block";
+if(
+ shopPage
+){
+
+ shopPage.style.display =
+ "none";
+
+}
 
 
 
@@ -1179,17 +1129,25 @@ function openAuctionPage(){
 
 
 
-  /*
-     打开页面刷新 Coins
-  */
+auctionPage.style.display =
+"block";
 
 
-  loadAuctionUser();
 
+
+
+
+
+loadAuctionUser();
 
 
 
 }
+
+
+
+
+
 
 
 
@@ -1207,76 +1165,84 @@ function connectUserListener(){
 
 
 
-  if(
-    window.U9User &&
-    U9User.subscribe
-  ){
+if(
+ window.U9User &&
+ U9User.subscribe
+){
 
 
 
-    U9User.subscribe(
+U9User.subscribe(
 
-      function(
-        user,
-        state
-      ){
-
-
-
-        if(
-          state ===
-          "AUTHENTICATED"
-        ){
+function(
+ user,
+ state
+){
 
 
 
-          if(
-            user &&
-            user.coins !== undefined
-          ){
-
-            setCoins(
-              user.coins
-            );
-
-          }
+if(
+ state ===
+ "AUTHENTICATED"
+){
 
 
-
-        }
-
-
-
-
-
-        if(
-          state ===
-          "UNAUTHENTICATED"
-        ){
+if(
+ user &&
+ user.coins !== undefined
+){
 
 
-
-          setCoins(
-            0
-          );
-
-
-        }
+ setCoins(
+  user.coins
+ );
 
 
-
-      }
-
-
-    );
-
-
-
-  }
+}
 
 
 
 }
+
+
+
+
+
+if(
+ state ===
+ "UNAUTHENTICATED"
+){
+
+
+
+setCoins(
+0
+);
+
+
+
+}
+
+
+
+}
+
+
+
+);
+
+
+
+}
+
+
+
+}
+
+
+
+
+
 
 
 
@@ -1293,46 +1259,41 @@ function initializeAuctionPage(){
 
 
 
-  if(
-    auctionPage
-  ){
+if(
+ auctionPage
+){
 
-    auctionPage.style.display =
-    "none";
+ auctionPage.style.display =
+ "none";
 
-  }
-
-
-
-
-
-  resetOrderPage();
+}
 
 
 
 
+if(
+ orderStartButton
+){
 
 
-  if(
-    orderStartButton
-  ){
+orderStartButton.addEventListener(
+
+ "click",
+
+ startOrder
+
+);
 
 
-    orderStartButton.addEventListener(
-
-      "click",
-
-      startOrder
-
-    );
-
-
-  }
-
+}
 
 
 
 }
+
+
+
+
 
 
 
@@ -1355,6 +1316,8 @@ openAuctionPage;
 
 
 
+
+
 /* =================================================
    START
 ================================================= */
@@ -1365,8 +1328,6 @@ initializeAuctionPage();
 
 
 connectUserListener();
-
-
 
 
 
