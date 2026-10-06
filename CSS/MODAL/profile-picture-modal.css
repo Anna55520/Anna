@@ -1,0 +1,710 @@
+
+/* =========================================================
+   PROFILE PICTURE MODAL
+========================================================= */
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+#U9-profile-picture-modal {
+
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 99999;
+
+  display: none;
+
+  align-items: center;
+
+  justify-content: center;
+
+}
+
+
+#U9-profile-picture-modal.U9-profile-picture-modal-open {
+
+  display: flex;
+
+}
+
+
+/* =========================================================
+   OVERLAY
+========================================================= */
+
+#U9-profile-picture-modal-overlay {
+
+  position: absolute;
+
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.55);
+
+  backdrop-filter: blur(4px);
+
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+#U9-profile-picture-modal-content {
+
+  position: relative;
+
+  z-index: 1;
+
+  width: min(
+    92vw,
+    520px
+  );
+
+  max-height: 92vh;
+
+  overflow: hidden;
+
+  display: flex;
+
+  flex-direction: column;
+
+  background: #ffffff;
+
+  border-radius: 16px;
+
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.25);
+
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+#U9-profile-picture-modal-header {
+
+  position: relative;
+
+  min-height: 58px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  border-bottom: 1px solid #eeeeee;
+
+}
+
+
+#U9-profile-picture-modal-title {
+
+  font-size: 18px;
+
+  font-weight: 600;
+
+  color: #222222;
+
+}
+
+
+#U9-profile-picture-modal-close {
+
+  position: absolute;
+
+  left: 14px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  width: 36px;
+
+  height: 36px;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #333333;
+
+  font-size: 28px;
+
+  line-height: 36px;
+
+  cursor: pointer;
+
+}
+
+
+#U9-profile-picture-modal-close:hover {
+
+  background: #f3f3f3;
+
+  border-radius: 50%;
+
+}
+
+
+#U9-profile-picture-modal-header-space {
+
+  position: absolute;
+
+  right: 14px;
+
+  width: 36px;
+
+  height: 36px;
+
+}
+
+
+/* =========================================================
+   BODY
+========================================================= */
+
+#U9-profile-picture-modal-body {
+
+  position: relative;
+
+  padding: 22px;
+
+  overflow-y: auto;
+
+}
+
+
+/* =========================================================
+   SELECT AREA
+========================================================= */
+
+#U9-profile-picture-modal-select {
+
+  min-height: 300px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  text-align: center;
+
+  padding: 30px 20px;
+
+  border: 2px dashed #dddddd;
+
+  border-radius: 14px;
+
+  box-sizing: border-box;
+
+}
+
+
+#U9-profile-picture-modal-select-icon {
+
+  width: 64px;
+
+  height: 64px;
+
+  margin-bottom: 18px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #f5f5f5;
+
+  border-radius: 50%;
+
+}
+
+
+#U9-profile-picture-modal-select-icon img {
+
+  width: 30px;
+
+  height: 30px;
+
+  object-fit: contain;
+
+}
+
+
+#U9-profile-picture-modal-select-title {
+
+  font-size: 18px;
+
+  font-weight: 600;
+
+  color: #222222;
+
+  margin-bottom: 8px;
+
+}
+
+
+#U9-profile-picture-modal-select-description {
+
+  max-width: 360px;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+
+  color: #777777;
+
+  margin-bottom: 22px;
+
+}
+
+
+#U9-profile-picture-modal-select-button {
+
+  min-width: 150px;
+
+  height: 42px;
+
+  padding: 0 20px;
+
+  border: 0;
+
+  border-radius: 8px;
+
+  background: #222222;
+
+  color: #ffffff;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+}
+
+
+#U9-profile-picture-modal-select-button:hover {
+
+  background: #333333;
+
+}
+
+
+/* =========================================================
+   EDITOR
+========================================================= */
+
+#U9-profile-picture-modal-editor {
+
+  display: flex;
+
+  flex-direction: column;
+
+}
+
+
+#U9-profile-picture-modal-editor[hidden] {
+
+  display: none;
+
+}
+
+
+/* =========================================================
+   CROP AREA
+========================================================= */
+
+#U9-profile-picture-modal-crop-area {
+
+  position: relative;
+
+  width: 100%;
+
+  aspect-ratio: 1 / 1;
+
+  overflow: hidden;
+
+  background: #111111;
+
+  border-radius: 12px;
+
+  touch-action: none;
+
+  user-select: none;
+
+}
+
+
+#U9-profile-picture-modal-image-container {
+
+  position: absolute;
+
+  left: 50%;
+
+  top: 50%;
+
+  width: 100%;
+
+  height: 100%;
+
+  transform:
+    translate(-50%, -50%);
+
+  transform-origin: center center;
+
+  cursor: grab;
+
+  touch-action: none;
+
+}
+
+
+#U9-profile-picture-modal-image-container.U9-dragging {
+
+  cursor: grabbing;
+
+}
+
+
+#U9-profile-picture-modal-image {
+
+  position: absolute;
+
+  left: 50%;
+
+  top: 50%;
+
+  width: auto;
+
+  height: auto;
+
+  max-width: none;
+
+  max-height: none;
+
+  transform:
+    translate(-50%, -50%);
+
+  transform-origin: center center;
+
+  pointer-events: none;
+
+  user-select: none;
+
+}
+
+
+/* =========================================================
+   CROP FRAME
+========================================================= */
+
+#U9-profile-picture-modal-crop-frame {
+
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  border: 2px solid rgba(255, 255, 255, 0.95);
+
+  border-radius: 50%;
+
+  box-sizing: border-box;
+
+  box-shadow:
+    0 0 0 9999px rgba(0, 0, 0, 0.42);
+
+}
+
+
+/* =========================================================
+   ZOOM
+========================================================= */
+
+#U9-profile-picture-modal-zoom {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 18px;
+
+}
+
+
+#U9-profile-picture-modal-zoom-out,
+#U9-profile-picture-modal-zoom-in {
+
+  flex: 0 0 36px;
+
+  width: 36px;
+
+  height: 36px;
+
+  padding: 0;
+
+  border: 1px solid #dddddd;
+
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  color: #222222;
+
+  font-size: 22px;
+
+  line-height: 34px;
+
+  cursor: pointer;
+
+}
+
+
+#U9-profile-picture-modal-zoom-out:hover,
+#U9-profile-picture-modal-zoom-in:hover {
+
+  background: #f5f5f5;
+
+}
+
+
+#U9-profile-picture-modal-zoom-range {
+
+  flex: 1;
+
+  width: 100%;
+
+  cursor: pointer;
+
+}
+
+
+/* =========================================================
+   EDIT ACTIONS
+========================================================= */
+
+#U9-profile-picture-modal-editor-actions {
+
+  display: flex;
+
+  gap: 10px;
+
+  margin-top: 18px;
+
+}
+
+
+#U9-profile-picture-modal-editor-actions button {
+
+  flex: 1;
+
+  min-height: 42px;
+
+  padding: 0 12px;
+
+  border-radius: 8px;
+
+  font-size: 14px;
+
+  cursor: pointer;
+
+}
+
+
+#U9-profile-picture-modal-reset,
+#U9-profile-picture-modal-change {
+
+  border: 1px solid #dddddd;
+
+  background: #ffffff;
+
+  color: #222222;
+
+}
+
+
+#U9-profile-picture-modal-reset:hover,
+#U9-profile-picture-modal-change:hover {
+
+  background: #f5f5f5;
+
+}
+
+
+#U9-profile-picture-modal-confirm {
+
+  border: 0;
+
+  background: #222222;
+
+  color: #ffffff;
+
+}
+
+
+#U9-profile-picture-modal-confirm:hover {
+
+  background: #333333;
+
+}
+
+
+#U9-profile-picture-modal-editor-actions button:disabled {
+
+  opacity: 0.5;
+
+  cursor: not-allowed;
+
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+#U9-profile-picture-modal-loading {
+
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 10;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.92);
+
+}
+
+
+#U9-profile-picture-modal-loading[hidden] {
+
+  display: none;
+
+}
+
+
+#U9-profile-picture-modal-loading img {
+
+  width: 42px;
+
+  height: 42px;
+
+  object-fit: contain;
+
+  margin-bottom: 12px;
+
+}
+
+
+#U9-profile-picture-modal-loading-text {
+
+  font-size: 14px;
+
+  color: #444444;
+
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+#U9-profile-picture-modal-message {
+
+  min-height: 20px;
+
+  margin-top: 14px;
+
+  font-size: 13px;
+
+  line-height: 1.5;
+
+  text-align: center;
+
+  color: #555555;
+
+}
+
+
+#U9-profile-picture-modal-message.U9-success {
+
+  color: #188038;
+
+}
+
+
+#U9-profile-picture-modal-message.U9-error {
+
+  color: #d93025;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+  #U9-profile-picture-modal-content {
+
+    width: 94vw;
+
+    max-height: 94vh;
+
+    border-radius: 14px;
+
+  }
+
+
+  #U9-profile-picture-modal-body {
+
+    padding: 16px;
+
+  }
+
+
+  #U9-profile-picture-modal-select {
+
+    min-height: 260px;
+
+  }
+
+
+  #U9-profile-picture-modal-editor-actions {
+
+    gap: 7px;
+
+  }
+
+
+  #U9-profile-picture-modal-editor-actions button {
+
+    padding: 0 8px;
+
+    font-size: 13px;
+
+  }
+
+}
