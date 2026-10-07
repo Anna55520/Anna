@@ -1,3 +1,4 @@
+
 /* =========================
    HEADER ELEMENTS
 ========================= */
@@ -25,13 +26,6 @@ const headerUsername =
   document.getElementById(
     "U9-page-header-username"
   );
-
-
-const headerLoading =
-  document.getElementById(
-    "U9-page-header-loading"
-  );
-
 
 
 
@@ -65,6 +59,7 @@ function getSessionToken(){
 
 
 
+
 /* =========================
    USER STATE
 ========================= */
@@ -75,7 +70,7 @@ null;
 
 
 let currentUserState =
-"CHECKING";
+"UNAUTHENTICATED";
 
 
 let currentUserError =
@@ -136,188 +131,6 @@ function formatUsername(
 
 
 /* =========================
-   HEADER LOADING
-========================= */
-
-
-function showHeaderLoading(){
-
-
-  if(headerLoading){
-
-    headerLoading.style.display =
-    "flex";
-
-  }
-
-
-  if(headerRegister){
-
-    headerRegister.style.display =
-    "none";
-
-  }
-
-
-  if(headerLogin){
-
-    headerLogin.style.display =
-    "none";
-
-  }
-
-
-  if(headerUser){
-
-    headerUser.style.display =
-    "none";
-
-    headerUser.classList.remove(
-      "active"
-    );
-
-  }
-
-
-  if(headerUsername){
-
-    headerUsername.textContent =
-    "";
-
-  }
-
-
-}
-
-
-
-
-
-/* =========================
-   HEADER GUEST
-========================= */
-
-
-function showHeaderGuest(){
-
-
-  if(headerLoading){
-
-    headerLoading.style.display =
-    "none";
-
-  }
-
-
-  if(headerRegister){
-
-    headerRegister.style.display =
-    "block";
-
-  }
-
-
-  if(headerLogin){
-
-    headerLogin.style.display =
-    "block";
-
-  }
-
-
-  if(headerUser){
-
-    headerUser.style.display =
-    "none";
-
-    headerUser.classList.remove(
-      "active"
-    );
-
-  }
-
-
-  if(headerUsername){
-
-    headerUsername.textContent =
-    "";
-
-  }
-
-
-}
-
-
-
-
-
-/* =========================
-   HEADER USER
-========================= */
-
-
-function showHeaderUser(
-  user
-){
-
-
-  if(headerLoading){
-
-    headerLoading.style.display =
-    "none";
-
-  }
-
-
-  if(headerRegister){
-
-    headerRegister.style.display =
-    "none";
-
-  }
-
-
-  if(headerLogin){
-
-    headerLogin.style.display =
-    "none";
-
-  }
-
-
-
-  if(headerUser){
-
-    headerUser.style.display =
-    "flex";
-
-
-    headerUser.classList.add(
-      "active"
-    );
-
-  }
-
-
-
-  if(headerUsername){
-
-    headerUsername.textContent =
-    formatUsername(
-      user.username
-    );
-
-  }
-
-
-
-}
-
-
-
-
-
-/* =========================
    UPDATE HEADER
 ========================= */
 
@@ -329,21 +142,93 @@ function updateHeaderUser(
 
   if(user){
 
-    showHeaderUser(
-      user
-    );
+
+    if(headerRegister){
+
+      headerRegister.style.display =
+      "none";
+
+    }
+
+
+    if(headerLogin){
+
+      headerLogin.style.display =
+      "none";
+
+    }
+
+
+
+    if(headerUser){
+
+      headerUser.classList.add(
+        "active"
+      );
+
+    }
+
+
+
+    if(headerUsername){
+
+      headerUsername.textContent =
+      formatUsername(
+        user.username
+      );
+
+    }
+
+
 
   }
+
+
 
   else{
 
-    showHeaderGuest();
+
+    if(headerRegister){
+
+      headerRegister.style.display =
+      "";
+
+    }
+
+
+    if(headerLogin){
+
+      headerLogin.style.display =
+      "";
+
+    }
+
+
+
+    if(headerUser){
+
+      headerUser.classList.remove(
+        "active"
+      );
+
+    }
+
+
+
+    if(headerUsername){
+
+      headerUsername.textContent =
+      "";
+
+    }
+
+
 
   }
 
 
-}
 
+}
 
 
 
@@ -374,53 +259,22 @@ function setUserState(
 
 
 
-  switch(state){
+  if(
+    state ===
+    "AUTHENTICATED"
+  ){
 
+    updateHeaderUser(
+      user
+    );
 
-    case "AUTHENTICATED":
+  }
 
+  else{
 
-      updateHeaderUser(
-        user
-      );
-
-
-      break;
-
-
-
-
-    case "UNAUTHENTICATED":
-
-
-      showHeaderGuest();
-
-
-      break;
-
-
-
-
-    case "CHECKING":
-
-
-      showHeaderLoading();
-
-
-      break;
-
-
-
-
-    case "ERROR":
-
-
-      showHeaderLoading();
-
-
-      break;
-
-
+    updateHeaderUser(
+      null
+    );
 
   }
 
@@ -464,6 +318,7 @@ function notifyUserListeners(){
 
       }
 
+
       catch(error){
 
 
@@ -481,6 +336,7 @@ function notifyUserListeners(){
 
     }
 
+
   );
 
 
@@ -497,6 +353,13 @@ function notifyUserListeners(){
 
 async function getCurrentUser(){
 
+
+  /*
+     保存旧用户
+
+     这样在 CHECKING 状态期间
+     其他页面不会突然丢失用户资料
+  */
 
   const previousUser =
   currentUser;
@@ -516,6 +379,11 @@ async function getCurrentUser(){
 
 
   try{
+
+
+    /* =========================
+       GET TOKEN
+    ========================= */
 
 
     const token =
@@ -540,6 +408,9 @@ async function getCurrentUser(){
 
 
 
+    /* =========================
+       REQUEST /ME
+    ========================= */
 
 
     const response =
@@ -552,11 +423,21 @@ async function getCurrentUser(){
         method:
         "GET",
 
+
+        /*
+           不使用浏览器缓存
+
+           每次 refresh 都从服务器
+           获取最新 user 数据
+        */
+
         cache:
         "no-store",
 
+
         credentials:
         "include",
+
 
         headers:
         headers
@@ -569,20 +450,20 @@ async function getCurrentUser(){
 
 
 
-    /*
-       没有登录
-       或 token 无效
-    */
+    /* =========================
+       INVALID SESSION
+    ========================= */
 
 
     if(
-
       response.status === 401 ||
-
       response.status === 403
-
     ){
 
+
+      /*
+         清除失效 token
+      */
 
       localStorage.removeItem(
         "u9_token"
@@ -611,9 +492,9 @@ async function getCurrentUser(){
 
 
 
-    /*
-       服务器错误
-    */
+    /* =========================
+       OTHER HTTP ERROR
+    ========================= */
 
 
     if(!response.ok){
@@ -621,9 +502,7 @@ async function getCurrentUser(){
 
       const error =
       new Error(
-
         `GET /me failed: ${response.status}`
-
       );
 
 
@@ -642,7 +521,7 @@ async function getCurrentUser(){
 
       console.error(
 
-        "U9 /me failed:",
+        "U9 /me request failed:",
 
         response.status
 
@@ -657,6 +536,11 @@ async function getCurrentUser(){
 
 
 
+
+
+    /* =========================
+       PARSE RESPONSE
+    ========================= */
 
 
     const result =
@@ -675,6 +559,11 @@ async function getCurrentUser(){
 
 
 
+    /* =========================
+       NO USER
+    ========================= */
+
+
     if(!user){
 
 
@@ -689,6 +578,7 @@ async function getCurrentUser(){
       );
 
 
+
       return null;
 
 
@@ -696,6 +586,11 @@ async function getCurrentUser(){
 
 
 
+
+
+    /* =========================
+       AUTHENTICATED
+    ========================= */
 
 
     setUserState(
@@ -711,11 +606,8 @@ async function getCurrentUser(){
 
 
     console.log(
-
       "U9 User Refreshed:",
-
       user
-
     );
 
 
@@ -739,6 +631,13 @@ async function getCurrentUser(){
     );
 
 
+
+    /*
+       网络错误时
+
+       保留之前的 user
+       不要直接把用户变成未登录
+    */
 
     setUserState(
 
@@ -767,8 +666,9 @@ async function getCurrentUser(){
 
 
 
+
 /* =========================
-   PUBLIC API
+   GET USER
 ========================= */
 
 
@@ -781,6 +681,12 @@ function getUser(){
 
 
 
+
+/* =========================
+   GET STATE
+========================= */
+
+
 function getUserState(){
 
   return currentUserState;
@@ -788,6 +694,12 @@ function getUserState(){
 }
 
 
+
+
+
+/* =========================
+   LOGIN CHECK
+========================= */
 
 
 function isLoggedIn(){
@@ -808,6 +720,14 @@ function isLoggedIn(){
 
 
 
+
+
+
+/* =========================
+   CHECKING
+========================= */
+
+
 function isChecking(){
 
   return (
@@ -820,6 +740,12 @@ function isChecking(){
 }
 
 
+
+
+
+/* =========================
+   SESSION CHECK
+========================= */
 
 
 function hasSession(){
@@ -835,6 +761,11 @@ function hasSession(){
 
 
 
+
+
+/* =========================
+   SUBSCRIBE
+========================= */
 
 
 function subscribeUser(
@@ -859,6 +790,10 @@ function subscribeUser(
 
 
 
+  /*
+     返回 unsubscribe
+  */
+
   return function(){
 
     userListeners.delete(
@@ -874,7 +809,25 @@ function subscribeUser(
 
 
 
+
+/* =========================
+   REFRESH
+========================= */
+
+
 async function refreshUser(){
+
+
+  /*
+     这里是真正重新请求 /me
+
+     所以：
+
+     U9User.refresh()
+
+     不只是重新读取 currentUser
+     而是重新从服务器获取最新数据
+  */
 
 
   return await getCurrentUser();
@@ -884,6 +837,12 @@ async function refreshUser(){
 
 
 
+
+
+
+/* =========================
+   LOGOUT CLEAR
+========================= */
 
 
 function clearCurrentUser(){
@@ -913,7 +872,6 @@ function clearCurrentUser(){
 
 
 
-
 /* =========================
    EXPORT
 ========================= */
@@ -922,33 +880,65 @@ function clearCurrentUser(){
 window.U9User = {
 
 
+  /*
+     获取当前缓存用户
+  */
+
   get:
   getUser,
 
+
+  /*
+     从服务器重新获取用户
+  */
 
   refresh:
   refreshUser,
 
 
+  /*
+     是否已经登录
+  */
+
   isLoggedIn:
   isLoggedIn,
 
+
+  /*
+     是否正在检查
+  */
 
   isChecking:
   isChecking,
 
 
+  /*
+     是否存在有效 session
+  */
+
   hasSession:
   hasSession,
 
+
+  /*
+     获取当前状态
+  */
 
   getState:
   getUserState,
 
 
+  /*
+     监听用户变化
+  */
+
   subscribe:
   subscribeUser,
 
+
+  /*
+     清除登录状态
+  */
 
   clear:
   clearCurrentUser
@@ -967,7 +957,10 @@ window.U9User = {
 ========================= */
 
 
-showHeaderLoading();
+/*
+   页面第一次加载时
+   自动检查当前用户
+*/
 
 
 getCurrentUser();
