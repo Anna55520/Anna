@@ -1,27 +1,32 @@
-
 /* =========================
    AUCTION PAGE
 ========================= */
 
 #U9-page-auction {
 
-  position: relative;
+    position: relative;
 
-  width: 100%;
+    width: 100%;
 
-  min-height: calc(100vh - 115px);
+    min-height:
+    calc(100vh - 115px);
 
-  box-sizing: border-box;
+    box-sizing: border-box;
 
-  margin-top: 115px;
+    margin-top: 115px;
 
-  padding: 24px 16px 40px;
+    padding:
+    24px 16px 40px;
 
-  background-color: #ee74d2;
+    background:
+    #ee74d2;
 
-  color: #ffffff;
+    color:
+    #ffffff;
 
-  font-family: Arial, sans-serif;
+    font-family:
+    Arial,
+    sans-serif;
 
 }
 
@@ -32,208 +37,269 @@
 
 #U9-page-auction h2 {
 
-  margin: 0 0 22px;
+    margin:
+    0 0 22px;
 
-  font-size: 28px;
+    font-size:
+    28px;
 
-  font-weight: 700;
-
-  line-height: 1.2;
-
-}
-
-
-/* =========================
-   INFO
-========================= */
-
-#U9-page-auction > div:not(#U9-product):not(#U9-matching) {
-
-  display: flex;
-
-  align-items: center;
-
-  justify-content: space-between;
-
-  width: 100%;
-
-  max-width: 520px;
-
-  min-height: 52px;
-
-  margin-bottom: 12px;
-
-  padding: 0 16px;
-
-  box-sizing: border-box;
-
-  border-radius: 14px;
-
-  background: rgba(255, 255, 255, 0.18);
-
-  border: 1px solid rgba(255, 255, 255, 0.25);
-
-  backdrop-filter: blur(10px);
-
-  -webkit-backdrop-filter: blur(10px);
-
-  font-size: 16px;
+    font-weight:
+    700;
 
 }
 
 
 /* =========================
-   COINS
+   INFO CARD
 ========================= */
 
-#U9-coins {
+#U9-page-auction > div {
 
-  font-size: 18px;
+    width:
+    100%;
 
-  font-weight: 700;
+    max-width:
+    520px;
 
 }
 
 
 /* =========================
-   ROUND
+   COINS / ROUND
 ========================= */
 
+#U9-coins,
 #U9-round-progress {
 
-  font-size: 18px;
+    font-size:
+    18px;
 
-  font-weight: 700;
+    font-weight:
+    700;
 
 }
+
 
 
 /* =========================
-   PRODUCT
+   TOP INFO
 ========================= */
 
-#U9-product {
+#U9-page-auction > div:nth-child(2),
+#U9-page-auction > div:nth-child(3) {
 
-  display: flex;
 
-  align-items: center;
+    display:
+    flex;
 
-  justify-content: center;
+    justify-content:
+    space-between;
 
-  width: 100%;
+    align-items:
+    center;
 
-  max-width: 520px;
 
-  min-height: 180px;
+    min-height:
+    52px;
 
-  margin: 20px 0 16px;
 
-  padding: 24px;
+    margin-bottom:
+    12px;
 
-  box-sizing: border-box;
 
-  border-radius: 20px;
+    padding:
+    0 16px;
 
-  background: #ffffff;
 
-  color: #333333;
+    box-sizing:
+    border-box;
 
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.12);
 
-  font-size: 18px;
+    border-radius:
+    14px;
 
-  font-weight: 600;
 
-  text-align: center;
+    background:
+    rgba(
+        255,
+        255,
+        255,
+        0.18
+    );
+
+
+    border:
+    1px solid
+    rgba(
+        255,
+        255,
+        255,
+        0.25
+    );
+
+
+    backdrop-filter:
+    blur(10px);
 
 }
+
 
 
 /* =========================
-   ORDER BUTTON
+   ORDER CARD
 ========================= */
 
-#U9-order-button {
+#U9-order {
 
-  display: block;
 
-  width: 100%;
+    display:
+    flex;
 
-  max-width: 520px;
 
-  height: 54px;
+    flex-direction:
+    column;
 
-  margin: 0;
 
-  padding: 0 20px;
+    gap:
+    12px;
 
-  border: none;
 
-  border-radius: 14px;
+    margin:
+    20px 0;
 
-  background: #ffffff;
 
-  color: #ee4fbe;
+    padding:
+    20px;
 
-  font-size: 17px;
 
-  font-weight: 700;
+    box-sizing:
+    border-box;
 
-  cursor: pointer;
 
-  box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.15);
+    border-radius:
+    20px;
 
-  transition:
-    transform 0.15s ease,
-    opacity 0.15s ease,
-    box-shadow 0.15s ease;
+
+    background:
+    #ffffff;
+
+
+    color:
+    #333333;
+
+
+    box-shadow:
+    0 10px 30px
+    rgba(
+        0,
+        0,
+        0,
+        0.12
+    );
+
 
 }
+
 
 
 /* =========================
-   BUTTON HOVER
+   PRODUCT IMAGE
 ========================= */
 
-#U9-order-button:hover {
+#U9-order-image {
 
-  transform: translateY(-1px);
 
-  box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.18);
+    width:
+    160px;
+
+
+    height:
+    160px;
+
+
+    object-fit:
+    cover;
+
+
+    margin:
+    0 auto;
+
+
+    border-radius:
+    16px;
+
 
 }
+
 
 
 /* =========================
-   BUTTON ACTIVE
+   ORDER TEXT
 ========================= */
 
-#U9-order-button:active {
 
-  transform: translateY(1px);
+#U9-order > div {
+
+
+    display:
+    flex;
+
+
+    justify-content:
+    space-between;
+
+
+    align-items:
+    center;
+
+
+    padding:
+    8px 0;
+
+
+    border-bottom:
+    1px solid
+    rgba(
+        0,
+        0,
+        0,
+        0.08
+    );
+
 
 }
+
+
+
+#U9-order > div:last-child {
+
+    border-bottom:
+    none;
+
+}
+
+
+
+#U9-order span {
+
+    font-weight:
+    700;
+
+}
+
 
 
 /* =========================
-   BUTTON DISABLED
+   STATUS
 ========================= */
 
-#U9-order-button:disabled {
+#U9-order-status {
 
-  opacity: 0.55;
-
-  cursor: not-allowed;
-
-  transform: none;
-
-  box-shadow:
-    0 5px 12px rgba(0, 0, 0, 0.08);
+    color:
+    #ee4fbe;
 
 }
+
 
 
 /* =========================
@@ -242,138 +308,370 @@
 
 #U9-matching {
 
-  display: flex;
 
-  align-items: center;
+    display:
+    flex;
 
-  justify-content: center;
 
-  width: 100%;
+    justify-content:
+    center;
 
-  max-width: 520px;
 
-  min-height: 48px;
+    align-items:
+    center;
 
-  margin-top: 14px;
 
-  box-sizing: border-box;
+    gap:
+    8px;
 
-  border-radius: 14px;
 
-  background: rgba(255, 255, 255, 0.18);
+    min-height:
+    48px;
 
-  color: #ffffff;
 
-  font-size: 16px;
+    margin:
+    14px 0;
 
-  font-weight: 600;
 
-  text-align: center;
+    padding:
+    0 20px;
+
+
+    box-sizing:
+    border-box;
+
+
+    border-radius:
+    14px;
+
+
+    background:
+    rgba(
+        255,
+        255,
+        255,
+        0.18
+    );
+
+
+    font-size:
+    16px;
+
+
+    font-weight:
+    600;
 
 }
+
 
 
 /* =========================
-   TABLET / DESKTOP
+   BUTTON GROUP
 ========================= */
 
-@media (min-width: 481px) {
+#U9-order-button,
+#U9-pay-button,
+#U9-complete-button {
 
-  #U9-page-auction {
 
-    padding-left: 24px;
+    display:
+    block;
 
-    padding-right: 24px;
 
-  }
+    width:
+    100%;
+
+
+    max-width:
+    520px;
+
+
+    height:
+    54px;
+
+
+    margin:
+    10px 0;
+
+
+    border:
+    none;
+
+
+    border-radius:
+    14px;
+
+
+    background:
+    #ffffff;
+
+
+    color:
+    #ee4fbe;
+
+
+    font-size:
+    17px;
+
+
+    font-weight:
+    700;
+
+
+    cursor:
+    pointer;
+
+
+    box-shadow:
+    0 8px 20px
+    rgba(
+        0,
+        0,
+        0,
+        0.15
+    );
+
+
+    transition:
+    .15s ease;
 
 }
+
+
+
+
+#U9-order-button:hover,
+#U9-pay-button:hover,
+#U9-complete-button:hover {
+
+
+    transform:
+    translateY(-1px);
+
+}
+
+
+
+/* =========================
+   DISABLED
+========================= */
+
+#U9-order-button:disabled,
+#U9-pay-button:disabled,
+#U9-complete-button:disabled {
+
+
+    opacity:
+    .55;
+
+
+    cursor:
+    not-allowed;
+
+
+    transform:
+    none;
+
+}
+
+
+
+/* =========================
+   PAY BUTTON
+========================= */
+
+#U9-pay-button {
+
+    color:
+    #ff8a00;
+
+}
+
+
+
+/* =========================
+   COMPLETE BUTTON
+========================= */
+
+#U9-complete-button {
+
+    color:
+    #16a34a;
+
+}
+
+
+
+/* =========================
+   COOLDOWN
+========================= */
+
+#U9-cooldown {
+
+
+    display:
+    flex;
+
+
+    justify-content:
+    center;
+
+
+    align-items:
+    center;
+
+
+    gap:
+    8px;
+
+
+    margin-top:
+    16px;
+
+
+    min-height:
+    48px;
+
+
+    border-radius:
+    14px;
+
+
+    background:
+    rgba(
+        255,
+        255,
+        255,
+        0.18
+    );
+
+
+    font-size:
+    16px;
+
+
+    font-weight:
+    700;
+
+
+}
+
+
+
+/* =========================
+   TABLET
+========================= */
+
+@media(min-width:481px){
+
+
+    #U9-page-auction {
+
+
+        padding-left:
+        24px;
+
+
+        padding-right:
+        24px;
+
+
+    }
+
+
+}
+
+
 
 
 /* =========================
    MOBILE
 ========================= */
 
-@media (max-width: 480px) {
-
-  #U9-page-auction {
-
-    width: 100%;
-
-    min-height: calc(100vh - 115px);
-
-    margin-top: 115px;
-
-    padding: 20px 14px 30px;
-
-  }
+@media(max-width:480px){
 
 
-  #U9-page-auction h2 {
-
-    margin-bottom: 18px;
-
-    font-size: 24px;
-
-  }
+    #U9-page-auction {
 
 
-  #U9-page-auction > div:not(#U9-product):not(#U9-matching) {
-
-    min-height: 48px;
-
-    padding: 0 14px;
-
-    border-radius: 12px;
-
-    font-size: 15px;
-
-  }
+        padding:
+        20px 14px 30px;
 
 
-  #U9-coins,
-  #U9-round-progress {
-
-    font-size: 16px;
-
-  }
+    }
 
 
-  #U9-product {
 
-    min-height: 160px;
-
-    margin-top: 16px;
-
-    padding: 20px;
-
-    border-radius: 18px;
-
-    font-size: 16px;
-
-  }
+    #U9-page-auction h2 {
 
 
-  #U9-order-button {
-
-    height: 52px;
-
-    border-radius: 13px;
-
-    font-size: 16px;
-
-  }
+        font-size:
+        24px;
 
 
-  #U9-matching {
+    }
 
-    min-height: 44px;
 
-    border-radius: 12px;
 
-    font-size: 15px;
+    #U9-order {
 
-  }
+
+        padding:
+        16px;
+
+
+        border-radius:
+        16px;
+
+
+    }
+
+
+
+    #U9-order-image {
+
+
+        width:
+        120px;
+
+
+        height:
+        120px;
+
+
+    }
+
+
+
+    #U9-order > div {
+
+
+        font-size:
+        14px;
+
+
+    }
+
+
+
+    #U9-order-button,
+    #U9-pay-button,
+    #U9-complete-button {
+
+
+        height:
+        52px;
+
+
+        font-size:
+        16px;
+
+
+        border-radius:
+        13px;
+
+
+    }
+
 
 }
-
