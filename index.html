@@ -454,7 +454,186 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
     <!-- AUCTION -->
 
     <div id="U9-page-auction">
-      Auction
+
+      <div class="U9-auction-container">
+
+        <!-- =========================
+            TOP
+        ========================= -->
+
+        <div class="U9-auction-top">
+
+          <div class="U9-auction-title">
+            <h1>Task Order</h1>
+            <p>Complete tasks and earn Coins</p>
+          </div>
+
+          <div class="U9-auction-coins-box">
+            <span>Coins</span>
+            <strong id="U9-auction-coins">0.00</strong>
+          </div>
+
+        </div>
+
+
+        <!-- =========================
+            ROUND
+        ========================= -->
+
+        <div class="U9-auction-round-card">
+
+          <div>
+            <span class="U9-auction-label">
+              Current Round
+            </span>
+
+            <strong id="U9-auction-round">
+              0 / 3
+            </strong>
+          </div>
+
+          <div
+            id="U9-auction-cooldown"
+            class="U9-auction-cooldown"
+          >
+          </div>
+
+        </div>
+
+
+        <!-- =========================
+            MATCHING
+        ========================= -->
+
+        <div
+          id="U9-auction-matching"
+          class="U9-auction-matching"
+        >
+
+          <div class="U9-auction-spinner"></div>
+
+          <h2>Matching Task</h2>
+
+          <p id="U9-auction-matching-text">
+            Please wait...
+          </p>
+
+        </div>
+
+
+        <!-- =========================
+            ORDER
+        ========================= -->
+
+        <div
+          id="U9-auction-order"
+          class="U9-auction-order"
+        >
+
+          <div class="U9-auction-order-header">
+
+            <span>Current Task</span>
+
+            <span
+              id="U9-auction-order-status"
+              class="U9-auction-status"
+            >
+              Pending
+            </span>
+
+          </div>
+
+
+          <div class="U9-auction-product">
+
+            <h2 id="U9-auction-product-name">
+              -
+            </h2>
+
+            <p id="U9-auction-product-description">
+              -
+            </p>
+
+          </div>
+
+
+          <div class="U9-auction-price-row">
+
+            <div>
+              <span>Price</span>
+              <strong id="U9-auction-product-price">
+                0.00
+              </strong>
+            </div>
+
+            <div>
+              <span>Profit</span>
+              <strong id="U9-auction-product-profit">
+                +0.00
+              </strong>
+            </div>
+
+          </div>
+
+
+          <a
+            id="U9-auction-product-url"
+            class="U9-auction-product-link"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="display:none;"
+          >
+            View Product
+          </a>
+
+
+          <button
+            id="U9-auction-complete"
+            type="button"
+            disabled
+          >
+            Complete Task
+          </button>
+
+        </div>
+
+
+        <!-- =========================
+            START
+        ========================= -->
+
+        <div
+          id="U9-auction-start-area"
+          class="U9-auction-start-area"
+        >
+
+          <button
+            id="U9-auction-start"
+            type="button"
+          >
+            Start Task
+          </button>
+
+          <p>
+            Minimum 50 Coins required to start
+          </p>
+
+        </div>
+
+
+        <!-- =========================
+            MESSAGE
+        ========================= -->
+
+        <div
+          id="U9-auction-message"
+          class="U9-auction-message"
+        >
+        </div>
+
+      </div>
+
     </div>
 
 
