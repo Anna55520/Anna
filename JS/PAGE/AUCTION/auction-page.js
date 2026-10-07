@@ -74,27 +74,29 @@
 
   }
 
-
   function getSupabase() {
 
-    if (
-      window.supabaseClient
-    ) {
-
-      return window.supabaseClient;
-
-    }
-
-    if (
+  if (
       typeof supabaseClient !==
-      "undefined"
-    ) {
+      "undefined" &&
+      supabaseClient
+  ) {
 
       return supabaseClient;
 
-    }
+  }
 
-    return null;
+
+  if (
+      window.supabaseClient
+  ) {
+
+      return window.supabaseClient;
+
+  }
+
+
+  return null;
 
   }
 
