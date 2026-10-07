@@ -45,14 +45,63 @@
   ========================================================= */
 
   function getUserId() {
-    const userId =
-      window.currentUserUUID ||
-      window.currentUserId ||
-      localStorage.getItem("currentUserUUID") ||
-      localStorage.getItem("currentUserId") ||
-      null;
+    // 1. 优先从 header.js 的 U9User 获取当前登录用户
+    try {
+      if (
+        window.U9User &&
+        typeof window.U9User.get === "function"
+      ) {
+        const user = window.U9User.get();
 
-    return userId;
+        if (user && user.id) {
+          console.log("U9: User ID from U9User:", user.id);
+          return user.id;
+        }
+      }
+    } catch (error) {
+      console.error("U9: Failed to read U9User:", error);
+    }
+
+    // 2. 兼容旧的全局变量
+    if (window.currentUserUUID) {
+      console.log(
+        "U9: User ID from window.currentUserUUID:",
+        window.currentUserUUID
+      );
+      return window.currentUserUUID;
+    }
+
+    if (window.currentUserId) {
+      console.log(
+        "U9: User ID from window.currentUserId:",
+        window.currentUserId
+      );
+      return window.currentUserId;
+    }
+
+    // 3. 兼容 localStorage
+    const storedUUID = localStorage.getItem("currentUserUUID");
+
+    if (storedUUID) {
+      console.log(
+        "U9: User ID from localStorage currentUserUUID:",
+        storedUUID
+      );
+      return storedUUID;
+    }
+
+    const storedId = localStorage.getItem("currentUserId");
+
+    if (storedId) {
+      console.log(
+        "U9: User ID from localStorage currentUserId:",
+        storedId
+      );
+      return storedId;
+    }
+
+    console.error("U9: User UUID is missing.");
+    return null;
   }
 
 
