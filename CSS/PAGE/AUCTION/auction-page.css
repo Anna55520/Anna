@@ -1,3 +1,4 @@
+
 /* =========================
    AUCTION PAGE
 ========================= */
@@ -14,7 +15,277 @@
 
   margin-top: 115px;
 
+  padding: 24px 16px 40px;
+
   background-color: #ee74d2;
+
+  color: #ffffff;
+
+  font-family: Arial, sans-serif;
+
+}
+
+
+/* =========================
+   TITLE
+========================= */
+
+#U9-page-auction h2 {
+
+  margin: 0 0 22px;
+
+  font-size: 28px;
+
+  font-weight: 700;
+
+  line-height: 1.2;
+
+}
+
+
+/* =========================
+   INFO
+========================= */
+
+#U9-page-auction > div:not(#U9-product):not(#U9-matching) {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  width: 100%;
+
+  max-width: 520px;
+
+  min-height: 52px;
+
+  margin-bottom: 12px;
+
+  padding: 0 16px;
+
+  box-sizing: border-box;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.18);
+
+  border: 1px solid rgba(255, 255, 255, 0.25);
+
+  backdrop-filter: blur(10px);
+
+  -webkit-backdrop-filter: blur(10px);
+
+  font-size: 16px;
+
+}
+
+
+/* =========================
+   COINS
+========================= */
+
+#U9-coins {
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+}
+
+
+/* =========================
+   ROUND
+========================= */
+
+#U9-round-progress {
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+}
+
+
+/* =========================
+   PRODUCT
+========================= */
+
+#U9-product {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 100%;
+
+  max-width: 520px;
+
+  min-height: 180px;
+
+  margin: 20px 0 16px;
+
+  padding: 24px;
+
+  box-sizing: border-box;
+
+  border-radius: 20px;
+
+  background: #ffffff;
+
+  color: #333333;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.12);
+
+  font-size: 18px;
+
+  font-weight: 600;
+
+  text-align: center;
+
+}
+
+
+/* =========================
+   ORDER BUTTON
+========================= */
+
+#U9-order-button {
+
+  display: block;
+
+  width: 100%;
+
+  max-width: 520px;
+
+  height: 54px;
+
+  margin: 0;
+
+  padding: 0 20px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: #ffffff;
+
+  color: #ee4fbe;
+
+  font-size: 17px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.15);
+
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease,
+    box-shadow 0.15s ease;
+
+}
+
+
+/* =========================
+   BUTTON HOVER
+========================= */
+
+#U9-order-button:hover {
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.18);
+
+}
+
+
+/* =========================
+   BUTTON ACTIVE
+========================= */
+
+#U9-order-button:active {
+
+  transform: translateY(1px);
+
+}
+
+
+/* =========================
+   BUTTON DISABLED
+========================= */
+
+#U9-order-button:disabled {
+
+  opacity: 0.55;
+
+  cursor: not-allowed;
+
+  transform: none;
+
+  box-shadow:
+    0 5px 12px rgba(0, 0, 0, 0.08);
+
+}
+
+
+/* =========================
+   MATCHING
+========================= */
+
+#U9-matching {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  width: 100%;
+
+  max-width: 520px;
+
+  min-height: 48px;
+
+  margin-top: 14px;
+
+  box-sizing: border-box;
+
+  border-radius: 14px;
+
+  background: rgba(255, 255, 255, 0.18);
+
+  color: #ffffff;
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  text-align: center;
+
+}
+
+
+/* =========================
+   TABLET / DESKTOP
+========================= */
+
+@media (min-width: 481px) {
+
+  #U9-page-auction {
+
+    padding-left: 24px;
+
+    padding-right: 24px;
+
+  }
 
 }
 
@@ -33,6 +304,76 @@
 
     margin-top: 115px;
 
+    padding: 20px 14px 30px;
+
+  }
+
+
+  #U9-page-auction h2 {
+
+    margin-bottom: 18px;
+
+    font-size: 24px;
+
+  }
+
+
+  #U9-page-auction > div:not(#U9-product):not(#U9-matching) {
+
+    min-height: 48px;
+
+    padding: 0 14px;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+
+  }
+
+
+  #U9-coins,
+  #U9-round-progress {
+
+    font-size: 16px;
+
+  }
+
+
+  #U9-product {
+
+    min-height: 160px;
+
+    margin-top: 16px;
+
+    padding: 20px;
+
+    border-radius: 18px;
+
+    font-size: 16px;
+
+  }
+
+
+  #U9-order-button {
+
+    height: 52px;
+
+    border-radius: 13px;
+
+    font-size: 16px;
+
+  }
+
+
+  #U9-matching {
+
+    min-height: 44px;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+
   }
 
 }
+
