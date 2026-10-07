@@ -1,10 +1,18 @@
+
 (() => {
 "use strict";
 
 /* =========================================================
    U9 ORDER FRONTEND
-   Compatible with:
-   u9-order Edge Function
+
+   Responsible for:
+   - Start Order
+   - Match Order
+   - Pay Remaining
+   - Load Status
+
+   Completion is handled by:
+   JS/PAGE/AUCTION/u9-complete.js
 ========================================================= */
 
 
@@ -47,21 +55,16 @@ const $ = (id) =>
 document.querySelector(id);
 
 
-
 const DOM = {
 
     orderButton:
         $("#U9-order-button"),
 
-
     coins:
         $("#U9-coins"),
 
-
     roundProgress:
         $("#U9-round-progress"),
-
-
 
     matching:
         $("#U9-matching"),
@@ -69,53 +72,38 @@ const DOM = {
     matchingTime:
         $("#U9-matching-time"),
 
-
-
     order:
         $("#U9-order"),
-
 
     orderImage:
         $("#U9-order-image"),
 
-
     orderName:
         $("#U9-order-name"),
-
 
     orderPrice:
         $("#U9-order-price"),
 
-
     orderProfit:
         $("#U9-order-profit"),
-
 
     orderPaid:
         $("#U9-order-paid"),
 
-
     orderRemaining:
         $("#U9-order-remaining"),
-
 
     orderStatus:
         $("#U9-order-status"),
 
-
-
     payButton:
         $("#U9-pay-button"),
-
 
     completeButton:
         $("#U9-complete-button"),
 
-
-
     cooldown:
         $("#U9-cooldown"),
-
 
     cooldownTime:
         $("#U9-cooldown-time"),
@@ -123,24 +111,20 @@ const DOM = {
 };
 
 
-
 /* =========================================================
    HELPERS
 ========================================================= */
-
 
 function number(value){
 
     const n =
     Number(value);
 
-
     return Number.isFinite(n)
         ? n
         : 0;
 
 }
-
 
 
 function money(value){
@@ -151,7 +135,6 @@ function money(value){
 }
 
 
-
 function setText(
     el,
     value
@@ -160,12 +143,10 @@ function setText(
     if(!el)
         return;
 
-
     el.textContent =
     value ?? "";
 
 }
-
 
 
 function show(el){
@@ -173,13 +154,10 @@ function show(el){
     if(!el)
         return;
 
-
     el.hidden = false;
-
     el.style.display = "";
 
 }
-
 
 
 function hide(el){
@@ -187,11 +165,9 @@ function hide(el){
     if(!el)
         return;
 
-
     el.hidden = true;
 
 }
-
 
 
 function enable(el){
@@ -199,11 +175,9 @@ function enable(el){
     if(!el)
         return;
 
-
     el.disabled = false;
 
 }
-
 
 
 function disable(el){
@@ -211,11 +185,9 @@ function disable(el){
     if(!el)
         return;
 
-
     el.disabled = true;
 
 }
-
 
 
 function clearTimer(timerName){
@@ -228,6 +200,7 @@ function clearTimer(timerName){
 
         state[timerName] =
         null;
+
     }
 
 }
@@ -236,7 +209,6 @@ function clearTimer(timerName){
 /* =========================================================
    AUTH
 ========================================================= */
-
 
 function getHeaders(){
 
@@ -268,17 +240,14 @@ function getHeaders(){
 }
 
 
-
 /* =========================================================
    API REQUEST
 ========================================================= */
-
 
 async function api(
     method="GET",
     body=null
 ){
-
 
     const options = {
 
@@ -304,13 +273,11 @@ async function api(
     }
 
 
-
     const response =
     await fetch(
         U9_ORDER_URL,
         options
     );
-
 
 
     let result;
@@ -336,7 +303,6 @@ async function api(
     }
 
 
-
     if(
         !response.ok ||
         result.success === false
@@ -348,15 +314,12 @@ async function api(
             `HTTP_${response.status}`
         );
 
-
         error.result =
         result;
-
 
         throw error;
 
     }
-
 
 
     return result;
@@ -364,12 +327,9 @@ async function api(
 }
 
 
-
-
 /* =========================================================
    TIMER CLEAN
 ========================================================= */
-
 
 function clearMatching(){
 
@@ -378,7 +338,6 @@ function clearMatching(){
     );
 
 }
-
 
 
 function clearCooldown(){
@@ -390,11 +349,9 @@ function clearCooldown(){
 }
 
 
-
 /* =========================================================
    USER STATE
 ========================================================= */
-
 
 function updateUser(user){
 
@@ -418,11 +375,9 @@ function updateUser(user){
 }
 
 
-
 /* =========================================================
    ROUND STATE
 ========================================================= */
-
 
 function updateRound(round){
 
@@ -432,7 +387,6 @@ function updateRound(round){
 
     window.U9CurrentRound =
     state.round;
-
 
 
     if(!round){
@@ -447,7 +401,6 @@ function updateRound(round){
     }
 
 
-
     const completed =
     number(
         round.completed_orders
@@ -460,12 +413,10 @@ function updateRound(round){
     );
 
 
-
     setText(
         DOM.roundProgress,
         `${completed}/${target}`
     );
-
 
 
     if(
@@ -495,7 +446,6 @@ function updateRound(round){
    ORDER STATE
 ========================================================= */
 
-
 function updateOrder(order){
 
     state.order =
@@ -506,12 +456,15 @@ function updateOrder(order){
     state.order;
 
 
-
     if(!order){
 
-        hide(DOM.order);
+        hide(
+            DOM.order
+        );
 
-        hide(DOM.matching);
+        hide(
+            DOM.matching
+        );
 
 
         clearMatching();
@@ -528,16 +481,24 @@ function updateOrder(order){
         );
 
 
+        hide(
+            DOM.payButton
+        );
+
+
+        /*
+          Completion button is controlled by
+          u9-complete.js.
+        */
+
         return;
 
     }
 
 
-
     show(
         DOM.order
     );
-
 
 
     setText(
@@ -580,7 +541,6 @@ function updateOrder(order){
     );
 
 
-
     if(DOM.orderImage){
 
         if(order.image_url){
@@ -605,11 +565,9 @@ function updateOrder(order){
     }
 
 
-/* PART 2 CONTINUES */
     /* =====================================================
-       MATCHING STATE
+       MATCHING
     ===================================================== */
-
 
     if(
         order.status === "MATCHING"
@@ -636,11 +594,6 @@ function updateOrder(order){
         );
 
 
-        hide(
-            DOM.completeButton
-        );
-
-
         startMatching(
             order.matching_ready_at
         );
@@ -651,8 +604,6 @@ function updateOrder(order){
     }
 
 
-
-
     clearMatching();
 
 
@@ -661,12 +612,9 @@ function updateOrder(order){
     );
 
 
-
-
     /* =====================================================
        PENDING
     ===================================================== */
-
 
     if(
         order.status === "PENDING"
@@ -683,12 +631,10 @@ function updateOrder(order){
         );
 
 
-
         const remaining =
         number(
             order.remaining_amount
         );
-
 
 
         if(
@@ -701,8 +647,13 @@ function updateOrder(order){
 
 
             disable(
-                DOM.completeButton
+                DOM.payButton
             );
+
+            /*
+              u9-complete.js will keep the
+              complete button disabled.
+            */
 
         }
         else{
@@ -711,15 +662,10 @@ function updateOrder(order){
                 DOM.payButton
             );
 
-
-            show(
-                DOM.completeButton
-            );
-
-
-            enable(
-                DOM.completeButton
-            );
+            /*
+              Completion button is enabled by
+              u9-complete.js.
+            */
 
         }
 
@@ -729,13 +675,9 @@ function updateOrder(order){
     }
 
 
-
-
-
     /* =====================================================
        COMPLETED
     ===================================================== */
-
 
     if(
         order.status === "COMPLETED"
@@ -743,11 +685,6 @@ function updateOrder(order){
 
         hide(
             DOM.payButton
-        );
-
-
-        hide(
-            DOM.completeButton
         );
 
 
@@ -763,15 +700,12 @@ function updateOrder(order){
 
     }
 
-
 }
-
 
 
 /* =========================================================
    MATCHING COUNTDOWN
 ========================================================= */
-
 
 function startMatching(
     readyAt
@@ -784,16 +718,13 @@ function startMatching(
         return;
 
 
-
     const target =
     new Date(
         readyAt
     ).getTime();
 
 
-
     async function tick(){
-
 
         const seconds =
         Math.max(
@@ -806,12 +737,10 @@ function startMatching(
         );
 
 
-
         setText(
             DOM.matchingTime,
             seconds
         );
-
 
 
         if(seconds <= 0){
@@ -826,7 +755,6 @@ function startMatching(
     }
 
 
-
     tick();
 
 
@@ -839,11 +767,9 @@ function startMatching(
 }
 
 
-
 /* =========================================================
    MATCH REQUEST
 ========================================================= */
-
 
 async function requestMatch(){
 
@@ -855,9 +781,7 @@ async function requestMatch(){
     true;
 
 
-
     try{
-
 
         const result =
         await api(
@@ -869,7 +793,6 @@ async function requestMatch(){
         );
 
 
-
         updateUser(
             result.user
         );
@@ -885,10 +808,8 @@ async function requestMatch(){
         );
 
 
-
     }
     catch(error){
-
 
         console.error(
             "[U9 MATCH]",
@@ -896,18 +817,10 @@ async function requestMatch(){
         );
 
 
-        /*
-          Server time is final.
-          Reload state.
-        */
-
-
         await loadStatus();
-
 
     }
     finally{
-
 
         state.busy =
         false;
@@ -917,23 +830,18 @@ async function requestMatch(){
 }
 
 
-
-
 /* =========================================================
    LOAD CURRENT STATUS
 ========================================================= */
-
 
 async function loadStatus(){
 
     try{
 
-
         const result =
         await api(
             "GET"
         );
-
 
 
         updateUser(
@@ -951,23 +859,18 @@ async function loadStatus(){
         );
 
 
-
         state.settings =
         result.settings;
-
 
 
         window.U9RoundSettings =
         result.settings;
 
 
-
         return result;
-
 
     }
     catch(error){
-
 
         handleError(
             error
@@ -981,13 +884,9 @@ async function loadStatus(){
 }
 
 
-
-
-
 /* =========================================================
    START ORDER
 ========================================================= */
-
 
 async function startOrder(){
 
@@ -995,10 +894,8 @@ async function startOrder(){
         return;
 
 
-
     state.busy =
     true;
-
 
 
     disable(
@@ -1012,9 +909,7 @@ async function startOrder(){
     );
 
 
-
     try{
-
 
         const result =
         await api(
@@ -1024,7 +919,6 @@ async function startOrder(){
                 "start"
             }
         );
-
 
 
         updateUser(
@@ -1041,36 +935,27 @@ async function startOrder(){
             result.order
         );
 
-
-
     }
     catch(error){
-
 
         handleError(
             error
         );
 
-
-
     }
     finally{
 
-
         state.busy =
         false;
-
 
     }
 
 }
 
 
-
 /* =========================================================
    PAY REMAINING
 ========================================================= */
-
 
 async function payRemaining(){
 
@@ -1080,7 +965,6 @@ async function payRemaining(){
 
     state.busy =
     true;
-
 
 
     disable(
@@ -1094,9 +978,7 @@ async function payRemaining(){
     );
 
 
-
     try{
-
 
         const result =
         await api(
@@ -1106,7 +988,6 @@ async function payRemaining(){
                 "pay"
             }
         );
-
 
 
         updateUser(
@@ -1123,42 +1004,33 @@ async function payRemaining(){
             result.order
         );
 
-
     }
     catch(error){
-
 
         handleError(
             error
         );
 
-
     }
     finally{
 
-
         state.busy =
         false;
-
 
     }
 
 }
 
 
-
-
 /* =========================================================
    COOLDOWN
 ========================================================= */
-
 
 function startCooldown(
     until
 ){
 
     clearCooldown();
-
 
 
     if(!until){
@@ -1172,11 +1044,9 @@ function startCooldown(
     }
 
 
-
     show(
         DOM.cooldown
     );
-
 
 
     const target =
@@ -1185,10 +1055,7 @@ function startCooldown(
     ).getTime();
 
 
-
-
     function tick(){
-
 
         const seconds =
         Math.max(
@@ -1201,16 +1068,13 @@ function startCooldown(
         );
 
 
-
         setText(
             DOM.cooldownTime,
             formatTime(seconds)
         );
 
 
-
         if(seconds <= 0){
-
 
             clearCooldown();
 
@@ -1227,9 +1091,7 @@ function startCooldown(
     }
 
 
-
     tick();
-
 
 
     state.cooldownTimer =
@@ -1237,7 +1099,6 @@ function startCooldown(
         tick,
         1000
     );
-
 
 
     disable(
@@ -1253,12 +1114,9 @@ function startCooldown(
 }
 
 
-
-
 /* =========================================================
    TIME FORMAT
 ========================================================= */
-
 
 function formatTime(
     seconds
@@ -1281,7 +1139,6 @@ function formatTime(
     seconds % 60;
 
 
-
     if(min <= 0)
         return `${sec}s`;
 
@@ -1291,110 +1148,15 @@ function formatTime(
 }
 
 
-
-/* PART 3 CONTINUES */
-
- 
-/* =========================================================
-   COMPLETE ORDER
-========================================================= */
-
-
-async function completeOrder(){
-
-    if(state.busy)
-        return;
-
-
-    state.busy =
-    true;
-
-
-
-    disable(
-        DOM.completeButton
-    );
-
-
-    setText(
-        DOM.completeButton,
-        "Completing..."
-    );
-
-
-
-    try{
-
-
-        const result =
-        await api(
-            "POST",
-            {
-                action:
-                "complete"
-            }
-        );
-
-
-
-        updateUser(
-            result.user
-        );
-
-
-        updateRound(
-            result.round
-        );
-
-
-        updateOrder(
-            result.order
-        );
-
-
-
-        /*
-          Do not immediately GET again.
-          Server response is already latest.
-        */
-
-
-    }
-    catch(error){
-
-
-        handleError(
-            error
-        );
-
-
-    }
-    finally{
-
-
-        state.busy =
-        false;
-
-
-    }
-
-}
-
-
-
-
-
 /* =========================================================
    ERROR HANDLER
 ========================================================= */
-
 
 function handleError(error){
 
     const code =
     error?.message ||
     "UNKNOWN_ERROR";
-
 
 
     console.error(
@@ -1404,12 +1166,9 @@ function handleError(error){
     );
 
 
-
     switch(code){
 
-
         case "UNAUTHORIZED":
-
 
             disable(
                 DOM.orderButton
@@ -1424,10 +1183,7 @@ function handleError(error){
             break;
 
 
-
-
         case "INSUFFICIENT_START_COINS":
-
 
             enable(
                 DOM.orderButton
@@ -1439,14 +1195,10 @@ function handleError(error){
                 "Insufficient Coins"
             );
 
-
             break;
 
 
-
-
         case "ORDER_ALREADY_ACTIVE":
-
 
             disable(
                 DOM.orderButton
@@ -1461,14 +1213,10 @@ function handleError(error){
 
             loadStatus();
 
-
             break;
 
 
-
-
         case "ROUND_COOLDOWN":
-
 
             disable(
                 DOM.orderButton
@@ -1483,14 +1231,10 @@ function handleError(error){
 
             loadStatus();
 
-
             break;
 
 
-
-
         case "INSUFFICIENT_COINS":
-
 
             enable(
                 DOM.payButton
@@ -1502,46 +1246,29 @@ function handleError(error){
                 "Insufficient Coins"
             );
 
-
             break;
 
 
-
-
         case "ORDER_PAYMENT_REQUIRED":
-
 
             show(
                 DOM.payButton
             );
 
-
-            disable(
-                DOM.completeButton
-            );
-
-
             break;
 
 
-
-
         case "NO_PRODUCTS":
-
 
             setText(
                 DOM.orderStatus,
                 "No Product"
             );
 
-
             break;
 
 
-
-
         case "U9_DISABLED":
-
 
             disable(
                 DOM.orderButton
@@ -1553,14 +1280,10 @@ function handleError(error){
                 "Unavailable"
             );
 
-
             break;
 
 
-
-
         default:
-
 
             if(
                 !state.order
@@ -1578,128 +1301,76 @@ function handleError(error){
 
             }
 
-
             break;
-
 
     }
 
 }
-
-
-
 
 
 /* =========================================================
    EVENTS
 ========================================================= */
 
-
 function bindEvents(){
 
-
-
     if(DOM.orderButton){
-
 
         DOM.orderButton.addEventListener(
             "click",
             function(e){
 
-
                 e.preventDefault();
 
-
                 startOrder();
-
 
             }
         );
 
-
     }
 
 
-
-
     if(DOM.payButton){
-
 
         DOM.payButton.addEventListener(
             "click",
             function(e){
 
-
                 e.preventDefault();
-
 
                 payRemaining();
 
-
             }
         );
 
-
     }
 
-
-
-
-    if(DOM.completeButton){
-
-
-        DOM.completeButton.addEventListener(
-            "click",
-            function(e){
-
-
-                e.preventDefault();
-
-
-                completeOrder();
-
-
-            }
-        );
-
-
-    }
-
+    /*
+      IMPORTANT:
+      U9-complete.js owns #U9-complete-button.
+      Do NOT bind it here.
+    */
 
 }
-
-
-
-
 
 
 /* =========================================================
    PUBLIC API
 ========================================================= */
 
-
 window.U9Order = {
-
 
     start:
     startOrder,
 
-
     match:
     requestMatch,
-
 
     pay:
     payRemaining,
 
-
-    complete:
-    completeOrder,
-
-
     refresh:
     loadStatus,
-
 
     getState:
     function(){
@@ -1710,40 +1381,26 @@ window.U9Order = {
 
     }
 
-
 };
-
-
-
-
-
 
 
 /* =========================================================
    INIT
 ========================================================= */
 
-
 async function init(){
-
 
     bindEvents();
 
-
     await loadStatus();
 
-
 }
-
-
-
 
 
 if(
     document.readyState ===
     "loading"
 ){
-
 
     document.addEventListener(
         "DOMContentLoaded",
@@ -1753,17 +1410,12 @@ if(
         }
     );
 
-
 }
 else{
 
-
     init();
 
-
 }
-
-
 
 
 })();
