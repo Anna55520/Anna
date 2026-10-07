@@ -1,112 +1,153 @@
-/* =========================
-   AUCTION PAGE
-========================= */
+
+/* =========================================================
+   U9 AUCTION PAGE
+   Complete Task / Auto Order / Round / Cooldown
+========================================================= */
 
 (function () {
+  "use strict";
 
-
-  /* =========================
+  /* =========================================================
      ELEMENTS
-  ========================= */
+  ========================================================= */
 
   const homePage =
-    document.getElementById(
-      "U9-page-home"
-    );
-
+    document.getElementById("U9-page-home");
 
   const shopPage =
-    document.getElementById(
-      "U9-page-shop"
-    );
-
+    document.getElementById("U9-page-shop");
 
   const auctionPage =
-    document.getElementById(
-      "U9-page-auction"
-    );
-
+    document.getElementById("U9-page-auction");
 
   const test1Page =
-    document.getElementById(
-      "U9-page-test1"
-    );
-
+    document.getElementById("U9-page-test1");
 
   const test2Page =
-    document.getElementById(
-      "U9-page-test2"
-    );
+    document.getElementById("U9-page-test2");
 
 
-  /* =========================
+  /* =========================================================
      U9 STATE
-  ========================= */
+  ========================================================= */
 
   let ordering = false;
-
   let completing = false;
 
   let matchingTimer = null;
-
   let cooldownTimer = null;
 
   let currentOrder = null;
 
 
-  /* =========================
-     HELPERS
-  ========================= */
+  /* =========================================================
+     USER
+  ========================================================= */
 
   function getUserId() {
-
-    return (
+    const userId =
       window.currentUserUUID ||
       window.currentUserId ||
-      localStorage.getItem(
-        "currentUserUUID"
-      ) ||
-      localStorage.getItem(
-        "currentUserId"
-      ) ||
-      null
-    );
+      localStorage.getItem("currentUserUUID") ||
+      localStorage.getItem("currentUserId") ||
+      null;
 
+    return userId;
   }
+
+
+  /* =========================================================
+     SUPABASE
+  ========================================================= */
 
   function getSupabase() {
 
-  if (
-      typeof supabaseClient !==
-      "undefined" &&
-      supabaseClient
-  ) {
+    /*
+      Try all common client names.
 
-      return supabaseClient;
+      Your old code only checked:
+        supabaseClient
+        window.supabaseClient
 
-  }
+      But your console showed:
+        typeof supabaseClient === "undefined"
+
+      So we also check window.supabase and other common names.
+    */
+
+    try {
+      if (
+        typeof supabaseClient !== "undefined" &&
+        supabaseClient
+      ) {
+        return supabaseClient;
+      }
+    } catch (e) {
+      // Ignore ReferenceError
+    }
 
 
-  if (
+    if (
       window.supabaseClient
-  ) {
-
+    ) {
       return window.supabaseClient;
+    }
 
+
+    if (
+      window.supabase
+    ) {
+      return window.supabase;
+    }
+
+
+    if (
+      window.SupabaseClient
+    ) {
+      return window.SupabaseClient;
+    }
+
+
+    if (
+      window.U9Supabase
+    ) {
+      return window.U9Supabase;
+    }
+
+
+    console.error(
+      "U9: Supabase client not found."
+    );
+
+    console.error(
+      "U9: window.supabaseClient =",
+      window.supabaseClient
+    );
+
+    console.error(
+      "U9: window.supabase =",
+      window.supabase
+    );
+
+    return null;
   }
 
 
-  return null;
-
-  }
-
+  /* =========================================================
+     FORMAT
+  ========================================================= */
 
   function formatCoins(value) {
+    const number =
+      Number(value);
 
-    return Number(
-      value || 0
-    ).toFixed(2);
+    if (
+      Number.isNaN(number)
+    ) {
+      return "0.00";
+    }
 
+    return number.toFixed(2);
   }
 
 
@@ -132,15 +173,16 @@
 
 
     return (
-      String(minutes)
-        .padStart(2, "0") +
+      String(minutes).padStart(2, "0") +
       ":" +
-      String(secs)
-        .padStart(2, "0")
+      String(secs).padStart(2, "0")
     );
-
   }
 
+
+  /* =========================================================
+     MESSAGE
+  ========================================================= */
 
   function showMessage(message) {
 
@@ -151,109 +193,18 @@
 
 
     if (!el) {
-
       return;
-
     }
 
 
     el.textContent =
       message || "";
-
   }
 
 
-  /* =========================
-     OPEN AUCTION PAGE
-  ========================= */
-
-  function openAuctionPage() {
-
-    if (
-      !auctionPage
-    ) {
-
-      return;
-
-    }
-
-
-    if (
-      homePage
-    ) {
-
-      homePage.style.display =
-        "none";
-
-    }
-
-
-    if (
-      shopPage
-    ) {
-
-      shopPage.style.display =
-        "none";
-
-    }
-
-
-    if (
-      test1Page
-    ) {
-
-      test1Page.style.display =
-        "none";
-
-    }
-
-
-    if (
-      test2Page
-    ) {
-
-      test2Page.style.display =
-        "none";
-
-    }
-
-
-    auctionPage.style.display =
-      "block";
-
-
-    refreshAuctionPage();
-
-  }
-
-
-  /* =========================
-     INITIALIZE AUCTION PAGE
-  ========================= */
-
-  function initializeAuctionPage() {
-
-    if (
-      !auctionPage
-    ) {
-
-      return;
-
-    }
-
-
-    auctionPage.style.display =
-      "none";
-
-
-    bindAuctionEvents();
-
-  }
-
-
-  /* =========================
-     UI
-  ========================= */
+  /* =========================================================
+     UI - COINS
+  ========================================================= */
 
   function updateCoins(coins) {
 
@@ -263,15 +214,23 @@
       );
 
 
-    if (el) {
+    if (!el) {
+      console.warn(
+        "U9: #U9-auction-coins not found."
+      );
 
-      el.textContent =
-        formatCoins(coins);
-
+      return;
     }
 
+
+    el.textContent =
+      formatCoins(coins);
   }
 
+
+  /* =========================================================
+     UI - ROUND
+  ========================================================= */
 
   function updateRound(
     completed,
@@ -284,37 +243,90 @@
       );
 
 
-    if (el) {
+    if (!el) {
+      console.warn(
+        "U9: #U9-auction-round not found."
+      );
 
-      el.textContent =
-        `${completed} / ${total}`;
-
+      return;
     }
 
+
+    const completedNumber =
+      Number(completed) || 0;
+
+    const totalNumber =
+      Number(total) || 0;
+
+
+    el.textContent =
+      `${completedNumber} / ${totalNumber}`;
   }
 
 
-  function hideMatching() {
+  /* =========================================================
+     UI - START BUTTON
+  ========================================================= */
 
-    const el =
+  function setStartButton(
+    disabled,
+    text
+  ) {
+
+    const button =
       document.getElementById(
-        "U9-auction-matching"
+        "U9-auction-start"
       );
 
 
-    if (el) {
-
-      el.style.display =
-        "none";
-
+    if (!button) {
+      return;
     }
 
+
+    button.disabled =
+      !!disabled;
+
+
+    button.textContent =
+      text || "Start Task";
   }
 
 
-  function showMatching(
-    message
+  /* =========================================================
+     UI - COMPLETE BUTTON
+  ========================================================= */
+
+  function setCompleteButton(
+    disabled,
+    text
   ) {
+
+    const button =
+      document.getElementById(
+        "U9-auction-complete"
+      );
+
+
+    if (!button) {
+      return;
+    }
+
+
+    button.disabled =
+      !!disabled;
+
+
+    button.textContent =
+      text || "Complete Task";
+  }
+
+
+  /* =========================================================
+     MATCHING UI
+  ========================================================= */
+
+  function showMatching(message) {
 
     const el =
       document.getElementById(
@@ -329,22 +341,36 @@
 
 
     if (el) {
-
       el.style.display =
         "block";
-
     }
 
 
     if (text) {
-
       text.textContent =
         message || "Matching...";
-
     }
-
   }
 
+
+  function hideMatching() {
+
+    const el =
+      document.getElementById(
+        "U9-auction-matching"
+      );
+
+
+    if (el) {
+      el.style.display =
+        "none";
+    }
+  }
+
+
+  /* =========================================================
+     ORDER UI
+  ========================================================= */
 
   function showOrder() {
 
@@ -355,12 +381,9 @@
 
 
     if (el) {
-
       el.style.display =
         "block";
-
     }
-
   }
 
 
@@ -373,81 +396,20 @@
 
 
     if (el) {
-
       el.style.display =
         "none";
-
     }
-
   }
 
 
-  function setStartButton(
-    disabled,
-    text
-  ) {
-
-    const button =
-      document.getElementById(
-        "U9-auction-start"
-      );
-
-
-    if (!button) {
-
-      return;
-
-    }
-
-
-    button.disabled =
-      !!disabled;
-
-
-    button.textContent =
-      text || "Start Task";
-
-  }
-
-
-  function setCompleteButton(
-    disabled,
-    text
-  ) {
-
-    const button =
-      document.getElementById(
-        "U9-auction-complete"
-      );
-
-
-    if (!button) {
-
-      return;
-
-    }
-
-
-    button.disabled =
-      !!disabled;
-
-
-    button.textContent =
-      text || "Complete Task";
-
-  }
-
-
-  /* =========================
+  /* =========================================================
      RENDER ORDER
-  ========================= */
+  ========================================================= */
 
   function renderOrder(order) {
 
     if (!order) {
-
       return;
-
     }
 
 
@@ -492,51 +454,41 @@
 
 
     if (name) {
-
       name.textContent =
         order.product_name ||
         "Task";
-
     }
 
 
     if (description) {
-
       description.textContent =
         order.product_description ||
         "Complete this task to receive your Coins and profit.";
-
     }
 
 
     if (price) {
-
       price.textContent =
         formatCoins(
           order.total_price
         );
-
     }
 
 
     if (profit) {
-
       profit.textContent =
         "+" +
         formatCoins(
           order.profit
         );
-
     }
 
 
     if (status) {
-
       status.textContent =
         order.status === "completed"
           ? "Completed"
           : "Pending";
-
     }
 
 
@@ -551,24 +503,22 @@
       url.style.display =
         "block";
 
-    }
+    } else if (url) {
 
-    else if (url) {
+      url.removeAttribute("href");
 
       url.style.display =
         "none";
-
     }
 
 
     showOrder();
-
   }
 
 
-  /* =========================
+  /* =========================================================
      ROUND STATUS
-  ========================= */
+  ========================================================= */
 
   async function loadRoundStatus() {
 
@@ -580,14 +530,32 @@
       getUserId();
 
 
-    if (
-      !client ||
-      !userId
-    ) {
+    if (!client) {
+
+      console.error(
+        "U9: Cannot load round status because Supabase client is missing."
+      );
 
       return null;
-
     }
+
+
+    if (!userId) {
+
+      console.error(
+        "U9: Cannot load round status because user UUID is missing."
+      );
+
+      return null;
+    }
+
+
+    console.log(
+      "U9: Loading round status...",
+      {
+        userId: userId
+      }
+    );
 
 
     const {
@@ -597,8 +565,7 @@
       await client.rpc(
         "u9_round_status",
         {
-          p_user_id:
-            userId
+          p_user_id: userId
         }
       );
 
@@ -606,20 +573,27 @@
     if (error) {
 
       console.error(
-        "u9_round_status error:",
+        "U9 u9_round_status ERROR:",
         error
       );
 
-
       throw error;
-
     }
+
+
+    console.log(
+      "U9 round status:",
+      data
+    );
 
 
     if (!data) {
 
-      return null;
+      console.warn(
+        "U9: u9_round_status returned no data."
+      );
 
+      return null;
     }
 
 
@@ -631,15 +605,26 @@
 
     if (!status) {
 
-      return null;
+      console.warn(
+        "U9: Round status row is empty."
+      );
 
+      return null;
     }
 
+
+    /* =========================
+       UPDATE COINS
+    ========================= */
 
     updateCoins(
       status.coins
     );
 
+
+    /* =========================
+       UPDATE ROUND
+    ========================= */
 
     updateRound(
       status.completed_count,
@@ -647,27 +632,28 @@
     );
 
 
+    /* =========================
+       COOLDOWN
+    ========================= */
+
     handleCooldown(
       status.cooldown_end_time
     );
 
 
     return status;
-
   }
 
 
-  /* =========================
+  /* =========================================================
      COOLDOWN
-  ========================= */
+  ========================================================= */
 
   function handleCooldown(
     cooldownEnd
   ) {
 
-    if (
-      cooldownTimer
-    ) {
+    if (cooldownTimer) {
 
       clearInterval(
         cooldownTimer
@@ -675,7 +661,6 @@
 
       cooldownTimer =
         null;
-
     }
 
 
@@ -688,21 +673,36 @@
     if (!cooldownEnd) {
 
       if (cooldownEl) {
-
         cooldownEl.textContent =
           "";
-
       }
 
 
-      setStartButton(
-        false,
-        "Start Task"
-      );
+      /*
+        Only enable Start Task if there
+        isn't another pending order.
+      */
+
+      if (
+        currentOrder &&
+        currentOrder.status === "pending"
+      ) {
+
+        setStartButton(
+          true,
+          "Complete current task first"
+        );
+
+      } else {
+
+        setStartButton(
+          false,
+          "Start Task"
+        );
+      }
 
 
       return;
-
     }
 
 
@@ -723,20 +723,21 @@
         remaining <= 0
       ) {
 
-        clearInterval(
-          cooldownTimer
-        );
+        if (cooldownTimer) {
 
+          clearInterval(
+            cooldownTimer
+          );
 
-        cooldownTimer =
-          null;
+          cooldownTimer =
+            null;
+        }
 
 
         if (cooldownEl) {
 
           cooldownEl.textContent =
             "";
-
         }
 
 
@@ -746,10 +747,22 @@
         );
 
 
-        loadRoundStatus();
+        /*
+          Refresh from database after cooldown.
+        */
+
+        loadRoundStatus()
+          .catch(
+            function (error) {
+              console.error(
+                "U9 cooldown refresh error:",
+                error
+              );
+            }
+          );
+
 
         return;
-
       }
 
 
@@ -760,7 +773,6 @@
           formatSeconds(
             remaining
           );
-
       }
 
 
@@ -768,7 +780,6 @@
         true,
         "Cooldown"
       );
-
     }
 
 
@@ -780,26 +791,25 @@
         tick,
         1000
       );
-
   }
 
 
-  /* =========================
-     MATCHING
-  ========================= */
+  /* =========================================================
+     MATCHING COUNTDOWN
+  ========================================================= */
 
   function startMatchingCountdown(
     matchEndTime
   ) {
 
-    if (
-      matchingTimer
-    ) {
+    if (matchingTimer) {
 
       clearInterval(
         matchingTimer
       );
 
+      matchingTimer =
+        null;
     }
 
 
@@ -820,19 +830,20 @@
         remaining <= 0
       ) {
 
-        clearInterval(
-          matchingTimer
-        );
+        if (matchingTimer) {
 
+          clearInterval(
+            matchingTimer
+          );
 
-        matchingTimer =
-          null;
+          matchingTimer =
+            null;
+        }
 
 
         finishMatching();
 
         return;
-
       }
 
 
@@ -841,7 +852,6 @@
         remaining +
         "s"
       );
-
     }
 
 
@@ -853,23 +863,23 @@
         tick,
         500
       );
-
   }
 
+
+  /* =========================================================
+     FINISH MATCHING
+  ========================================================= */
 
   function finishMatching() {
 
     hideMatching();
 
 
-    if (
-      currentOrder
-    ) {
+    if (currentOrder) {
 
       renderOrder(
         currentOrder
       );
-
     }
 
 
@@ -883,20 +893,17 @@
       true,
       "Complete current task first"
     );
-
   }
 
 
-  /* =========================
+  /* =========================================================
      START TASK
-  ========================= */
+  ========================================================= */
 
   async function startTask() {
 
     if (ordering) {
-
       return;
-
     }
 
 
@@ -908,29 +915,31 @@
       getUserId();
 
 
-    if (
-      !client
-    ) {
+    if (!client) {
 
       alert(
         "Supabase client is not initialized."
       );
 
-      return;
+      console.error(
+        "U9: startTask() aborted - Supabase client missing."
+      );
 
+      return;
     }
 
 
-    if (
-      !userId
-    ) {
+    if (!userId) {
 
       alert(
         "Please log in first."
       );
 
-      return;
+      console.error(
+        "U9: startTask() aborted - user UUID missing."
+      );
 
+      return;
     }
 
 
@@ -954,6 +963,14 @@
       );
 
 
+      console.log(
+        "U9: Calling u9_auto_order...",
+        {
+          userId: userId
+        }
+      );
+
+
       const {
         data,
         error
@@ -961,17 +978,26 @@
         await client.rpc(
           "u9_auto_order",
           {
-            p_user_id:
-              userId
+            p_user_id: userId
           }
         );
 
 
       if (error) {
 
-        throw error;
+        console.error(
+          "U9 u9_auto_order RPC ERROR:",
+          error
+        );
 
+        throw error;
       }
+
+
+      console.log(
+        "U9 auto order result:",
+        data
+      );
 
 
       const result =
@@ -985,9 +1011,12 @@
         throw new Error(
           "No order was returned."
         );
-
       }
 
+
+      /* =====================================================
+         COOLDOWN
+      ===================================================== */
 
       if (
         result.cooldown === true
@@ -995,16 +1024,22 @@
 
         hideMatching();
 
+
         await loadRoundStatus();
+
 
         showMessage(
           "The current round is cooling down."
         );
 
-        return;
 
+        return;
       }
 
+
+      /* =====================================================
+         CREATE CURRENT ORDER
+      ===================================================== */
 
       currentOrder = {
 
@@ -1042,14 +1077,21 @@
 
         round_id:
           result.round_id
-
       };
 
+
+      /* =====================================================
+         UPDATE COINS IMMEDIATELY
+      ===================================================== */
 
       updateCoins(
         result.coins_after
       );
 
+
+      /* =====================================================
+         MATCHING
+      ===================================================== */
 
       const matchEnd =
         result.match_end_time;
@@ -1061,17 +1103,13 @@
           matchEnd
         );
 
-      }
-
-      else {
+      } else {
 
         finishMatching();
-
       }
 
 
       showMessage("");
-
     }
 
     catch (error) {
@@ -1085,44 +1123,44 @@
       hideMatching();
 
 
+      setStartButton(
+        false,
+        "Start Task"
+      );
+
+
       showMessage(
         error?.message ||
         "Failed to start task."
       );
-
     }
 
     finally {
 
       ordering =
         false;
-
     }
-
   }
 
 
-  /* =========================
+  /* =========================================================
      COMPLETE TASK
-  ========================= */
+  ========================================================= */
 
   async function completeTask() {
 
-    if (
-      completing
-    ) {
-
+    if (completing) {
       return;
-
     }
 
 
-    if (
-      !currentOrder?.order_id
-    ) {
+    if (!currentOrder?.order_id) {
+
+      console.warn(
+        "U9: No current order to complete."
+      );
 
       return;
-
     }
 
 
@@ -1134,13 +1172,23 @@
       getUserId();
 
 
-    if (
-      !client ||
-      !userId
-    ) {
+    if (!client) {
+
+      showMessage(
+        "Supabase client is not initialized."
+      );
 
       return;
+    }
 
+
+    if (!userId) {
+
+      showMessage(
+        "Please log in first."
+      );
+
+      return;
     }
 
 
@@ -1156,6 +1204,15 @@
 
     try {
 
+      console.log(
+        "U9: Completing order...",
+        {
+          userId: userId,
+          orderId: currentOrder.order_id
+        }
+      );
+
+
       const {
         data,
         error
@@ -1163,9 +1220,7 @@
         await client.rpc(
           "u9_complete_order",
           {
-            p_user_id:
-              userId,
-
+            p_user_id: userId,
             p_order_id:
               currentOrder.order_id
           }
@@ -1174,9 +1229,19 @@
 
       if (error) {
 
-        throw error;
+        console.error(
+          "U9 u9_complete_order RPC ERROR:",
+          error
+        );
 
+        throw error;
       }
+
+
+      console.log(
+        "U9 complete order result:",
+        data
+      );
 
 
       const result =
@@ -1190,44 +1255,56 @@
         throw new Error(
           "Completion result is empty."
         );
-
       }
 
+
+      /* =====================================================
+         UPDATE ORDER
+      ===================================================== */
 
       currentOrder.status =
         "completed";
 
+
+      /* =====================================================
+         UPDATE COINS
+      ===================================================== */
 
       updateCoins(
         result.coins_after
       );
 
 
-      const status =
+      /* =====================================================
+         UPDATE STATUS
+      ===================================================== */
+
+      const statusEl =
         document.getElementById(
           "U9-auction-order-status"
         );
 
 
-      if (status) {
+      if (statusEl) {
 
-        status.textContent =
+        statusEl.textContent =
           "Completed";
-
       }
 
 
-      setCompleteButton(
-        true,
-        "Completed"
-      );
-
+      /* =====================================================
+         UPDATE ROUND
+      ===================================================== */
 
       updateRound(
         result.completed_count,
         result.orders_per_round
       );
 
+
+      /* =====================================================
+         COOLDOWN
+      ===================================================== */
 
       if (
         result.cooldown_end_time
@@ -1242,9 +1319,12 @@
           "Round completed. Cooldown started."
         );
 
-      }
+      } else {
 
-      else {
+        /*
+          Keep completed order visible,
+          but allow the next task.
+        */
 
         setStartButton(
           false,
@@ -1255,12 +1335,20 @@
         showMessage(
           "Task completed successfully."
         );
-
       }
 
 
-      await loadRoundStatus();
+      setCompleteButton(
+        true,
+        "Completed"
+      );
 
+
+      /*
+        Refresh exact database status.
+      */
+
+      await loadRoundStatus();
     }
 
     catch (error) {
@@ -1281,28 +1369,37 @@
         error?.message ||
         "Failed to complete task."
       );
-
     }
 
     finally {
 
       completing =
         false;
-
     }
-
   }
 
 
-  /* =========================
-     REFRESH PAGE
-  ========================= */
+  /* =========================================================
+     REFRESH AUCTION PAGE
+  ========================================================= */
 
   async function refreshAuctionPage() {
 
+    console.log(
+      "U9: Refreshing auction page..."
+    );
+
+
     try {
 
-      await loadRoundStatus();
+      const status =
+        await loadRoundStatus();
+
+
+      console.log(
+        "U9: Auction page refreshed.",
+        status
+      );
 
     }
 
@@ -1313,14 +1410,71 @@
         error
       );
 
-    }
 
+      showMessage(
+        error?.message ||
+        "Failed to load auction status."
+      );
+    }
   }
 
 
-  /* =========================
+  /* =========================================================
+     OPEN AUCTION PAGE
+  ========================================================= */
+
+  function openAuctionPage() {
+
+    if (!auctionPage) {
+
+      console.warn(
+        "U9: Auction page element not found."
+      );
+
+      return;
+    }
+
+
+    if (homePage) {
+      homePage.style.display =
+        "none";
+    }
+
+
+    if (shopPage) {
+      shopPage.style.display =
+        "none";
+    }
+
+
+    if (test1Page) {
+      test1Page.style.display =
+        "none";
+    }
+
+
+    if (test2Page) {
+      test2Page.style.display =
+        "none";
+    }
+
+
+    auctionPage.style.display =
+      "block";
+
+
+    /*
+      Load database state every time
+      auction page is opened.
+    */
+
+    refreshAuctionPage();
+  }
+
+
+  /* =========================================================
      EVENTS
-  ========================= */
+  ========================================================= */
 
   function bindAuctionEvents() {
 
@@ -1338,39 +1492,83 @@
 
     if (startButton) {
 
-      startButton.addEventListener(
-        "click",
-        startTask
-      );
+      /*
+        Prevent duplicate listeners.
+      */
 
+      startButton.onclick =
+        startTask;
     }
 
 
     if (completeButton) {
 
-      completeButton.addEventListener(
-        "click",
-        completeTask
-      );
-
+      completeButton.onclick =
+        completeTask;
     }
-
   }
 
 
-  /* =========================
-     PUBLIC FUNCTION
-  ========================= */
+  /* =========================================================
+     INITIALIZE
+  ========================================================= */
+
+  function initializeAuctionPage() {
+
+    if (!auctionPage) {
+
+      console.warn(
+        "U9: Auction page does not exist."
+      );
+
+      return;
+    }
+
+
+    auctionPage.style.display =
+      "none";
+
+
+    bindAuctionEvents();
+
+
+    console.log(
+      "U9 Auction Page initialized."
+    );
+  }
+
+
+  /* =========================================================
+     PUBLIC API
+  ========================================================= */
 
   window.openAuctionPage =
     openAuctionPage;
 
 
-  /* =========================
-     START AUCTION PAGE
-  ========================= */
+  window.U9Auction = {
+
+    refresh:
+      refreshAuctionPage,
+
+    startTask:
+      startTask,
+
+    completeTask:
+      completeTask,
+
+    getUserId:
+      getUserId,
+
+    getSupabase:
+      getSupabase
+  };
+
+
+  /* =========================================================
+     START
+  ========================================================= */
 
   initializeAuctionPage();
-
 
 })();
