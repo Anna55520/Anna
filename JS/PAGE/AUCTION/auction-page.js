@@ -1393,6 +1393,9 @@
       );
 
 
+      currentOrder = null;
+
+
       /*
         Refresh exact database status.
       */
@@ -1434,37 +1437,56 @@
 
   async function refreshAuctionPage() {
 
-    console.log(
-      "U9: Refreshing auction page..."
-    );
-
-
-    try {
-
-      const status =
-        await loadRoundStatus();
-
-
       console.log(
-        "U9: Auction page refreshed.",
-        status
-      );
-
-    }
-
-    catch (error) {
-
-      console.error(
-        "U9 AUCTION REFRESH ERROR:",
-        error
+        "U9: Refreshing auction page..."
       );
 
 
-      showMessage(
-        error?.message ||
-        "Failed to load auction status."
-      );
-    }
+      try {
+
+        const status =
+          await loadRoundStatus();
+
+
+        const pendingOrder =
+          await loadPendingOrder();
+
+
+        console.log(
+          "U9: Auction status:",
+          status
+        );
+
+
+        console.log(
+          "U9: Pending order:",
+          pendingOrder
+        );
+
+
+        return {
+          status,
+          pendingOrder
+        };
+
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "U9 AUCTION REFRESH ERROR:",
+          error
+        );
+
+
+        showMessage(
+          error?.message ||
+          "Failed to load auction status."
+        );
+
+        return null;
+      }
   }
 
 
@@ -1586,6 +1608,118 @@
     );
   }
 
+  /* =========================================================
+     1321
+  ========================================================= */
+
+  async function loadPendingOrder(){
+
+      const client = getSupabase();
+
+      const userId = getUserId();
+
+
+      if(!client || !userId){
+          return null;
+      }
+
+
+      const {
+          data,
+          error
+      } = await client
+          .from("u9-orders")
+          .select("*")
+          .eq(
+              "user_id",
+              userId
+          )
+          .eq(
+              "status",
+              "pending"
+          )
+          .limit(1)
+          .maybeSingle();
+
+
+      if(error){
+
+          console.error(
+              "load pending order error:",
+              error
+          );
+
+          return null;
+      }
+
+
+      if(!data){
+
+          return null;
+
+      }
+
+
+      currentOrder = {
+
+          order_id:
+              data.id,
+
+          user_id:
+              data.user_id,
+
+          product_id:
+              data.product_id,
+
+          product_name:
+              "Task",
+
+          product_description:
+              "",
+
+          product_url:
+              "",
+
+          total_price:
+              data.total_price,
+
+          profit:
+              data.profit,
+
+          status:
+              data.status,
+
+          round_id:
+              data.round_id
+      };
+
+
+      renderOrder(
+          currentOrder
+      );
+
+
+      setCompleteButton(
+          false,
+          "Complete Task"
+      );
+
+
+      setStartButton(
+          true,
+          "Complete current task first"
+      );
+
+
+      console.log(
+          "U9 pending order restored:",
+          currentOrder
+      );
+
+
+      return currentOrder;
+
+  }
 
   /* =========================================================
      PUBLIC API
