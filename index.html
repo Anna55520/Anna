@@ -450,7 +450,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
       Shop
     </div>
 
-
     <!-- AUCTION -->
 
     <div id="U9-page-auction">
@@ -458,6 +457,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
         <h2>U9 Auction</h2>
 
 
+        <!-- USER COINS -->
         <div>
             Coins:
             <span id="U9-coins">
@@ -466,6 +466,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
         </div>
 
 
+        <!-- ROUND -->
         <div>
             Round:
             <span id="U9-round-progress">
@@ -474,18 +475,128 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
         </div>
 
 
-        <div id="U9-product">
-            Waiting...
+
+        <!-- ORDER INFO -->
+
+        <div id="U9-order" hidden>
+
+            <img
+                id="U9-order-image"
+                hidden
+                alt="product"
+            >
+
+
+            <div>
+                Product:
+                <span id="U9-order-name"></span>
+            </div>
+
+
+            <div>
+                Price:
+                <span id="U9-order-price">
+                </span>
+            </div>
+
+
+            <div>
+                Profit:
+                <span id="U9-order-profit">
+                </span>
+            </div>
+
+
+            <div>
+                Paid:
+                <span id="U9-order-paid">
+                </span>
+            </div>
+
+
+            <div>
+                Remaining:
+                <span id="U9-order-remaining">
+                </span>
+            </div>
+
+
+            <div>
+                Status:
+                <span id="U9-order-status">
+                </span>
+            </div>
+
         </div>
 
 
+
+        <!-- MATCHING -->
+
+        <div id="U9-matching" hidden>
+
+            Matching...
+
+            <span id="U9-matching-time">
+                0
+            </span>
+            s
+
+        </div>
+
+
+
+        <!-- ORDER BUTTON -->
+
         <button id="U9-order-button">
-            Order
+
+            Start Order
+
         </button>
 
 
-        <div id="U9-matching">
+
+        <!-- PAY BUTTON -->
+
+        <button
+            id="U9-pay-button"
+            hidden
+        >
+
+            Pay Remaining
+
+        </button>
+
+
+
+        <!-- COMPLETE BUTTON -->
+
+        <button
+            id="U9-complete-button"
+            hidden
+        >
+
+            Complete Order
+
+        </button>
+
+
+
+        <!-- COOLDOWN -->
+
+        <div
+            id="U9-cooldown"
+            hidden
+        >
+
+            Cooldown:
+
+            <span id="U9-cooldown-time">
+                0s
+            </span>
+
         </div>
+
 
 
     </div>
