@@ -1,3 +1,4 @@
+
 (() => {
 "use strict";
 
@@ -16,6 +17,10 @@
 
  Completion:
  u9-complete.js
+
+ Safari Fix:
+ 1. Read localStorage.u9_token
+ 2. Wait for token before first API request
 =========================================================
 */
 
@@ -67,62 +72,47 @@ const DOM = {
     orderButton:
     $("#U9-order-button"),
 
-
     coins:
     $("#U9-coins"),
-
 
     roundProgress:
     $("#U9-round-progress"),
 
-
     matching:
     $("#U9-matching"),
-
 
     matchingTime:
     $("#U9-matching-time"),
 
-
     order:
     $("#U9-order"),
-
 
     orderImage:
     $("#U9-order-image"),
 
-
     orderName:
     $("#U9-order-name"),
-
 
     orderPrice:
     $("#U9-order-price"),
 
-
     orderProfit:
     $("#U9-order-profit"),
-
 
     orderPaid:
     $("#U9-order-paid"),
 
-
     orderRemaining:
     $("#U9-order-remaining"),
-
 
     orderStatus:
     $("#U9-order-status"),
 
-
     payButton:
     $("#U9-pay-button"),
 
-
     cooldown:
     $("#U9-cooldown"),
-
 
     cooldownTime:
     $("#U9-cooldown-time")
@@ -250,9 +240,70 @@ function clearCooldown(){
    AUTH HEADER
 ======================================================== */
 
+function getAuthToken(){
+
+    /*
+    --------------------------------------------------------
+    U9 primary session token
+
+    The U9 login system stores the session token in:
+
+    localStorage:
+    u9_token
+    --------------------------------------------------------
+    */
+
+    let token = "";
+
+
+
+    try{
+
+        token =
+        localStorage.getItem(
+            "u9_token"
+        ) ||
+        "";
+
+    }
+    catch(error){
+
+        console.warn(
+            "[U9 AUTH] Unable to read localStorage",
+            error
+        );
+
+    }
+
+
+
+    /*
+    --------------------------------------------------------
+    Fallbacks
+    --------------------------------------------------------
+    */
+
+    if(!token){
+
+        token =
+        window.U9AccessToken ||
+        window.accessToken ||
+        window.authToken ||
+        "";
+
+    }
+
+
+
+    return token.trim();
+
+}
+
+
+
 function headers(){
 
-    const h={
+    const h = {
 
         "Content-Type":
         "application/json"
@@ -260,11 +311,9 @@ function headers(){
     };
 
 
+
     const token =
-    window.U9AccessToken ||
-    window.accessToken ||
-    window.authToken ||
-    "";
+    getAuthToken();
 
 
 
@@ -276,7 +325,87 @@ function headers(){
     }
 
 
+
     return h;
+
+}
+
+
+
+/* ========================================================
+   WAIT FOR AUTH TOKEN
+======================================================== */
+
+async function waitForAuthToken(
+    timeout = 5000
+){
+
+    /*
+    --------------------------------------------------------
+    If token already exists, continue immediately.
+    --------------------------------------------------------
+    */
+
+    const existingToken =
+    getAuthToken();
+
+
+
+    if(existingToken){
+
+        return existingToken;
+
+    }
+
+
+
+    /*
+    --------------------------------------------------------
+    Safari / page restore protection
+
+    Header.js may still be restoring the session when
+    Auction initializes.
+
+    Check several times before giving up.
+    --------------------------------------------------------
+    */
+
+    const start =
+    Date.now();
+
+
+
+    while(
+        Date.now() - start <
+        timeout
+    ){
+
+        await new Promise(
+            resolve =>
+            setTimeout(
+                resolve,
+                100
+            )
+        );
+
+
+
+        const token =
+        getAuthToken();
+
+
+
+        if(token){
+
+            return token;
+
+        }
+
+    }
+
+
+
+    return null;
 
 }
 
@@ -328,6 +457,7 @@ async function api(
     let data;
 
 
+
     try{
 
         data =
@@ -369,6 +499,8 @@ async function api(
 
 }
 
+
+
 /* ========================================================
    USER UPDATE
 ======================================================== */
@@ -379,8 +511,10 @@ function updateUser(user){
     return;
 
 
+
     state.user =
     user;
+
 
 
     text(
@@ -389,6 +523,7 @@ function updateUser(user){
             user.coins
         )
     );
+
 
 
     window.U9RoundUser =
@@ -406,6 +541,7 @@ function updateRound(round){
 
     state.round =
     round || null;
+
 
 
     window.U9CurrentRound =
@@ -466,6 +602,7 @@ function updateOrder(order){
     order || null;
 
 
+
     window.U9CurrentOrder =
     state.order;
 
@@ -478,9 +615,11 @@ function updateOrder(order){
         );
 
 
+
         hide(
             DOM.matching
         );
+
 
 
         hide(
@@ -488,7 +627,9 @@ function updateOrder(order){
         );
 
 
+
         clearMatching();
+
 
 
         enable(
@@ -496,10 +637,12 @@ function updateOrder(order){
         );
 
 
+
         text(
             DOM.orderButton,
             "Start Order"
         );
+
 
 
         return;
@@ -520,10 +663,12 @@ function updateOrder(order){
     );
 
 
+
     text(
         DOM.orderName,
         order.product_name || ""
     );
+
 
 
     text(
@@ -534,6 +679,7 @@ function updateOrder(order){
     );
 
 
+
     text(
         DOM.orderProfit,
         money(
@@ -542,12 +688,14 @@ function updateOrder(order){
     );
 
 
+
     text(
         DOM.orderPaid,
         money(
             order.paid_amount
         )
     );
+
 
 
     text(
@@ -571,6 +719,7 @@ function updateOrder(order){
             order.image_url;
 
 
+
             show(
                 DOM.orderImage
             );
@@ -588,14 +737,11 @@ function updateOrder(order){
 
 
 
-
-
     /*
     ======================================================
        MATCHING
     ======================================================
     */
-
 
     if(
         order.status === "MATCHING"
@@ -606,9 +752,11 @@ function updateOrder(order){
         );
 
 
+
         disable(
             DOM.orderButton
         );
+
 
 
         text(
@@ -617,14 +765,17 @@ function updateOrder(order){
         );
 
 
+
         hide(
             DOM.payButton
         );
 
 
+
         startMatching(
             order.matching_ready_at
         );
+
 
 
         return;
@@ -636,10 +787,10 @@ function updateOrder(order){
     clearMatching();
 
 
+
     hide(
         DOM.matching
     );
-
 
 
 
@@ -649,7 +800,6 @@ function updateOrder(order){
     ======================================================
     */
 
-
     if(
         order.status === "PENDING"
     ){
@@ -657,6 +807,7 @@ function updateOrder(order){
         disable(
             DOM.orderButton
         );
+
 
 
         text(
@@ -682,6 +833,7 @@ function updateOrder(order){
             );
 
 
+
             enable(
                 DOM.payButton
             );
@@ -696,11 +848,10 @@ function updateOrder(order){
         }
 
 
+
         return;
 
     }
-
-
 
 
 
@@ -709,7 +860,6 @@ function updateOrder(order){
        COMPLETED
     ======================================================
     */
-
 
     if(
         order.status === "COMPLETED"
@@ -720,6 +870,7 @@ function updateOrder(order){
         );
 
 
+
         text(
             DOM.orderButton,
             "Start Order"
@@ -728,6 +879,8 @@ function updateOrder(order){
     }
 
 }
+
+
 
 /* ========================================================
    LOAD STATUS
@@ -749,9 +902,11 @@ async function loadStatus(){
         );
 
 
+
         updateRound(
             result.round
         );
+
 
 
         updateOrder(
@@ -772,7 +927,6 @@ async function loadStatus(){
 
         return result;
 
-
     }
     catch(error){
 
@@ -782,9 +936,11 @@ async function loadStatus(){
         );
 
 
+
         handleError(
             error
         );
+
 
 
         return null;
@@ -792,7 +948,6 @@ async function loadStatus(){
     }
 
 }
-
 
 
 
@@ -818,6 +973,7 @@ async function startOrder(){
     );
 
 
+
     text(
         DOM.orderButton,
         "Starting..."
@@ -826,7 +982,6 @@ async function startOrder(){
 
 
     try{
-
 
         const result =
         await api(
@@ -843,6 +998,7 @@ async function startOrder(){
         );
 
 
+
         updateOrder(
             result.order
         );
@@ -851,11 +1007,8 @@ async function startOrder(){
 
         await loadStatus();
 
-
-
     }
     catch(error){
-
 
         console.error(
             "[U9 START ERROR]",
@@ -863,23 +1016,19 @@ async function startOrder(){
         );
 
 
+
         handleError(
             error
         );
 
-
     }
     finally{
 
-
         state.busy=false;
-
 
     }
 
 }
-
-
 
 
 
@@ -901,7 +1050,6 @@ async function matchOrder(){
 
 
     try{
-
 
         const result =
         await api(
@@ -927,11 +1075,8 @@ async function matchOrder(){
 
         await loadStatus();
 
-
-
     }
     catch(error){
-
 
         console.error(
             "[U9 MATCH ERROR]",
@@ -939,20 +1084,17 @@ async function matchOrder(){
         );
 
 
-        await loadStatus();
 
+        await loadStatus();
 
     }
     finally{
 
-
         state.busy=false;
-
 
     }
 
 }
-
 
 
 
@@ -963,7 +1105,6 @@ async function matchOrder(){
 function startMatching(
     readyAt
 ){
-
 
     clearMatching();
 
@@ -976,19 +1117,14 @@ function startMatching(
 
 
 
-
     const target =
     new Date(
         readyAt
-    )
-    .getTime();
-
-
+    ).getTime();
 
 
 
     function tick(){
-
 
         const seconds =
         Math.max(
@@ -1024,10 +1160,7 @@ function startMatching(
 
         }
 
-
     }
-
-
 
 
 
@@ -1041,10 +1174,7 @@ function startMatching(
         1000
     );
 
-
 }
-
-
 
 
 
@@ -1053,7 +1183,6 @@ function startMatching(
 ======================================================== */
 
 async function payRemaining(){
-
 
     if(
         state.busy
@@ -1081,7 +1210,6 @@ async function payRemaining(){
 
     try{
 
-
         const result =
         await api(
             "POST",
@@ -1097,6 +1225,7 @@ async function payRemaining(){
         );
 
 
+
         updateOrder(
             result.order
         );
@@ -1105,11 +1234,8 @@ async function payRemaining(){
 
         await loadStatus();
 
-
-
     }
     catch(error){
-
 
         console.error(
             "[U9 PAY ERROR]",
@@ -1117,22 +1243,21 @@ async function payRemaining(){
         );
 
 
+
         handleError(
             error
         );
 
-
-
     }
     finally{
 
-
         state.busy=false;
-
 
     }
 
 }
+
+
 
 /* ========================================================
    COOLDOWN
@@ -1169,15 +1294,11 @@ function startCooldown(
     const target =
     new Date(
         until
-    )
-    .getTime();
-
-
+    ).getTime();
 
 
 
     function tick(){
-
 
         const seconds =
         Math.max(
@@ -1219,10 +1340,7 @@ function startCooldown(
 
         }
 
-
     }
-
-
 
 
 
@@ -1236,9 +1354,7 @@ function startCooldown(
         1000
     );
 
-
 }
-
 
 
 
@@ -1286,8 +1402,6 @@ function formatTime(
 
 
 
-
-
 /* ========================================================
    ERROR HANDLER
 ======================================================== */
@@ -1311,13 +1425,12 @@ function handleError(
 
     switch(code){
 
-
         case "UNAUTHORIZED":
-
 
             disable(
                 DOM.orderButton
             );
+
 
 
             text(
@@ -1326,17 +1439,17 @@ function handleError(
             );
 
 
-        break;
 
+        break;
 
 
 
         case "INSUFFICIENT_START_COINS":
 
-
             enable(
                 DOM.orderButton
             );
+
 
 
             text(
@@ -1345,17 +1458,17 @@ function handleError(
             );
 
 
-        break;
 
+        break;
 
 
 
         case "ORDER_ALREADY_ACTIVE":
 
-
             disable(
                 DOM.orderButton
             );
+
 
 
             text(
@@ -1364,20 +1477,21 @@ function handleError(
             );
 
 
+
             loadStatus();
+
 
 
         break;
 
 
 
-
         case "ROUND_COOLDOWN":
-
 
             disable(
                 DOM.orderButton
             );
+
 
 
             text(
@@ -1386,20 +1500,21 @@ function handleError(
             );
 
 
+
             loadStatus();
+
 
 
         break;
 
 
 
-
         case "INSUFFICIENT_COINS":
-
 
             enable(
                 DOM.payButton
             );
+
 
 
             text(
@@ -1408,13 +1523,12 @@ function handleError(
             );
 
 
+
         break;
 
 
 
-
         case "NO_PRODUCTS":
-
 
             text(
                 DOM.orderStatus,
@@ -1422,17 +1536,17 @@ function handleError(
             );
 
 
-        break;
 
+        break;
 
 
 
         case "U9_DISABLED":
 
-
             disable(
                 DOM.orderButton
             );
+
 
 
             text(
@@ -1441,13 +1555,12 @@ function handleError(
             );
 
 
+
         break;
 
 
 
-
         default:
-
 
             if(
                 !state.order
@@ -1458,6 +1571,7 @@ function handleError(
                 );
 
 
+
                 text(
                     DOM.orderButton,
                     "Start Order"
@@ -1465,15 +1579,11 @@ function handleError(
 
             }
 
-
         break;
 
     }
 
-
 }
-
-
 
 
 
@@ -1483,16 +1593,13 @@ function handleError(
 
 function bindEvents(){
 
-
     if(
         DOM.orderButton
     ){
 
-
         DOM.orderButton.addEventListener(
             "click",
             e=>{
-
 
                 e.preventDefault();
 
@@ -1500,14 +1607,10 @@ function bindEvents(){
 
                 startOrder();
 
-
             }
         );
 
-
     }
-
-
 
 
 
@@ -1515,11 +1618,9 @@ function bindEvents(){
         DOM.payButton
     ){
 
-
         DOM.payButton.addEventListener(
             "click",
             e=>{
-
 
                 e.preventDefault();
 
@@ -1527,18 +1628,12 @@ function bindEvents(){
 
                 payRemaining();
 
-
             }
         );
 
-
     }
 
-
-
 }
-
-
 
 
 
@@ -1548,22 +1643,17 @@ function bindEvents(){
 
 window.U9Order = {
 
-
     start:
     startOrder,
-
 
     match:
     matchOrder,
 
-
     pay:
     payRemaining,
 
-
     refresh:
     loadStatus,
-
 
     getState(){
 
@@ -1573,11 +1663,7 @@ window.U9Order = {
 
     }
 
-
 };
-
-
-
 
 
 
@@ -1587,19 +1673,72 @@ window.U9Order = {
 
 async function init(){
 
-
     bindEvents();
 
 
 
-    await loadStatus();
+    /*
+    --------------------------------------------------------
+    IMPORTANT
 
+    Do NOT call loadStatus immediately.
+
+    Safari can initialize this script before Header.js
+    has restored the U9 session token.
+
+    Wait for u9_token first.
+    --------------------------------------------------------
+    */
+
+    const token =
+    await waitForAuthToken(
+        5000
+    );
+
+
+
+    if(!token){
+
+        console.warn(
+            "[U9 AUTH] No session token found."
+        );
+
+
+
+        /*
+        Do not send an unauthenticated request.
+        */
+
+        handleError(
+            new Error(
+                "UNAUTHORIZED"
+            )
+        );
+
+
+
+        return;
+
+    }
+
+
+
+    /*
+    --------------------------------------------------------
+    Token is available.
+    Now it is safe to load Auction status.
+    --------------------------------------------------------
+    */
+
+    await loadStatus();
 
 }
 
 
 
-
+/* ========================================================
+   START
+======================================================== */
 
 if(
     document.readyState === "loading"
@@ -1613,13 +1752,10 @@ if(
         }
     );
 
-
 }
 else{
 
-
     init();
-
 
 }
 
