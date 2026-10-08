@@ -43,6 +43,12 @@
 
   let currentCoins = 0;
 
+  /*
+   * Latest round status returned by u9_round_status.
+   * This now also contains pending order information.
+   */
+  let currentRoundStatus = null;
+
 
   /* =========================================================
      USER
@@ -469,15 +475,9 @@
     }
 
 
-    /*
-     * Check immediately.
-     */
     refreshBalance();
 
 
-    /*
-     * Then check every 2 seconds.
-     */
     balanceTimer =
       setInterval(
         refreshBalance,
@@ -784,11 +784,63 @@
     showOrder();
 
 
-    /*
-     * Always make the button depend on the
-     * current Coins balance.
-     */
     updateCompleteButtonByBalance();
+  }
+
+
+  /* =========================================================
+     BUILD PENDING ORDER FROM ROUND STATUS
+  ========================================================= */
+
+  function buildPendingOrderFromStatus(status) {
+
+    if (!status) {
+      return null;
+    }
+
+
+    if (
+      !status.pending_order_id ||
+      status.pending_status !== "pending"
+    ) {
+
+      return null;
+    }
+
+
+    return {
+
+      order_id:
+        status.pending_order_id,
+
+      user_id:
+        getUserId(),
+
+      product_id:
+        status.pending_product_id,
+
+      product_name:
+        status.pending_product_name ||
+        "Task",
+
+      product_description:
+        "",
+
+      product_url:
+        "",
+
+      total_price:
+        status.pending_total_price,
+
+      profit:
+        status.pending_profit,
+
+      status:
+        status.pending_status,
+
+      round_id:
+        status.pending_round_id
+    };
   }
 
 
@@ -887,6 +939,13 @@
 
       return null;
     }
+
+
+    /*
+     * Save the complete status object.
+     */
+    currentRoundStatus =
+      status;
 
 
     updateCoins(
@@ -1331,10 +1390,6 @@
       );
 
 
-      /*
-       * Complete Task depends on the actual
-       * current Coins balance.
-       */
       updateCompleteButtonByBalance();
 
 
@@ -1344,13 +1399,6 @@
       );
 
 
-      /*
-       * Start checking the balance.
-       *
-       * If the user recharges while this
-       * order is pending, the Complete button
-       * will automatically become enabled.
-       */
       startBalanceRefresh();
 
 
@@ -1428,9 +1476,6 @@
     }
 
 
-    /*
-     * Extra frontend protection.
-     */
     if (
       currentCoins < 0
     ) {
@@ -1520,12 +1565,12 @@
         data,
         error
       } =
-      await client.rpc(
-        "u9_auto_order",
-        {
-          p_user_id: userId
-        }
-      );
+        await client.rpc(
+          "u9_auto_order",
+          {
+            p_user_id: userId
+          }
+        );
 
 
       if (error) {
@@ -1750,9 +1795,6 @@
     }
 
 
-    /*
-     * Never allow completion while Coins are negative.
-     */
     if (
       currentCoins < 0
     ) {
@@ -1761,10 +1803,12 @@
         "Please recharge your Coins before completing this order."
       );
 
+
       setCompleteButton(
         true,
         "Recharge to Complete"
       );
+
 
       return;
     }
@@ -1823,14 +1867,14 @@
         data,
         error
       } =
-      await client.rpc(
-        "u9_complete_order",
-        {
-          p_user_id: userId,
-          p_order_id:
-            currentOrder.order_id
-        }
-      );
+        await client.rpc(
+          "u9_complete_order",
+          {
+            p_user_id: userId,
+            p_order_id:
+              currentOrder.order_id
+          }
+        );
 
 
       if (error) {
@@ -1943,10 +1987,6 @@
       );
 
 
-      /*
-       * If the balance is still negative,
-       * keep the button disabled.
-       */
       if (
         currentCoins < 0
       ) {
@@ -1983,95 +2023,38 @@
      LOAD PENDING ORDER
   ========================================================= */
 
-  async function loadPendingOrder() {
+  async function loadPendingOrder(
+    status
+  ) {
 
-    const client =
-      getSupabase();
+    /*
+     * Pending order information now comes from
+     * u9_round_status.
+     *
+     * Do not query u9-orders directly from the browser.
+     */
 
-
-    const userId =
-      getUserId();
-
-
-    if (
-      !client ||
-      !userId
-    ) {
-
-      return null;
-    }
-
-
-    const {
-      data,
-      error
-    } =
-      await client
-        .from("u9-orders")
-        .select("*")
-        .eq(
-          "user_id",
-          userId
-        )
-        .eq(
-          "status",
-          "pending"
-        )
-        .limit(1)
-        .maybeSingle();
-
-
-    if (error) {
-
-      console.error(
-        "U9 load pending order error:",
-        error
+    const pendingOrder =
+      buildPendingOrderFromStatus(
+        status
       );
 
-      return null;
-    }
 
+    if (!pendingOrder) {
 
-    if (!data) {
+      currentOrder =
+        null;
 
       stopBalanceRefresh();
 
+      hideOrder();
+
       return null;
     }
 
 
-    currentOrder = {
-
-      order_id:
-        data.id,
-
-      user_id:
-        data.user_id,
-
-      product_id:
-        data.product_id,
-
-      product_name:
-        "Task",
-
-      product_description:
-        "",
-
-      product_url:
-        "",
-
-      total_price:
-        data.total_price,
-
-      profit:
-        data.profit,
-
-      status:
-        data.status,
-
-      round_id:
-        data.round_id
-    };
+    currentOrder =
+      pendingOrder;
 
 
     renderOrder(
@@ -2079,10 +2062,6 @@
     );
 
 
-    /*
-     * Do NOT enable Complete unconditionally.
-     * It depends on the current Coins balance.
-     */
     updateCompleteButtonByBalance();
 
 
@@ -2092,10 +2071,6 @@
     );
 
 
-    /*
-     * Start balance polling so a recharge
-     * can automatically unlock Complete Task.
-     */
     startBalanceRefresh();
 
 
@@ -2269,15 +2244,32 @@
 
     try {
 
+      /*
+       * u9_round_status now returns:
+       *
+       * Coins
+       * Round information
+       * Pending order information
+       *
+       * in one RPC call.
+       */
       const status =
         await loadRoundStatus();
+
+
+      if (!status) {
+
+        return null;
+      }
 
 
       /*
        * A pending order has priority.
        */
       const pendingOrder =
-        await loadPendingOrder();
+        await loadPendingOrder(
+          status
+        );
 
 
       if (
@@ -2286,6 +2278,12 @@
 
         currentMatching =
           null;
+
+
+        console.log(
+          "U9: Pending order restored from round status.",
+          pendingOrder
+        );
 
 
         return {
