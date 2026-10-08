@@ -829,6 +829,10 @@
       product_url:
         "",
 
+      product_image_url:
+        status.pending_product_image_url ||
+        "",
+
       total_price:
         status.pending_total_price,
 
