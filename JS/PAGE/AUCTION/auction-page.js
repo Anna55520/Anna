@@ -41,6 +41,8 @@
 
   let currentMatching = null;
 
+  let currentCoins = 0;
+
 
   /* =========================================================
      USER
@@ -291,24 +293,51 @@
 
   function updateCoins(coins) {
 
+    currentCoins =
+      Number(coins) || 0;
+
+
     const el =
       document.getElementById(
         "U9-auction-coins"
       );
 
 
-    if (!el) {
+    if (el) {
 
-      console.warn(
-        "U9: #U9-auction-coins not found."
-      );
-
-      return;
+      el.textContent =
+        formatCoins(
+          currentCoins
+        );
     }
 
 
-    el.textContent =
-      formatCoins(coins);
+    /*
+    * A pending order cannot be completed
+    * while the user's Coins are negative.
+    */
+    if (
+      currentOrder &&
+      currentOrder.status === "pending"
+    ) {
+
+      if (
+        currentCoins < 0
+      ) {
+
+        setCompleteButton(
+          true,
+          "Recharge to Complete"
+        );
+
+      } else {
+
+        setCompleteButton(
+          false,
+          "Complete Task"
+        );
+      }
+    }
   }
 
 
@@ -1149,11 +1178,30 @@
         currentOrder
       );
 
+      const currentCoins =
+      Number(
+          document.getElementById(
+          "U9-auction-coins"
+          )?.textContent
+      );
+
+      if (
+      Number.isFinite(currentCoins) &&
+      currentCoins < 0
+      ) {
 
       setCompleteButton(
-        false,
-        "Complete Task"
+          true,
+          "Recharge to Complete"
       );
+
+      } else {
+
+      setCompleteButton(
+          false,
+          "Complete Task"
+      );
+      }
 
 
       setStartButton(
@@ -1536,15 +1584,17 @@
       return;
     }
 
-
-    if (!currentOrder?.order_id) {
-
-      console.warn(
-        "U9: No current order to complete."
-      );
+    if (
+      currentCoins < 0
+    ) {
 
       showMessage(
-        "There is no completed matching order yet."
+        "Please recharge your Coins before completing this order."
+      );
+
+      setCompleteButton(
+        true,
+        "Recharge to Complete"
       );
 
       return;
