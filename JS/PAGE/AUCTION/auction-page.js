@@ -36,9 +36,9 @@
 
   let matchingTimer = null;
   let cooldownTimer = null;
+  let balanceTimer = null;
 
   let currentOrder = null;
-
   let currentMatching = null;
 
   let currentCoins = 0;
@@ -288,6 +288,40 @@
 
 
   /* =========================================================
+     UI - COMPLETE BUTTON BY BALANCE
+  ========================================================= */
+
+  function updateCompleteButtonByBalance() {
+
+    if (
+      !currentOrder ||
+      currentOrder.status !== "pending"
+    ) {
+
+      return;
+    }
+
+
+    if (
+      currentCoins < 0
+    ) {
+
+      setCompleteButton(
+        true,
+        "Recharge to Complete"
+      );
+
+    } else {
+
+      setCompleteButton(
+        false,
+        "Complete Task"
+      );
+    }
+  }
+
+
+  /* =========================================================
      UI - COINS
   ========================================================= */
 
@@ -312,32 +346,143 @@
     }
 
 
-    /*
-    * A pending order cannot be completed
-    * while the user's Coins are negative.
-    */
+    updateCompleteButtonByBalance();
+  }
+
+
+  /* =========================================================
+     BALANCE AUTO REFRESH
+  ========================================================= */
+
+  function stopBalanceRefresh() {
+
+    if (balanceTimer) {
+
+      clearInterval(
+        balanceTimer
+      );
+
+      balanceTimer =
+        null;
+    }
+  }
+
+
+  function startBalanceRefresh() {
+
+    stopBalanceRefresh();
+
+
     if (
-      currentOrder &&
-      currentOrder.status === "pending"
+      !currentOrder ||
+      currentOrder.status !== "pending"
     ) {
 
+      return;
+    }
+
+
+    async function refreshBalance() {
+
       if (
-        currentCoins < 0
+        !currentOrder ||
+        currentOrder.status !== "pending"
       ) {
 
-        setCompleteButton(
-          true,
-          "Recharge to Complete"
+        stopBalanceRefresh();
+
+        return;
+      }
+
+
+      const client =
+        getSupabase();
+
+
+      const userId =
+        getUserId();
+
+
+      if (
+        !client ||
+        !userId
+      ) {
+
+        return;
+      }
+
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await client.rpc(
+            "u9_round_status",
+            {
+              p_user_id: userId
+            }
+          );
+
+
+        if (error) {
+
+          console.error(
+            "U9 balance refresh error:",
+            error
+          );
+
+          return;
+        }
+
+
+        if (!data) {
+          return;
+        }
+
+
+        const status =
+          Array.isArray(data)
+            ? data[0]
+            : data;
+
+
+        if (!status) {
+          return;
+        }
+
+
+        updateCoins(
+          status.coins
         );
 
-      } else {
+      }
 
-        setCompleteButton(
-          false,
-          "Complete Task"
+      catch (error) {
+
+        console.error(
+          "U9 balance refresh exception:",
+          error
         );
       }
     }
+
+
+    /*
+     * Check immediately.
+     */
+    refreshBalance();
+
+
+    /*
+     * Then check every 2 seconds.
+     */
+    balanceTimer =
+      setInterval(
+        refreshBalance,
+        2000
+      );
   }
 
 
@@ -637,6 +782,13 @@
 
 
     showOrder();
+
+
+    /*
+     * Always make the button depend on the
+     * current Coins balance.
+     */
+    updateCompleteButtonByBalance();
   }
 
 
@@ -1166,8 +1318,8 @@
 
 
       /*
-       * Coins are updated only now.
-       * This is after the matching has completed.
+       * Coins are deducted here,
+       * after matching is finished.
        */
       updateCoins(
         result.coins_after
@@ -1178,36 +1330,28 @@
         currentOrder
       );
 
-      const currentCoins =
-      Number(
-          document.getElementById(
-          "U9-auction-coins"
-          )?.textContent
-      );
 
-      if (
-      Number.isFinite(currentCoins) &&
-      currentCoins < 0
-      ) {
-
-      setCompleteButton(
-          true,
-          "Recharge to Complete"
-      );
-
-      } else {
-
-      setCompleteButton(
-          false,
-          "Complete Task"
-      );
-      }
+      /*
+       * Complete Task depends on the actual
+       * current Coins balance.
+       */
+      updateCompleteButtonByBalance();
 
 
       setStartButton(
         true,
         "Complete current task first"
       );
+
+
+      /*
+       * Start checking the balance.
+       *
+       * If the user recharges while this
+       * order is pending, the Complete button
+       * will automatically become enabled.
+       */
+      startBalanceRefresh();
 
 
       showMessage(
@@ -1278,6 +1422,21 @@
 
       showMessage(
         "Please complete the current task first."
+      );
+
+      return;
+    }
+
+
+    /*
+     * Extra frontend protection.
+     */
+    if (
+      currentCoins < 0
+    ) {
+
+      showMessage(
+        "Please recharge your Coins before starting another task."
       );
 
       return;
@@ -1476,16 +1635,13 @@
 
 
       /*
-       * Coins must NOT change here.
+       * Coins do NOT change during Matching.
        */
       updateCoins(
         result.coins_after
       );
 
 
-      /*
-       * The order does NOT exist yet.
-       */
       currentOrder =
         null;
 
@@ -1521,10 +1677,6 @@
 
       } else {
 
-        /*
-         * If the server somehow returns no end time,
-         * finish matching immediately.
-         */
         await finishMatching();
       }
     }
@@ -1584,6 +1736,23 @@
       return;
     }
 
+
+    if (
+      !currentOrder ||
+      currentOrder.status !== "pending"
+    ) {
+
+      showMessage(
+        "There is no pending task to complete."
+      );
+
+      return;
+    }
+
+
+    /*
+     * Never allow completion while Coins are negative.
+     */
     if (
       currentCoins < 0
     ) {
@@ -1695,26 +1864,14 @@
       }
 
 
-      /* =====================================================
-         UPDATE ORDER
-      ===================================================== */
-
       currentOrder.status =
         "completed";
 
-
-      /* =====================================================
-         UPDATE COINS
-      ===================================================== */
 
       updateCoins(
         result.coins_after
       );
 
-
-      /* =====================================================
-         UPDATE STATUS
-      ===================================================== */
 
       const statusEl =
         document.getElementById(
@@ -1729,19 +1886,14 @@
       }
 
 
-      /* =====================================================
-         UPDATE ROUND
-      ===================================================== */
-
       updateRound(
         result.completed_count,
         result.orders_per_round
       );
 
 
-      /* =====================================================
-         COOLDOWN
-      ===================================================== */
+      stopBalanceRefresh();
+
 
       if (
         result.cooldown_end_time
@@ -1791,10 +1943,26 @@
       );
 
 
-      setCompleteButton(
-        false,
-        "Complete Task"
-      );
+      /*
+       * If the balance is still negative,
+       * keep the button disabled.
+       */
+      if (
+        currentCoins < 0
+      ) {
+
+        setCompleteButton(
+          true,
+          "Recharge to Complete"
+        );
+
+      } else {
+
+        setCompleteButton(
+          false,
+          "Complete Task"
+        );
+      }
 
 
       showMessage(
@@ -1866,6 +2034,8 @@
 
     if (!data) {
 
+      stopBalanceRefresh();
+
       return null;
     }
 
@@ -1909,16 +2079,24 @@
     );
 
 
-    setCompleteButton(
-      false,
-      "Complete Task"
-    );
+    /*
+     * Do NOT enable Complete unconditionally.
+     * It depends on the current Coins balance.
+     */
+    updateCompleteButtonByBalance();
 
 
     setStartButton(
       true,
       "Complete current task first"
     );
+
+
+    /*
+     * Start balance polling so a recharge
+     * can automatically unlock Complete Task.
+     */
+    startBalanceRefresh();
 
 
     console.log(
@@ -2025,6 +2203,9 @@
       null;
 
 
+    stopBalanceRefresh();
+
+
     hideOrder();
 
 
@@ -2113,6 +2294,13 @@
           activeMatching: null
         };
       }
+
+
+      /*
+       * If there is no pending order,
+       * stop balance polling.
+       */
+      stopBalanceRefresh();
 
 
       /*
