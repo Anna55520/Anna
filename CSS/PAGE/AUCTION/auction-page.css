@@ -518,3 +518,25 @@
   }
 
 }
+
+/* =========================
+   PRODUCT IMAGE
+========================= */
+
+.U9-auction-product-image {
+
+  display: block;
+
+  width: 100%;
+
+  max-width: 240px;
+
+  max-height: 240px;
+
+  margin: 0 auto 20px;
+
+  object-fit: contain;
+
+  border-radius: 12px;
+
+}
