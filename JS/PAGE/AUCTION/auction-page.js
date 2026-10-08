@@ -1,11 +1,11 @@
-
 /* =========================================================
    U9 AUCTION PAGE
-   Complete Task / Auto Order / Round / Cooldown
+   Task Matching / Order / Round / Cooldown
 ========================================================= */
 
 (function () {
   "use strict";
+
 
   /* =========================================================
      ELEMENTS
@@ -28,7 +28,7 @@
 
 
   /* =========================================================
-     U9 STATE
+     STATE
   ========================================================= */
 
   let ordering = false;
@@ -39,68 +39,106 @@
 
   let currentOrder = null;
 
+  let currentMatching = null;
+
 
   /* =========================================================
      USER
   ========================================================= */
 
   function getUserId() {
-    // 1. 优先从 header.js 的 U9User 获取当前登录用户
+
     try {
+
       if (
         window.U9User &&
         typeof window.U9User.get === "function"
       ) {
-        const user = window.U9User.get();
 
-        if (user && user.id) {
-          console.log("U9: User ID from U9User:", user.id);
+        const user =
+          window.U9User.get();
+
+        if (
+          user &&
+          user.id
+        ) {
+
+          console.log(
+            "U9: User ID from U9User:",
+            user.id
+          );
+
           return user.id;
         }
       }
+
     } catch (error) {
-      console.error("U9: Failed to read U9User:", error);
+
+      console.error(
+        "U9: Failed to read U9User:",
+        error
+      );
     }
 
-    // 2. 兼容旧的全局变量
+
     if (window.currentUserUUID) {
+
       console.log(
         "U9: User ID from window.currentUserUUID:",
         window.currentUserUUID
       );
+
       return window.currentUserUUID;
     }
 
+
     if (window.currentUserId) {
+
       console.log(
         "U9: User ID from window.currentUserId:",
         window.currentUserId
       );
+
       return window.currentUserId;
     }
 
-    // 3. 兼容 localStorage
-    const storedUUID = localStorage.getItem("currentUserUUID");
+
+    const storedUUID =
+      localStorage.getItem(
+        "currentUserUUID"
+      );
 
     if (storedUUID) {
+
       console.log(
         "U9: User ID from localStorage currentUserUUID:",
         storedUUID
       );
+
       return storedUUID;
     }
 
-    const storedId = localStorage.getItem("currentUserId");
+
+    const storedId =
+      localStorage.getItem(
+        "currentUserId"
+      );
 
     if (storedId) {
+
       console.log(
         "U9: User ID from localStorage currentUserId:",
         storedId
       );
+
       return storedId;
     }
 
-    console.error("U9: User UUID is missing.");
+
+    console.error(
+      "U9: User UUID is missing."
+    );
+
     return null;
   }
 
@@ -111,27 +149,17 @@
 
   function getSupabase() {
 
-    /*
-      Try all common client names.
-
-      Your old code only checked:
-        supabaseClient
-        window.supabaseClient
-
-      But your console showed:
-        typeof supabaseClient === "undefined"
-
-      So we also check window.supabase and other common names.
-    */
-
     try {
+
       if (
         typeof supabaseClient !== "undefined" &&
         supabaseClient
       ) {
+
         return supabaseClient;
       }
-    } catch (e) {
+
+    } catch (error) {
       // Ignore ReferenceError
     }
 
@@ -139,6 +167,7 @@
     if (
       window.supabaseClient
     ) {
+
       return window.supabaseClient;
     }
 
@@ -146,6 +175,7 @@
     if (
       window.supabase
     ) {
+
       return window.supabase;
     }
 
@@ -153,6 +183,7 @@
     if (
       window.SupabaseClient
     ) {
+
       return window.SupabaseClient;
     }
 
@@ -160,6 +191,7 @@
     if (
       window.U9Supabase
     ) {
+
       return window.U9Supabase;
     }
 
@@ -187,12 +219,14 @@
   ========================================================= */
 
   function formatCoins(value) {
+
     const number =
       Number(value);
 
     if (
       Number.isNaN(number)
     ) {
+
       return "0.00";
     }
 
@@ -264,6 +298,7 @@
 
 
     if (!el) {
+
       console.warn(
         "U9: #U9-auction-coins not found."
       );
@@ -293,6 +328,7 @@
 
 
     if (!el) {
+
       console.warn(
         "U9: #U9-auction-round not found."
       );
@@ -390,12 +426,14 @@
 
 
     if (el) {
+
       el.style.display =
         "block";
     }
 
 
     if (text) {
+
       text.textContent =
         message || "Matching...";
     }
@@ -411,6 +449,7 @@
 
 
     if (el) {
+
       el.style.display =
         "none";
     }
@@ -430,6 +469,7 @@
 
 
     if (el) {
+
       el.style.display =
         "block";
     }
@@ -445,6 +485,7 @@
 
 
     if (el) {
+
       el.style.display =
         "none";
     }
@@ -503,6 +544,7 @@
 
 
     if (name) {
+
       name.textContent =
         order.product_name ||
         "Task";
@@ -510,6 +552,7 @@
 
 
     if (description) {
+
       description.textContent =
         order.product_description ||
         "Complete this task to receive your Coins and profit.";
@@ -517,6 +560,7 @@
 
 
     if (price) {
+
       price.textContent =
         formatCoins(
           order.total_price
@@ -525,6 +569,7 @@
 
 
     if (profit) {
+
       profit.textContent =
         "+" +
         formatCoins(
@@ -534,6 +579,7 @@
 
 
     if (status) {
+
       status.textContent =
         order.status === "completed"
           ? "Completed"
@@ -662,28 +708,16 @@
     }
 
 
-    /* =========================
-       UPDATE COINS
-    ========================= */
-
     updateCoins(
       status.coins
     );
 
-
-    /* =========================
-       UPDATE ROUND
-    ========================= */
 
     updateRound(
       status.completed_count,
       status.orders_per_round
     );
 
-
-    /* =========================
-       COOLDOWN
-    ========================= */
 
     handleCooldown(
       status.cooldown_end_time
@@ -722,15 +756,24 @@
     if (!cooldownEnd) {
 
       if (cooldownEl) {
+
         cooldownEl.textContent =
           "";
       }
 
 
-      /*
-        Only enable Start Task if there
-        isn't another pending order.
-      */
+      if (
+        currentMatching
+      ) {
+
+        setStartButton(
+          true,
+          "Matching..."
+        );
+
+        return;
+      }
+
 
       if (
         currentOrder &&
@@ -790,19 +833,22 @@
         }
 
 
-        setStartButton(
-          false,
-          "Start Task"
-        );
+        if (
+          !currentMatching &&
+          !currentOrder
+        ) {
 
+          setStartButton(
+            false,
+            "Start Task"
+          );
+        }
 
-        /*
-          Refresh from database after cooldown.
-        */
 
         loadRoundStatus()
           .catch(
             function (error) {
+
               console.error(
                 "U9 cooldown refresh error:",
                 error
@@ -919,29 +965,240 @@
      FINISH MATCHING
   ========================================================= */
 
-  function finishMatching() {
+  async function finishMatching() {
 
-    hideMatching();
+    if (!currentMatching) {
 
-
-    if (currentOrder) {
-
-      renderOrder(
-        currentOrder
+      console.warn(
+        "U9: No active matching found."
       );
+
+      hideMatching();
+
+      return;
     }
 
 
-    setCompleteButton(
-      false,
-      "Complete Task"
-    );
+    const client =
+      getSupabase();
+
+
+    const userId =
+      getUserId();
+
+
+    if (!client || !userId) {
+
+      showMessage(
+        "Unable to complete matching."
+      );
+
+      return;
+    }
+
+
+    const matchingId =
+      currentMatching.matching_id;
+
+
+    if (!matchingId) {
+
+      console.error(
+        "U9: matching_id is missing."
+      );
+
+      showMessage(
+        "Matching ID is missing."
+      );
+
+      return;
+    }
 
 
     setStartButton(
       true,
-      "Complete current task first"
+      "Creating order..."
     );
+
+
+    showMatching(
+      "Matching completed. Creating order..."
+    );
+
+
+    try {
+
+      console.log(
+        "U9: Calling u9_order_matching...",
+        {
+          userId: userId,
+          matchingId: matchingId
+        }
+      );
+
+
+      const {
+        data,
+        error
+      } =
+        await client.rpc(
+          "u9_order_matching",
+          {
+            p_user_id: userId,
+            p_matching_id: matchingId
+          }
+        );
+
+
+      if (error) {
+
+        console.error(
+          "U9 u9_order_matching RPC ERROR:",
+          error
+        );
+
+        throw error;
+      }
+
+
+      console.log(
+        "U9 order matching result:",
+        data
+      );
+
+
+      const result =
+        Array.isArray(data)
+          ? data[0]
+          : data;
+
+
+      if (!result) {
+
+        throw new Error(
+          "Order matching result is empty."
+        );
+      }
+
+
+      if (!result.order_id) {
+
+        throw new Error(
+          "Order was not created."
+        );
+      }
+
+
+      currentOrder = {
+
+        order_id:
+          result.order_id,
+
+        user_id:
+          result.user_id,
+
+        product_id:
+          result.product_id,
+
+        product_name:
+          result.product_name,
+
+        product_description:
+          "",
+
+        product_url:
+          "",
+
+        total_price:
+          result.total_price,
+
+        profit:
+          result.profit,
+
+        coins_after:
+          result.coins_after,
+
+        status:
+          result.status || "pending",
+
+        round_id:
+          result.round_id,
+
+        order_number:
+          result.order_number
+      };
+
+
+      currentMatching =
+        null;
+
+
+      hideMatching();
+
+
+      /*
+       * Coins are updated only now.
+       * This is after the matching has completed.
+       */
+      updateCoins(
+        result.coins_after
+      );
+
+
+      renderOrder(
+        currentOrder
+      );
+
+
+      setCompleteButton(
+        false,
+        "Complete Task"
+      );
+
+
+      setStartButton(
+        true,
+        "Complete current task first"
+      );
+
+
+      showMessage(
+        "Task matched successfully."
+      );
+    }
+
+    catch (error) {
+
+      console.error(
+        "U9 ORDER MATCHING ERROR:",
+        error
+      );
+
+
+      currentMatching =
+        null;
+
+
+      hideMatching();
+
+
+      setCompleteButton(
+        true,
+        "Complete Task"
+      );
+
+
+      setStartButton(
+        false,
+        "Start Task"
+      );
+
+
+      showMessage(
+        error?.message ||
+        "Failed to create order."
+      );
+    }
   }
 
 
@@ -952,6 +1209,29 @@
   async function startTask() {
 
     if (ordering) {
+      return;
+    }
+
+
+    if (currentMatching) {
+
+      console.warn(
+        "U9: Matching is already running."
+      );
+
+      return;
+    }
+
+
+    if (
+      currentOrder &&
+      currentOrder.status === "pending"
+    ) {
+
+      showMessage(
+        "Please complete the current task first."
+      );
+
       return;
     }
 
@@ -1005,11 +1285,20 @@
     hideOrder();
 
 
+    setCompleteButton(
+      true,
+      "Complete Task"
+    );
+
+
     try {
 
       showMatching(
-        "Starting task..."
+        "Starting Matching..."
       );
+
+
+      showMessage("");
 
 
       console.log(
@@ -1024,12 +1313,12 @@
         data,
         error
       } =
-        await client.rpc(
-          "u9_auto_order",
-          {
-            p_user_id: userId
-          }
-        );
+      await client.rpc(
+        "u9_auto_order",
+        {
+          p_user_id: userId
+        }
+      );
 
 
       if (error) {
@@ -1058,7 +1347,7 @@
       if (!result) {
 
         throw new Error(
-          "No order was returned."
+          "No matching result was returned."
         );
       }
 
@@ -1070,6 +1359,9 @@
       if (
         result.cooldown === true
       ) {
+
+        currentMatching =
+          null;
 
         hideMatching();
 
@@ -1087,13 +1379,21 @@
 
 
       /* =====================================================
-         CREATE CURRENT ORDER
+         SAVE MATCHING STATE
       ===================================================== */
 
-      currentOrder = {
+      if (!result.matching_id) {
 
-        order_id:
-          result.order_id,
+        throw new Error(
+          "Matching ID was not returned."
+        );
+      }
+
+
+      currentMatching = {
+
+        matching_id:
+          result.matching_id,
 
         user_id:
           result.user_id,
@@ -1104,14 +1404,6 @@
         product_name:
           result.product_name,
 
-        product_description:
-          result.product_description ||
-          "",
-
-        product_url:
-          result.product_url ||
-          "",
-
         total_price:
           result.total_price,
 
@@ -1121,25 +1413,52 @@
         coins_after:
           result.coins_after,
 
-        status:
-          "pending",
+        match_start_time:
+          result.match_start_time,
+
+        match_end_time:
+          result.match_end_time,
 
         round_id:
-          result.round_id
+          result.round_id,
+
+        order_number:
+          result.order_number
       };
 
 
-      /* =====================================================
-         UPDATE COINS IMMEDIATELY
-      ===================================================== */
-
+      /*
+       * Coins must NOT change here.
+       */
       updateCoins(
         result.coins_after
       );
 
 
+      /*
+       * The order does NOT exist yet.
+       */
+      currentOrder =
+        null;
+
+
+      hideOrder();
+
+
+      setCompleteButton(
+        true,
+        "Complete Task"
+      );
+
+
+      setStartButton(
+        true,
+        "Matching..."
+      );
+
+
       /* =====================================================
-         MATCHING
+         START MATCHING COUNTDOWN
       ===================================================== */
 
       const matchEnd =
@@ -1154,11 +1473,12 @@
 
       } else {
 
-        finishMatching();
+        /*
+         * If the server somehow returns no end time,
+         * finish matching immediately.
+         */
+        await finishMatching();
       }
-
-
-      showMessage("");
     }
 
     catch (error) {
@@ -1169,7 +1489,21 @@
       );
 
 
+      currentMatching =
+        null;
+
+
+      currentOrder =
+        null;
+
+
       hideMatching();
+
+
+      setCompleteButton(
+        true,
+        "Complete Task"
+      );
 
 
       setStartButton(
@@ -1207,6 +1541,10 @@
 
       console.warn(
         "U9: No current order to complete."
+      );
+
+      showMessage(
+        "There is no completed matching order yet."
       );
 
       return;
@@ -1266,14 +1604,14 @@
         data,
         error
       } =
-        await client.rpc(
-          "u9_complete_order",
-          {
-            p_user_id: userId,
-            p_order_id:
-              currentOrder.order_id
-          }
-        );
+      await client.rpc(
+        "u9_complete_order",
+        {
+          p_user_id: userId,
+          p_order_id:
+            currentOrder.order_id
+        }
+      );
 
 
       if (error) {
@@ -1370,11 +1708,6 @@
 
       } else {
 
-        /*
-          Keep completed order visible,
-          but allow the next task.
-        */
-
         setStartButton(
           false,
           "Start Task"
@@ -1393,12 +1726,9 @@
       );
 
 
-      currentOrder = null;
+      currentOrder =
+        null;
 
-
-      /*
-        Refresh exact database status.
-      */
 
       await loadRoundStatus();
     }
@@ -1432,61 +1762,359 @@
 
 
   /* =========================================================
+     LOAD PENDING ORDER
+  ========================================================= */
+
+  async function loadPendingOrder() {
+
+    const client =
+      getSupabase();
+
+
+    const userId =
+      getUserId();
+
+
+    if (
+      !client ||
+      !userId
+    ) {
+
+      return null;
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await client
+        .from("u9-orders")
+        .select("*")
+        .eq(
+          "user_id",
+          userId
+        )
+        .eq(
+          "status",
+          "pending"
+        )
+        .limit(1)
+        .maybeSingle();
+
+
+    if (error) {
+
+      console.error(
+        "U9 load pending order error:",
+        error
+      );
+
+      return null;
+    }
+
+
+    if (!data) {
+
+      return null;
+    }
+
+
+    currentOrder = {
+
+      order_id:
+        data.id,
+
+      user_id:
+        data.user_id,
+
+      product_id:
+        data.product_id,
+
+      product_name:
+        "Task",
+
+      product_description:
+        "",
+
+      product_url:
+        "",
+
+      total_price:
+        data.total_price,
+
+      profit:
+        data.profit,
+
+      status:
+        data.status,
+
+      round_id:
+        data.round_id
+    };
+
+
+    renderOrder(
+      currentOrder
+    );
+
+
+    setCompleteButton(
+      false,
+      "Complete Task"
+    );
+
+
+    setStartButton(
+      true,
+      "Complete current task first"
+    );
+
+
+    console.log(
+      "U9 pending order restored:",
+      currentOrder
+    );
+
+
+    return currentOrder;
+  }
+
+
+  /* =========================================================
+     LOAD ACTIVE MATCHING
+  ========================================================= */
+
+  async function loadActiveMatching() {
+
+    const client =
+      getSupabase();
+
+
+    const userId =
+      getUserId();
+
+
+    if (
+      !client ||
+      !userId
+    ) {
+
+      return null;
+    }
+
+
+    const {
+      data,
+      error
+    } =
+      await client
+        .from("u9-matchings")
+        .select("*")
+        .eq(
+          "user_id",
+          userId
+        )
+        .eq(
+          "status",
+          "matching"
+        )
+        .order(
+          "created_at",
+          {
+            ascending: false
+          }
+        )
+        .limit(1)
+        .maybeSingle();
+
+
+    if (error) {
+
+      console.error(
+        "U9 load active matching error:",
+        error
+      );
+
+      return null;
+    }
+
+
+    if (!data) {
+
+      return null;
+    }
+
+
+    currentMatching = {
+
+      matching_id:
+        data.id,
+
+      user_id:
+        data.user_id,
+
+      product_id:
+        data.product_id,
+
+      match_start_time:
+        data.match_start_time,
+
+      match_end_time:
+        data.match_end_time,
+
+      round_id:
+        data.round_id,
+
+      order_number:
+        data.order_number
+    };
+
+
+    currentOrder =
+      null;
+
+
+    hideOrder();
+
+
+    setCompleteButton(
+      true,
+      "Complete Task"
+    );
+
+
+    setStartButton(
+      true,
+      "Matching..."
+    );
+
+
+    const remaining =
+      Math.ceil(
+        (
+          new Date(
+            data.match_end_time
+          ).getTime() -
+          Date.now()
+        ) / 1000
+      );
+
+
+    if (
+      remaining <= 0
+    ) {
+
+      await finishMatching();
+
+    } else {
+
+      startMatchingCountdown(
+        data.match_end_time
+      );
+    }
+
+
+    console.log(
+      "U9 active matching restored:",
+      currentMatching
+    );
+
+
+    return currentMatching;
+  }
+
+
+  /* =========================================================
      REFRESH AUCTION PAGE
   ========================================================= */
 
   async function refreshAuctionPage() {
 
-      console.log(
-        "U9: Refreshing auction page..."
-      );
+    console.log(
+      "U9: Refreshing auction page..."
+    );
 
 
-      try {
+    try {
 
-        const status =
-          await loadRoundStatus();
-
-
-        const pendingOrder =
-          await loadPendingOrder();
+      const status =
+        await loadRoundStatus();
 
 
-        console.log(
-          "U9: Auction status:",
-          status
-        );
+      /*
+       * A pending order has priority.
+       */
+      const pendingOrder =
+        await loadPendingOrder();
 
 
-        console.log(
-          "U9: Pending order:",
-          pendingOrder
-        );
+      if (
+        pendingOrder
+      ) {
+
+        currentMatching =
+          null;
 
 
         return {
           status,
-          pendingOrder
+          pendingOrder,
+          activeMatching: null
         };
-
-
       }
 
-      catch (error) {
 
-        console.error(
-          "U9 AUCTION REFRESH ERROR:",
-          error
-        );
+      /*
+       * If there is no pending order,
+       * check whether Matching is still active.
+       */
+      const activeMatching =
+        await loadActiveMatching();
 
 
-        showMessage(
-          error?.message ||
-          "Failed to load auction status."
-        );
+      console.log(
+        "U9: Auction status:",
+        status
+      );
 
-        return null;
-      }
+
+      console.log(
+        "U9: Pending order:",
+        pendingOrder
+      );
+
+
+      console.log(
+        "U9: Active matching:",
+        activeMatching
+      );
+
+
+      return {
+        status,
+        pendingOrder,
+        activeMatching
+      };
+
+    }
+
+    catch (error) {
+
+      console.error(
+        "U9 AUCTION REFRESH ERROR:",
+        error
+      );
+
+
+      showMessage(
+        error?.message ||
+        "Failed to load auction status."
+      );
+
+
+      return null;
+    }
   }
 
 
@@ -1507,24 +2135,28 @@
 
 
     if (homePage) {
+
       homePage.style.display =
         "none";
     }
 
 
     if (shopPage) {
+
       shopPage.style.display =
         "none";
     }
 
 
     if (test1Page) {
+
       test1Page.style.display =
         "none";
     }
 
 
     if (test2Page) {
+
       test2Page.style.display =
         "none";
     }
@@ -1533,11 +2165,6 @@
     auctionPage.style.display =
       "block";
 
-
-    /*
-      Load database state every time
-      auction page is opened.
-    */
 
     refreshAuctionPage();
   }
@@ -1563,10 +2190,6 @@
 
     if (startButton) {
 
-      /*
-        Prevent duplicate listeners.
-      */
-
       startButton.onclick =
         startTask;
     }
@@ -1578,6 +2201,33 @@
         completeTask;
     }
   }
+
+
+  /* =========================================================
+     PUBLIC API
+  ========================================================= */
+
+  window.openAuctionPage =
+    openAuctionPage;
+
+
+  window.U9Auction = {
+
+    refresh:
+      refreshAuctionPage,
+
+    startTask:
+      startTask,
+
+    completeTask:
+      completeTask,
+
+    getUserId:
+      getUserId,
+
+    getSupabase:
+      getSupabase
+  };
 
 
   /* =========================================================
@@ -1608,149 +2258,6 @@
     );
   }
 
-  /* =========================================================
-     1321
-  ========================================================= */
-
-  async function loadPendingOrder(){
-
-      const client = getSupabase();
-
-      const userId = getUserId();
-
-
-      if(!client || !userId){
-          return null;
-      }
-
-
-      const {
-          data,
-          error
-      } = await client
-          .from("u9-orders")
-          .select("*")
-          .eq(
-              "user_id",
-              userId
-          )
-          .eq(
-              "status",
-              "pending"
-          )
-          .limit(1)
-          .maybeSingle();
-
-
-      if(error){
-
-          console.error(
-              "load pending order error:",
-              error
-          );
-
-          return null;
-      }
-
-
-      if(!data){
-
-          return null;
-
-      }
-
-
-      currentOrder = {
-
-          order_id:
-              data.id,
-
-          user_id:
-              data.user_id,
-
-          product_id:
-              data.product_id,
-
-          product_name:
-              "Task",
-
-          product_description:
-              "",
-
-          product_url:
-              "",
-
-          total_price:
-              data.total_price,
-
-          profit:
-              data.profit,
-
-          status:
-              data.status,
-
-          round_id:
-              data.round_id
-      };
-
-
-      renderOrder(
-          currentOrder
-      );
-
-
-      setCompleteButton(
-          false,
-          "Complete Task"
-      );
-
-
-      setStartButton(
-          true,
-          "Complete current task first"
-      );
-
-
-      console.log(
-          "U9 pending order restored:",
-          currentOrder
-      );
-
-
-      return currentOrder;
-
-  }
-
-  /* =========================================================
-     PUBLIC API
-  ========================================================= */
-
-  window.openAuctionPage =
-    openAuctionPage;
-
-
-  window.U9Auction = {
-
-    refresh:
-      refreshAuctionPage,
-
-    startTask:
-      startTask,
-
-    completeTask:
-      completeTask,
-
-    getUserId:
-      getUserId,
-
-    getSupabase:
-      getSupabase
-  };
-
-
-  /* =========================================================
-     START
-  ========================================================= */
 
   initializeAuctionPage();
 
