@@ -1073,6 +1073,33 @@
         }
 
 
+        /*
+         * Cooldown has ended.
+         *
+         * The previous round is finished.
+         * Show the new round as 0 / total immediately.
+         *
+         * The actual new round_id will be created
+         * by u9_auto_order when the next task starts.
+         */
+        if (
+          currentRoundStatus
+        ) {
+
+          updateRound(
+            0,
+            currentRoundStatus.orders_per_round
+          );
+
+          currentRoundStatus = {
+            ...currentRoundStatus,
+            completed_count: 0,
+            cooldown_start_time: null,
+            cooldown_end_time: null
+          };
+        }
+
+
         if (
           !currentMatching &&
           !currentOrder
@@ -1083,18 +1110,6 @@
             "Start Task"
           );
         }
-
-
-        loadRoundStatus()
-          .catch(
-            function (error) {
-
-              console.error(
-                "U9 cooldown refresh error:",
-                error
-              );
-            }
-          );
 
 
         return;
