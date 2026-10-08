@@ -676,46 +676,47 @@
       return;
     }
 
-
-    currentOrder =
-      order;
-
+    currentOrder = order;
 
     const name =
       document.getElementById(
         "U9-auction-product-name"
       );
 
+    const image =
+      document.getElementById(
+        "U9-auction-product-image"
+      );
 
     const description =
       document.getElementById(
         "U9-auction-product-description"
       );
 
-
     const price =
       document.getElementById(
         "U9-auction-product-price"
       );
-
 
     const profit =
       document.getElementById(
         "U9-auction-product-profit"
       );
 
-
     const url =
       document.getElementById(
         "U9-auction-product-url"
       );
-
 
     const status =
       document.getElementById(
         "U9-auction-order-status"
       );
 
+
+    /* =====================================================
+      PRODUCT NAME
+    ===================================================== */
 
     if (name) {
 
@@ -725,6 +726,41 @@
     }
 
 
+    /* =====================================================
+      PRODUCT IMAGE
+    ===================================================== */
+
+    if (image) {
+
+      if (order.product_image_url) {
+
+        image.src =
+          order.product_image_url;
+
+        image.alt =
+          order.product_name ||
+          "Product";
+
+        image.style.display =
+          "block";
+
+      } else {
+
+        image.removeAttribute("src");
+
+        image.alt =
+          "";
+
+        image.style.display =
+          "none";
+      }
+    }
+
+
+    /* =====================================================
+      PRODUCT DESCRIPTION
+    ===================================================== */
+
     if (description) {
 
       description.textContent =
@@ -732,6 +768,10 @@
         "Complete this task to receive your Coins and profit.";
     }
 
+
+    /* =====================================================
+      PRICE
+    ===================================================== */
 
     if (price) {
 
@@ -741,6 +781,10 @@
         );
     }
 
+
+    /* =====================================================
+      PROFIT
+    ===================================================== */
 
     if (profit) {
 
@@ -752,6 +796,10 @@
     }
 
 
+    /* =====================================================
+      STATUS
+    ===================================================== */
+
     if (status) {
 
       status.textContent =
@@ -760,6 +808,10 @@
           : "Pending";
     }
 
+
+    /* =====================================================
+      PRODUCT URL
+    ===================================================== */
 
     if (
       url &&
@@ -783,10 +835,8 @@
 
     showOrder();
 
-
     updateCompleteButtonByBalance();
   }
-
 
   /* =========================================================
      BUILD PENDING ORDER FROM ROUND STATUS
