@@ -71,11 +71,6 @@
           user.id
         ) {
 
-          console.log(
-            "U9: User ID from U9User:",
-            user.id
-          );
-
           return user.id;
         }
       }
@@ -1411,6 +1406,9 @@
 
         product_name:
           result.product_name,
+
+        product_image_url:
+          result.product_image_url || "",
 
         product_description:
           "",
