@@ -71,11 +71,6 @@
           user.id
         ) {
 
-          console.log(
-            "U9: User ID from U9User:",
-            user.id
-          );
-
           return user.id;
         }
       }
