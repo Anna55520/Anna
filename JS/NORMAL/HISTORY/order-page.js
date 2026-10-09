@@ -1,343 +1,66 @@
 
 /* =========================================================
-   U9 ORDER HISTORY PAGE
-   File: JS/NORMAL/HISTORY/order-page.js
-
-   Uses:
-   - Existing U9 Supabase client
-   - Edge Function: u9-order-history
-
-   Does NOT modify:
-   - /me
-   - u9_auto_order
-   - u9_round_status
-   - u9_order_matching
-   - u9_complete_order
-========================================================= */
+ * U9 ORDER HISTORY PAGE
+ * File: JS/NORMAL/HISTORY/order-page.js
+ *
+ * Uses:
+ *   Page ID:   History-model-Order-Page
+ *   Button ID: History-model-Order-button
+ *   Token:     localStorage["u9_token"]
+ *   Function:  u9-order-history
+ *
+ * Does NOT modify /me or task/order RPC functions.
+ * ========================================================= */
 
 (function () {
   "use strict";
 
-  const FUNCTION_URL =
-    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/u9-order-history";
-
   const PAGE_ID = "History-model-Order-Page";
-  const NAV_BUTTON_ID = "History-model-Order-button";
+  const BUTTON_ID = "History-model-Order-button";
+  const FUNCTION_NAME = "u9-order-history";
 
-  let loading = false;
   let initialized = false;
+  let loading = false;
+  let lastLoadTime = 0;
 
-  let pageElements = {
-    root: null,
-    message: null,
-    list: null,
-    refreshButton: null
-  };
+  const CACHE_MS = 15000;
 
-  /* =========================================================
-     SUPABASE CLIENT
-  ========================================================= */
-
-  function getSupabase() {
-    return (
-      window.supabaseClient ||
-      window.supabase ||
-      null
-    );
-  }
-
-  /* =========================================================
-     CURRENT USER
-     User ID is not sent to the Edge Function.
-     The server must identify the user from the U9 session.
-  ========================================================= */
-
-  function getCurrentUser() {
-    try {
-      if (
-        window.U9User &&
-        typeof window.U9User.get === "function"
-      ) {
-        return window.U9User.get();
-      }
-    } catch (error) {
-      console.warn(
-        "[U9 Order History] U9User.get failed:",
-        error
-      );
-    }
-
-    return (
-      window.currentUser ||
-      window.currentUserData ||
-      null
-    );
-  }
-
-  /* =========================================================
-     PAGE ELEMENTS
-  ========================================================= */
-
-  function getPageRoot() {
+  function getPage() {
     return document.getElementById(PAGE_ID);
   }
 
-  function getOrCreateElement(tag, id, parent) {
-    let element = document.getElementById(id);
-
-    if (!element) {
-      element = document.createElement(tag);
-      element.id = id;
-      parent.appendChild(element);
-    }
-
-    return element;
+  function getSupabaseClient() {
+    return window.supabaseClient || window.supabase || null;
   }
 
-  function setupPageElements() {
-    const root = getPageRoot();
-
-    if (!root) {
-      console.warn(
-        "[U9 Order History] Page element not found:",
-        PAGE_ID
-      );
-      return false;
-    }
-
-    pageElements.root = root;
-
-    root.style.boxSizing = "border-box";
-
-    const styleId = "U9-order-history-style";
-
-    if (!document.getElementById(styleId)) {
-      const style = document.createElement("style");
-      style.id = styleId;
-
-      style.textContent = `
-        #U9-order-history-container {
-          width: 100%;
-          max-width: 1000px;
-          margin: 0 auto;
-          padding: 16px;
-          box-sizing: border-box;
-        }
-
-        #U9-order-history-toolbar {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          margin-bottom: 16px;
-          flex-wrap: wrap;
-        }
-
-        #U9-order-history-heading {
-          margin: 0;
-          font-size: 22px;
-          font-weight: 700;
-        }
-
-        #U9-order-history-refresh {
-          border: none;
-          border-radius: 8px;
-          padding: 10px 16px;
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 600;
-        }
-
-        #U9-order-history-refresh:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        #U9-order-history-message {
-          padding: 18px 12px;
-          text-align: center;
-          overflow-wrap: anywhere;
-        }
-
-        #U9-order-history-list {
-          display: flex;
-          flex-direction: column;
-          gap: 14px;
-        }
-
-        .U9-order-history-card {
-          display: flex;
-          align-items: flex-start;
-          gap: 14px;
-          padding: 14px;
-          border: 1px solid rgba(128,128,128,0.28);
-          border-radius: 12px;
-          box-sizing: border-box;
-          overflow-wrap: anywhere;
-        }
-
-        .U9-order-history-image {
-          width: 92px;
-          height: 92px;
-          flex: 0 0 92px;
-          object-fit: cover;
-          border-radius: 8px;
-          background: rgba(128,128,128,0.12);
-        }
-
-        .U9-order-history-details {
-          min-width: 0;
-          flex: 1;
-        }
-
-        .U9-order-history-product-name {
-          margin: 0 0 8px;
-          font-size: 16px;
-          font-weight: 700;
-          overflow-wrap: anywhere;
-        }
-
-        .U9-order-history-meta {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 6px 12px;
-          font-size: 13px;
-        }
-
-        .U9-order-history-meta > div {
-          min-width: 0;
-          overflow-wrap: anywhere;
-        }
-
-        .U9-order-history-status {
-          display: inline-block;
-          margin-top: 10px;
-          padding: 4px 9px;
-          border-radius: 999px;
-          font-size: 12px;
-          font-weight: 700;
-          background: rgba(128,128,128,0.14);
-        }
-
-        @media (max-width: 480px) {
-          #U9-order-history-container {
-            padding: 10px;
-          }
-
-          .U9-order-history-card {
-            gap: 10px;
-            padding: 10px;
-          }
-
-          .U9-order-history-image {
-            width: 76px;
-            height: 76px;
-            flex-basis: 76px;
-          }
-
-          .U9-order-history-meta {
-            grid-template-columns: minmax(0, 1fr);
-          }
-        }
-      `;
-
-      document.head.appendChild(style);
-    }
-
-    const container = getOrCreateElement(
-      "div",
-      "U9-order-history-container",
-      root
-    );
-
-    const toolbar = getOrCreateElement(
-      "div",
-      "U9-order-history-toolbar",
-      container
-    );
-
-    const heading = getOrCreateElement(
-      "h2",
-      "U9-order-history-heading",
-      toolbar
-    );
-
-    heading.textContent = "Order History";
-
-    const refreshButton = getOrCreateElement(
-      "button",
-      "U9-order-history-refresh",
-      toolbar
-    );
-
-    refreshButton.type = "button";
-    refreshButton.textContent = "Refresh";
-
-    const message = getOrCreateElement(
-      "div",
-      "U9-order-history-message",
-      container
-    );
-
-    const list = getOrCreateElement(
-      "div",
-      "U9-order-history-list",
-      container
-    );
-
-    pageElements.message = message;
-    pageElements.list = list;
-    pageElements.refreshButton = refreshButton;
-
-    if (!refreshButton.dataset.u9Bound) {
-      refreshButton.addEventListener("click", function () {
-        loadOrderHistory();
-      });
-
-      refreshButton.dataset.u9Bound = "true";
-    }
-
-    return true;
+  function getSessionToken() {
+    return localStorage.getItem("u9_token") || "";
   }
 
-  /* =========================================================
-     MESSAGE
-  ========================================================= */
-
-  function showHistoryMessage(message, show = true) {
-    if (!pageElements.message) return;
-
-    pageElements.message.textContent = message;
-    pageElements.message.style.display = show
-      ? "block"
-      : "none";
-  }
-
-  function setLoadingState(isLoading) {
-    if (pageElements.refreshButton) {
-      pageElements.refreshButton.disabled = isLoading;
-      pageElements.refreshButton.textContent = isLoading
-        ? "Loading..."
-        : "Refresh";
-    }
-  }
-
-  /* =========================================================
-     FORMAT HELPERS
-  ========================================================= */
-
-  function escapeText(value) {
-    return String(value ?? "");
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, function (char) {
+      const entities = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      };
+      return entities[char];
+    });
   }
 
   function formatMoney(value) {
     const number = Number(value);
 
     if (!Number.isFinite(number)) {
-      return value == null ? "—" : String(value);
+      return "0.00";
     }
 
-    return number.toFixed(2);
+    return number.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   }
 
   function formatDate(value) {
@@ -346,390 +69,520 @@
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-      return String(value);
+      return escapeHTML(value);
     }
 
     return date.toLocaleString();
   }
 
-  function formatStatus(status) {
-    const value = String(status || "unknown")
-      .trim()
-      .toLowerCase();
+  function normalizeStatus(status) {
+    const value = String(status || "unknown").toLowerCase();
 
     const labels = {
-      pending: "Pending",
       completed: "Completed",
+      complete: "Completed",
+      pending: "Pending",
+      processing: "Processing",
       cancelled: "Cancelled",
       canceled: "Cancelled",
-      failed: "Failed",
-      matching: "Matching"
+      failed: "Failed"
     };
 
-    return labels[value] || value;
+    return labels[value] || value.charAt(0).toUpperCase() + value.slice(1);
   }
 
-  function getProductImage(product) {
-    if (!product) return "";
+  function showMessage(type, message) {
+    const page = getPage();
+    if (!page) return;
 
-    return (
-      product.image_url ||
-      product.product_image_url ||
-      product.image ||
-      product.thumbnail_url ||
-      ""
-    );
+    const container = page.querySelector("#U9-order-history-message");
+    if (!container) return;
+
+    container.className = "u9-order-history-message " + type;
+    container.textContent = message;
+    container.hidden = false;
   }
 
-  function createTextElement(tag, className, text) {
-    const element = document.createElement(tag);
+  function hideMessage() {
+    const page = getPage();
+    const container = page?.querySelector("#U9-order-history-message");
 
-    if (className) {
-      element.className = className;
+    if (container) {
+      container.hidden = true;
+      container.textContent = "";
+    }
+  }
+
+  function setLoading(isLoading) {
+    const page = getPage();
+    if (!page) return;
+
+    const button = page.querySelector("#U9-order-history-refresh");
+
+    if (button) {
+      button.disabled = isLoading;
+      button.textContent = isLoading ? "Loading..." : "Refresh";
+    }
+  }
+
+  function renderPage() {
+    const page = getPage();
+    if (!page) {
+      console.error("[U9 Order History] Page element not found:", PAGE_ID);
+      return false;
     }
 
-    element.textContent = escapeText(text);
+    // Avoid rebuilding the page every time the navigation button is clicked.
+    if (page.dataset.orderHistoryRendered === "true") {
+      return true;
+    }
 
-    return element;
+    page.innerHTML = `
+      <div class="u9-order-history">
+        <div class="u9-order-history-header">
+          <div>
+            <h2 class="u9-order-history-title">Order History</h2>
+            <p class="u9-order-history-subtitle">
+              View your previous tasks and order details.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            id="U9-order-history-refresh"
+            class="u9-order-history-refresh"
+          >
+            Refresh
+          </button>
+        </div>
+
+        <div
+          id="U9-order-history-message"
+          class="u9-order-history-message"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+
+        <div
+          id="U9-order-history-summary"
+          class="u9-order-history-summary"
+        >
+          Your orders will appear here.
+        </div>
+
+        <div
+          id="U9-order-history-list"
+          class="u9-order-history-list"
+        ></div>
+      </div>
+
+      <style>
+        #${PAGE_ID} .u9-order-history {
+          width: 100%;
+          box-sizing: border-box;
+          padding: 20px;
+          color: #222;
+        }
+
+        #${PAGE_ID} .u9-order-history-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 20px;
+        }
+
+        #${PAGE_ID} .u9-order-history-title {
+          margin: 0;
+          font-size: 24px;
+          font-weight: 700;
+        }
+
+        #${PAGE_ID} .u9-order-history-subtitle {
+          margin: 6px 0 0;
+          color: #777;
+          font-size: 14px;
+        }
+
+        #${PAGE_ID} .u9-order-history-refresh {
+          padding: 10px 16px;
+          border: 0;
+          border-radius: 8px;
+          background: #222;
+          color: #fff;
+          cursor: pointer;
+          font-size: 14px;
+        }
+
+        #${PAGE_ID} .u9-order-history-refresh:disabled {
+          opacity: .6;
+          cursor: not-allowed;
+        }
+
+        #${PAGE_ID} .u9-order-history-message {
+          margin: 12px 0;
+          padding: 12px 14px;
+          border-radius: 8px;
+          background: #f3f3f3;
+          color: #333;
+          overflow-wrap: anywhere;
+        }
+
+        #${PAGE_ID} .u9-order-history-message.error {
+          background: #fff0f0;
+          color: #a40000;
+        }
+
+        #${PAGE_ID} .u9-order-history-message.success {
+          background: #effaf0;
+          color: #176b2c;
+        }
+
+        #${PAGE_ID} .u9-order-history-summary {
+          margin-bottom: 14px;
+          color: #666;
+          font-size: 14px;
+        }
+
+        #${PAGE_ID} .u9-order-history-list {
+          display: grid;
+          grid-template-columns: 1fr;
+          gap: 14px;
+        }
+
+        #${PAGE_ID} .u9-order-card {
+          box-sizing: border-box;
+          padding: 16px;
+          border: 1px solid #e7e7e7;
+          border-radius: 12px;
+          background: #fff;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, .035);
+        }
+
+        #${PAGE_ID} .u9-order-card-top {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 14px;
+        }
+
+        #${PAGE_ID} .u9-order-name {
+          margin: 0;
+          font-size: 17px;
+          font-weight: 700;
+          overflow-wrap: anywhere;
+        }
+
+        #${PAGE_ID} .u9-order-id {
+          margin-top: 5px;
+          color: #888;
+          font-size: 12px;
+          overflow-wrap: anywhere;
+        }
+
+        #${PAGE_ID} .u9-order-status {
+          flex-shrink: 0;
+          padding: 5px 9px;
+          border-radius: 20px;
+          background: #eee;
+          color: #444;
+          font-size: 12px;
+        }
+
+        #${PAGE_ID} .u9-order-status.completed {
+          background: #e8f7eb;
+          color: #176b2c;
+        }
+
+        #${PAGE_ID} .u9-order-details {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        #${PAGE_ID} .u9-order-detail-label {
+          margin-bottom: 4px;
+          color: #888;
+          font-size: 12px;
+        }
+
+        #${PAGE_ID} .u9-order-detail-value {
+          font-size: 14px;
+          font-weight: 600;
+          overflow-wrap: anywhere;
+        }
+
+        #${PAGE_ID} .u9-order-empty {
+          padding: 32px 16px;
+          border: 1px dashed #ddd;
+          border-radius: 12px;
+          color: #777;
+          text-align: center;
+        }
+
+        @media (max-width: 480px) {
+          #${PAGE_ID} .u9-order-history {
+            padding: 14px;
+          }
+
+          #${PAGE_ID} .u9-order-history-title {
+            font-size: 21px;
+          }
+
+          #${PAGE_ID} .u9-order-details {
+            gap: 14px 10px;
+          }
+        }
+      </style>
+    `;
+
+    page.dataset.orderHistoryRendered = "true";
+
+    page.querySelector("#U9-order-history-refresh")
+      ?.addEventListener("click", function () {
+        loadOrderHistory(true);
+      });
+
+    return true;
   }
 
-  /* =========================================================
-     RENDER ORDER CARDS
-  ========================================================= */
+  function renderOrders(orders) {
+    const page = getPage();
+    if (!page) return;
 
-  function renderOrders(orders, productsById) {
-    if (!pageElements.list) return;
+    const list = page.querySelector("#U9-order-history-list");
+    const summary = page.querySelector("#U9-order-history-summary");
 
-    pageElements.list.replaceChildren();
+    if (!list || !summary) return;
 
-    if (!Array.isArray(orders) || orders.length === 0) {
-      showHistoryMessage("No order history yet.");
+    const safeOrders = Array.isArray(orders) ? orders : [];
+
+    summary.textContent =
+      safeOrders.length === 1
+        ? "1 order found."
+        : `${safeOrders.length} orders found.`;
+
+    if (safeOrders.length === 0) {
+      list.innerHTML = `
+        <div class="u9-order-empty">
+          <div style="font-size: 18px; margin-bottom: 8px;">
+            No orders yet
+          </div>
+          <div>Your completed and pending orders will appear here.</div>
+        </div>
+      `;
       return;
     }
 
-    showHistoryMessage("", false);
-
-    orders.forEach(function (order) {
-      const product = productsById.get(order.product_id) || {};
-
-      const card = document.createElement("article");
-      card.className = "U9-order-history-card";
-
-      const imageUrl = getProductImage(product);
-
-      if (imageUrl) {
-        const image = document.createElement("img");
-
-        image.className = "U9-order-history-image";
-        image.src = imageUrl;
-        image.alt = product.name || "Product";
-        image.loading = "lazy";
-
-        image.addEventListener("error", function () {
-          image.style.display = "none";
-        });
-
-        card.appendChild(image);
-      }
-
-      const details = document.createElement("div");
-      details.className = "U9-order-history-details";
-
-      const productName = product.name ||
-        order.product_name ||
-        "Product";
-
-      details.appendChild(
-        createTextElement(
-          "h3",
-          "U9-order-history-product-name",
-          productName
-        )
+    list.innerHTML = safeOrders.map(function (order) {
+      const orderId = escapeHTML(order.id || "—");
+      const productName = escapeHTML(
+        order.product_name || order.product?.name || "Product"
       );
+      const status = normalizeStatus(order.status);
+      const statusClass =
+        String(order.status || "").toLowerCase() === "completed"
+          ? "completed"
+          : "";
 
-      const meta = document.createElement("div");
-      meta.className = "U9-order-history-meta";
+      const quantity = Number(order.quantity);
+      const quantityText = Number.isFinite(quantity) ? quantity : 1;
 
-      const fields = [
-        ["Order ID", order.id || "—"],
-        ["Quantity", order.quantity ?? 1],
-        ["Price", formatMoney(order.total_price)],
-        ["Profit", formatMoney(order.profit)],
-        ["Date", formatDate(order.created_at)]
-      ];
+      return `
+        <article class="u9-order-card">
+          <div class="u9-order-card-top">
+            <div>
+              <h3 class="u9-order-name">${productName}</h3>
+              <div class="u9-order-id">Order ID: ${orderId}</div>
+            </div>
 
-      fields.forEach(function (field) {
-        const item = document.createElement("div");
+            <span class="u9-order-status ${statusClass}">
+              ${escapeHTML(status)}
+            </span>
+          </div>
 
-        const label = document.createElement("strong");
-        label.textContent = field[0] + ": ";
+          <div class="u9-order-details">
+            <div>
+              <div class="u9-order-detail-label">Quantity</div>
+              <div class="u9-order-detail-value">${quantityText}</div>
+            </div>
 
-        const value = document.createElement("span");
-        value.textContent = escapeText(field[1]);
+            <div>
+              <div class="u9-order-detail-label">Total Price</div>
+              <div class="u9-order-detail-value">
+                ${formatMoney(order.total_price)}
+              </div>
+            </div>
 
-        item.appendChild(label);
-        item.appendChild(value);
-        meta.appendChild(item);
-      });
+            <div>
+              <div class="u9-order-detail-label">Profit</div>
+              <div class="u9-order-detail-value">
+                ${formatMoney(order.profit)}
+              </div>
+            </div>
 
-      details.appendChild(meta);
-
-      const status = createTextElement(
-        "span",
-        "U9-order-history-status",
-        formatStatus(order.status)
-      );
-
-      details.appendChild(status);
-      card.appendChild(details);
-      pageElements.list.appendChild(card);
-    });
+            <div>
+              <div class="u9-order-detail-label">Created At</div>
+              <div class="u9-order-detail-value">
+                ${formatDate(order.created_at)}
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+    }).join("");
   }
 
-  /* =========================================================
-     REQUEST EDGE FUNCTION
-
-     Uses the U9 session cookie when it is available.
-     If the existing application keeps its session token in
-     localStorage, it tries common U9 session keys as well.
-
-     Do not send a user_id parameter. The Edge Function must
-     identify the user from the verified session.
-  ========================================================= */
-
-  function getSessionToken() {
-    const possibleKeys = [
-      "u9_session",
-      "u9Session",
-      "u9_session_token",
-      "session_token"
-    ];
-
-    for (const key of possibleKeys) {
-      try {
-        const value = localStorage.getItem(key);
-
-        if (value && value.trim()) {
-          return value.trim();
-        }
-      } catch (error) {
-        console.warn(
-          "[U9 Order History] Cannot read localStorage:",
-          error
-        );
-      }
-    }
-
-    return null;
-  }
-
-  async function requestOrderHistory() {
-    const supabase = getSupabase();
-
-    if (!supabase) {
-      throw new Error(
-        "Supabase client is not initialized."
-      );
-    }
-
-    /*
-      Preferred path:
-      Use the existing Supabase client to invoke the function.
-      This sends the project's API key and the client's configured
-      Authorization header.
-    */
-    const { data, error } = await supabase.functions.invoke(
-      "u9-order-history",
-      {
-        method: "GET"
-      }
-    );
-
-    if (!error && data) {
-      return data;
-    }
-
-    console.warn(
-      "[U9 Order History] Supabase invoke failed; trying direct request:",
-      error
-    );
-
-    /*
-      Fallback path:
-      If U9 stores its custom session token in localStorage,
-      send it as a Bearer token to the same Edge Function.
-      The function must still validate the token hash server-side.
-    */
-    const token = getSessionToken();
-
-    if (token) {
-      const headers = {
-        "Content-Type": "application/json"
-      };
-
-      /*
-        supabase.functions.invoke normally handles the project's
-        API key. A direct fetch also needs the project's public
-        anon/publishable key in apikey. We deliberately do not
-        guess the key from undocumented globals.
-      */
-      const publicKey =
-        window.SUPABASE_ANON_KEY ||
-        window.supabaseAnonKey ||
-        window.supabasePublishableKey;
-
-      if (!publicKey) {
-        throw new Error(
-          "The U9 session was found, but the public Supabase API key is not exposed to this page. Configure the existing public key global or use the existing client request."
-        );
-      }
-
-      headers.apikey = publicKey;
-      headers.Authorization = "Bearer " + token;
-
-      const response = await fetch(FUNCTION_URL, {
-        method: "GET",
-        headers,
-        credentials: "include"
-      });
-
-      const result = await response.json().catch(function () {
-        return {};
-      });
-
-      if (!response.ok) {
-        throw new Error(
-          result.error ||
-          "Order history request failed (" + response.status + ")."
-        );
-      }
-
-      return result;
-    }
-
-    throw error || new Error(
-      "Unable to load order history."
-    );
-  }
-
-  /* =========================================================
-     LOAD ORDER HISTORY
-  ========================================================= */
-
-  async function loadOrderHistory() {
+  async function loadOrderHistory(forceRefresh) {
     if (loading) return;
 
-    if (!setupPageElements()) return;
+    const page = getPage();
+    if (!page) {
+      console.error("[U9 Order History] Page element not found:", PAGE_ID);
+      return;
+    }
+
+    if (!renderPage()) return;
+
+    const now = Date.now();
+
+    if (
+      !forceRefresh &&
+      page.dataset.orderHistoryLoaded === "true" &&
+      now - lastLoadTime < CACHE_MS
+    ) {
+      return;
+    }
+
+    const token = getSessionToken();
+
+    if (!token) {
+      showMessage("error", "Please log in to view your order history.");
+      renderOrders([]);
+      return;
+    }
+
+    const client = getSupabaseClient();
+
+    if (!client || !client.functions) {
+      showMessage(
+        "error",
+        "Supabase client is not initialized. Please check supabase-client.js."
+      );
+      return;
+    }
 
     loading = true;
-    setLoadingState(true);
-    showHistoryMessage("Loading order history...");
-    pageElements.list.replaceChildren();
+    setLoading(true);
+    hideMessage();
 
     try {
-      const currentUser = getCurrentUser();
-
-      if (!currentUser) {
-        console.warn(
-          "[U9 Order History] No current user found in frontend state."
-        );
-      }
-
-      const data = await requestOrderHistory();
-
-      if (!data || data.success !== true) {
-        throw new Error(
-          data?.error || "Unexpected Edge Function response."
-        );
-      }
-
-      const orders = Array.isArray(data.orders)
-        ? data.orders
-        : [];
-
-      const products = Array.isArray(data.products)
-        ? data.products
-        : [];
-
-      const productsById = new Map(
-        products
-          .filter(function (product) {
-            return product && product.id;
-          })
-          .map(function (product) {
-            return [product.id, product];
-          })
+      /*
+       * The Supabase client automatically supplies the public apikey.
+       * Explicitly override Authorization with the U9 session token.
+       * The Edge Function must have verify_jwt=false and validate this
+       * custom token against the U9 session table itself.
+       */
+      const { data, error } = await client.functions.invoke(
+        FUNCTION_NAME,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
       );
+
+      if (error) {
+        let details = error.message || "Unknown function error";
+
+        if (error.context && typeof error.context.json === "function") {
+          try {
+            const body = await error.context.json();
+            if (body?.error) details = body.error;
+            else if (body?.message) details = body.message;
+          } catch (_) {
+            // Keep the original error message.
+          }
+        }
+
+        throw new Error(details);
+      }
+
+      if (!data || data.success !== true || !Array.isArray(data.orders)) {
+        throw new Error(data?.error || "The server returned an invalid response.");
+      }
+
+      renderOrders(data.orders);
+      page.dataset.orderHistoryLoaded = "true";
+      lastLoadTime = Date.now();
 
       console.log(
-        "[U9 Order History] Record count:",
-        orders.length
+        "[U9 Order History] Loaded",
+        data.orders.length,
+        "orders."
       );
-
-      renderOrders(orders, productsById);
     } catch (error) {
-      console.error(
-        "[U9 Order History] Load failed:",
-        error
-      );
+      console.error("[U9 Order History] Load failed:", error);
 
-      showHistoryMessage(
-        error?.message ||
-        "Unable to load order history. Please try again."
+      showMessage(
+        "error",
+        error?.message || "Unable to load order history. Please try again."
       );
     } finally {
       loading = false;
-      setLoadingState(false);
+      setLoading(false);
     }
   }
 
-  /* =========================================================
-     PAGE INITIALIZATION
-  ========================================================= */
+  function initialize() {
+    if (initialized) return;
 
-  function initializeOrderPage() {
-    if (initialized) {
-      setupPageElements();
+    const page = getPage();
+
+    if (!page) {
+      console.warn(
+        "[U9 Order History] Waiting for page element:",
+        PAGE_ID
+      );
       return;
     }
 
     initialized = true;
+    renderPage();
 
-    const navButton = document.getElementById(
-      NAV_BUTTON_ID
-    );
+    const navButton = document.getElementById(BUTTON_ID);
 
-    if (navButton && !navButton.dataset.u9OrderBound) {
+    if (navButton) {
       navButton.addEventListener("click", function () {
-        loadOrderHistory();
+        loadOrderHistory(false);
       });
-
-      navButton.dataset.u9OrderBound = "true";
+    } else {
+      console.warn(
+        "[U9 Order History] Navigation button not found:",
+        BUTTON_ID
+      );
     }
 
-    if (getPageRoot()) {
-      setupPageElements();
-    }
-
-    console.log("[U9 Order History] Initialized.");
+    console.log("[U9 Order History] Page initialized.");
   }
 
-  /* =========================================================
-     PUBLIC API
-  ========================================================= */
-
-  window.U9OrderHistory = {
-    refresh: loadOrderHistory,
-    initialize: initializeOrderPage
+  // Optional public methods for debugging or manual refresh.
+  window.U9OrderHistoryPage = {
+    initialize: initialize,
+    refresh: function () {
+      return loadOrderHistory(true);
+    },
+    load: function () {
+      return loadOrderHistory(false);
+    }
   };
 
   if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      initializeOrderPage,
-      { once: true }
-    );
+    document.addEventListener("DOMContentLoaded", initialize);
   } else {
-    initializeOrderPage();
+    initialize();
   }
 })();
