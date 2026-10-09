@@ -1,326 +1,365 @@
-/* =====================================================
-   HISTORY MODAL OVERLAY
-===================================================== */
+/* =========================
+   HISTORY NORMAL MODAL
+========================= */
+
+
+/* =========================
+   MODAL
+========================= */
 
 #U9-history-normal-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
 
-  display: none;
-  align-items: center;
+  position: fixed;
+
+  top: 115px;
+  left: 0;
+
+  width: 100%;
+  height: calc(100vh - 115px);
+
+  box-sizing: border-box;
+
+  display: flex;
   justify-content: center;
+  align-items: stretch;
+
+  background-color:
+    rgba(0, 0, 0, 0.18);
+
+  z-index: 1000;
+
+  overflow: hidden;
+
+  visibility: hidden;
+  pointer-events: none;
+
+}
+
+
+/* =========================
+   MODAL CONTENT
+========================= */
+
+#U9-history-normal-modal-content {
+
+  position: relative;
 
   width: 100%;
   height: 100%;
 
-  padding: 20px;
-  box-sizing: border-box;
-
-  background-color: rgba(0, 0, 0, 0.55);
-}
-
-
-/* =====================================================
-   HISTORY MODAL CONTENT
-===================================================== */
-
-#U9-history-normal-modal-content {
-  position: relative;
-
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  max-width: 900px;
-
-  height: 80vh;
-  max-height: 700px;
-  min-height: 300px;
-
-  overflow: hidden;
   box-sizing: border-box;
 
   background-color: #ffffff;
-  border-radius: 12px;
 
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+
+  transform:
+    translateY(100%);
+
+  transition:
+    transform 0.45s ease;
+
 }
 
 
-/* =====================================================
-   HISTORY MODAL TITLE BAR
-===================================================== */
+/* =========================
+   OPEN
+========================= */
+
+#U9-history-normal-modal.modal-open {
+
+  visibility: visible;
+
+  pointer-events: auto;
+
+}
+
+
+#U9-history-normal-modal.modal-open
+#U9-history-normal-modal-content {
+
+  transform:
+    translateY(0);
+
+}
+
+
+/* =========================
+   CLOSING
+========================= */
+
+#U9-history-normal-modal.modal-closing {
+
+  visibility: visible;
+
+  pointer-events: none;
+
+}
+
+
+#U9-history-normal-modal.modal-closing
+#U9-history-normal-modal-content {
+
+  transform:
+    translateY(100%);
+
+}
+
+
+/* =========================
+   TITLE
+========================= */
 
 #U9-history-normal-modal-title {
+
   position: relative;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex: 0 0 55px;
   width: 100%;
   height: 55px;
-  min-height: 55px;
 
-  padding: 0 55px;
   box-sizing: border-box;
-
-  background-color: #78ace9;
-  color: #ffffff;
-
-  font-size: 18px;
-  font-weight: 600;
-  text-align: center;
-}
-
-
-/* TITLE TEXT */
-
-#U9-history-normal-modal-title span {
-  display: block;
-
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-
-/* =====================================================
-   HISTORY MODAL CLOSE BUTTON
-===================================================== */
-
-#U9-history-normal-modal-close {
-  position: absolute;
-  top: 50%;
-  right: 12px;
 
   display: flex;
   align-items: center;
-  justify-content: center;
 
-  width: 32px;
-  height: 32px;
+  padding:
+    0
+    60px
+    0
+    20px;
+
+  font-size: 20px;
+  font-weight: 600;
+
+  color: #111111;
+
+  background-color: #ffffff;
+
+  border-bottom:
+    1px solid #eeeeee;
+
+}
+
+
+/* =========================
+   CLOSE BUTTON
+========================= */
+
+#U9-history-normal-modal-close {
+
+  position: absolute;
+
+  top: 50%;
+  right: 15px;
+
+  width: 36px;
+  height: 36px;
 
   padding: 0;
-  transform: translateY(-50%);
 
   border: none;
-  border-radius: 6px;
+  outline: none;
 
-  background-color: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  border-radius: 50%;
 
-  font-family: Arial, sans-serif;
-  font-size: 26px;
+  background-color: #f1f1f1;
+
+  color: #111111;
+
+  font-size: 24px;
   font-weight: 400;
+
   line-height: 1;
 
   cursor: pointer;
 
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-
-#U9-history-normal-modal-close:hover {
-  background-color: rgba(255, 255, 255, 0.28);
-}
-
-
-#U9-history-normal-modal-close:active {
-  transform: translateY(-50%) scale(0.94);
-}
-
-
-#U9-history-normal-modal-close:focus-visible {
-  outline: 2px solid #ffffff;
-  outline-offset: 2px;
-}
-
-
-/* =====================================================
-   HISTORY PAGE NAVIGATION CONTAINER
-===================================================== */
-
-#History-model-navigation {
-  display: flex;
-  align-items: stretch;
-
-  flex: 0 0 48px;
-  width: 100%;
-  height: 48px;
-  min-height: 48px;
-
-  box-sizing: border-box;
-
-  background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-
-/* =====================================================
-   HISTORY NAVIGATION BUTTON
-===================================================== */
-
-.History-model-nav-button {
-  position: relative;
+  transform:
+    translateY(-50%);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
+}
+
+
+/* =========================
+   CLOSE HOVER
+========================= */
+
+#U9-history-normal-modal-close:hover {
+
+  background-color:
+    #e8e8e8;
+
+}
+
+
+/* =========================
+   CLOSE ACTIVE
+========================= */
+
+#U9-history-normal-modal-close:active {
+
+  transform:
+    translateY(-50%)
+    scale(0.94);
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 480px) {
+
+  #U9-history-normal-modal {
+
+    top: 115px;
+
+    height:
+      calc(100vh - 115px);
+
+  }
+
+
+  #U9-history-normal-modal-content {
+
+    width: 100%;
+
+    max-width: 100%;
+
+  }
+
+
+  #U9-history-normal-modal-title {
+
+    height: 55px;
+
+    padding:
+      0
+      55px
+      0
+      15px;
+
+    font-size: 18px;
+
+  }
+
+
+  #U9-history-normal-modal-close {
+
+    right: 10px;
+
+    width: 36px;
+    height: 36px;
+
+  }
+
+}
+
+/* =========================
+   HISTORY PAGE NAVIGATION
+========================= */
+
+#History-model-navigation {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.History-model-nav-button {
+  position: relative;
   flex: 1 1 0;
   min-width: 0;
-  height: 100%;
-
-  padding: 0 12px;
-  box-sizing: border-box;
-
+  padding: 12px 6px;
   border: none;
   border-radius: 0;
-
-  background-color: transparent;
-  color: #777777;
-
-  font-family: inherit;
+  background-color: #ffffff;
+  color: #666666;
   font-size: 14px;
   font-weight: 500;
-  text-align: center;
-  white-space: nowrap;
-
   cursor: pointer;
-
   transition:
     color 0.2s ease,
     background-color 0.2s ease;
 }
 
-
-/* NAVIGATION BUTTON HOVER */
-
 .History-model-nav-button:hover {
-  background-color: #f5f8fc;
-  color: #78ace9;
+  background-color: #f7f7f7;
 }
 
-
-/* =====================================================
-   ACTIVE NAVIGATION BUTTON
-===================================================== */
-
 .History-model-nav-button.active {
-  background-color: #ffffff;
-  color: #78ace9;
+  color: #111111;
   font-weight: 600;
 }
 
-
-/* ACTIVE BUTTON UNDERLINE */
-
 .History-model-nav-button.active::after {
-  content: "";
-
   position: absolute;
-  right: 0;
+  right: 20%;
   bottom: 0;
-  left: 0;
-
+  left: 20%;
   height: 3px;
-
-  background-color: #78ace9;
   border-radius: 3px 3px 0 0;
+  background-color: #111111;
+  content: "";
 }
 
-
-/* KEYBOARD FOCUS */
-
-.History-model-nav-button:focus-visible {
-  outline: 2px solid #78ace9;
-  outline-offset: -3px;
-}
-
-
-/* =====================================================
-   HISTORY PAGES WRAPPER
-   The individual page styles are in separate CSS files.
-===================================================== */
+/* =========================
+   HISTORY PAGE CONTAINER
+========================= */
 
 #History-model-pages {
-  flex: 1 1 auto;
-
   width: 100%;
-  min-height: 0;
-
+  height: calc(100% - 103px);
+  box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: auto;
-
-  box-sizing: border-box;
-
   background-color: #ffffff;
 }
 
+.History-model-page {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  background-color: #ffffff;
+}
 
-/* =====================================================
-   MOBILE LAYOUT
-===================================================== */
+.History-model-page[hidden] {
+  display: none !important;
+}
+
+.History-model-page h2 {
+  margin: 0 0 12px;
+  color: #111111;
+  font-size: 18px;
+}
+
+.History-model-page p {
+  margin: 0;
+  color: #666666;
+  font-size: 14px;
+}
+
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 480px) {
 
-  #U9-history-normal-modal {
-    padding: 10px;
-  }
-
-
-  #U9-history-normal-modal-content {
-    width: 100%;
-    height: 85vh;
-    max-height: 85vh;
-    min-height: 280px;
-
-    border-radius: 10px;
-  }
-
-
-  #U9-history-normal-modal-title {
-    flex-basis: 50px;
-    height: 50px;
-    min-height: 50px;
-
-    padding: 0 48px;
-
-    font-size: 16px;
-  }
-
-
-  #U9-history-normal-modal-close {
-    right: 8px;
-
-    width: 30px;
-    height: 30px;
-
-    font-size: 24px;
-  }
-
-
-  #History-model-navigation {
-    flex-basis: 44px;
-    height: 44px;
-    min-height: 44px;
-  }
-
-
   .History-model-nav-button {
-    padding: 0 5px;
-
+    padding: 12px 3px;
     font-size: 12px;
   }
 
-
-  .History-model-nav-button.active::after {
-    height: 3px;
+  .History-model-page {
+    padding: 15px;
   }
+
 }
