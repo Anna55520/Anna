@@ -2568,52 +2568,53 @@
 
 
 /* =========================
-AUCTION TOOL BUTTONS
+   AUCTION TOOL BUTTONS
 ========================= */
 
 (function () {
-"use strict";
+  "use strict";
 
-function initializeAuctionTools() {
-const historyButton = document.getElementById(
-"U9-auction-tool-3"
-);
-
-
-if (!historyButton) {
-  return;
-}
-
-// Prevent duplicate event listeners.
-if (historyButton.dataset.u9Bound === "true") {
-  return;
-}
-
-historyButton.dataset.u9Bound = "true";
-
-historyButton.addEventListener("click", async function () {
-  const manager = window.U9WindowManager;
-
-  if (!manager || typeof manager.open !== "function") {
-    console.error(
-      "U9 Auction: Window Manager is not available."
+  function initializeAuctionTools() {
+    const historyButton = document.getElementById(
+      "U9-auction-tool-3"
     );
-    return;
+
+    if (!historyButton) {
+      return;
+    }
+
+    if (historyButton.dataset.u9Bound === "true") {
+      return;
+    }
+
+    historyButton.dataset.u9Bound = "true";
+
+    historyButton.addEventListener(
+      "click",
+      async function () {
+        if (
+          !window.U9History ||
+          typeof window.U9History.openPage !== "function"
+        ) {
+          console.error(
+            "U9 Auction: U9History is not available."
+          );
+
+          return;
+        }
+
+        await window.U9History.openPage("order");
+      }
+    );
   }
 
-  await manager.open("history");
-});
-
-
-}
-
-if (document.readyState === "loading") {
-document.addEventListener(
-"DOMContentLoaded",
-initializeAuctionTools,
-{ once: true }
-);
-} else {
-initializeAuctionTools();
-}
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeAuctionTools,
+      { once: true }
+    );
+  } else {
+    initializeAuctionTools();
+  }
 })();
