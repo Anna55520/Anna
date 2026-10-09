@@ -2,319 +2,364 @@
    HISTORY NORMAL MODAL
 ========================= */
 
-(function () {
-  "use strict";
 
-  /* =========================
-     ELEMENTS
-  ========================= */
+/* =========================
+   MODAL
+========================= */
 
-  const historyModal = document.getElementById(
-    "U9-history-normal-modal"
-  );
+#U9-history-normal-modal {
 
-  const historyModalContent = document.getElementById(
-    "U9-history-normal-modal-content"
-  );
+  position: fixed;
 
-  const historyModalClose = document.getElementById(
-    "U9-history-normal-modal-close"
-  );
+  top: 115px;
+  left: 0;
 
-  const historyPageButtons = document.querySelectorAll(
-    ".History-model-nav-button"
-  );
+  width: 100%;
+  height: calc(100vh - 115px);
 
-  const historyPages = {
-    shop: document.getElementById(
-      "History-model-shop-Page"
-    ),
+  box-sizing: border-box;
 
-    save: document.getElementById(
-      "History-model-Save-Page"
-    ),
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
 
-    order: document.getElementById(
-      "History-model-Order-Page"
-    )
-  };
+  background-color:
+    rgba(0, 0, 0, 0.18);
 
-  let currentHistoryPage = "shop";
+  z-index: 1000;
+
+  overflow: hidden;
+
+  visibility: hidden;
+  pointer-events: none;
+
+}
 
 
-  /* =========================
-     SWITCH HISTORY PAGE
-  ========================= */
+/* =========================
+   MODAL CONTENT
+========================= */
 
-  function showHistoryPage(pageName) {
-    const targetPage = historyPages[pageName];
+#U9-history-normal-modal-content {
 
-    if (!targetPage) {
-      console.error(
-        "U9 History: Invalid page:",
-        pageName
-      );
+  position: relative;
 
-      return false;
-    }
+  width: 100%;
+  height: 100%;
 
-    currentHistoryPage = pageName;
+  box-sizing: border-box;
 
-    Object.keys(historyPages).forEach(function (key) {
-      const page = historyPages[key];
+  background-color: #ffffff;
 
-      if (!page) {
-        return;
-      }
+  overflow: hidden;
 
-      const isActive = key === pageName;
+  transform:
+    translateY(100%);
 
-      page.hidden = !isActive;
-      page.setAttribute(
-        "aria-hidden",
-        String(!isActive)
-      );
-    });
+  transition:
+    transform 0.45s ease;
 
-    historyPageButtons.forEach(function (button) {
-      const isActive =
-        button.dataset.historyPage === pageName;
+}
 
-      button.classList.toggle(
-        "active",
-        isActive
-      );
 
-      button.setAttribute(
-        "aria-current",
-        isActive ? "page" : "false"
-      );
-    });
+/* =========================
+   OPEN
+========================= */
 
-    return true;
+#U9-history-normal-modal.modal-open {
+
+  visibility: visible;
+
+  pointer-events: auto;
+
+}
+
+
+#U9-history-normal-modal.modal-open
+#U9-history-normal-modal-content {
+
+  transform:
+    translateY(0);
+
+}
+
+
+/* =========================
+   CLOSING
+========================= */
+
+#U9-history-normal-modal.modal-closing {
+
+  visibility: visible;
+
+  pointer-events: none;
+
+}
+
+
+#U9-history-normal-modal.modal-closing
+#U9-history-normal-modal-content {
+
+  transform:
+    translateY(100%);
+
+}
+
+
+/* =========================
+   TITLE
+========================= */
+
+#U9-history-normal-modal-title {
+
+  position: relative;
+
+  width: 100%;
+  height: 55px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  align-items: center;
+
+  padding:
+    0
+    60px
+    0
+    20px;
+
+  font-size: 20px;
+  font-weight: 600;
+
+  color: #111111;
+
+  background-color: #ffffff;
+
+  border-bottom:
+    1px solid #eeeeee;
+
+}
+
+
+/* =========================
+   CLOSE BUTTON
+========================= */
+
+#U9-history-normal-modal-close {
+
+  position: absolute;
+
+  top: 50%;
+  right: 15px;
+
+  width: 36px;
+  height: 36px;
+
+  padding: 0;
+
+  border: none;
+  outline: none;
+
+  border-radius: 50%;
+
+  background-color: #f1f1f1;
+
+  color: #111111;
+
+  font-size: 24px;
+  font-weight: 400;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  transform:
+    translateY(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+}
+
+
+/* =========================
+   CLOSE HOVER
+========================= */
+
+#U9-history-normal-modal-close:hover {
+
+  background-color:
+    #e8e8e8;
+
+}
+
+
+/* =========================
+   CLOSE ACTIVE
+========================= */
+
+#U9-history-normal-modal-close:active {
+
+  transform:
+    translateY(-50%)
+    scale(0.94);
+
+}
+
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 480px) {
+
+  #U9-history-normal-modal {
+
+    top: 115px;
+
+    height:
+      calc(100vh - 115px);
+
   }
 
 
-  /* =========================
-     OPEN HISTORY MODAL
-  ========================= */
+  #U9-history-normal-modal-content {
 
-  function openHistoryModal() {
-    if (
-      !historyModal ||
-      !historyModalContent
-    ) {
-      return false;
-    }
+    width: 100%;
 
-    historyModal.classList.remove(
-      "modal-closing"
-    );
+    max-width: 100%;
 
-    /*
-     * If no page is selected, show Shop Page.
-     * Do not reset an already selected page.
-     */
-    showHistoryPage(currentHistoryPage);
-
-    historyModal.classList.add(
-      "modal-open"
-    );
-
-    return true;
   }
 
 
-  /* =========================
-     CLOSE HISTORY MODAL
-  ========================= */
+  #U9-history-normal-modal-title {
 
-  function closeHistoryModal() {
-    if (
-      !historyModal ||
-      !historyModalContent
-    ) {
-      return false;
-    }
+    height: 55px;
 
-    if (
-      !historyModal.classList.contains(
-        "modal-open"
-      )
-    ) {
-      return true;
-    }
+    padding:
+      0
+      55px
+      0
+      15px;
 
-    historyModal.classList.remove(
-      "modal-open"
-    );
+    font-size: 18px;
 
-    historyModal.classList.add(
-      "modal-closing"
-    );
-
-    let finished = false;
-
-    function finishClose() {
-      if (finished) {
-        return;
-      }
-
-      finished = true;
-
-      historyModal.classList.remove(
-        "modal-closing"
-      );
-
-      historyModalContent.removeEventListener(
-        "transitionend",
-        handleCloseAnimation
-      );
-    }
-
-    function handleCloseAnimation(event) {
-      if (
-        event.target !== historyModalContent ||
-        event.propertyName !== "transform"
-      ) {
-        return;
-      }
-
-      finishClose();
-    }
-
-    historyModalContent.addEventListener(
-      "transitionend",
-      handleCloseAnimation
-    );
-
-    setTimeout(
-      finishClose,
-      700
-    );
-
-    return true;
   }
 
 
-  /* =========================
-     PAGE BUTTON EVENTS
-  ========================= */
+  #U9-history-normal-modal-close {
 
-  historyPageButtons.forEach(function (button) {
-    button.addEventListener("click", function () {
-      const pageName =
-        button.dataset.historyPage;
+    right: 10px;
 
-      showHistoryPage(pageName);
-    });
-  });
+    width: 36px;
+    height: 36px;
 
-
-  /* =========================
-     WINDOW MANAGER
-  ========================= */
-
-  if (
-    window.U9WindowManager
-  ) {
-    window.U9WindowManager.register(
-      "history",
-      {
-        open: openHistoryModal,
-
-        close: closeHistoryModal,
-
-        isOpen: function () {
-          if (!historyModal) {
-            return false;
-          }
-
-          return (
-            historyModal.classList.contains(
-              "modal-open"
-            ) ||
-            historyModal.classList.contains(
-              "modal-closing"
-            )
-          );
-        }
-      }
-    );
   }
 
+}
 
-  /* =========================
-     PUBLIC API
-  ========================= */
+/* =========================
+   HISTORY PAGE NAVIGATION
+========================= */
 
-  window.openHistoryModal = openHistoryModal;
+#History-model-navigation {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eeeeee;
+}
 
-  window.closeHistoryModal = closeHistoryModal;
+.History-model-nav-button {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 12px 6px;
+  border: none;
+  border-radius: 0;
+  background-color: #ffffff;
+  color: #666666;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
 
-  window.U9History = {
-    openPage: async function (pageName) {
-      if (!historyPages[pageName]) {
-        console.error(
-          "U9 History: Cannot open unknown page:",
-          pageName
-        );
+.History-model-nav-button:hover {
+  background-color: #f7f7f7;
+}
 
-        return false;
-      }
+.History-model-nav-button.active {
+  color: #111111;
+  font-weight: 600;
+}
 
-      /*
-       * Select the requested page before opening
-       * so the correct page appears immediately.
-       */
-      if (!showHistoryPage(pageName)) {
-        return false;
-      }
+.History-model-nav-button.active::after {
+  position: absolute;
+  right: 20%;
+  bottom: 0;
+  left: 20%;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background-color: #111111;
+  content: "";
+}
 
-      const manager = window.U9WindowManager;
+/* =========================
+   HISTORY PAGE CONTAINER
+========================= */
 
-      if (
-        manager &&
-        typeof manager.open === "function"
-      ) {
-        await manager.open("history");
-      } else {
-        openHistoryModal();
-      }
+#History-model-pages {
+  width: 100%;
+  height: calc(100% - 103px);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
 
-      return true;
-    },
+.History-model-page {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 0px;
+  background-color: #ffffff;
+}
 
-    showPage: showHistoryPage,
+.History-model-page[hidden] {
+  display: none !important;
+}
 
-    getCurrentPage: function () {
-      return currentHistoryPage;
-    }
-  };
+.History-model-page h2 {
+  margin: 0 0 12px;
+  color: #111111;
+  font-size: 18px;
+}
 
+.History-model-page p {
+  margin: 0;
+  color: #666666;
+  font-size: 14px;
+}
 
-  /* =========================
-     CLOSE BUTTON
-  ========================= */
+/* =========================
+   MOBILE
+========================= */
 
-  if (historyModalClose) {
-    historyModalClose.addEventListener(
-      "click",
-      function () {
-        if (window.U9WindowManager) {
-          window.U9WindowManager.close("history");
-        } else {
-          closeHistoryModal();
-        }
-      }
-    );
+@media (max-width: 480px) {
+
+  .History-model-nav-button {
+    padding: 12px 3px;
+    font-size: 12px;
   }
 
+  .History-model-page {
+    padding: 15px;
+  }
 
-  /* =========================
-     INITIAL PAGE
-  ========================= */
-
-  showHistoryPage("shop");
-
-})();
+}
