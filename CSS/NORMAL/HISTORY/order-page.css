@@ -92,7 +92,7 @@
   align-items: center;
   justify-content: center;
   min-width: 28px;
-  height: 29px;
+  height: 20px;
   margin: 0;
   padding: 0 5px;
   border: 1px solid #dddddd;
@@ -120,8 +120,8 @@
 
 #History-model-Order-Page
 .U9-history-order-page-button.active {
-  border-color: #222222;
-  background: #222222;
+  border-color: #afacac;
+  background: #585858;
   color: #ffffff;
   font-weight: 600;
 }
@@ -680,7 +680,7 @@
   }
 
   #History-model-Order-Page #U9-history-order-pagination {
-    gap: 1px;
+    gap: 10px;
   }
 
   #History-model-Order-Page .U9-history-order-page-button {
