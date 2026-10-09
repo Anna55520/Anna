@@ -19,7 +19,7 @@
   const FUNCTION_NAME = "u9-order-history";
 
   const PAGE_SIZE = 10;
-  const VISIBLE_PAGE_BUTTONS = 5;
+  const VISIBLE_PAGE_BUTTONS = 3;
   const CACHE_MS = 15000;
 
   let initialized = false;
@@ -27,6 +27,10 @@
   let allOrders = [];
   let currentPage = 1;
   let lastLoadTime = 0;
+
+  /* =======================================================
+     BASIC HELPERS
+  ======================================================= */
 
   function getPage() {
     return document.getElementById(PAGE_ID);
@@ -101,14 +105,38 @@
     const value = String(status || "unknown").toLowerCase();
 
     const knownStatuses = {
-      completed: { label: "Completed", className: "completed" },
-      complete: { label: "Completed", className: "completed" },
-      pending: { label: "Pending", className: "pending" },
-      matching: { label: "Matching", className: "matching" },
-      processing: { label: "Processing", className: "processing" },
-      cancelled: { label: "Cancelled", className: "cancelled" },
-      canceled: { label: "Cancelled", className: "canceled" },
-      failed: { label: "Failed", className: "failed" }
+      completed: {
+        label: "Completed",
+        className: "completed"
+      },
+      complete: {
+        label: "Completed",
+        className: "completed"
+      },
+      pending: {
+        label: "Pending",
+        className: "pending"
+      },
+      matching: {
+        label: "Matching",
+        className: "matching"
+      },
+      processing: {
+        label: "Processing",
+        className: "processing"
+      },
+      cancelled: {
+        label: "Cancelled",
+        className: "cancelled"
+      },
+      canceled: {
+        label: "Cancelled",
+        className: "canceled"
+      },
+      failed: {
+        label: "Failed",
+        className: "failed"
+      }
     };
 
     return knownStatuses[value] || {
@@ -117,35 +145,68 @@
     };
   }
 
-  function showMessage(type, message) {
+  /* =======================================================
+     CENTRAL LOADING / ERROR STATE
+  ======================================================= */
+
+  function showOrderHistoryState(type, message) {
     const page = getPage();
-    const element = page?.querySelector("#U9-history-order-message");
 
-    if (!element) return;
-
-    element.className = "";
-
-    if (type === "error") {
-      element.classList.add("error");
-    } else if (type === "success") {
-      element.classList.add("success");
-    }
-
-    element.textContent = message;
-    element.hidden = false;
-  }
-
-  function hideMessage() {
-    const element = getPage()?.querySelector(
-      "#U9-history-order-message"
+    const state = page?.querySelector(
+      "#U9-history-order-state"
     );
 
-    if (element) {
-      element.hidden = true;
-      element.textContent = "";
-      element.className = "";
+    const stateMessage = page?.querySelector(
+      "#U9-history-order-state-message"
+    );
+
+    const retryButton = page?.querySelector(
+      "#U9-history-order-retry"
+    );
+
+    const list = page?.querySelector(
+      "#U9-history-order-list"
+    );
+
+    if (!state || !stateMessage) return;
+
+    state.hidden = false;
+    state.dataset.state = type;
+    stateMessage.textContent = message;
+
+    if (retryButton) {
+      retryButton.hidden = type !== "error";
+    }
+
+    if (list) {
+      list.hidden = true;
     }
   }
+
+  function hideOrderHistoryState() {
+    const page = getPage();
+
+    const state = page?.querySelector(
+      "#U9-history-order-state"
+    );
+
+    const list = page?.querySelector(
+      "#U9-history-order-list"
+    );
+
+    if (state) {
+      state.hidden = true;
+      delete state.dataset.state;
+    }
+
+    if (list) {
+      list.hidden = false;
+    }
+  }
+
+  /* =======================================================
+     REFRESH BUTTON
+  ======================================================= */
 
   function setLoading(isLoading) {
     const button = getPage()?.querySelector(
@@ -155,7 +216,7 @@
     if (!button) return;
 
     button.disabled = isLoading;
-    button.textContent = isLoading ? "Loading..." : "Refresh";
+    button.textContent = "Refresh";
   }
 
   /* =======================================================
@@ -170,6 +231,7 @@
         "[U9 Order History] Page element not found:",
         PAGE_ID
       );
+
       return false;
     }
 
@@ -180,34 +242,10 @@
     page.innerHTML = `
       <div class="U9-history-order-sticky">
 
-        <div class="U9-history-order-header">
-          <div class="U9-history-order-heading">
-            <h2>Order History</h2>
-
-            <p class="U9-history-order-subtitle">
-              View your previous tasks and order details.
-            </p>
-          </div>
-
-          <button
-            type="button"
-            id="U9-history-order-refresh"
-          >
-            Refresh
-          </button>
-        </div>
-
-        <div
-          id="U9-history-order-message"
-          role="status"
-          aria-live="polite"
-          hidden
-        ></div>
-
         <div class="U9-history-order-summary-row">
 
           <p id="U9-history-order-summary">
-            Loading order history...
+            0 orders
           </p>
 
           <nav
@@ -215,7 +253,41 @@
             aria-label="Order history pagination"
           ></nav>
 
+          <button
+            type="button"
+            id="U9-history-order-refresh"
+          >
+            Refresh
+          </button>
+
         </div>
+
+      </div>
+
+      <div
+        id="U9-history-order-state"
+        class="U9-history-order-state"
+        role="status"
+        aria-live="polite"
+        hidden
+      >
+        <img
+          class="U9-history-order-loading-image"
+          src="/SVG/logo/loading.svg"
+          alt=""
+        >
+
+        <p id="U9-history-order-state-message">
+          Loading order history...
+        </p>
+
+        <button
+          type="button"
+          id="U9-history-order-retry"
+          hidden
+        >
+          Try again
+        </button>
       </div>
 
       <div id="U9-history-order-list"></div>
@@ -223,18 +295,37 @@
 
     page.dataset.orderHistoryRendered = "true";
 
+    /* Refresh button */
+
     page.querySelector("#U9-history-order-refresh")
       ?.addEventListener("click", function () {
         loadOrderHistory(true);
       });
 
+    /* Retry button */
+
+    page.querySelector("#U9-history-order-retry")
+      ?.addEventListener("click", function () {
+        loadOrderHistory(true);
+      });
+
+    /* Pagination buttons */
+
     page.querySelector("#U9-history-order-pagination")
       ?.addEventListener("click", function (event) {
-        const button = event.target.closest(
+        const target = event.target;
+
+        if (!(target instanceof Element)) {
+          return;
+        }
+
+        const button = target.closest(
           "button[data-page-action], button[data-page-number]"
         );
 
-        if (!button || button.disabled) return;
+        if (!button || button.disabled) {
+          return;
+        }
 
         const action = button.dataset.pageAction;
 
@@ -265,12 +356,14 @@
   ======================================================= */
 
   function getTotalPages() {
-    return Math.max(1, Math.ceil(allOrders.length / PAGE_SIZE));
+    return Math.max(
+      1,
+      Math.ceil(allOrders.length / PAGE_SIZE)
+    );
   }
 
   function renderPagination() {
-    const page = getPage();
-    const pagination = page?.querySelector(
+    const pagination = getPage()?.querySelector(
       "#U9-history-order-pagination"
     );
 
@@ -278,8 +371,6 @@
 
     const totalPages = getTotalPages();
 
-    // Show five consecutive page slots.
-    // When there are fewer than five pages, unused slots show "–".
     let startPage = 1;
 
     if (totalPages > VISIBLE_PAGE_BUTTONS) {
@@ -302,7 +393,11 @@
       >‹</button>
     `;
 
-    for (let slot = 0; slot < VISIBLE_PAGE_BUTTONS; slot++) {
+    for (
+      let slot = 0;
+      slot < VISIBLE_PAGE_BUTTONS;
+      slot++
+    ) {
       const pageNumber = startPage + slot;
 
       if (pageNumber <= totalPages) {
@@ -311,7 +406,9 @@
         html += `
           <button
             type="button"
-            class="U9-history-order-page-button ${isActive ? "active" : ""}"
+            class="U9-history-order-page-button ${
+              isActive ? "active" : ""
+            }"
             data-page-number="${pageNumber}"
             aria-label="Page ${pageNumber}"
             ${isActive ? 'aria-current="page"' : ""}
@@ -355,6 +452,7 @@
     }
 
     currentPage = nextPage;
+
     renderOrders();
   }
 
@@ -372,7 +470,9 @@
     list.innerHTML = `
       <div class="U9-history-order-empty">
         <div class="U9-history-order-empty-icon">📦</div>
+
         <h3>No orders yet</h3>
+
         <p>
           Your completed and pending orders will appear here.
         </p>
@@ -405,7 +505,9 @@
     }
 
     summary.textContent =
-      `${totalOrders} ${totalOrders === 1 ? "order" : "orders"} found.`;
+      `${totalOrders} ${
+        totalOrders === 1 ? "order" : "orders"
+      }`;
 
     renderPagination();
 
@@ -437,6 +539,7 @@
         : "";
 
       const quantityNumber = Number(order.quantity);
+
       const quantity =
         Number.isFinite(quantityNumber) && quantityNumber > 0
           ? quantityNumber
@@ -464,6 +567,7 @@
         <article class="U9-history-order-card">
 
           <div class="U9-history-order-card-top">
+
             <div class="U9-history-order-date">
               ${escapeHTML(formatDate(order.created_at))}
             </div>
@@ -471,6 +575,7 @@
             <span class="U9-history-order-status${statusClass}">
               ${statusLabel}
             </span>
+
           </div>
 
           <div class="U9-history-order-product">
@@ -497,35 +602,39 @@
               </p>
 
             </div>
+
           </div>
 
           <div class="U9-history-order-card-bottom">
+
             <span>Order ID</span>
 
             <span class="U9-history-order-id">
               ${orderId}
             </span>
+
           </div>
 
         </article>
       `;
     }).join("");
 
-    // Replace failed image loads with the existing placeholder style.
-    list.querySelectorAll(".U9-history-order-image").forEach(
-      function (image) {
-        image.addEventListener("error", function () {
-          const placeholder = document.createElement("div");
+    /* Replace failed images with a placeholder. */
 
-          placeholder.className =
-            "U9-history-order-image-placeholder";
+    list.querySelectorAll(
+      ".U9-history-order-image"
+    ).forEach(function (image) {
+      image.addEventListener("error", function () {
+        const placeholder = document.createElement("div");
 
-          placeholder.textContent = "Image unavailable";
+        placeholder.className =
+          "U9-history-order-image-placeholder";
 
-          image.replaceWith(placeholder);
-        }, { once: true });
-      }
-    );
+        placeholder.textContent = "Image unavailable";
+
+        image.replaceWith(placeholder);
+      }, { once: true });
+    });
   }
 
   /* =======================================================
@@ -537,7 +646,9 @@
 
     const page = getPage();
 
-    if (!page || !renderPage()) return;
+    if (!page || !renderPage()) {
+      return;
+    }
 
     const now = Date.now();
 
@@ -546,6 +657,7 @@
       page.dataset.orderHistoryLoaded === "true" &&
       now - lastLoadTime < CACHE_MS
     ) {
+      hideOrderHistoryState();
       return;
     }
 
@@ -555,28 +667,33 @@
       allOrders = [];
       currentPage = 1;
 
-      showMessage(
+      showOrderHistoryState(
         "error",
         "Please log in to view your order history."
       );
 
-      renderOrders();
       return;
     }
 
     const client = getSupabaseClient();
 
     if (!client || !client.functions) {
-      showMessage(
+      showOrderHistoryState(
         "error",
         "Supabase client is not initialized. Check supabase-client.js."
       );
+
       return;
     }
 
     loading = true;
+
     setLoading(true);
-    hideMessage();
+
+    showOrderHistoryState(
+      "loading",
+      "Loading order history..."
+    );
 
     try {
       const { data, error } = await client.functions.invoke(
@@ -590,7 +707,8 @@
       );
 
       if (error) {
-        let details = error.message || "Unknown function error";
+        let details =
+          error.message || "Unknown function error";
 
         if (
           error.context &&
@@ -605,7 +723,7 @@
               details = body.message;
             }
           } catch (_) {
-            // Use the original error message.
+            // Keep the original error message.
           }
         }
 
@@ -627,6 +745,8 @@
 
       renderOrders();
 
+      hideOrderHistoryState();
+
       page.dataset.orderHistoryLoaded = "true";
       lastLoadTime = Date.now();
 
@@ -635,17 +755,19 @@
         allOrders.length,
         "orders."
       );
+
     } catch (error) {
       console.error(
         "[U9 Order History] Load failed:",
         error
       );
 
-      showMessage(
+      showOrderHistoryState(
         "error",
         error?.message ||
           "Unable to load order history. Please try again."
       );
+
     } finally {
       loading = false;
       setLoading(false);
@@ -666,6 +788,7 @@
         "[U9 Order History] Page element not found yet:",
         PAGE_ID
       );
+
       return;
     }
 
@@ -689,7 +812,10 @@
     console.log("[U9 Order History] Page initialized.");
   }
 
-  // Public methods for manual refresh or debugging.
+  /* =======================================================
+     PUBLIC METHODS
+  ======================================================= */
+
   window.U9OrderHistoryPage = {
     initialize: initialize,
 
@@ -702,9 +828,17 @@
     }
   };
 
+  /* =======================================================
+     START
+  ======================================================= */
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initialize);
+    document.addEventListener(
+      "DOMContentLoaded",
+      initialize
+    );
   } else {
     initialize();
   }
+
 })();
