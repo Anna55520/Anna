@@ -2,364 +2,319 @@
    HISTORY NORMAL MODAL
 ========================= */
 
+(function () {
+  "use strict";
 
-/* =========================
-   MODAL
-========================= */
+  /* =========================
+     ELEMENTS
+  ========================= */
 
-#U9-history-normal-modal {
+  const historyModal = document.getElementById(
+    "U9-history-normal-modal"
+  );
 
-  position: fixed;
+  const historyModalContent = document.getElementById(
+    "U9-history-normal-modal-content"
+  );
 
-  top: 115px;
-  left: 0;
+  const historyModalClose = document.getElementById(
+    "U9-history-normal-modal-close"
+  );
 
-  width: 100%;
-  height: calc(100vh - 115px);
+  const historyPageButtons = document.querySelectorAll(
+    ".History-model-nav-button"
+  );
 
-  box-sizing: border-box;
+  const historyPages = {
+    shop: document.getElementById(
+      "History-model-shop-Page"
+    ),
 
-  display: flex;
-  justify-content: center;
-  align-items: stretch;
+    save: document.getElementById(
+      "History-model-Save-Page"
+    ),
 
-  background-color:
-    rgba(0, 0, 0, 0.18);
+    order: document.getElementById(
+      "History-model-Order-Page"
+    )
+  };
 
-  z-index: 1000;
+  let currentHistoryPage = "shop";
 
-  overflow: hidden;
 
-  visibility: hidden;
-  pointer-events: none;
+  /* =========================
+     SWITCH HISTORY PAGE
+  ========================= */
 
-}
+  function showHistoryPage(pageName) {
+    const targetPage = historyPages[pageName];
 
+    if (!targetPage) {
+      console.error(
+        "U9 History: Invalid page:",
+        pageName
+      );
 
-/* =========================
-   MODAL CONTENT
-========================= */
+      return false;
+    }
 
-#U9-history-normal-modal-content {
+    currentHistoryPage = pageName;
 
-  position: relative;
+    Object.keys(historyPages).forEach(function (key) {
+      const page = historyPages[key];
 
-  width: 100%;
-  height: 100%;
+      if (!page) {
+        return;
+      }
 
-  box-sizing: border-box;
+      const isActive = key === pageName;
 
-  background-color: #ffffff;
+      page.hidden = !isActive;
+      page.setAttribute(
+        "aria-hidden",
+        String(!isActive)
+      );
+    });
 
-  overflow: hidden;
+    historyPageButtons.forEach(function (button) {
+      const isActive =
+        button.dataset.historyPage === pageName;
 
-  transform:
-    translateY(100%);
+      button.classList.toggle(
+        "active",
+        isActive
+      );
 
-  transition:
-    transform 0.45s ease;
+      button.setAttribute(
+        "aria-current",
+        isActive ? "page" : "false"
+      );
+    });
 
-}
-
-
-/* =========================
-   OPEN
-========================= */
-
-#U9-history-normal-modal.modal-open {
-
-  visibility: visible;
-
-  pointer-events: auto;
-
-}
-
-
-#U9-history-normal-modal.modal-open
-#U9-history-normal-modal-content {
-
-  transform:
-    translateY(0);
-
-}
-
-
-/* =========================
-   CLOSING
-========================= */
-
-#U9-history-normal-modal.modal-closing {
-
-  visibility: visible;
-
-  pointer-events: none;
-
-}
-
-
-#U9-history-normal-modal.modal-closing
-#U9-history-normal-modal-content {
-
-  transform:
-    translateY(100%);
-
-}
-
-
-/* =========================
-   TITLE
-========================= */
-
-#U9-history-normal-modal-title {
-
-  position: relative;
-
-  width: 100%;
-  height: 55px;
-
-  box-sizing: border-box;
-
-  display: flex;
-  align-items: center;
-
-  padding:
-    0
-    60px
-    0
-    20px;
-
-  font-size: 20px;
-  font-weight: 600;
-
-  color: #111111;
-
-  background-color: #ffffff;
-
-  border-bottom:
-    1px solid #eeeeee;
-
-}
-
-
-/* =========================
-   CLOSE BUTTON
-========================= */
-
-#U9-history-normal-modal-close {
-
-  position: absolute;
-
-  top: 50%;
-  right: 15px;
-
-  width: 36px;
-  height: 36px;
-
-  padding: 0;
-
-  border: none;
-  outline: none;
-
-  border-radius: 50%;
-
-  background-color: #f1f1f1;
-
-  color: #111111;
-
-  font-size: 24px;
-  font-weight: 400;
-
-  line-height: 1;
-
-  cursor: pointer;
-
-  transform:
-    translateY(-50%);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-}
-
-
-/* =========================
-   CLOSE HOVER
-========================= */
-
-#U9-history-normal-modal-close:hover {
-
-  background-color:
-    #e8e8e8;
-
-}
-
-
-/* =========================
-   CLOSE ACTIVE
-========================= */
-
-#U9-history-normal-modal-close:active {
-
-  transform:
-    translateY(-50%)
-    scale(0.94);
-
-}
-
-
-/* =========================
-   MOBILE
-========================= */
-
-@media (max-width: 480px) {
-
-  #U9-history-normal-modal {
-
-    top: 115px;
-
-    height:
-      calc(100vh - 115px);
-
+    return true;
   }
 
 
-  #U9-history-normal-modal-content {
+  /* =========================
+     OPEN HISTORY MODAL
+  ========================= */
 
-    width: 100%;
+  function openHistoryModal() {
+    if (
+      !historyModal ||
+      !historyModalContent
+    ) {
+      return false;
+    }
 
-    max-width: 100%;
+    historyModal.classList.remove(
+      "modal-closing"
+    );
 
+    /*
+     * If no page is selected, show Shop Page.
+     * Do not reset an already selected page.
+     */
+    showHistoryPage(currentHistoryPage);
+
+    historyModal.classList.add(
+      "modal-open"
+    );
+
+    return true;
   }
 
 
-  #U9-history-normal-modal-title {
+  /* =========================
+     CLOSE HISTORY MODAL
+  ========================= */
 
-    height: 55px;
+  function closeHistoryModal() {
+    if (
+      !historyModal ||
+      !historyModalContent
+    ) {
+      return false;
+    }
 
-    padding:
-      0
-      55px
-      0
-      15px;
+    if (
+      !historyModal.classList.contains(
+        "modal-open"
+      )
+    ) {
+      return true;
+    }
 
-    font-size: 18px;
+    historyModal.classList.remove(
+      "modal-open"
+    );
 
+    historyModal.classList.add(
+      "modal-closing"
+    );
+
+    let finished = false;
+
+    function finishClose() {
+      if (finished) {
+        return;
+      }
+
+      finished = true;
+
+      historyModal.classList.remove(
+        "modal-closing"
+      );
+
+      historyModalContent.removeEventListener(
+        "transitionend",
+        handleCloseAnimation
+      );
+    }
+
+    function handleCloseAnimation(event) {
+      if (
+        event.target !== historyModalContent ||
+        event.propertyName !== "transform"
+      ) {
+        return;
+      }
+
+      finishClose();
+    }
+
+    historyModalContent.addEventListener(
+      "transitionend",
+      handleCloseAnimation
+    );
+
+    setTimeout(
+      finishClose,
+      700
+    );
+
+    return true;
   }
 
 
-  #U9-history-normal-modal-close {
+  /* =========================
+     PAGE BUTTON EVENTS
+  ========================= */
 
-    right: 10px;
+  historyPageButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      const pageName =
+        button.dataset.historyPage;
 
-    width: 36px;
-    height: 36px;
+      showHistoryPage(pageName);
+    });
+  });
 
+
+  /* =========================
+     WINDOW MANAGER
+  ========================= */
+
+  if (
+    window.U9WindowManager
+  ) {
+    window.U9WindowManager.register(
+      "history",
+      {
+        open: openHistoryModal,
+
+        close: closeHistoryModal,
+
+        isOpen: function () {
+          if (!historyModal) {
+            return false;
+          }
+
+          return (
+            historyModal.classList.contains(
+              "modal-open"
+            ) ||
+            historyModal.classList.contains(
+              "modal-closing"
+            )
+          );
+        }
+      }
+    );
   }
 
-}
 
-/* =========================
-   HISTORY PAGE NAVIGATION
-========================= */
+  /* =========================
+     PUBLIC API
+  ========================= */
 
-#History-model-navigation {
-  display: flex;
-  align-items: stretch;
-  width: 100%;
-  min-height: 48px;
-  box-sizing: border-box;
-  background-color: #ffffff;
-  border-bottom: 1px solid #eeeeee;
-}
+  window.openHistoryModal = openHistoryModal;
 
-.History-model-nav-button {
-  position: relative;
-  flex: 1 1 0;
-  min-width: 0;
-  padding: 12px 6px;
-  border: none;
-  border-radius: 0;
-  background-color: #ffffff;
-  color: #666666;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition:
-    color 0.2s ease,
-    background-color 0.2s ease;
-}
+  window.closeHistoryModal = closeHistoryModal;
 
-.History-model-nav-button:hover {
-  background-color: #f7f7f7;
-}
+  window.U9History = {
+    openPage: async function (pageName) {
+      if (!historyPages[pageName]) {
+        console.error(
+          "U9 History: Cannot open unknown page:",
+          pageName
+        );
 
-.History-model-nav-button.active {
-  color: #111111;
-  font-weight: 600;
-}
+        return false;
+      }
 
-.History-model-nav-button.active::after {
-  position: absolute;
-  right: 20%;
-  bottom: 0;
-  left: 20%;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  background-color: #111111;
-  content: "";
-}
+      /*
+       * Select the requested page before opening
+       * so the correct page appears immediately.
+       */
+      if (!showHistoryPage(pageName)) {
+        return false;
+      }
 
-/* =========================
-   HISTORY PAGE CONTAINER
-========================= */
+      const manager = window.U9WindowManager;
 
-#History-model-pages {
-  width: 100%;
-  height: calc(100% - 103px);
-  box-sizing: border-box;
-  overflow-x: hidden;
-  overflow-y: auto;
-  background-color: #ffffff;
-}
+      if (
+        manager &&
+        typeof manager.open === "function"
+      ) {
+        await manager.open("history");
+      } else {
+        openHistoryModal();
+      }
 
-.History-model-page {
-  width: 100%;
-  min-height: 100%;
-  box-sizing: border-box;
-  padding: 0px;
-  background-color: #ffffff;
-}
+      return true;
+    },
 
-.History-model-page[hidden] {
-  display: none !important;
-}
+    showPage: showHistoryPage,
 
-.History-model-page h2 {
-  margin: 0 0 12px;
-  color: #111111;
-  font-size: 18px;
-}
+    getCurrentPage: function () {
+      return currentHistoryPage;
+    }
+  };
 
-.History-model-page p {
-  margin: 0;
-  color: #666666;
-  font-size: 14px;
-}
 
-/* =========================
-   MOBILE
-========================= */
+  /* =========================
+     CLOSE BUTTON
+  ========================= */
 
-@media (max-width: 480px) {
-
-  .History-model-nav-button {
-    padding: 12px 3px;
-    font-size: 12px;
+  if (historyModalClose) {
+    historyModalClose.addEventListener(
+      "click",
+      function () {
+        if (window.U9WindowManager) {
+          window.U9WindowManager.close("history");
+        } else {
+          closeHistoryModal();
+        }
+      }
+    );
   }
 
-  .History-model-page {
-    padding: 15px;
-  }
 
-}
+  /* =========================
+     INITIAL PAGE
+  ========================= */
+
+  showHistoryPage("shop");
+
+})();
