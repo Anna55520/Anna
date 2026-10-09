@@ -2565,3 +2565,55 @@
   initializeAuctionPage();
 
 })();
+
+
+/* =========================
+AUCTION TOOL BUTTONS
+========================= */
+
+(function () {
+"use strict";
+
+function initializeAuctionTools() {
+const historyButton = document.getElementById(
+"U9-auction-tool-3"
+);
+
+
+if (!historyButton) {
+  return;
+}
+
+// Prevent duplicate event listeners.
+if (historyButton.dataset.u9Bound === "true") {
+  return;
+}
+
+historyButton.dataset.u9Bound = "true";
+
+historyButton.addEventListener("click", async function () {
+  const manager = window.U9WindowManager;
+
+  if (!manager || typeof manager.open !== "function") {
+    console.error(
+      "U9 Auction: Window Manager is not available."
+    );
+    return;
+  }
+
+  await manager.open("history");
+});
+
+
+}
+
+if (document.readyState === "loading") {
+document.addEventListener(
+"DOMContentLoaded",
+initializeAuctionTools,
+{ once: true }
+);
+} else {
+initializeAuctionTools();
+}
+})();
