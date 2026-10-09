@@ -47,8 +47,6 @@
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.035);
 }
 
-/* One compact row */
-
 #History-model-Order-Page .U9-history-order-summary-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
@@ -84,15 +82,13 @@
   white-space: nowrap;
 }
 
-/* Page buttons */
-
 #History-model-Order-Page .U9-history-order-page-button {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
   min-width: 28px;
-  height: 20px;
+  height: 27px;
   margin: 0;
   padding: 0 5px;
   border: 1px solid #dddddd;
@@ -180,31 +176,30 @@
     opacity 0.15s ease;
 }
 
-#History-model-Order-Page #U9-history-order-refresh:hover:not(:disabled) {
-  border-color: #fefefe00;
-  background: #78ace9;
+#History-model-Order-Page
+#U9-history-order-refresh:hover:not(:disabled) {
+  background: #659bdd;
 }
 
-#History-model-Order-Page #U9-history-order-refresh:active:not(:disabled) {
-  background: #e5e5e5;
+#History-model-Order-Page
+#U9-history-order-refresh:active:not(:disabled) {
+  background: #4f89cc;
 }
 
-#History-model-Order-Page #U9-history-order-refresh:disabled {
+#History-model-Order-Page
+#U9-history-order-refresh:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-#History-model-Order-Page #U9-history-order-refresh:focus-visible {
+#History-model-Order-Page
+#U9-history-order-refresh:focus-visible {
   outline: 2px solid #555555;
   outline-offset: 2px;
 }
 
 /* =========================================================
    CENTRAL LOADING / ERROR STATE
-   Used by:
-   #U9-history-order-state
-   #U9-history-order-state-message
-   #U9-history-order-retry
 ========================================================= */
 
 #History-model-Order-Page .U9-history-order-state {
@@ -223,26 +218,22 @@
 /* Respect the hidden attribute */
 
 #History-model-Order-Page
-.U9-history-order-state[hidden] {
-  display: none !important;
-}
-
+.U9-history-order-state[hidden],
 #History-model-Order-Page
 #U9-history-order-list[hidden] {
   display: none !important;
 }
 
-/* Loading SVG */
+/* Three-dot inline SVG loader */
 
 #History-model-Order-Page .U9-history-order-loading-image {
   display: block;
   flex-shrink: 0;
-  width: 64px;
-  height: 64px;
-  max-width: 22vw;
-  max-height: 22vw;
+  width: 100px;
+  height: 40px;
+  max-width: 100%;
   margin: 0;
-  object-fit: contain;
+  overflow: visible;
 }
 
 /* Loading / error text */
@@ -283,12 +274,14 @@
   cursor: pointer;
 }
 
-#History-model-Order-Page #U9-history-order-retry:hover {
+#History-model-Order-Page
+#U9-history-order-retry:hover {
   border-color: #bbbbbb;
   background: #eeeeee;
 }
 
-#History-model-Order-Page #U9-history-order-retry:focus-visible {
+#History-model-Order-Page
+#U9-history-order-retry:focus-visible {
   outline: 2px solid #555555;
   outline-offset: 2px;
 }
@@ -300,11 +293,14 @@
 
 /* =========================================================
    ORDER LIST
+   Desktop: 2 cards per row
+   Mobile: 1 card per row
 ========================================================= */
 
 #History-model-Order-Page #U9-history-order-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   gap: 14px;
   width: 100%;
   min-width: 0;
@@ -368,21 +364,28 @@
   white-space: nowrap;
 }
 
-#History-model-Order-Page .U9-history-order-status.completed {
+#History-model-Order-Page
+.U9-history-order-status.completed {
   background: #e7f7ed;
   color: #18743a;
 }
 
-#History-model-Order-Page .U9-history-order-status.pending,
-#History-model-Order-Page .U9-history-order-status.matching,
-#History-model-Order-Page .U9-history-order-status.processing {
+#History-model-Order-Page
+.U9-history-order-status.pending,
+#History-model-Order-Page
+.U9-history-order-status.matching,
+#History-model-Order-Page
+.U9-history-order-status.processing {
   background: #fff4d9;
   color: #8b6100;
 }
 
-#History-model-Order-Page .U9-history-order-status.cancelled,
-#History-model-Order-Page .U9-history-order-status.canceled,
-#History-model-Order-Page .U9-history-order-status.failed {
+#History-model-Order-Page
+.U9-history-order-status.cancelled,
+#History-model-Order-Page
+.U9-history-order-status.canceled,
+#History-model-Order-Page
+.U9-history-order-status.failed {
   background: #fdeaea;
   color: #b42318;
 }
@@ -415,7 +418,8 @@
 
 /* Image placeholder */
 
-#History-model-Order-Page .U9-history-order-image-placeholder {
+#History-model-Order-Page
+.U9-history-order-image-placeholder {
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -436,12 +440,14 @@
 
 /* Product text */
 
-#History-model-Order-Page .U9-history-order-product-info {
+#History-model-Order-Page
+.U9-history-order-product-info {
   flex: 1;
   min-width: 0;
 }
 
-#History-model-Order-Page .U9-history-order-product-info h3 {
+#History-model-Order-Page
+.U9-history-order-product-info h3 {
   margin: 0 0 9px;
   color: #111111;
   font-size: 15px;
@@ -450,7 +456,8 @@
   overflow-wrap: anywhere;
 }
 
-#History-model-Order-Page .U9-history-order-product-info p {
+#History-model-Order-Page
+.U9-history-order-product-info p {
   margin: 4px 0;
   color: #666666;
   font-size: 12px;
@@ -459,7 +466,8 @@
   overflow-wrap: anywhere;
 }
 
-#History-model-Order-Page .U9-history-order-product-info strong {
+#History-model-Order-Page
+.U9-history-order-product-info strong {
   color: #333333;
   font-weight: 600;
 }
@@ -490,10 +498,13 @@
 
 /* =========================================================
    EMPTY STATE
+   Span the full grid width
 ========================================================= */
 
 #History-model-Order-Page .U9-history-order-empty {
+  grid-column: 1 / -1;
   width: 100%;
+  min-width: 0;
   margin: 0;
   padding: 48px 16px;
   border: 1px dashed #dddddd;
@@ -502,20 +513,23 @@
   text-align: center;
 }
 
-#History-model-Order-Page .U9-history-order-empty-icon {
+#History-model-Order-Page
+.U9-history-order-empty-icon {
   margin-bottom: 12px;
   font-size: 36px;
   line-height: 1.2;
 }
 
-#History-model-Order-Page .U9-history-order-empty h3 {
+#History-model-Order-Page
+.U9-history-order-empty h3 {
   margin: 0 0 8px;
   color: #333333;
   font-size: 16px;
   font-weight: 600;
 }
 
-#History-model-Order-Page .U9-history-order-empty p {
+#History-model-Order-Page
+.U9-history-order-empty p {
   margin: 0;
   color: #888888;
   font-size: 13px;
@@ -523,14 +537,52 @@
 }
 
 /* =========================================================
+   TABLET
+   Keep 2 cards per row
+========================================================= */
+
+@media (min-width: 481px) and (max-width: 900px) {
+  #History-model-Order-Page #U9-history-order-list {
+    gap: 12px;
+    padding: 14px 14px 22px;
+  }
+
+  #History-model-Order-Page .U9-history-order-card {
+    padding: 12px;
+  }
+
+  #History-model-Order-Page .U9-history-order-product {
+    gap: 10px;
+  }
+
+  #History-model-Order-Page .U9-history-order-image,
+  #History-model-Order-Page
+  .U9-history-order-image-placeholder {
+    width: 76px;
+    height: 76px;
+  }
+
+  #History-model-Order-Page
+  .U9-history-order-product-info h3 {
+    font-size: 14px;
+  }
+
+  #History-model-Order-Page
+  .U9-history-order-product-info p {
+    font-size: 11px;
+  }
+}
+
+/* =========================================================
    MOBILE
+   One card per row
 ========================================================= */
 
 @media (max-width: 480px) {
   /* Compact top row */
 
   #History-model-Order-Page .U9-history-order-sticky {
-    padding: 10px 10px;
+    padding: 10px;
   }
 
   #History-model-Order-Page .U9-history-order-summary-row {
@@ -569,9 +621,12 @@
     gap: 12px;
   }
 
+  /* Keep the SVG at its natural 100 x 40 size */
+
   #History-model-Order-Page .U9-history-order-loading-image {
-    width: 56px;
-    height: 56px;
+    width: 100px;
+    height: 40px;
+    max-width: 100%;
   }
 
   #History-model-Order-Page #U9-history-order-state-message {
@@ -579,9 +634,10 @@
     font-size: 13px;
   }
 
-  /* Order list */
+  /* One card per row */
 
   #History-model-Order-Page #U9-history-order-list {
+    grid-template-columns: minmax(0, 1fr);
     gap: 12px;
     padding: 12px 10px 20px;
   }
@@ -615,17 +671,20 @@
   }
 
   #History-model-Order-Page .U9-history-order-image,
-  #History-model-Order-Page .U9-history-order-image-placeholder {
+  #History-model-Order-Page
+  .U9-history-order-image-placeholder {
     width: 82px;
     height: 82px;
   }
 
-  #History-model-Order-Page .U9-history-order-product-info h3 {
+  #History-model-Order-Page
+  .U9-history-order-product-info h3 {
     margin-bottom: 7px;
     font-size: 14px;
   }
 
-  #History-model-Order-Page .U9-history-order-product-info p {
+  #History-model-Order-Page
+  .U9-history-order-product-info p {
     margin: 3px 0;
     font-size: 11px;
   }
@@ -648,15 +707,18 @@
     padding: 36px 14px;
   }
 
-  #History-model-Order-Page .U9-history-order-empty-icon {
+  #History-model-Order-Page
+  .U9-history-order-empty-icon {
     font-size: 32px;
   }
 
-  #History-model-Order-Page .U9-history-order-empty h3 {
+  #History-model-Order-Page
+  .U9-history-order-empty h3 {
     font-size: 15px;
   }
 
-  #History-model-Order-Page .U9-history-order-empty p {
+  #History-model-Order-Page
+  .U9-history-order-empty p {
     font-size: 12px;
   }
 }
@@ -680,7 +742,7 @@
   }
 
   #History-model-Order-Page #U9-history-order-pagination {
-    gap: 10px;
+    gap: 2px;
   }
 
   #History-model-Order-Page .U9-history-order-page-button {
@@ -697,6 +759,7 @@
   }
 
   #History-model-Order-Page #U9-history-order-list {
+    grid-template-columns: minmax(0, 1fr);
     padding-right: 7px;
     padding-left: 7px;
   }
@@ -706,7 +769,8 @@
   }
 
   #History-model-Order-Page .U9-history-order-image,
-  #History-model-Order-Page .U9-history-order-image-placeholder {
+  #History-model-Order-Page
+  .U9-history-order-image-placeholder {
     width: 70px;
     height: 70px;
   }
