@@ -21,7 +21,7 @@
   const FUNCTION_URL =
     "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/u9-order-history";
 
-  const PAGE_ID = "U9-page-order";
+  const PAGE_ID = "History-model-Order-Page";
   const NAV_BUTTON_ID = "History-model-Order-button";
 
   let loading = false;
