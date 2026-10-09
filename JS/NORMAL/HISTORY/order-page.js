@@ -271,11 +271,68 @@
         aria-live="polite"
         hidden
       >
-        <img
+        <svg
           class="U9-history-order-loading-image"
-          src="/SVG/logo/loading.svg"
-          alt=""
+          xmlns="http://www.w3.org/2000/svg"
+          width="100"
+          height="40"
+          viewBox="0 0 100 40"
+          role="img"
+          aria-label="Loading"
         >
+          <g fill="#2F73EF">
+            <circle cx="20" cy="20" r="5">
+              <animate
+                attributeName="r"
+                values="5;8;5"
+                dur="0.9s"
+                begin="0s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="opacity"
+                values="0.45;1;0.45"
+                dur="0.9s"
+                begin="0s"
+                repeatCount="indefinite"
+              />
+            </circle>
+
+            <circle cx="50" cy="20" r="5">
+              <animate
+                attributeName="r"
+                values="5;8;5"
+                dur="0.9s"
+                begin="0.15s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="opacity"
+                values="0.45;1;0.45"
+                dur="0.9s"
+                begin="0.15s"
+                repeatCount="indefinite"
+              />
+            </circle>
+
+            <circle cx="80" cy="20" r="5">
+              <animate
+                attributeName="r"
+                values="5;8;5"
+                dur="0.9s"
+                begin="0.3s"
+                repeatCount="indefinite"
+              />
+              <animate
+                attributeName="opacity"
+                values="0.45;1;0.45"
+                dur="0.9s"
+                begin="0.3s"
+                repeatCount="indefinite"
+              />
+            </circle>
+          </g>
+        </svg>
 
         <p id="U9-history-order-state-message">
           Loading order history...
