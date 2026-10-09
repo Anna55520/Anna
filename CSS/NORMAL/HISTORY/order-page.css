@@ -1,29 +1,57 @@
 
-/* =========================
+/* =========================================================
    U9 HISTORY ORDER PAGE
-========================= */
+   File: CSS/NORMAL/HISTORY/order-page.css
+========================================================= */
 
 #History-model-Order-Page {
   background-color: #f7f7f7;
   color: #111111;
+  box-sizing: border-box;
 }
 
-/* =========================
+/* =========================================================
+   STICKY TOP AREA
+========================================================= */
+
+#History-model-Order-Page .U9-history-order-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 16px 20px 12px;
+  background: #f7f7f7;
+  border-bottom: 1px solid #e8e8e8;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.035);
+}
+
+/* =========================================================
    PAGE HEADER
-========================= */
+========================================================= */
 
 #History-model-Order-Page .U9-history-order-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+}
+
+#History-model-Order-Page .U9-history-order-heading {
+  min-width: 0;
 }
 
 #History-model-Order-Page .U9-history-order-header h2 {
   margin: 0;
+  color: #111111;
   font-size: 20px;
   font-weight: 600;
+}
+
+#History-model-Order-Page .U9-history-order-subtitle {
+  margin: 5px 0 0;
+  color: #777777;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 #History-model-Order-Page #U9-history-order-refresh {
@@ -41,32 +69,115 @@
   background: #eeeeee;
 }
 
-/* =========================
+#History-model-Order-Page #U9-history-order-refresh:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* =========================================================
    STATUS MESSAGE
-========================= */
+========================================================= */
 
 #History-model-Order-Page #U9-history-order-message {
-  margin-bottom: 12px;
+  margin: 0 0 10px;
   color: #777777;
   font-size: 13px;
   line-height: 1.5;
   overflow-wrap: anywhere;
 }
 
-/* =========================
+#History-model-Order-Page #U9-history-order-message.error {
+  color: #b42318;
+}
+
+#History-model-Order-Page #U9-history-order-message.success {
+  color: #18743a;
+}
+
+/* =========================================================
+   SUMMARY AND PAGINATION
+========================================================= */
+
+#History-model-Order-Page .U9-history-order-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+#History-model-Order-Page #U9-history-order-summary {
+  margin: 0;
+  color: #555555;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#History-model-Order-Page #U9-history-order-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+#History-model-Order-Page .U9-history-order-page-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0 8px;
+  border: 1px solid #dddddd;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #333333;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+#History-model-Order-Page .U9-history-order-page-button:hover:not(:disabled) {
+  border-color: #999999;
+  background: #eeeeee;
+}
+
+#History-model-Order-Page .U9-history-order-page-button.active {
+  border-color: #222222;
+  background: #222222;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+#History-model-Order-Page .U9-history-order-page-button:disabled {
+  background: #f4f4f4;
+  color: #b8b8b8;
+  cursor: default;
+}
+
+#History-model-Order-Page .U9-history-order-page-button.placeholder {
+  border-color: transparent;
+  background: transparent;
+  color: #bbbbbb;
+}
+
+/* =========================================================
    ORDER LIST
-========================= */
+========================================================= */
 
 #History-model-Order-Page #U9-history-order-list {
   display: flex;
   flex-direction: column;
   gap: 14px;
   width: 100%;
+  box-sizing: border-box;
+  padding: 16px 20px 24px;
 }
 
-/* =========================
+/* =========================================================
    ORDER CARD
-========================= */
+========================================================= */
 
 #History-model-Order-Page .U9-history-order-card {
   width: 100%;
@@ -78,9 +189,9 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.035);
 }
 
-/* =========================
+/* =========================================================
    CARD TOP
-========================= */
+========================================================= */
 
 #History-model-Order-Page .U9-history-order-card-top {
   display: flex;
@@ -98,9 +209,9 @@
   overflow-wrap: anywhere;
 }
 
-/* =========================
+/* =========================================================
    ORDER STATUS
-========================= */
+========================================================= */
 
 #History-model-Order-Page .U9-history-order-status {
   flex-shrink: 0;
@@ -118,19 +229,22 @@
 }
 
 #History-model-Order-Page .U9-history-order-status.pending,
-#History-model-Order-Page .U9-history-order-status.matching {
+#History-model-Order-Page .U9-history-order-status.matching,
+#History-model-Order-Page .U9-history-order-status.processing {
   background: #fff4d9;
   color: #8b6100;
 }
 
-#History-model-Order-Page .U9-history-order-status.cancelled {
+#History-model-Order-Page .U9-history-order-status.cancelled,
+#History-model-Order-Page .U9-history-order-status.canceled,
+#History-model-Order-Page .U9-history-order-status.failed {
   background: #fdeaea;
   color: #b42318;
 }
 
-/* =========================
+/* =========================================================
    PRODUCT INFORMATION
-========================= */
+========================================================= */
 
 #History-model-Order-Page .U9-history-order-product {
   display: flex;
@@ -190,9 +304,9 @@
   overflow-wrap: anywhere;
 }
 
-/* =========================
+/* =========================================================
    CARD BOTTOM
-========================= */
+========================================================= */
 
 #History-model-Order-Page .U9-history-order-card-bottom {
   display: flex;
@@ -212,9 +326,9 @@
   overflow-wrap: anywhere;
 }
 
-/* =========================
+/* =========================================================
    EMPTY STATE
-========================= */
+========================================================= */
 
 #History-model-Order-Page .U9-history-order-empty {
   padding: 48px 16px;
@@ -242,13 +356,26 @@
   line-height: 1.6;
 }
 
-/* =========================
+/* =========================================================
    MOBILE
-========================= */
+========================================================= */
 
 @media (max-width: 480px) {
-  #History-model-Order-Page {
-    padding: 14px;
+  #History-model-Order-Page .U9-history-order-sticky {
+    padding: 12px 14px 10px;
+  }
+
+  #History-model-Order-Page .U9-history-order-header h2 {
+    font-size: 19px;
+  }
+
+  #History-model-Order-Page .U9-history-order-subtitle {
+    font-size: 12px;
+  }
+
+  #History-model-Order-Page #U9-history-order-list {
+    gap: 12px;
+    padding: 12px 14px 20px;
   }
 
   #History-model-Order-Page .U9-history-order-card {
@@ -276,5 +403,22 @@
 
   #History-model-Order-Page .U9-history-order-date {
     font-size: 11px;
+  }
+
+  #History-model-Order-Page .U9-history-order-summary-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  #History-model-Order-Page #U9-history-order-pagination {
+    justify-content: flex-start;
+    gap: 4px;
+  }
+
+  #History-model-Order-Page .U9-history-order-page-button {
+    min-width: 28px;
+    height: 29px;
+    padding: 0 6px;
   }
 }
