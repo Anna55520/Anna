@@ -1417,33 +1417,102 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
   </div>
 
-
   <!-- =================================================
       HISTORY MODAL
   ================================================= -->
 
   <div id="U9-history-normal-modal">
 
-
     <div id="U9-history-normal-modal-content">
 
-
+      <!-- TITLE -->
       <div id="U9-history-normal-modal-title">
 
-        History
+        <span>History</span>
 
         <button
           id="U9-history-normal-modal-close"
           type="button"
+          aria-label="Close History"
         >
           ×
         </button>
 
       </div>
 
+      <!-- PAGE NAVIGATION -->
+      <div id="History-model-navigation">
+
+        <button
+          id="History-model-shop-button"
+          class="History-model-nav-button"
+          type="button"
+          data-history-page="shop"
+        >
+          Shop Page
+        </button>
+
+        <button
+          id="History-model-Save-button"
+          class="History-model-nav-button"
+          type="button"
+          data-history-page="save"
+        >
+          Save Page
+        </button>
+
+        <button
+          id="History-model-Order-button"
+          class="History-model-nav-button"
+          type="button"
+          data-history-page="order"
+        >
+          Order Page
+        </button>
+
+      </div>
+
+      <!-- PAGE CONTENT -->
+      <div id="History-model-pages">
+
+        <!-- SHOP PAGE -->
+        <section
+          id="History-model-shop-Page"
+          class="History-model-page"
+          data-page="shop"
+          aria-hidden="false"
+        >
+          <h2>Shop Page</h2>
+          <p>Shop page content will be added here.</p>
+        </section>
+
+        <!-- SAVE PAGE -->
+        <section
+          id="History-model-Save-Page"
+          class="History-model-page"
+          data-page="save"
+          aria-hidden="true"
+          hidden
+        >
+          <h2>Save Page</h2>
+          <p>Save page content will be added here.</p>
+        </section>
+
+        <!-- ORDER PAGE -->
+        <section
+          id="History-model-Order-Page"
+          class="History-model-page"
+          data-page="order"
+          aria-hidden="true"
+          hidden
+        >
+          <h2>Order Page</h2>
+          <p>Order page content will be added here.</p>
+        </section>
+
+      </div>
 
     </div>
-
 
   </div>
 
