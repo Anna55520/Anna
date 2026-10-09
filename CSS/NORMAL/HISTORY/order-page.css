@@ -166,8 +166,8 @@
   padding: 6px 10px;
   border: 1px solid #dddddd;
   border-radius: 7px;
-  background: #ffffff;
-  color: #222222;
+  background: #78ace9;
+  color: #ffffff;
   font-family: inherit;
   font-size: 12px;
   font-weight: 400;
@@ -181,8 +181,8 @@
 }
 
 #History-model-Order-Page #U9-history-order-refresh:hover:not(:disabled) {
-  border-color: #cccccc;
-  background: #eeeeee;
+  border-color: #fefefe;
+  background: #cfcece;
 }
 
 #History-model-Order-Page #U9-history-order-refresh:active:not(:disabled) {
