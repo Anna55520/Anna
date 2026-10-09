@@ -258,3 +258,108 @@
   }
 
 }
+
+/* =========================
+   HISTORY PAGE NAVIGATION
+========================= */
+
+#History-model-navigation {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  background-color: #ffffff;
+  border-bottom: 1px solid #eeeeee;
+}
+
+.History-model-nav-button {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 12px 6px;
+  border: none;
+  border-radius: 0;
+  background-color: #ffffff;
+  color: #666666;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.History-model-nav-button:hover {
+  background-color: #f7f7f7;
+}
+
+.History-model-nav-button.active {
+  color: #111111;
+  font-weight: 600;
+}
+
+.History-model-nav-button.active::after {
+  position: absolute;
+  right: 20%;
+  bottom: 0;
+  left: 20%;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background-color: #111111;
+  content: "";
+}
+
+/* =========================
+   HISTORY PAGE CONTAINER
+========================= */
+
+#History-model-pages {
+  width: 100%;
+  height: calc(100% - 103px);
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: #ffffff;
+}
+
+.History-model-page {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+  background-color: #ffffff;
+}
+
+.History-model-page[hidden] {
+  display: none !important;
+}
+
+.History-model-page h2 {
+  margin: 0 0 12px;
+  color: #111111;
+  font-size: 18px;
+}
+
+.History-model-page p {
+  margin: 0;
+  color: #666666;
+  font-size: 14px;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 480px) {
+
+  .History-model-nav-button {
+    padding: 12px 3px;
+    font-size: 12px;
+  }
+
+  .History-model-page {
+    padding: 15px;
+  }
+
+}
