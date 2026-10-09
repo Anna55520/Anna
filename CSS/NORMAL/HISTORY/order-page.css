@@ -181,8 +181,8 @@
 }
 
 #History-model-Order-Page #U9-history-order-refresh:hover:not(:disabled) {
-  border-color: #fefefe;
-  background: #cfcece;
+  border-color: #fefefe00;
+  background: #78ace9;
 }
 
 #History-model-Order-Page #U9-history-order-refresh:active:not(:disabled) {
