@@ -334,12 +334,18 @@
     showMessage("Loading task history...");
 
     try {
+      console.log("[U9 Order History] Current user ID:", userId);
+
       const { data: orders, error: ordersError } =
-        await supabase
+      await supabase
           .from("u9-orders")
           .select("*")
           .eq("user_id", userId)
           .order("created_at", { ascending: false });
+
+      console.log("[U9 Order History] Query error:", ordersError);
+      console.log("[U9 Order History] Query data:", orders);
+      console.log("[U9 Order History] Record count:", orders?.length);
 
       if (ordersError) {
         throw ordersError;
