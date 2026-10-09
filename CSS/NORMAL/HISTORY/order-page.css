@@ -1,1 +1,280 @@
 
+/* =========================
+   U9 HISTORY ORDER PAGE
+========================= */
+
+#History-model-Order-Page {
+  background-color: #f7f7f7;
+  color: #111111;
+}
+
+/* =========================
+   PAGE HEADER
+========================= */
+
+#History-model-Order-Page .U9-history-order-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+#History-model-Order-Page .U9-history-order-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+#History-model-Order-Page #U9-history-order-refresh {
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #222222;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+#History-model-Order-Page #U9-history-order-refresh:hover {
+  background: #eeeeee;
+}
+
+/* =========================
+   STATUS MESSAGE
+========================= */
+
+#History-model-Order-Page #U9-history-order-message {
+  margin-bottom: 12px;
+  color: #777777;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* =========================
+   ORDER LIST
+========================= */
+
+#History-model-Order-Page #U9-history-order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+}
+
+/* =========================
+   ORDER CARD
+========================= */
+
+#History-model-Order-Page .U9-history-order-card {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 16px;
+  border: 1px solid #eeeeee;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.035);
+}
+
+/* =========================
+   CARD TOP
+========================= */
+
+#History-model-Order-Page .U9-history-order-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eeeeee;
+}
+
+#History-model-Order-Page .U9-history-order-date {
+  color: #777777;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* =========================
+   ORDER STATUS
+========================= */
+
+#History-model-Order-Page .U9-history-order-status {
+  flex-shrink: 0;
+  padding: 5px 9px;
+  border-radius: 20px;
+  background: #eeeeee;
+  color: #555555;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+#History-model-Order-Page .U9-history-order-status.completed {
+  background: #e7f7ed;
+  color: #18743a;
+}
+
+#History-model-Order-Page .U9-history-order-status.pending,
+#History-model-Order-Page .U9-history-order-status.matching {
+  background: #fff4d9;
+  color: #8b6100;
+}
+
+#History-model-Order-Page .U9-history-order-status.cancelled {
+  background: #fdeaea;
+  color: #b42318;
+}
+
+/* =========================
+   PRODUCT INFORMATION
+========================= */
+
+#History-model-Order-Page .U9-history-order-product {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 0;
+}
+
+#History-model-Order-Page .U9-history-order-image {
+  display: block;
+  flex-shrink: 0;
+  width: 100px;
+  height: 100px;
+  box-sizing: border-box;
+  border: 1px solid #eeeeee;
+  border-radius: 8px;
+  background: #f7f7f7;
+  object-fit: contain;
+}
+
+#History-model-Order-Page .U9-history-order-image-placeholder {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 100px;
+  height: 100px;
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid #eeeeee;
+  border-radius: 8px;
+  background: #f1f1f1;
+  color: #888888;
+  font-size: 11px;
+  text-align: center;
+}
+
+#History-model-Order-Page .U9-history-order-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+#History-model-Order-Page .U9-history-order-product-info h3 {
+  margin: 0 0 9px;
+  color: #111111;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+#History-model-Order-Page .U9-history-order-product-info p {
+  margin: 4px 0;
+  color: #666666;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* =========================
+   CARD BOTTOM
+========================= */
+
+#History-model-Order-Page .U9-history-order-card-bottom {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #eeeeee;
+  color: #888888;
+  font-size: 11px;
+}
+
+#History-model-Order-Page .U9-history-order-id {
+  max-width: 75%;
+  color: #666666;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+#History-model-Order-Page .U9-history-order-empty {
+  padding: 48px 16px;
+  border: 1px dashed #dddddd;
+  border-radius: 12px;
+  background: #ffffff;
+  text-align: center;
+}
+
+#History-model-Order-Page .U9-history-order-empty-icon {
+  margin-bottom: 12px;
+  font-size: 36px;
+}
+
+#History-model-Order-Page .U9-history-order-empty h3 {
+  margin: 0 0 8px;
+  color: #333333;
+  font-size: 16px;
+}
+
+#History-model-Order-Page .U9-history-order-empty p {
+  margin: 0;
+  color: #888888;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 480px) {
+  #History-model-Order-Page {
+    padding: 14px;
+  }
+
+  #History-model-Order-Page .U9-history-order-card {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  #History-model-Order-Page .U9-history-order-image,
+  #History-model-Order-Page .U9-history-order-image-placeholder {
+    width: 82px;
+    height: 82px;
+  }
+
+  #History-model-Order-Page .U9-history-order-product {
+    gap: 10px;
+  }
+
+  #History-model-Order-Page .U9-history-order-product-info h3 {
+    font-size: 14px;
+  }
+
+  #History-model-Order-Page .U9-history-order-card-top {
+    gap: 8px;
+  }
+
+  #History-model-Order-Page .U9-history-order-date {
+    font-size: 11px;
+  }
+}
