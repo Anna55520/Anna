@@ -856,15 +856,28 @@
     const navButton = document.getElementById(BUTTON_ID);
 
     if (navButton) {
-      navButton.addEventListener("click", function () {
-        loadOrderHistory(false);
-      });
+    navButton.addEventListener("click", function () {
+    loadOrderHistory(false);
+    });
     } else {
-      console.warn(
-        "[U9 Order History] Navigation button not found:",
-        BUTTON_ID
-      );
+    console.warn(
+    "[U9 Order History] Navigation button not found:",
+    BUTTON_ID
+    );
     }
+
+    document.addEventListener("click", function (event) {
+    const target = event.target;
+
+    if (!(target instanceof Element)) {
+    return;
+    }
+
+    if (target.closest("#U9-auction-tool-3")) {
+    loadOrderHistory(false);
+    }
+    });
+
 
     console.log("[U9 Order History] Page initialized.");
   }
