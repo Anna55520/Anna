@@ -81,6 +81,16 @@ if (
       );
       }
 
+      const auctionPage =
+      document.getElementById("U9-page-auction");
+
+      if (shopPage) {
+      shopPage.classList.toggle(
+          "auction-toolbar-collapsed",
+          collapsed
+      );
+      }
+
       containerToolHeaderToggle.textContent =
         collapsed ? "˅" : "˄";
 
