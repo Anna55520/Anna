@@ -36,3 +36,23 @@
   }
 
 }
+
+
+/* =========================
+   HOME PAGE TOOLBAR SYNC
+========================= */
+
+#U9-page-home {
+  transition: transform 0.35s ease;
+  transform: translateY(0);
+}
+
+#U9-page-home.home-toolbar-collapsed {
+  transform: translateY(-55px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #U9-page-home {
+    transition: none;
+  }
+}
