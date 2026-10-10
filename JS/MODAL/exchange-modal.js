@@ -371,7 +371,8 @@
      OPEN MODAL
   ========================= */
 
-  async function openExchangeModal() {
+
+  function openExchangeModal() {
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
 
@@ -382,7 +383,8 @@
     clearMessage();
     setExchangeType(exchangeType);
 
-    await loadExchangeInfo();
+    // 先显示窗口，再在后台加载兑换信息
+    void loadExchangeInfo();
 
     requestAnimationFrame(() => {
       if (modal.classList.contains("is-open")) {
