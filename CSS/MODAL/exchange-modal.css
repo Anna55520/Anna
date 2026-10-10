@@ -30,7 +30,9 @@
   pointer-events: auto;
 }
 
-/* OVERLAY */
+/* =========================
+   OVERLAY
+========================= */
 
 #U9-exchange-modal-overlay {
   position: absolute;
@@ -40,7 +42,9 @@
   cursor: pointer;
 }
 
-/* CONTENT */
+/* =========================
+   MODAL CONTENT
+========================= */
 
 #U9-exchange-modal-content {
   position: relative;
@@ -48,9 +52,29 @@
 
   width: 100%;
   max-width: 430px;
-  max-height: calc(100vh - 40px);
-  overflow-y: auto;
 
+  /* Keep the modal within the viewport */
+  max-height: calc(100vh - 40px);
+  max-height: calc(100dvh - 40px);
+
+  /* Enable scrolling inside the modal */
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+
+  /* Hide the scrollbar without disabling scrolling */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#U9-exchange-modal-content::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+#U9-exchange-modal-content {
   padding: 22px;
   box-sizing: border-box;
 
@@ -69,7 +93,9 @@
   transform: translateY(0) scale(1);
 }
 
-/* HEADER */
+/* =========================
+   HEADER
+========================= */
 
 #U9-exchange-modal-header {
   display: flex;
@@ -82,11 +108,18 @@
 
 #U9-exchange-modal-title {
   margin: 0;
+
   font-size: 23px;
   font-weight: 700;
+  line-height: 1.4;
+
+  color: #222;
 }
 
 #U9-exchange-modal-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 0 0 auto;
 
   width: 36px;
@@ -103,23 +136,36 @@
   line-height: 1;
 
   cursor: pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
 }
 
 #U9-exchange-modal-close:hover {
   background: #e5e5e5;
+  color: #111;
 }
 
-/* DIRECTION */
+#U9-exchange-modal-close:focus-visible {
+  outline: 2px solid #555;
+  outline-offset: 2px;
+}
+
+/* =========================
+   EXCHANGE DIRECTION
+========================= */
 
 #U9-exchange-direction {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 8px;
 
   margin-bottom: 20px;
 }
 
 .U9-exchange-direction-button {
+  min-width: 0;
   min-height: 44px;
   padding: 10px 8px;
 
@@ -131,12 +177,18 @@
 
   font-size: 13px;
   font-weight: 600;
+  line-height: 1.4;
 
   cursor: pointer;
+
   transition:
     color 0.18s ease,
     background 0.18s ease,
     border-color 0.18s ease;
+}
+
+.U9-exchange-direction-button:hover {
+  border-color: #999;
 }
 
 .U9-exchange-direction-button.active {
@@ -145,7 +197,14 @@
   border-color: #222;
 }
 
-/* RATE INFORMATION */
+.U9-exchange-direction-button:focus-visible {
+  outline: 2px solid #555;
+  outline-offset: 2px;
+}
+
+/* =========================
+   RATE INFORMATION
+========================= */
 
 #U9-exchange-info {
   display: flex;
@@ -167,6 +226,7 @@
   gap: 14px;
 
   font-size: 13px;
+  line-height: 1.5;
 }
 
 .U9-exchange-info-row span,
@@ -176,15 +236,20 @@
 
 .U9-exchange-info-row strong,
 .U9-exchange-preview-row strong {
+  min-width: 0;
+
   text-align: right;
   overflow-wrap: anywhere;
 }
 
-/* AMOUNT */
+/* =========================
+   AMOUNT INPUT
+========================= */
 
 #U9-exchange-form {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 #U9-exchange-amount-label {
@@ -192,10 +257,14 @@
 
   font-size: 14px;
   font-weight: 600;
+  line-height: 1.5;
 }
 
 #U9-exchange-amount {
+  display: block;
+
   width: 100%;
+  min-width: 0;
   min-height: 48px;
   padding: 12px 14px;
 
@@ -208,6 +277,7 @@
   background: #fff;
   color: #222;
 
+  font-family: inherit;
   font-size: 16px;
 }
 
@@ -221,13 +291,18 @@
 
   color: #777;
   font-size: 12px;
+  line-height: 1.5;
+
+  overflow-wrap: anywhere;
 }
 
 #U9-exchange-available-value {
   color: #333;
 }
 
-/* PREVIEW */
+/* =========================
+   EXCHANGE PREVIEW
+========================= */
 
 #U9-exchange-preview {
   display: flex;
@@ -243,6 +318,7 @@
 
 .U9-exchange-preview-row.total {
   padding-top: 13px;
+
   border-top: 1px solid #e5e5e5;
 
   font-size: 15px;
@@ -253,7 +329,9 @@
   color: #16834a;
 }
 
-/* MESSAGE */
+/* =========================
+   MESSAGE
+========================= */
 
 #U9-exchange-message {
   display: none;
@@ -265,6 +343,7 @@
 
   font-size: 13px;
   line-height: 1.5;
+
   overflow-wrap: anywhere;
 }
 
@@ -282,7 +361,9 @@
   background: #eaf8ef;
 }
 
-/* SUBMIT */
+/* =========================
+   SUBMIT BUTTON
+========================= */
 
 #U9-exchange-submit {
   width: 100%;
@@ -296,10 +377,13 @@
   color: #fff;
   background: #222;
 
+  font-family: inherit;
   font-size: 15px;
   font-weight: 700;
 
   cursor: pointer;
+
+  transition: background 0.18s ease;
 }
 
 #U9-exchange-submit:hover:not(:disabled) {
@@ -312,7 +396,24 @@
   cursor: not-allowed;
 }
 
-/* MOBILE */
+/* =========================
+   DESKTOP
+========================= */
+
+@media (min-width: 481px) {
+  #U9-exchange-modal {
+    padding: 20px;
+  }
+
+  #U9-exchange-modal-content {
+    max-height: calc(100vh - 40px);
+    max-height: calc(100dvh - 40px);
+  }
+}
+
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 480px) {
   #U9-exchange-modal {
@@ -321,6 +422,8 @@
 
   #U9-exchange-modal-content {
     max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+
     padding: 18px;
     border-radius: 15px;
   }
@@ -334,10 +437,16 @@
   }
 }
 
+/* =========================
+   REDUCED MOTION
+========================= */
+
 @media (prefers-reduced-motion: reduce) {
   #U9-exchange-modal,
   #U9-exchange-modal-content,
-  .U9-exchange-direction-button {
+  .U9-exchange-direction-button,
+  #U9-exchange-modal-close,
+  #U9-exchange-submit {
     transition: none;
   }
 }
