@@ -396,11 +396,26 @@
   /* =========================
      CLOSE MODAL
   ========================= */
-
+  
   function closeExchangeModal() {
+    // 先将焦点移出即将隐藏的弹窗
+    if (modal.contains(document.activeElement)) {
+      if (
+        auctionToolButton &&
+        auctionToolButton.isConnected &&
+        !auctionToolButton.disabled
+      ) {
+        auctionToolButton.focus({ preventScroll: true });
+      } else {
+        document.activeElement.blur();
+      }
+    }
+
+    // 再隐藏弹窗
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
   }
+
 
   /* =========================
      REGISTER WINDOW
