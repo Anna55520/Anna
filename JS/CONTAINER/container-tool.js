@@ -90,6 +90,27 @@ if (
           collapsed
         );
       }
+
+      const test1Page =
+        document.getElementById("U9-page-test1");
+
+      if (test1Page) {
+        test1Page.classList.toggle(
+          "test1-toolbar-collapsed",
+          collapsed
+        );
+      }
+
+      const test2Page =
+        document.getElementById("U9-page-test2");
+
+      if (test2Page) {
+        test2Page.classList.toggle(
+          "test2-toolbar-collapsed",
+          collapsed
+        );
+      }
+
       containerToolHeaderToggle.textContent =
         collapsed ? "˅" : "˄";
 
