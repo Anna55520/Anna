@@ -16,6 +16,62 @@ const menuButton =
 
 
 /* =========================
+   HEADER TOOL TOGGLE
+========================= */
+
+const containerToolHeaderToggle =
+  document.getElementById(
+    "U9-page-header-tool-toggle"
+  );
+
+if (tool) {
+  // 工具栏默认展开
+  tool.classList.remove(
+    "container-tool-collapsed"
+  );
+
+  // 默认显示 PAGE MENU
+  tool.classList.add("menu-open");
+}
+
+if (headerToolToggle && tool) {
+  headerToolToggle.textContent = "˄";
+  headerToolToggle.setAttribute(
+    "aria-expanded",
+    "true"
+  );
+  headerToolToggle.setAttribute(
+    "aria-label",
+    "Hide toolbar"
+  );
+
+  headerToolToggle.addEventListener(
+    "click",
+    function () {
+      const collapsed =
+        tool.classList.toggle(
+          "container-tool-collapsed"
+        );
+
+      headerToolToggle.textContent =
+        collapsed ? "˅" : "˄";
+
+      headerToolToggle.setAttribute(
+        "aria-expanded",
+        String(!collapsed)
+      );
+
+      headerToolToggle.setAttribute(
+        "aria-label",
+        collapsed
+          ? "Show toolbar"
+          : "Hide toolbar"
+      );
+    }
+  );
+}
+
+/* =========================
    PROFILE BUTTON
 ========================= */
 
