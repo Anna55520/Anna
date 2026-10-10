@@ -73,6 +73,32 @@
     });
   }
 
+
+  function updateAuctionCoins(coins) {
+    const coinsElement = document.getElementById("U9-auction-coins");
+
+    if (!coinsElement) {
+      console.warn("U9 Exchange: #U9-auction-coins not found.");
+      return;
+    }
+
+    const value = Number(coins);
+
+    if (!Number.isFinite(value)) {
+      return;
+    }
+
+    coinsElement.textContent = value.toFixed(2);
+
+    // 同步更新 AUCTION 页面内部的 Coins 状态
+    if (
+      window.U9Auction &&
+      typeof window.U9Auction.updateCoins === "function"
+    ) {
+      window.U9Auction.updateCoins(value);
+    }
+  }
+
   function getToken() {
     try {
       return localStorage.getItem("u9_token");
@@ -506,9 +532,6 @@
 
       const row = result.result;
 
-      /*
-       * Update the display immediately from the database result.
-       */
       if (row) {
         balances = {
           balance: Number(row.balance_after),
@@ -516,6 +539,9 @@
         };
 
         renderAvailableAmount();
+
+        // 立即同步 AUCTION 页面 Coins
+        updateAuctionCoins(balances.coins);
       }
 
       amountInput.value = "";
