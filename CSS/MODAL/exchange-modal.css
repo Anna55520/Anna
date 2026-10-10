@@ -32,6 +32,7 @@
 
 /* =========================
    OVERLAY
+   Clicking background does not close modal
 ========================= */
 
 #U9-exchange-modal-overlay {
@@ -39,7 +40,8 @@
   inset: 0;
 
   background: rgba(0, 0, 0, 0.58);
-  cursor: pointer;
+
+  cursor: default;
 }
 
 /* =========================
@@ -50,39 +52,27 @@
   position: relative;
   z-index: 1;
 
+  display: flex;
+  flex-direction: column;
+
   width: 100%;
   max-width: 430px;
 
-  /* Keep the modal within the viewport */
   max-height: calc(100vh - 40px);
   max-height: calc(100dvh - 40px);
 
-  /* Enable scrolling inside the modal */
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-
-  /* Hide the scrollbar without disabling scrolling */
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-#U9-exchange-modal-content::-webkit-scrollbar {
-  display: none;
-  width: 0;
-  height: 0;
-}
-
-#U9-exchange-modal-content {
-  padding: 22px;
+  min-height: 0;
+  padding: 0;
   box-sizing: border-box;
 
   color: #222;
   background: #fff;
-  border-radius: 18px;
 
+  border-radius: 18px;
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.25);
+
+  /* The modal itself does not scroll */
+  overflow: hidden;
 
   transform: translateY(12px) scale(0.98);
   transition: transform 0.22s ease;
@@ -94,32 +84,50 @@
 }
 
 /* =========================
-   HEADER
+   FIXED HEADER
 ========================= */
 
 #U9-exchange-modal-header {
+  position: relative;
+  z-index: 2;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
 
-  margin-bottom: 22px;
+  flex: 0 0 auto;
+
+  width: 100%;
+  min-height: 68px;
+
+  padding: 16px 22px;
+  margin: 0;
+
+  box-sizing: border-box;
+
+  background: #fff;
+  border-bottom: 1px solid #eee;
 }
 
 #U9-exchange-modal-title {
   margin: 0;
+  padding: 0;
+
+  color: #222;
 
   font-size: 23px;
   font-weight: 700;
   line-height: 1.4;
-
-  color: #222;
 }
+
+/* CLOSE BUTTON */
 
 #U9-exchange-modal-close {
   display: flex;
   align-items: center;
   justify-content: center;
+
   flex: 0 0 auto;
 
   width: 36px;
@@ -143,8 +151,8 @@
 }
 
 #U9-exchange-modal-close:hover {
-  background: #e5e5e5;
   color: #111;
+  background: #e5e5e5;
 }
 
 #U9-exchange-modal-close:focus-visible {
@@ -153,21 +161,56 @@
 }
 
 /* =========================
+   SCROLLABLE BODY
+========================= */
+
+#U9-exchange-modal-body {
+  flex: 1 1 auto;
+
+  width: 100%;
+  min-height: 0;
+
+  padding: 22px;
+  box-sizing: border-box;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+
+  /* Hide scrollbar, but keep scrolling enabled */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#U9-exchange-modal-body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* =========================
    EXCHANGE DIRECTION
 ========================= */
 
 #U9-exchange-direction {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 8px;
 
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  gap: 8px;
   margin-bottom: 20px;
 }
 
 .U9-exchange-direction-button {
   min-width: 0;
   min-height: 44px;
+
   padding: 10px 8px;
+  box-sizing: border-box;
 
   border: 1px solid #dedede;
   border-radius: 10px;
@@ -175,6 +218,7 @@
   color: #555;
   background: #fff;
 
+  font-family: inherit;
   font-size: 13px;
   font-weight: 600;
   line-height: 1.4;
@@ -203,7 +247,7 @@
 }
 
 /* =========================
-   RATE INFORMATION
+   RATE AND FEE INFORMATION
 ========================= */
 
 #U9-exchange-info {
@@ -243,12 +287,14 @@
 }
 
 /* =========================
-   AMOUNT INPUT
+   AMOUNT FORM
 ========================= */
 
 #U9-exchange-form {
   display: flex;
   flex-direction: column;
+
+  width: 100%;
   min-width: 0;
 }
 
@@ -266,8 +312,8 @@
   width: 100%;
   min-width: 0;
   min-height: 48px;
-  padding: 12px 14px;
 
+  padding: 12px 14px;
   box-sizing: border-box;
 
   border: 1px solid #d8d8d8;
@@ -368,8 +414,10 @@
 #U9-exchange-submit {
   width: 100%;
   min-height: 48px;
+
   margin-top: 18px;
   padding: 12px 16px;
+  box-sizing: border-box;
 
   border: 0;
   border-radius: 10px;
@@ -393,6 +441,7 @@
 #U9-exchange-submit:disabled {
   color: #888;
   background: #dedede;
+
   cursor: not-allowed;
 }
 
@@ -424,12 +473,20 @@
     max-height: calc(100vh - 24px);
     max-height: calc(100dvh - 24px);
 
-    padding: 18px;
     border-radius: 15px;
+  }
+
+  #U9-exchange-modal-header {
+    min-height: 62px;
+    padding: 13px 18px;
   }
 
   #U9-exchange-modal-title {
     font-size: 21px;
+  }
+
+  #U9-exchange-modal-body {
+    padding: 18px;
   }
 
   .U9-exchange-direction-button {
