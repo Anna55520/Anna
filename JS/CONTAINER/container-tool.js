@@ -111,6 +111,53 @@ if (
         );
       }
 
+      const historyModal =
+        document.getElementById(
+          "U9-history-normal-modal"
+        );
+
+      if (historyModal) {
+        historyModal.classList.toggle(
+          "history-toolbar-collapsed",
+          collapsed
+        );
+      }
+
+      const giftModal =
+        document.getElementById(
+          "U9-gift-normal-modal"
+        );
+
+      if (giftModal) {
+        giftModal.classList.toggle(
+          "gift-toolbar-collapsed",
+          collapsed
+        );
+      }
+
+      const inboxModal =
+        document.getElementById(
+          "U9-inbox-normal-modal"
+        );
+
+      if (inboxModal) {
+        inboxModal.classList.toggle(
+          "inbox-toolbar-collapsed",
+          collapsed
+        );
+      }
+
+      const messageModal =
+        document.getElementById(
+          "U9-message-normal-modal"
+        );
+
+      if (messageModal) {
+        messageModal.classList.toggle(
+          "message-toolbar-collapsed",
+          collapsed
+        );
+      }
       containerToolHeaderToggle.textContent =
         collapsed ? "˅" : "˄";
 
