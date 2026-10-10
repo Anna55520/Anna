@@ -60,6 +60,16 @@ if (
           "container-tool-collapsed"
         );
 
+      const homePage =
+        document.getElementById("U9-page-home");
+
+      if (homePage) {
+        homePage.classList.toggle(
+          "home-toolbar-collapsed",
+          collapsed
+        );
+      }
+
       containerToolHeaderToggle.textContent =
         collapsed ? "˅" : "˄";
 
