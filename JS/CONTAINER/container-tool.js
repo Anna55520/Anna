@@ -1,4 +1,5 @@
 
+
 /* =========================
    CONTAINER TOOL
 ========================= */
@@ -68,6 +69,16 @@ if (
           "home-toolbar-collapsed",
           collapsed
         );
+      }
+
+      const shopPage =
+      document.getElementById("U9-page-shop");
+
+      if (shopPage) {
+      shopPage.classList.toggle(
+          "shop-toolbar-collapsed",
+          collapsed
+      );
       }
 
       containerToolHeaderToggle.textContent =
