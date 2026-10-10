@@ -72,25 +72,24 @@ if (
       }
 
       const shopPage =
-      document.getElementById("U9-page-shop");
+        document.getElementById("U9-page-shop");
 
       if (shopPage) {
-      shopPage.classList.toggle(
+        shopPage.classList.toggle(
           "shop-toolbar-collapsed",
           collapsed
-      );
+        );
       }
 
       const auctionPage =
-      document.getElementById("U9-page-auction");
+        document.getElementById("U9-page-auction");
 
-      if (shopPage) {
-      shopPage.classList.toggle(
+      if (auctionPage) {
+        auctionPage.classList.toggle(
           "auction-toolbar-collapsed",
           collapsed
-      );
+        );
       }
-
       containerToolHeaderToggle.textContent =
         collapsed ? "˅" : "˄";
 
