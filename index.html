@@ -1808,10 +1808,8 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
     id="U9-exchange-modal"
     aria-hidden="true"
   >
-    <div
-      id="U9-exchange-modal-overlay"
-      data-exchange-close
-    ></div>
+    <!-- Background overlay: clicking it will NOT close the modal -->
+    <div id="U9-exchange-modal-overlay"></div>
 
     <section
       id="U9-exchange-modal-content"
@@ -1819,7 +1817,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
       aria-modal="true"
       aria-labelledby="U9-exchange-modal-title"
     >
-      <!-- HEADER -->
+      <!-- FIXED HEADER -->
       <div id="U9-exchange-modal-header">
         <h2 id="U9-exchange-modal-title">Exchange</h2>
 
@@ -1827,105 +1825,109 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           id="U9-exchange-modal-close"
           type="button"
           aria-label="Close Exchange"
-        >
-          ×
-        </button>
+        >×</button>
       </div>
 
-      <!-- EXCHANGE DIRECTION -->
-      <div id="U9-exchange-direction">
-        <button
-          type="button"
-          class="U9-exchange-direction-button active"
-          data-exchange-type="balance_to_coins"
-          aria-pressed="true"
-        >
-          Balance → Coins
-        </button>
+      <!-- SCROLLABLE BODY -->
+      <div id="U9-exchange-modal-body">
 
-        <button
-          type="button"
-          class="U9-exchange-direction-button"
-          data-exchange-type="coins_to_balance"
-          aria-pressed="false"
-        >
-          Coins → Balance
-        </button>
-      </div>
+        <!-- EXCHANGE DIRECTION -->
+        <div id="U9-exchange-direction">
+          <button
+            type="button"
+            class="U9-exchange-direction-button active"
+            data-exchange-type="balance_to_coins"
+            aria-pressed="true"
+          >
+            Balance → Coins
+          </button>
 
-      <!-- RATE AND FEE -->
-      <div id="U9-exchange-info">
-        <div class="U9-exchange-info-row">
-          <span>Exchange Rate</span>
-          <strong id="U9-exchange-rate">Loading...</strong>
+          <button
+            type="button"
+            class="U9-exchange-direction-button"
+            data-exchange-type="coins_to_balance"
+            aria-pressed="false"
+          >
+            Coins → Balance
+          </button>
         </div>
 
-        <div class="U9-exchange-info-row">
-          <span>Exchange Fee</span>
-          <strong id="U9-exchange-fee-rate">Loading...</strong>
-        </div>
-      </div>
-
-      <!-- AMOUNT -->
-      <form id="U9-exchange-form">
-        <label
-          id="U9-exchange-amount-label"
-          for="U9-exchange-amount"
-        >
-          Balance Amount
-        </label>
-
-        <input
-          id="U9-exchange-amount"
-          name="amount"
-          type="number"
-          min="0.01"
-          step="0.01"
-          inputmode="decimal"
-          placeholder="Enter amount"
-          autocomplete="off"
-          required
-        >
-
-        <div id="U9-exchange-available">
-          Available Balance:
-          <strong id="U9-exchange-available-value">—</strong>
-        </div>
-
-        <!-- PREVIEW -->
-        <div id="U9-exchange-preview">
-          <div class="U9-exchange-preview-row">
-            <span>Gross Amount</span>
-            <strong id="U9-exchange-gross">—</strong>
+        <!-- RATE AND FEE -->
+        <div id="U9-exchange-info">
+          <div class="U9-exchange-info-row">
+            <span>Exchange Rate</span>
+            <strong id="U9-exchange-rate">Loading...</strong>
           </div>
 
-          <div class="U9-exchange-preview-row">
-            <span>Fee Amount</span>
-            <strong id="U9-exchange-fee">—</strong>
-          </div>
-
-          <div class="U9-exchange-preview-row total">
-            <span>You Receive</span>
-            <strong id="U9-exchange-net">—</strong>
+          <div class="U9-exchange-info-row">
+            <span>Exchange Fee</span>
+            <strong id="U9-exchange-fee-rate">Loading...</strong>
           </div>
         </div>
 
-        <!-- MESSAGE -->
-        <div
-          id="U9-exchange-message"
-          role="status"
-          aria-live="polite"
-        ></div>
+        <!-- AMOUNT FORM -->
+        <form id="U9-exchange-form">
+          <label
+            id="U9-exchange-amount-label"
+            for="U9-exchange-amount"
+          >
+            Balance Amount
+          </label>
 
-        <!-- SUBMIT -->
-        <button
-          id="U9-exchange-submit"
-          type="submit"
-          disabled
-        >
-          Exchange
-        </button>
-      </form>
+          <input
+            id="U9-exchange-amount"
+            name="amount"
+            type="number"
+            min="0.01"
+            step="0.01"
+            inputmode="decimal"
+            placeholder="Enter amount"
+            autocomplete="off"
+            required
+          >
+
+          <!-- AVAILABLE BALANCE -->
+          <div id="U9-exchange-available">
+            Available Balance:
+            <strong id="U9-exchange-available-value">—</strong>
+          </div>
+
+          <!-- EXCHANGE PREVIEW -->
+          <div id="U9-exchange-preview">
+            <div class="U9-exchange-preview-row">
+              <span>Gross Amount</span>
+              <strong id="U9-exchange-gross">—</strong>
+            </div>
+
+            <div class="U9-exchange-preview-row">
+              <span>Fee Amount</span>
+              <strong id="U9-exchange-fee">—</strong>
+            </div>
+
+            <div class="U9-exchange-preview-row total">
+              <span>You Receive</span>
+              <strong id="U9-exchange-net">—</strong>
+            </div>
+          </div>
+
+          <!-- MESSAGE -->
+          <div
+            id="U9-exchange-message"
+            role="status"
+            aria-live="polite"
+          ></div>
+
+          <!-- SUBMIT -->
+          <button
+            id="U9-exchange-submit"
+            type="submit"
+            disabled
+          >
+            Exchange
+          </button>
+        </form>
+
+      </div>
     </section>
   </div>
 
