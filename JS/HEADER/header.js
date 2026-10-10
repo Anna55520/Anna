@@ -34,6 +34,10 @@ const headerLoading =
 
 
 
+const headerToolToggle =
+  document.getElementById(
+    "U9-page-header-tool-toggle"
+  );
 
 
 /* =========================
@@ -186,6 +190,10 @@ function showHeaderLoading(){
 
   }
 
+  if (headerToolToggle) {
+    headerToolToggle.classList.remove("active");
+  }
+
 
 }
 
@@ -244,6 +252,9 @@ function showHeaderGuest(){
 
   }
 
+  if (headerToolToggle) {
+    headerToolToggle.classList.remove("active");
+  }
 
 }
 
@@ -309,7 +320,9 @@ function showHeaderUser(
 
   }
 
-
+  if (headerToolToggle) {
+    headerToolToggle.classList.add("active");
+  }
 
 }
 
