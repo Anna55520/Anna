@@ -14,10 +14,6 @@
     "U9-exchange-modal-close"
   );
 
-  const overlay = document.getElementById(
-    "U9-exchange-modal-overlay"
-  );
-
   const form = document.getElementById(
     "U9-exchange-form"
   );
@@ -77,13 +73,33 @@
   if (
     !modal ||
     !closeButton ||
-    !overlay ||
     !form ||
     !amountInput ||
+    !amountLabel ||
+    !availableLabel ||
+    !availableValue ||
+    !submitButton ||
+    !message ||
+    !rateElement ||
+    !feeRateElement ||
+    !grossElement ||
+    !feeElement ||
+    !netElement ||
     !auctionToolButton
   ) {
     console.error(
       "U9 Exchange Modal: Required HTML elements are missing."
+    );
+
+    return;
+  }
+
+  if (
+    !window.U9WindowManager ||
+    typeof window.U9WindowManager.register !== "function"
+  ) {
+    console.error(
+      "U9 Exchange Modal: Window Manager is not available."
     );
 
     return;
@@ -97,6 +113,7 @@
 
   function showMessage(text, type = "error") {
     message.textContent = text;
+
     message.className =
       "is-visible " +
       (type === "success" ? "is-success" : "is-error");
@@ -136,6 +153,7 @@
         button.dataset.exchangeType === type;
 
       button.classList.toggle("active", active);
+
       button.setAttribute(
         "aria-pressed",
         String(active)
@@ -144,22 +162,23 @@
 
     if (type === "balance_to_coins") {
       amountLabel.textContent = "Balance Amount";
+
       availableLabel.firstChild.textContent =
         "Available Balance: ";
     } else {
       amountLabel.textContent = "Coins Amount";
+
       availableLabel.firstChild.textContent =
         "Available Coins: ";
     }
 
     amountInput.value = "";
+
     resetPreview();
     clearMessage();
 
     /*
-      The actual rate, available balance,
-      and fee will be loaded from the backend
-      in the next integration step.
+      Backend configuration is not connected yet.
     */
 
     rateElement.textContent = "Loading...";
@@ -167,8 +186,8 @@
     availableValue.textContent = "—";
 
     /*
-      Keep disabled until the authenticated
-      exchange API has been connected.
+      Keep exchange disabled until the authenticated
+      backend API has been connected.
     */
 
     submitButton.disabled = true;
@@ -190,12 +209,25 @@
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
 
+    const body = document.getElementById(
+      "U9-exchange-modal-body"
+    );
+
+    if (body) {
+      body.scrollTop = 0;
+    }
+
     setExchangeType(exchangeType);
 
     requestAnimationFrame(() => {
-      amountInput.focus({
-        preventScroll: true
-      });
+      if (
+        modal.classList.contains("is-open") &&
+        amountInput
+      ) {
+        amountInput.focus({
+          preventScroll: true
+        });
+      }
     });
   }
 
@@ -212,23 +244,14 @@
      REGISTER WINDOW
   ========================= */
 
-  if (
-    !window.U9WindowManager ||
-    typeof window.U9WindowManager.register !== "function"
-  ) {
-    console.error(
-      "U9 Exchange Modal: Window Manager is not available."
-    );
-
-    return;
-  }
-
   const registered = window.U9WindowManager.register(
     "exchange-modal",
     {
       open: openExchangeModal,
       close: closeExchangeModal,
-      isOpen: () => modal.classList.contains("is-open")
+
+      isOpen: () =>
+        modal.classList.contains("is-open")
     }
   );
 
@@ -241,49 +264,83 @@
   }
 
   /* =========================
-     TOOL BUTTON
+     OPEN FROM AUCTION TOOL
   ========================= */
 
-  auctionToolButton.addEventListener("click", async () => {
-    await window.U9WindowManager.open(
-      "exchange-modal"
-    );
-  });
+  auctionToolButton.addEventListener(
+    "click",
+    async () => {
+      try {
+        await window.U9WindowManager.open(
+          "exchange-modal"
+        );
+      } catch (error) {
+        console.error(
+          "U9 Exchange Modal: Failed to open.",
+          error
+        );
+      }
+    }
+  );
 
   /* =========================
-     CLOSE BUTTON
+     CLOSE BUTTON ONLY
   ========================= */
 
-  closeButton.addEventListener("click", async () => {
-    await window.U9WindowManager.close(
-      "exchange-modal"
-    );
-  });
+  closeButton.addEventListener(
+    "click",
+    async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      try {
+        await window.U9WindowManager.close(
+          "exchange-modal"
+        );
+      } catch (error) {
+        console.error(
+          "U9 Exchange Modal: Failed to close.",
+          error
+        );
+      }
+    }
+  );
 
   /* =========================
-     OVERLAY CLICK
+     OVERLAY
+     Intentionally has NO click-to-close handler.
   ========================= */
 
-  overlay.addEventListener("click", async () => {
-    await window.U9WindowManager.close(
-      "exchange-modal"
-    );
-  });
+  /* Do not add an overlay click listener here. */
 
   /* =========================
      ESCAPE KEY
   ========================= */
 
-  document.addEventListener("keydown", async (event) => {
-    if (
-      event.key === "Escape" &&
-      window.U9WindowManager.isOpen("exchange-modal")
-    ) {
-      await window.U9WindowManager.close(
-        "exchange-modal"
-      );
+  document.addEventListener(
+    "keydown",
+    async (event) => {
+      if (
+        event.key !== "Escape" ||
+        !modal.classList.contains("is-open")
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+
+      try {
+        await window.U9WindowManager.close(
+          "exchange-modal"
+        );
+      } catch (error) {
+        console.error(
+          "U9 Exchange Modal: Failed to close with Escape.",
+          error
+        );
+      }
     }
-  });
+  );
 
   /* =========================
      AMOUNT INPUT
@@ -294,9 +351,8 @@
     resetPreview();
 
     /*
-      Do not calculate money locally yet.
-      Preview calculations will use values
-      returned by the backend configuration.
+      Preview calculations will be added when
+      backend configuration is connected.
     */
   });
 
@@ -316,6 +372,7 @@
      INITIAL STATE
   ========================= */
 
+  modal.classList.remove("is-open");
   modal.setAttribute("aria-hidden", "true");
 
   setExchangeType("balance_to_coins");
