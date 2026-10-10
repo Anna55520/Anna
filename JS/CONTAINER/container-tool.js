@@ -18,54 +18,37 @@ const menuButton =
 /* =========================
    HEADER TOOL TOGGLE
 ========================= */
+if (containerToolHeaderToggle && tool) {
+  containerToolHeaderToggle.textContent = "˄";
 
-const containerToolHeaderToggle =
-  document.getElementById(
-    "U9-page-header-tool-toggle"
-  );
-
-if (tool) {
-  // 工具栏默认展开
-  tool.classList.remove(
-    "container-tool-collapsed"
-  );
-
-  // 默认显示 PAGE MENU
-  tool.classList.add("menu-open");
-}
-
-if (headerToolToggle && tool) {
-  headerToolToggle.textContent = "˄";
-  headerToolToggle.setAttribute(
+  containerToolHeaderToggle.setAttribute(
     "aria-expanded",
     "true"
   );
-  headerToolToggle.setAttribute(
+
+  containerToolHeaderToggle.setAttribute(
     "aria-label",
     "Hide toolbar"
   );
 
-  headerToolToggle.addEventListener(
+  containerToolHeaderToggle.addEventListener(
     "click",
     function () {
-      const collapsed =
-        tool.classList.toggle(
-          "container-tool-collapsed"
-        );
+      const collapsed = tool.classList.toggle(
+        "container-tool-collapsed"
+      );
 
-      headerToolToggle.textContent =
+      containerToolHeaderToggle.textContent =
         collapsed ? "˅" : "˄";
 
-      headerToolToggle.setAttribute(
+      containerToolHeaderToggle.setAttribute(
         "aria-expanded",
         String(!collapsed)
       );
 
-      headerToolToggle.setAttribute(
+      containerToolHeaderToggle.setAttribute(
         "aria-label",
-        collapsed
-          ? "Show toolbar"
-          : "Hide toolbar"
+        collapsed ? "Show toolbar" : "Hide toolbar"
       );
     }
   );
