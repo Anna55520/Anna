@@ -19,11 +19,38 @@ const menuButton =
    HEADER TOOL TOGGLE
 ========================= */
 
-// 注意：使用独立变量名，避免与 header.js 冲突
+// 使用独立变量名，避免与 header.js 冲突
 const containerToolHeaderToggle =
   document.getElementById(
     "U9-page-header-tool-toggle"
   );
+
+// 设置 SVG 图标
+function setToolToggleIcon(collapsed) {
+  if (!containerToolHeaderToggle) return;
+
+  containerToolHeaderToggle.innerHTML = collapsed
+    ? `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    `
+    : `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 15l6-6 6 6" />
+      </svg>
+    `;
+
+  containerToolHeaderToggle.setAttribute(
+    "aria-expanded",
+    String(!collapsed)
+  );
+
+  containerToolHeaderToggle.setAttribute(
+    "aria-label",
+    collapsed ? "Show toolbar" : "Hide toolbar"
+  );
+}
 
 if (tool) {
   // 工具栏默认展开
@@ -32,26 +59,12 @@ if (tool) {
   );
 
   // 默认显示 PAGE MENU
-  tool.classList.add(
-    "menu-open"
-  );
+  tool.classList.add("menu-open");
 }
 
-if (
-  containerToolHeaderToggle &&
-  tool
-) {
-  containerToolHeaderToggle.textContent = "˄";
-
-  containerToolHeaderToggle.setAttribute(
-    "aria-expanded",
-    "true"
-  );
-
-  containerToolHeaderToggle.setAttribute(
-    "aria-label",
-    "Hide toolbar"
-  );
+if (containerToolHeaderToggle && tool) {
+  // 初始化为展开状态
+  setToolToggleIcon(false);
 
   containerToolHeaderToggle.addEventListener(
     "click",
@@ -61,120 +74,45 @@ if (
           "container-tool-collapsed"
         );
 
-      const homePage =
-        document.getElementById("U9-page-home");
+      // 同步页面布局
+      const pageClasses = [
+        ["U9-page-home", "home-toolbar-collapsed"],
+        ["U9-page-shop", "shop-toolbar-collapsed"],
+        ["U9-page-auction", "auction-toolbar-collapsed"],
+        ["U9-page-test1", "test1-toolbar-collapsed"],
+        ["U9-page-test2", "test2-toolbar-collapsed"]
+      ];
 
-      if (homePage) {
-        homePage.classList.toggle(
-          "home-toolbar-collapsed",
-          collapsed
-        );
-      }
+      pageClasses.forEach(function (item) {
+        const page = document.getElementById(item[0]);
 
-      const shopPage =
-        document.getElementById("U9-page-shop");
+        if (page) {
+          page.classList.toggle(item[1], collapsed);
+        }
+      });
 
-      if (shopPage) {
-        shopPage.classList.toggle(
-          "shop-toolbar-collapsed",
-          collapsed
-        );
-      }
+      // 同步普通窗口布局
+      const modalClasses = [
+        ["U9-history-normal-modal", "history-toolbar-collapsed"],
+        ["U9-gift-normal-modal", "gift-toolbar-collapsed"],
+        ["U9-inbox-normal-modal", "inbox-toolbar-collapsed"],
+        ["U9-message-normal-modal", "message-toolbar-collapsed"]
+      ];
 
-      const auctionPage =
-        document.getElementById("U9-page-auction");
+      modalClasses.forEach(function (item) {
+        const modal = document.getElementById(item[0]);
 
-      if (auctionPage) {
-        auctionPage.classList.toggle(
-          "auction-toolbar-collapsed",
-          collapsed
-        );
-      }
+        if (modal) {
+          modal.classList.toggle(item[1], collapsed);
+        }
+      });
 
-      const test1Page =
-        document.getElementById("U9-page-test1");
-
-      if (test1Page) {
-        test1Page.classList.toggle(
-          "test1-toolbar-collapsed",
-          collapsed
-        );
-      }
-
-      const test2Page =
-        document.getElementById("U9-page-test2");
-
-      if (test2Page) {
-        test2Page.classList.toggle(
-          "test2-toolbar-collapsed",
-          collapsed
-        );
-      }
-
-      const historyModal =
-        document.getElementById(
-          "U9-history-normal-modal"
-        );
-
-      if (historyModal) {
-        historyModal.classList.toggle(
-          "history-toolbar-collapsed",
-          collapsed
-        );
-      }
-
-      const giftModal =
-        document.getElementById(
-          "U9-gift-normal-modal"
-        );
-
-      if (giftModal) {
-        giftModal.classList.toggle(
-          "gift-toolbar-collapsed",
-          collapsed
-        );
-      }
-
-      const inboxModal =
-        document.getElementById(
-          "U9-inbox-normal-modal"
-        );
-
-      if (inboxModal) {
-        inboxModal.classList.toggle(
-          "inbox-toolbar-collapsed",
-          collapsed
-        );
-      }
-
-      const messageModal =
-        document.getElementById(
-          "U9-message-normal-modal"
-        );
-
-      if (messageModal) {
-        messageModal.classList.toggle(
-          "message-toolbar-collapsed",
-          collapsed
-        );
-      }
-      containerToolHeaderToggle.textContent =
-        collapsed ? "˅" : "˄";
-
-      containerToolHeaderToggle.setAttribute(
-        "aria-expanded",
-        String(!collapsed)
-      );
-
-      containerToolHeaderToggle.setAttribute(
-        "aria-label",
-        collapsed
-          ? "Show toolbar"
-          : "Hide toolbar"
-      );
+      // 更新 SVG 箭头及无障碍属性
+      setToolToggleIcon(collapsed);
     }
   );
 }
+
 
 
 /* =========================
