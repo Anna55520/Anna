@@ -309,3 +309,20 @@
     transition: none;
   }
 }
+
+/* =========================
+   HISTORY ORDER OVERFLOW FIX
+========================= */
+
+#History-model-pages {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+#History-model-Order-Page {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: clip;
+}
