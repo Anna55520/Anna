@@ -1,1 +1,343 @@
 
+/* =========================
+   U9 EXCHANGE MODAL
+========================= */
+
+#U9-exchange-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 20px;
+  box-sizing: border-box;
+
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+
+  transition:
+    opacity 0.22s ease,
+    visibility 0.22s ease;
+}
+
+#U9-exchange-modal.is-open {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* OVERLAY */
+
+#U9-exchange-modal-overlay {
+  position: absolute;
+  inset: 0;
+
+  background: rgba(0, 0, 0, 0.58);
+  cursor: pointer;
+}
+
+/* CONTENT */
+
+#U9-exchange-modal-content {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  max-width: 430px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+
+  padding: 22px;
+  box-sizing: border-box;
+
+  color: #222;
+  background: #fff;
+  border-radius: 18px;
+
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.25);
+
+  transform: translateY(12px) scale(0.98);
+  transition: transform 0.22s ease;
+}
+
+#U9-exchange-modal.is-open
+#U9-exchange-modal-content {
+  transform: translateY(0) scale(1);
+}
+
+/* HEADER */
+
+#U9-exchange-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  margin-bottom: 22px;
+}
+
+#U9-exchange-modal-title {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 700;
+}
+
+#U9-exchange-modal-close {
+  flex: 0 0 auto;
+
+  width: 36px;
+  height: 36px;
+  padding: 0;
+
+  border: 0;
+  border-radius: 50%;
+
+  color: #333;
+  background: #f1f1f1;
+
+  font-size: 26px;
+  line-height: 1;
+
+  cursor: pointer;
+}
+
+#U9-exchange-modal-close:hover {
+  background: #e5e5e5;
+}
+
+/* DIRECTION */
+
+#U9-exchange-direction {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+
+  margin-bottom: 20px;
+}
+
+.U9-exchange-direction-button {
+  min-height: 44px;
+  padding: 10px 8px;
+
+  border: 1px solid #dedede;
+  border-radius: 10px;
+
+  color: #555;
+  background: #fff;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition:
+    color 0.18s ease,
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.U9-exchange-direction-button.active {
+  color: #fff;
+  background: #222;
+  border-color: #222;
+}
+
+/* RATE INFORMATION */
+
+#U9-exchange-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 14px;
+  margin-bottom: 20px;
+
+  background: #f7f7f7;
+  border-radius: 12px;
+}
+
+.U9-exchange-info-row,
+.U9-exchange-preview-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  font-size: 13px;
+}
+
+.U9-exchange-info-row span,
+.U9-exchange-preview-row span {
+  color: #666;
+}
+
+.U9-exchange-info-row strong,
+.U9-exchange-preview-row strong {
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+/* AMOUNT */
+
+#U9-exchange-form {
+  display: flex;
+  flex-direction: column;
+}
+
+#U9-exchange-amount-label {
+  margin-bottom: 8px;
+
+  font-size: 14px;
+  font-weight: 600;
+}
+
+#U9-exchange-amount {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+  outline: none;
+
+  background: #fff;
+  color: #222;
+
+  font-size: 16px;
+}
+
+#U9-exchange-amount:focus {
+  border-color: #555;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06);
+}
+
+#U9-exchange-available {
+  margin-top: 9px;
+
+  color: #777;
+  font-size: 12px;
+}
+
+#U9-exchange-available-value {
+  color: #333;
+}
+
+/* PREVIEW */
+
+#U9-exchange-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+
+  padding: 16px;
+  margin-top: 20px;
+
+  border: 1px solid #ededed;
+  border-radius: 12px;
+}
+
+.U9-exchange-preview-row.total {
+  padding-top: 13px;
+  border-top: 1px solid #e5e5e5;
+
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.U9-exchange-preview-row.total strong {
+  color: #16834a;
+}
+
+/* MESSAGE */
+
+#U9-exchange-message {
+  display: none;
+
+  margin-top: 14px;
+  padding: 10px 12px;
+
+  border-radius: 8px;
+
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#U9-exchange-message.is-visible {
+  display: block;
+}
+
+#U9-exchange-message.is-error {
+  color: #a12626;
+  background: #fff0f0;
+}
+
+#U9-exchange-message.is-success {
+  color: #176b3a;
+  background: #eaf8ef;
+}
+
+/* SUBMIT */
+
+#U9-exchange-submit {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 18px;
+  padding: 12px 16px;
+
+  border: 0;
+  border-radius: 10px;
+
+  color: #fff;
+  background: #222;
+
+  font-size: 15px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
+
+#U9-exchange-submit:hover:not(:disabled) {
+  background: #444;
+}
+
+#U9-exchange-submit:disabled {
+  color: #888;
+  background: #dedede;
+  cursor: not-allowed;
+}
+
+/* MOBILE */
+
+@media (max-width: 480px) {
+  #U9-exchange-modal {
+    padding: 12px;
+  }
+
+  #U9-exchange-modal-content {
+    max-height: calc(100vh - 24px);
+    padding: 18px;
+    border-radius: 15px;
+  }
+
+  #U9-exchange-modal-title {
+    font-size: 21px;
+  }
+
+  .U9-exchange-direction-button {
+    font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #U9-exchange-modal,
+  #U9-exchange-modal-content,
+  .U9-exchange-direction-button {
+    transition: none;
+  }
+}
