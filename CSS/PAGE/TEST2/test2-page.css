@@ -1,38 +1,50 @@
+
 /* =========================
    TEST2 PAGE
 ========================= */
 
 #U9-page-test2 {
-
   position: relative;
-
   width: 100%;
-
   min-height: calc(100vh - 115px);
-
   box-sizing: border-box;
-
   margin-top: 115px;
-
   background-color: #00e1ff;
-
+  transition: margin-top 0.35s ease, min-height 0.35s ease;
 }
 
+/* =========================
+   TOOLBAR COLLAPSED
+========================= */
+
+#U9-page-test2.test2-toolbar-collapsed {
+  margin-top: 60px;
+  min-height: calc(100vh - 60px);
+}
 
 /* =========================
    MOBILE
 ========================= */
 
 @media (max-width: 480px) {
-
   #U9-page-test2 {
-
     width: 100%;
-
     min-height: calc(100vh - 115px);
-
     margin-top: 115px;
-
   }
 
+  #U9-page-test2.test2-toolbar-collapsed {
+    margin-top: 60px;
+    min-height: calc(100vh - 60px);
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
+
+@media (prefers-reduced-motion: reduce) {
+  #U9-page-test2 {
+    transition: none;
+  }
 }
