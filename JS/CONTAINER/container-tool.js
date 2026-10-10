@@ -8,7 +8,6 @@ const tool =
     "U9-page-container-tool"
   );
 
-
 const menuButton =
   document.getElementById(
     "U9-page-container-tool-menu"
@@ -18,7 +17,29 @@ const menuButton =
 /* =========================
    HEADER TOOL TOGGLE
 ========================= */
-if (containerToolHeaderToggle && tool) {
+
+// 注意：使用独立变量名，避免与 header.js 冲突
+const containerToolHeaderToggle =
+  document.getElementById(
+    "U9-page-header-tool-toggle"
+  );
+
+if (tool) {
+  // 工具栏默认展开
+  tool.classList.remove(
+    "container-tool-collapsed"
+  );
+
+  // 默认显示 PAGE MENU
+  tool.classList.add(
+    "menu-open"
+  );
+}
+
+if (
+  containerToolHeaderToggle &&
+  tool
+) {
   containerToolHeaderToggle.textContent = "˄";
 
   containerToolHeaderToggle.setAttribute(
@@ -34,9 +55,10 @@ if (containerToolHeaderToggle && tool) {
   containerToolHeaderToggle.addEventListener(
     "click",
     function () {
-      const collapsed = tool.classList.toggle(
-        "container-tool-collapsed"
-      );
+      const collapsed =
+        tool.classList.toggle(
+          "container-tool-collapsed"
+        );
 
       containerToolHeaderToggle.textContent =
         collapsed ? "˅" : "˄";
@@ -48,11 +70,14 @@ if (containerToolHeaderToggle && tool) {
 
       containerToolHeaderToggle.setAttribute(
         "aria-label",
-        collapsed ? "Show toolbar" : "Hide toolbar"
+        collapsed
+          ? "Show toolbar"
+          : "Hide toolbar"
       );
     }
   );
 }
+
 
 /* =========================
    PROFILE BUTTON
@@ -73,18 +98,15 @@ const messageButton =
     "U9-page-container-tool-message"
   );
 
-
 const inboxButton =
   document.getElementById(
     "U9-page-container-tool-inbox"
   );
 
-
 const giftButton =
   document.getElementById(
     "U9-page-container-tool-gift"
   );
-
 
 const historyButton =
   document.getElementById(
@@ -101,24 +123,20 @@ const homeButton =
     "U9-page-container-tool-home"
   );
 
-
 const shopButton =
   document.getElementById(
     "U9-page-container-tool-shop-page"
   );
-
 
 const auctionButton =
   document.getElementById(
     "U9-page-container-tool-auction"
   );
 
-
 const test1Button =
   document.getElementById(
     "U9-page-container-tool-test1"
   );
-
 
 const test2Button =
   document.getElementById(
@@ -135,7 +153,6 @@ const pagePrevButton =
     "U9-page-container-tool-pages-prev"
   );
 
-
 const pageNextButton =
   document.getElementById(
     "U9-page-container-tool-pages-next"
@@ -147,9 +164,7 @@ const pageNextButton =
 ========================= */
 
 function getWindowManager() {
-
   return window.U9WindowManager || null;
-
 }
 
 
@@ -158,22 +173,14 @@ function getWindowManager() {
 ========================= */
 
 async function closeCurrentWindow() {
-
   const manager =
     getWindowManager();
 
-
-  if (
-    !manager
-  ) {
-
+  if (!manager) {
     return true;
-
   }
 
-
   return await manager.closeCurrent();
-
 }
 
 
@@ -184,24 +191,16 @@ async function closeCurrentWindow() {
 async function openContainerWindow(
   windowName
 ) {
-
   const manager =
     getWindowManager();
 
-
-  if (
-    !manager
-  ) {
-
+  if (!manager) {
     return false;
-
   }
-
 
   return await manager.open(
     windowName
   );
-
 }
 
 
@@ -213,29 +212,22 @@ function playToolAnimation(
   button,
   animation
 ) {
-
   if (
     !button ||
     !animation
   ) {
-
     return;
-
   }
-
 
   button.classList.remove(
     animation
   );
 
-
   void button.offsetWidth;
-
 
   button.classList.add(
     animation
   );
-
 }
 
 
@@ -243,27 +235,20 @@ function playToolAnimation(
    MESSAGE BUTTON
 ========================= */
 
-if (
-  messageButton
-) {
-
+if (messageButton) {
   messageButton.addEventListener(
     "click",
     function () {
-
       playToolAnimation(
         messageButton,
         "message-bounce"
       );
 
-
       openContainerWindow(
         "message"
       );
-
     }
   );
-
 }
 
 
@@ -271,27 +256,20 @@ if (
    INBOX BUTTON
 ========================= */
 
-if (
-  inboxButton
-) {
-
+if (inboxButton) {
   inboxButton.addEventListener(
     "click",
     function () {
-
       playToolAnimation(
         inboxButton,
         "inbox-shake"
       );
 
-
       openContainerWindow(
         "inbox"
       );
-
     }
   );
-
 }
 
 
@@ -299,27 +277,20 @@ if (
    GIFT BUTTON
 ========================= */
 
-if (
-  giftButton
-) {
-
+if (giftButton) {
   giftButton.addEventListener(
     "click",
     function () {
-
       playToolAnimation(
         giftButton,
         "gift-bounce"
       );
 
-
       openContainerWindow(
         "gift"
       );
-
     }
   );
-
 }
 
 
@@ -327,27 +298,20 @@ if (
    HISTORY BUTTON
 ========================= */
 
-if (
-  historyButton
-) {
-
+if (historyButton) {
   historyButton.addEventListener(
     "click",
     function () {
-
       playToolAnimation(
         historyButton,
         "history-shake"
       );
 
-
       openContainerWindow(
         "history"
       );
-
     }
   );
-
 }
 
 
@@ -355,17 +319,12 @@ if (
    MENU
 ========================= */
 
-if (
-  menuButton
-) {
-
+if (menuButton) {
   menuButton.addEventListener(
     "click",
     async function () {
-
       const manager =
         getWindowManager();
-
 
       /*
          If a Window is open,
@@ -376,36 +335,23 @@ if (
         manager &&
         manager.getCurrent()
       ) {
-
         const closed =
           await closeCurrentWindow();
 
-
-        if (
-          !closed
-        ) {
-
+        if (!closed) {
           return;
-
         }
-
       }
-
 
       /*
          Open / close menu
       */
 
-      if (
-        tool
-      ) {
-
+      if (tool) {
         tool.classList.toggle(
           "menu-open"
         );
-
       }
-
 
       /*
          Menu animation
@@ -415,17 +361,13 @@ if (
         "menu-heartbeat"
       );
 
-
       void menuButton.offsetWidth;
-
 
       menuButton.classList.add(
         "menu-heartbeat"
       );
-
     }
   );
-
 }
 
 
@@ -442,7 +384,6 @@ if (
 */
 
 async function openProfileFromContainerTool() {
-
   /*
      Check U9 user state
   */
@@ -452,19 +393,14 @@ async function openProfileFromContainerTool() {
     typeof window.U9User.isLoggedIn ===
       "function"
   ) {
-
     const loggedIn =
       window.U9User.isLoggedIn();
-
 
     /*
        NOT LOGGED IN
     */
 
-    if (
-      !loggedIn
-    ) {
-
+    if (!loggedIn) {
       /*
          Prefer the existing
          Login Modal function.
@@ -474,13 +410,9 @@ async function openProfileFromContainerTool() {
         typeof window.openLoginModal ===
         "function"
       ) {
-
         window.openLoginModal();
-
         return;
-
       }
-
 
       /*
          Fallback:
@@ -493,22 +425,13 @@ async function openProfileFromContainerTool() {
           "U9-page-header-login"
         );
 
-
-      if (
-        loginButton
-      ) {
-
+      if (loginButton) {
         loginButton.click();
-
       }
 
-
       return;
-
     }
-
   }
-
 
   /*
      LOGGED IN
@@ -518,40 +441,27 @@ async function openProfileFromContainerTool() {
   const manager =
     getWindowManager();
 
-
-  if (
-    !manager
-  ) {
-
+  if (!manager) {
     return;
-
   }
-
 
   await manager.open(
     "profile"
   );
-
 }
 
 
 /* =========================
-   PROFILE BUTTON
+   PROFILE BUTTON EVENT
 ========================= */
 
-if (
-  profileButton
-) {
-
+if (profileButton) {
   profileButton.addEventListener(
     "click",
     function () {
-
       openProfileFromContainerTool();
-
     }
   );
-
 }
 
 
@@ -569,17 +479,11 @@ const pageWindowSize = 3;
 ========================= */
 
 const pageButtons = [
-
   homeButton,
-
   shopButton,
-
   auctionButton,
-
   test1Button,
-
   test2Button
-
 ];
 
 
@@ -590,37 +494,23 @@ const pageButtons = [
 function setActivePageButton(
   activeButton
 ) {
-
   pageButtons.forEach(
     function (button) {
-
-      if (
-        !button
-      ) {
-
+      if (!button) {
         return;
-
       }
-
 
       button.classList.remove(
         "active"
       );
-
     }
   );
 
-
-  if (
-    activeButton
-  ) {
-
+  if (activeButton) {
     activeButton.classList.add(
       "active"
     );
-
   }
-
 }
 
 
@@ -629,21 +519,14 @@ function setActivePageButton(
 ========================= */
 
 function renderPageWindow() {
-
   pageButtons.forEach(
     function (
       button,
       index
     ) {
-
-      if (
-        !button
-      ) {
-
+      if (!button) {
         return;
-
       }
-
 
       const visible =
         index >= pageWindowStart &&
@@ -651,15 +534,12 @@ function renderPageWindow() {
           pageWindowStart +
           pageWindowSize;
 
-
       button.style.display =
         visible
           ? "flex"
           : "none";
-
     }
   );
-
 }
 
 
@@ -667,58 +547,39 @@ function renderPageWindow() {
    OPEN HOME PAGE
 ========================= */
 
-if (
-  homeButton
-) {
-
+if (homeButton) {
   homeButton.addEventListener(
     "click",
     async function () {
-
       const manager =
         getWindowManager();
-
 
       if (
         manager &&
         manager.getCurrent()
       ) {
-
         const closed =
           await closeCurrentWindow();
 
-
-        if (
-          !closed
-        ) {
-
+        if (!closed) {
           return;
-
         }
-
       }
-
 
       if (
         typeof window.openHomePage !==
         "function"
       ) {
-
         return;
-
       }
-
 
       setActivePageButton(
         homeButton
       );
 
-
       window.openHomePage();
-
     }
   );
-
 }
 
 
@@ -726,58 +587,39 @@ if (
    OPEN SHOP PAGE
 ========================= */
 
-if (
-  shopButton
-) {
-
+if (shopButton) {
   shopButton.addEventListener(
     "click",
     async function () {
-
       const manager =
         getWindowManager();
-
 
       if (
         manager &&
         manager.getCurrent()
       ) {
-
         const closed =
           await closeCurrentWindow();
 
-
-        if (
-          !closed
-        ) {
-
+        if (!closed) {
           return;
-
         }
-
       }
-
 
       if (
         typeof window.openShopPage !==
         "function"
       ) {
-
         return;
-
       }
-
 
       setActivePageButton(
         shopButton
       );
 
-
       window.openShopPage();
-
     }
   );
-
 }
 
 
@@ -785,58 +627,39 @@ if (
    OPEN AUCTION PAGE
 ========================= */
 
-if (
-  auctionButton
-) {
-
+if (auctionButton) {
   auctionButton.addEventListener(
     "click",
     async function () {
-
       const manager =
         getWindowManager();
-
 
       if (
         manager &&
         manager.getCurrent()
       ) {
-
         const closed =
           await closeCurrentWindow();
 
-
-        if (
-          !closed
-        ) {
-
+        if (!closed) {
           return;
-
         }
-
       }
-
 
       if (
         typeof window.openAuctionPage !==
         "function"
       ) {
-
         return;
-
       }
-
 
       setActivePageButton(
         auctionButton
       );
 
-
       window.openAuctionPage();
-
     }
   );
-
 }
 
 
@@ -844,58 +667,39 @@ if (
    OPEN TEST 1 PAGE
 ========================= */
 
-if (
-  test1Button
-) {
-
+if (test1Button) {
   test1Button.addEventListener(
     "click",
     async function () {
-
       const manager =
         getWindowManager();
-
 
       if (
         manager &&
         manager.getCurrent()
       ) {
-
         const closed =
           await closeCurrentWindow();
 
-
-        if (
-          !closed
-        ) {
-
+        if (!closed) {
           return;
-
         }
-
       }
-
 
       if (
         typeof window.openTest1Page !==
         "function"
       ) {
-
         return;
-
       }
-
 
       setActivePageButton(
         test1Button
       );
 
-
       window.openTest1Page();
-
     }
   );
-
 }
 
 
@@ -903,58 +707,39 @@ if (
    OPEN TEST 2 PAGE
 ========================= */
 
-if (
-  test2Button
-) {
-
+if (test2Button) {
   test2Button.addEventListener(
     "click",
     async function () {
-
       const manager =
         getWindowManager();
-
 
       if (
         manager &&
         manager.getCurrent()
       ) {
-
         const closed =
           await closeCurrentWindow();
 
-
-        if (
-          !closed
-        ) {
-
+        if (!closed) {
           return;
-
         }
-
       }
-
 
       if (
         typeof window.openTest2Page !==
         "function"
       ) {
-
         return;
-
       }
-
 
       setActivePageButton(
         test2Button
       );
 
-
       window.openTest2Page();
-
     }
   );
-
 }
 
 
@@ -978,29 +763,21 @@ setActivePageButton(
    NEXT PAGE WINDOW
 ========================= */
 
-if (
-  pageNextButton
-) {
-
+if (pageNextButton) {
   pageNextButton.addEventListener(
     "click",
     function () {
-
       if (
         pageWindowStart <
         pageButtons.length -
-        pageWindowSize
+          pageWindowSize
       ) {
-
         pageWindowStart++;
 
         renderPageWindow();
-
       }
-
     }
   );
-
 }
 
 
@@ -1008,26 +785,15 @@ if (
    PREVIOUS PAGE WINDOW
 ========================= */
 
-if (
-  pagePrevButton
-) {
-
+if (pagePrevButton) {
   pagePrevButton.addEventListener(
     "click",
     function () {
-
-      if (
-        pageWindowStart >
-        0
-      ) {
-
+      if (pageWindowStart > 0) {
         pageWindowStart--;
 
         renderPageWindow();
-
       }
-
     }
   );
-
 }
