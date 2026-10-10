@@ -1,55 +1,50 @@
+
 /* =========================
    HOME PAGE
 ========================= */
 
 #U9-page-home {
-
   position: relative;
-
   width: 100%;
-
   min-height: calc(100vh - 115px);
-
   box-sizing: border-box;
-
   margin-top: 115px;
-
   background-color: #f575c8;
 
+  transition:
+    margin-top 0.35s ease,
+    min-height 0.35s ease;
 }
 
+/* =========================
+   TOOLBAR COLLAPSED
+========================= */
+
+#U9-page-home.home-toolbar-collapsed {
+  margin-top: 60px;
+  min-height: calc(100vh - 60px);
+}
 
 /* =========================
    MOBILE
 ========================= */
 
 @media (max-width: 480px) {
-
   #U9-page-home {
-
     width: 100%;
-
     min-height: calc(100vh - 115px);
-
     margin-top: 115px;
-
   }
 
+  #U9-page-home.home-toolbar-collapsed {
+    margin-top: 60px;
+    min-height: calc(100vh - 60px);
+  }
 }
-
 
 /* =========================
-   HOME PAGE TOOLBAR SYNC
+   REDUCED MOTION
 ========================= */
-
-#U9-page-home {
-  transition: transform 0.35s ease;
-  transform: translateY(0);
-}
-
-#U9-page-home.home-toolbar-collapsed {
-  transform: translateY(-55px);
-}
 
 @media (prefers-reduced-motion: reduce) {
   #U9-page-home {
