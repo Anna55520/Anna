@@ -1081,3 +1081,14 @@ button:not(#U9-page-container-tool-search-button):hover {
     transition: none;
   }
 }
+
+
+/* =========================
+   HIDE SEARCH WHEN MENU OPEN
+========================= */
+
+#U9-page-container-tool.menu-open
+#U9-page-container-tool-search {
+  visibility: hidden;
+  pointer-events: none;
+}
