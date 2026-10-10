@@ -1082,6 +1082,28 @@ button:not(#U9-page-container-tool-search-button):hover {
   }
 }
 
+/* =========================
+   HEADER TOOL TOGGLE SVG
+========================= */
+
+#U9-page-header-tool-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#U9-page-header-tool-toggle svg {
+  display: block;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
 
 /* =========================
    HIDE SEARCH WHEN MENU OPEN
