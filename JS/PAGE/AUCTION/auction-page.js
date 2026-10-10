@@ -2513,7 +2513,6 @@
   window.openAuctionPage =
     openAuctionPage;
 
-
   window.U9Auction = {
 
     refresh:
@@ -2529,7 +2528,10 @@
       getUserId,
 
     getSupabase:
-      getSupabase
+      getSupabase,
+
+    updateCoins:
+      updateCoins
   };
 
 
