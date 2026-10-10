@@ -28,6 +28,11 @@
 
   overflow: hidden;
 
+  transform: translateY(0);
+
+  transition:
+    transform 0.35s ease;
+
 
   /* =========================
      CONTAINER TOOL BUTTON COLORS
@@ -1060,4 +1065,19 @@ button:not(#U9-page-container-tool-search-button):hover {
 
   }
 
+}
+
+
+/* =========================
+   CONTAINER TOOL COLLAPSE
+========================= */
+
+#U9-page-container-tool.container-tool-collapsed {
+  transform: translateY(calc(-100% - 1px));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #U9-page-container-tool {
+    transition: none;
+  }
 }
