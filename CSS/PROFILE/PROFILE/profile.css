@@ -1,3 +1,4 @@
+
 /* =========================
    PROFILE MODAL
 ========================= */
@@ -8,40 +9,20 @@
 ========================= */
 
 #U9-profile-modal {
-
   position: fixed;
-
   top: 60px;
-
   left: 0;
-
   width: 100%;
-
   height: calc(100vh - 60px);
-
   box-sizing: border-box;
-
   display: flex;
-
   justify-content: center;
-
   align-items: stretch;
-
-  background-color: rgba(
-    0,
-    0,
-    0,
-    0.18
-  );
-
+  background-color: rgba(0, 0, 0, 0.18);
   z-index: 1200;
-
   overflow: hidden;
-
   visibility: hidden;
-
   pointer-events: none;
-
 }
 
 
@@ -50,24 +31,14 @@
 ========================= */
 
 #U9-profile-modal-content {
-
   position: relative;
-
   width: 100%;
-
   height: 100%;
-
   box-sizing: border-box;
-
   background-color: #ffffff;
-
   overflow: hidden;
-
   transform: translateY(100%);
-
-  transition:
-    transform 0.45s ease;
-
+  transition: transform 0.45s ease;
 }
 
 
@@ -76,19 +47,13 @@
 ========================= */
 
 #U9-profile-modal.modal-open {
-
   visibility: visible;
-
   pointer-events: auto;
-
 }
-
 
 #U9-profile-modal.modal-open
 #U9-profile-modal-content {
-
   transform: translateY(0);
-
 }
 
 
@@ -97,19 +62,13 @@
 ========================= */
 
 #U9-profile-modal.modal-closing {
-
   visibility: visible;
-
   pointer-events: none;
-
 }
-
 
 #U9-profile-modal.modal-closing
 #U9-profile-modal-content {
-
   transform: translateY(100%);
-
 }
 
 
@@ -118,30 +77,16 @@
 ========================= */
 
 #U9-profile-modal-header {
-
   position: relative;
-
   width: 100%;
-
   height: 55px;
-
   box-sizing: border-box;
-
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
-  padding:
-    0
-    60px;
-
+  padding: 0 60px;
   background-color: #77ace9;
-
-  border-bottom:
-    1px solid #eeeeee;
-
+  border-bottom: 1px solid #eeeeee;
 }
 
 
@@ -150,59 +95,35 @@
 ========================= */
 
 #U9-profile-modal-close {
-
   position: absolute;
-
   top: 50%;
-
   left: 15px;
-
   width: 36px;
-
   height: 36px;
-
   padding: 0;
-
   border: none;
-
   outline: none;
-
   border-radius: 50%;
-
   background-color: #f1f1f100;
-
   cursor: pointer;
-
-  transform:
-    translateY(-50%);
-
+  transform: translateY(-50%);
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
 }
 
 
 /* =========================
    CLOSE / BACK IMAGE
-   ONLY CLOSE BUTTON IMAGE
 ========================= */
 
 #U9-profile-modal-close
 > #U9-profile-modal-close-icon {
-
   width: 22px;
-
   height: 22px;
-
   object-fit: contain;
-
   display: block;
-
   pointer-events: none;
-
 }
 
 
@@ -211,9 +132,7 @@
 ========================= */
 
 #U9-profile-modal-close:hover {
-
   background-color: #ffffff00;
-
 }
 
 
@@ -222,11 +141,7 @@
 ========================= */
 
 #U9-profile-modal-close:active {
-
-  transform:
-    translateY(-50%)
-    scale(0.94);
-
+  transform: translateY(-50%) scale(0.94);
 }
 
 
@@ -235,45 +150,28 @@
 ========================= */
 
 #U9-profile-modal-title {
-
   position: relative;
-
   font-size: 20px;
-
   font-weight: 600;
-
   line-height: 1;
-
   color: #ffffff;
-
 }
 
 
 /* =========================
    PROFILE RIGHT IMAGE
-   ONLY MODAL RIGHT IMAGE
 ========================= */
 
 #U9-profile-modal
 #U9-profile-modal-icon {
-
   position: absolute;
-
   top: 50%;
-
   right: 15px;
-
   width: 28px;
-
   height: 28px;
-
-  transform:
-    translateY(-50%);
-
+  transform: translateY(-50%);
   object-fit: contain;
-
   display: block;
-
 }
 
 
@@ -282,20 +180,12 @@
 ========================= */
 
 #U9-profile-modal-body {
-
   width: 100%;
-
-  height:
-    calc(100% - 55px);
-
+  height: calc(100% - 55px);
   box-sizing: border-box;
-
   overflow-y: auto;
-
   overflow-x: hidden;
-
   -webkit-overflow-scrolling: touch;
-
 }
 
 
@@ -304,87 +194,47 @@
 ========================= */
 
 #U9-profile-avatar {
-
   position: relative;
-
   width: 130px;
-
   height: 130px;
-
-  margin:
-    55px
-    auto
-    25px
-    auto;
-
+  margin: 55px auto 25px auto;
   flex: 0 0 130px;
-
 }
 
 
 /* =========================
    AVATAR IMAGE
-   ONLY USER AVATAR IMAGE
 ========================= */
 
 #U9-profile-avatar
 > #U9-profile-avatar-image {
-
   position: absolute;
-
   top: 50%;
-
   left: 50%;
-
   width: 105px;
-
   height: 105px;
-
-  transform:
-    translate(
-      -50%,
-      -50%
-    );
-
+  transform: translate(-50%, -50%);
   object-fit: cover;
-
   border-radius: 50%;
-
   display: block;
-
 }
 
 
 /* =========================
    AVATAR FRAME
-   ONLY USER AVATAR FRAME
 ========================= */
 
 #U9-profile-avatar
 > #U9-profile-avatar-frame {
-
   position: absolute;
-
   top: 50%;
-
   left: 50%;
-
   width: 200px;
-
   height: 200px;
-
-  transform:
-    translate(
-      -50%,
-      -50%
-    );
-
+  transform: translate(-50%, -50%);
   display: block;
-
   pointer-events: none;
-
   object-fit: contain;
-
 }
 
 
@@ -393,19 +243,12 @@
 ========================= */
 
 #U9-profile-main {
-
   width: 100%;
-
   min-height: 100%;
-
   box-sizing: border-box;
-
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
 }
 
 
@@ -414,71 +257,58 @@
 ========================= */
 
 #U9-profile-info-loading {
-
   width: 100%;
-
   min-height: 28px;
-
   box-sizing: border-box;
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
 }
 
 
 /* =========================
    PROFILE INFO LOADING IMAGE
-   ONLY PROFILE LOADING IMAGE
 ========================= */
 
 #U9-profile-info-loading
 > img {
-
   width: 70px;
-
   height: 50px;
-
   object-fit: contain;
-
   display: block;
-
 }
 
 
+/* =========================
+   HIDE LOADING INDICATOR
+========================= */
+
 #U9-profile-info-loading.hidden {
-
   display: none;
-
 }
 
 
 /* =========================
    PROFILE INFO
+   KEEP VISIBLE DURING LOADING
 ========================= */
 
 #U9-profile-info {
-
   width: 100%;
-
   box-sizing: border-box;
-
-  display: none;
-
+  display: flex;
   flex-direction: column;
-
   align-items: center;
-
 }
 
 
+/* =========================
+   PROFILE INFO LOADED
+   COMPATIBILITY WITH EXISTING JS
+========================= */
+
 #U9-profile-info.loaded {
-
   display: flex;
-
 }
 
 
@@ -487,31 +317,18 @@
 ========================= */
 
 #U9-profile-username {
-
   width: 100%;
-
   min-height: 28px;
-
   box-sizing: border-box;
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
   margin: 0;
-
   text-align: center;
-
   font-size: 20px;
-
   font-weight: 600;
-
   line-height: 1.4;
-
   color: #222222;
-
 }
 
 
@@ -520,29 +337,17 @@
 ========================= */
 
 #U9-profile-account {
-
   width: 100%;
-
   min-height: 28px;
-
   box-sizing: border-box;
-
   margin-top: 4px;
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
   text-align: center;
-
   font-size: 15px;
-
   font-weight: 400;
-
   color: #777777;
-
 }
 
 
@@ -551,31 +356,16 @@
 ========================= */
 
 #U9-profile-balance-container {
-
   position: relative;
-
-  width:
-    min(
-      400px,
-      calc(100% - 30px)
-    );
-
+  width: min(400px, calc(100% - 30px));
   box-sizing: border-box;
-
   margin-top: 10px;
-
   padding: 20px;
-
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   background-color: #78ace9;
-
   border-radius: 14px;
-
 }
 
 
@@ -584,17 +374,11 @@
 ========================= */
 
 #U9-profile-balance-info {
-
   width: 100%;
-
   box-sizing: border-box;
-
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
 }
 
 
@@ -603,29 +387,17 @@
 ========================= */
 
 #U9-profile-balance-title {
-
   width: 100%;
-
   min-height: 28px;
-
   box-sizing: border-box;
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
   text-align: center;
-
   font-size: 16px;
-
   font-weight: 500;
-
   line-height: 1.2;
-
   color: #ffffff;
-
 }
 
 
@@ -634,21 +406,13 @@
 ========================= */
 
 #U9-profile-balance-value-row {
-
   position: relative;
-
   width: 100%;
-
   min-height: 36px;
-
   box-sizing: border-box;
-
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
 }
 
 
@@ -657,27 +421,16 @@
 ========================= */
 
 #U9-profile-balance {
-
   min-width: 0;
-
   min-height: 28px;
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
   text-align: center;
-
   font-size: 22px;
-
   font-weight: 600;
-
   line-height: 1.2;
-
   color: #ffffff;
-
 }
 
 
@@ -686,9 +439,7 @@
 ========================= */
 
 #U9-profile-balance[hidden] {
-
   display: none !important;
-
 }
 
 
@@ -697,29 +448,17 @@
 ========================= */
 
 #U9-profile-coins {
-
   min-width: 0;
-
   min-height: 28px;
-
   margin: 0;
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
   text-align: center;
-
   font-size: 22px;
-
   font-weight: 600;
-
   line-height: 1.2;
-
   color: #ffffff;
-
 }
 
 
@@ -728,9 +467,7 @@
 ========================= */
 
 #U9-profile-coins[hidden] {
-
   display: none !important;
-
 }
 
 
@@ -739,68 +476,39 @@
 ========================= */
 
 #U9-profile-balance-toggle {
-
   position: absolute;
-
   top: 50%;
-
-  right:
-    calc(
-      (100% - 352px) / 2
-    );
-
+  right: calc((100% - 352px) / 2);
   width: 36px;
-
   height: 36px;
-
   padding: 0;
-
   border: none;
-
   outline: none;
-
   border-radius: 50%;
-
   box-sizing: border-box;
-
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
   background-color: #ffffff00;
-
   cursor: pointer;
-
-  transform:
-    translateY(-50%);
-
+  transform: translateY(-50%);
   transition:
     background-color 0.2s ease,
     transform 0.15s ease;
-
 }
 
 
 /* =========================
    BALANCE / COINS TOGGLE IMAGE
-   ONLY BALANCE TOGGLE IMAGE
 ========================= */
 
 #U9-profile-balance-toggle
 > img {
-
   width: 22px;
-
   height: 22px;
-
   object-fit: contain;
-
   display: block;
-
   pointer-events: none;
-
 }
 
 
@@ -809,9 +517,7 @@
 ========================= */
 
 #U9-profile-balance-toggle:hover {
-
   background-color: #ffffff05;
-
 }
 
 
@@ -820,11 +526,7 @@
 ========================= */
 
 #U9-profile-balance-toggle:active {
-
-  transform:
-    translateY(-50%)
-    scale(0.92);
-
+  transform: translateY(-50%) scale(0.92);
 }
 
 
@@ -833,17 +535,11 @@
 ========================= */
 
 #U9-profile-balance-buttons {
-
   width: 100%;
-
   margin-top: 18px;
-
   display: flex;
-
   justify-content: center;
-
   align-items: center;
-
 }
 
 
@@ -852,23 +548,12 @@
 ========================= */
 
 #U9-profile-buttons {
-
   width: 100%;
-
   box-sizing: border-box;
-
-  margin:
-    15px
-    0
-    25px
-    0;
-
+  margin: 15px 0 25px 0;
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
 }
 
 
@@ -878,37 +563,21 @@
 
 #U9-profile-button-1,
 #U9-profile-button-2 {
-
   position: relative;
-
   width: 170px;
-
   height: 50px;
-
   padding: 0;
-
   border: none;
-
   border-radius: 10px;
-
   box-sizing: border-box;
-
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
   background-color: #fefeff;
-
   color: #222222;
-
   font-size: 15px;
-
   font-weight: 500;
-
   cursor: pointer;
-
 }
 
 
@@ -917,9 +586,7 @@
 ========================= */
 
 #U9-profile-button-1 {
-
   margin-right: 6px;
-
 }
 
 
@@ -928,9 +595,7 @@
 ========================= */
 
 #U9-profile-button-2 {
-
   margin-left: 6px;
-
 }
 
 
@@ -939,47 +604,30 @@
 ========================= */
 
 #U9-profile-balance-buttons {
-
   display: flex;
-
   flex-direction: row;
-
   justify-content: center;
-
   align-items: center;
-
 }
 
 
 /* =========================
    BUTTON 1 / 2 IMAGE
-   ONLY BUTTON 1 / 2 IMAGES
 ========================= */
 
 #U9-profile-button-1
 > img,
 #U9-profile-button-2
 > img {
-
   position: absolute;
-
   left: 12px;
-
   top: 50%;
-
   width: 28px;
-
   height: 28px;
-
-  transform:
-    translateY(-50%);
-
+  transform: translateY(-50%);
   object-fit: contain;
-
   display: block;
-
   pointer-events: none;
-
 }
 
 
@@ -989,17 +637,11 @@
 
 #U9-profile-button-1 span,
 #U9-profile-button-2 span {
-
   display: block;
-
   width: 100%;
-
   text-align: center;
-
   line-height: 1.2;
-
   white-space: nowrap;
-
 }
 
 
@@ -1011,41 +653,21 @@
 #U9-profile-button-4,
 #U9-profile-button-5,
 #U9-profile-button-6 {
-
   position: relative;
-
-  width:
-    min(
-      400px,
-      calc(100% - 30px)
-    );
-
+  width: min(400px, calc(100% - 30px));
   height: 50px;
-
   padding: 0;
-
   border: none;
-
   border-radius: 10px;
-
   box-sizing: border-box;
-
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
   background-color: #e1e2e6;
-
   color: #222222;
-
   font-size: 16px;
-
   font-weight: 500;
-
   cursor: pointer;
-
 }
 
 
@@ -1054,9 +676,7 @@
 ========================= */
 
 #U9-profile-button-3 {
-
   margin-top: 15px;
-
 }
 
 
@@ -1067,15 +687,12 @@
 #U9-profile-button-4,
 #U9-profile-button-5,
 #U9-profile-button-6 {
-
   margin-top: 12px;
-
 }
 
 
 /* =========================
    BUTTON 3 / 4 / 5 / 6 IMAGE
-   ONLY BUTTON 3-6 IMAGES
 ========================= */
 
 #U9-profile-button-3
@@ -1086,26 +703,15 @@
 > img,
 #U9-profile-button-6
 > img {
-
   position: absolute;
-
   left: 18px;
-
   top: 50%;
-
   width: 30px;
-
   height: 30px;
-
-  transform:
-    translateY(-50%);
-
+  transform: translateY(-50%);
   object-fit: contain;
-
   display: block;
-
   pointer-events: none;
-
 }
 
 
@@ -1117,17 +723,11 @@
 #U9-profile-button-4 span,
 #U9-profile-button-5 span,
 #U9-profile-button-6 span {
-
   display: block;
-
   width: 100%;
-
   text-align: center;
-
   line-height: 1.2;
-
   white-space: nowrap;
-
 }
 
 
@@ -1137,19 +737,14 @@
 
 #U9-profile-button-1:hover,
 #U9-profile-button-2:hover {
-
   background-color: #dce8ff;
-
 }
-
 
 #U9-profile-button-3:hover,
 #U9-profile-button-4:hover,
 #U9-profile-button-5:hover,
 #U9-profile-button-6:hover {
-
   background-color: #e0ecff;
-
 }
 
 
@@ -1163,10 +758,7 @@
 #U9-profile-button-4:active,
 #U9-profile-button-5:active,
 #U9-profile-button-6:active {
-
-  transform:
-    scale(0.96);
-
+  transform: scale(0.96);
 }
 
 
@@ -1176,34 +768,23 @@
 
 @media (max-width: 480px) {
 
-
   /* =========================
      BUTTON 1 / 2
   ========================= */
 
   #U9-profile-button-1,
   #U9-profile-button-2 {
-
     width: 148px;
-
     height: 48px;
-
     font-size: 14px;
-
   }
-
 
   #U9-profile-button-1 {
-
     margin-right: 4px;
-
   }
 
-
   #U9-profile-button-2 {
-
     margin-left: 4px;
-
   }
 
 
@@ -1215,13 +796,9 @@
   > img,
   #U9-profile-button-2
   > img {
-
     width: 26px;
-
     height: 26px;
-
     left: 10px;
-
   }
 
 
@@ -1230,11 +807,8 @@
   ========================= */
 
   #U9-profile-balance-title {
-
     min-height: 26px;
-
     font-size: 15px;
-
   }
 
 
@@ -1243,9 +817,7 @@
   ========================= */
 
   #U9-profile-balance-value-row {
-
     min-height: 34px;
-
   }
 
 
@@ -1254,11 +826,8 @@
   ========================= */
 
   #U9-profile-balance {
-
     min-height: 26px;
-
     font-size: 20px;
-
   }
 
 
@@ -1267,11 +836,8 @@
   ========================= */
 
   #U9-profile-coins {
-
     min-height: 26px;
-
     font-size: 20px;
-
   }
 
 
@@ -1280,16 +846,9 @@
   ========================= */
 
   #U9-profile-balance-toggle {
-
-    right:
-      calc(
-        (100% - 304px) / 2
-      );
-
+    right: calc((100% - 304px) / 2);
     width: 34px;
-
     height: 34px;
-
   }
 
 
@@ -1299,11 +858,8 @@
 
   #U9-profile-balance-toggle
   > img {
-
     width: 20px;
-
     height: 20px;
-
   }
 
 
@@ -1315,16 +871,10 @@
   #U9-profile-button-4,
   #U9-profile-button-5,
   #U9-profile-button-6 {
-
-    width:
-      calc(100% - 30px);
-
+    width: calc(100% - 30px);
     max-width: 350px;
-
     height: 48px;
-
     font-size: 18px;
-
   }
 
 
@@ -1340,13 +890,9 @@
   > img,
   #U9-profile-button-6
   > img {
-
     width: 28px;
-
     height: 28px;
-
     left: 18px;
-
   }
 
 
@@ -1356,11 +902,8 @@
 
   #U9-profile-modal-close
   > #U9-profile-modal-close-icon {
-
     width: 20px;
-
     height: 20px;
-
   }
 
 
@@ -1370,13 +913,8 @@
 
   #U9-profile-modal
   #U9-profile-modal-icon {
-
     width: 26px;
-
     height: 26px;
-
     right: 15px;
-
   }
-
 }
