@@ -677,13 +677,38 @@
   }
 
 
-  /* ===============================
-     LOADING
-  =============================== */
+/* =================================================
+   FIX: CENTER LOADING PAID FRAMES TEXT
+================================================= */
 
+.U9-profile-page3-loading {
+  width: 100%;
+  box-sizing: border-box;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  text-align: center;
+  padding: 30px 20px;
+  margin: 0 auto;
+
+  color: #777777;
+  font-size: 15px;
+}
+
+/* Ensure the loading text itself is centered */
+.U9-profile-page3-loading > * {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
   .U9-profile-page3-loading {
     padding: 25px 10px;
     font-size: 14px;
   }
-
 }
+
