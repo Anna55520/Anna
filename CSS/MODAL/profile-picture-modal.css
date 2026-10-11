@@ -1,6 +1,28 @@
+
 /* =========================================================
-   PROFILE PICTURE MODAL
+   U9 PROFILE PICTURE MODAL
+   File: CSS/MODAL/profile-picture-modal.css
 ========================================================= */
+
+
+/* =========================================================
+   GLOBAL BOX MODEL
+========================================================= */
+
+#U9-profile-picture-modal,
+#U9-profile-picture-modal * {
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PAGE SCROLL LOCK
+   JavaScript must toggle this class when opening/closing.
+========================================================= */
+
+body.U9-profile-picture-modal-active {
+  overflow: hidden;
+}
 
 
 /* =========================================================
@@ -8,26 +30,19 @@
 ========================================================= */
 
 #U9-profile-picture-modal {
-
   position: fixed;
-
   inset: 0;
-
   z-index: 99999;
 
   display: none;
-
   align-items: center;
-
   justify-content: center;
 
+  padding: 12px;
 }
 
-
 #U9-profile-picture-modal.U9-profile-picture-modal-open {
-
   display: flex;
-
 }
 
 
@@ -36,15 +51,12 @@
 ========================================================= */
 
 #U9-profile-picture-modal-overlay {
-
   position: absolute;
-
   inset: 0;
 
   background: rgba(0, 0, 0, 0.55);
-
   backdrop-filter: blur(4px);
-
+  -webkit-backdrop-filter: blur(4px);
 }
 
 
@@ -53,31 +65,23 @@
 ========================================================= */
 
 #U9-profile-picture-modal-content {
-
   position: relative;
-
   z-index: 1;
 
-  width: min(
-    92vw,
-    520px
-  );
-
-  max-height: 92vh;
-
-  overflow: hidden;
-
   display: flex;
-
   flex-direction: column;
 
-  background: #ffffff;
+  width: min(92vw, 520px);
+  max-height: 92vh;
+  max-height: 92dvh;
 
+  min-width: 0;
+  overflow: hidden;
+
+  background: #ffffff;
   border-radius: 16px;
 
-  box-shadow:
-    0 20px 60px rgba(0, 0, 0, 0.25);
-
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
 }
 
 
@@ -86,83 +90,79 @@
 ========================================================= */
 
 #U9-profile-picture-modal-header {
-
   position: relative;
 
+  flex: 0 0 auto;
   min-height: 58px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   border-bottom: 1px solid #eeeeee;
-
 }
-
 
 #U9-profile-picture-modal-title {
+  max-width: calc(100% - 100px);
+
+  margin: 0;
 
   font-size: 18px;
-
   font-weight: 600;
+  line-height: 1.4;
 
   color: #222222;
-
+  text-align: center;
 }
 
-
 #U9-profile-picture-modal-close {
-
   position: absolute;
-
   left: 14px;
-
   top: 50%;
 
   transform: translateY(-50%);
 
   width: 36px;
-
   height: 36px;
-
   padding: 0;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   border: 0;
-
-  background: transparent;
-
-  color: #333333;
-
-  font-size: 28px;
-
-  line-height: 36px;
-
-  cursor: pointer;
-
-}
-
-
-#U9-profile-picture-modal-close:hover {
-
-  background: #f3f3f3;
-
   border-radius: 50%;
 
+  background: transparent;
+  color: #333333;
+
+  font-family: inherit;
+  font-size: 28px;
+  line-height: 1;
+
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
+#U9-profile-picture-modal-close:hover {
+  background: #f3f3f3;
+}
+
+#U9-profile-picture-modal-close:focus-visible {
+  outline: 2px solid #555555;
+  outline-offset: 2px;
+}
 
 #U9-profile-picture-modal-header-space {
-
   position: absolute;
-
   right: 14px;
+  top: 50%;
+
+  transform: translateY(-50%);
 
   width: 36px;
-
   height: 36px;
-
+  pointer-events: none;
 }
 
 
@@ -171,13 +171,19 @@
 ========================================================= */
 
 #U9-profile-picture-modal-body {
-
   position: relative;
+
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
 
   padding: 22px;
 
+  overflow-x: hidden;
   overflow-y: auto;
 
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 
@@ -186,38 +192,24 @@
 ========================================================= */
 
 #U9-profile-picture-modal-select {
-
   min-height: 300px;
+  width: 100%;
 
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   justify-content: center;
-
-  text-align: center;
 
   padding: 30px 20px;
 
   border: 2px dashed #dddddd;
-
   border-radius: 14px;
 
-  box-sizing: border-box;
-
+  text-align: center;
 }
 
-
-/* =========================================================
-   SELECT AREA HIDDEN
-========================================================= */
-
 #U9-profile-picture-modal-select[hidden] {
-
   display: none !important;
-
 }
 
 
@@ -226,34 +218,27 @@
 ========================================================= */
 
 #U9-profile-picture-modal-select-icon {
-
   width: 64px;
-
   height: 64px;
+  flex: 0 0 auto;
 
   margin-bottom: 18px;
 
   display: flex;
-
   align-items: center;
-
   justify-content: center;
 
   background: #f5f5f5;
-
   border-radius: 50%;
-
 }
 
-
 #U9-profile-picture-modal-select-icon img {
+  display: block;
 
   width: 30px;
-
   height: 30px;
 
   object-fit: contain;
-
 }
 
 
@@ -262,15 +247,13 @@
 ========================================================= */
 
 #U9-profile-picture-modal-select-title {
+  margin: 0 0 8px;
 
   font-size: 18px;
-
   font-weight: 600;
+  line-height: 1.4;
 
   color: #222222;
-
-  margin-bottom: 8px;
-
 }
 
 
@@ -279,17 +262,14 @@
 ========================================================= */
 
 #U9-profile-picture-modal-select-description {
-
   max-width: 360px;
+  margin: 0 0 22px;
 
   font-size: 13px;
-
   line-height: 1.5;
 
   color: #777777;
-
-  margin-bottom: 22px;
-
+  overflow-wrap: anywhere;
 }
 
 
@@ -298,32 +278,31 @@
 ========================================================= */
 
 #U9-profile-picture-modal-select-button {
-
   min-width: 150px;
-
-  height: 42px;
+  min-height: 42px;
 
   padding: 0 20px;
 
   border: 0;
-
   border-radius: 8px;
 
   background: #222222;
-
   color: #ffffff;
 
+  font-family: inherit;
   font-size: 14px;
 
   cursor: pointer;
-
+  -webkit-tap-highlight-color: transparent;
 }
 
-
 #U9-profile-picture-modal-select-button:hover {
-
   background: #333333;
+}
 
+#U9-profile-picture-modal-select-button:focus-visible {
+  outline: 2px solid #777777;
+  outline-offset: 3px;
 }
 
 
@@ -332,22 +311,14 @@
 ========================================================= */
 
 #U9-profile-picture-modal-editor {
-
   display: flex;
-
   flex-direction: column;
 
+  min-width: 0;
 }
 
-
-/* =========================================================
-   EDITOR HIDDEN
-========================================================= */
-
 #U9-profile-picture-modal-editor[hidden] {
-
   display: none !important;
-
 }
 
 
@@ -356,31 +327,24 @@
 ========================================================= */
 
 #U9-profile-picture-modal-crop-area {
-
   position: relative;
 
   width: 320px;
-
   height: 320px;
 
   max-width: 100%;
-
-  max-height: 100%;
+  flex: 0 1 auto;
+  flex-shrink: 1;
 
   margin: 0 auto;
-
   overflow: hidden;
 
   background: #111111;
-
   border-radius: 12px;
 
   touch-action: none;
-
   user-select: none;
-
-  box-sizing: border-box;
-
+  -webkit-user-select: none;
 }
 
 
@@ -389,33 +353,25 @@
 ========================================================= */
 
 #U9-profile-picture-modal-image-container {
-
   position: absolute;
-
   left: 50%;
-
   top: 50%;
 
   width: 100%;
-
   height: 100%;
 
-  transform:
-    translate(-50%, -50%);
-
+  transform: translate(-50%, -50%);
   transform-origin: center center;
 
   cursor: grab;
 
   touch-action: none;
-
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-
 #U9-profile-picture-modal-image-container.U9-dragging {
-
   cursor: grabbing;
-
 }
 
 
@@ -424,32 +380,24 @@
 ========================================================= */
 
 #U9-profile-picture-modal-image {
-
   position: absolute;
-
   left: 50%;
-
   top: 50%;
 
   width: auto;
-
   height: auto;
 
   max-width: none;
-
   max-height: none;
 
-  transform:
-    translate(-50%, -50%);
-
+  transform: translate(-50%, -50%);
   transform-origin: center center;
 
   pointer-events: none;
 
   user-select: none;
-
+  -webkit-user-select: none;
   -webkit-user-drag: none;
-
 }
 
 
@@ -458,22 +406,15 @@
 ========================================================= */
 
 #U9-profile-picture-modal-crop-frame {
-
   position: absolute;
-
   inset: 0;
+
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
 
   pointer-events: none;
 
-  border: 2px solid rgba(255, 255, 255, 0.95);
-
-  border-radius: 50%;
-
-  box-sizing: border-box;
-
-  box-shadow:
-    0 0 0 9999px rgba(0, 0, 0, 0.42);
-
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.42);
 }
 
 
@@ -482,68 +423,65 @@
 ========================================================= */
 
 #U9-profile-picture-modal-zoom {
-
   display: flex;
-
   align-items: center;
 
   gap: 10px;
 
   width: 320px;
-
   max-width: 100%;
+  min-width: 0;
 
   margin: 18px auto 0;
-
 }
-
 
 #U9-profile-picture-modal-zoom-out,
 #U9-profile-picture-modal-zoom-in {
-
   flex: 0 0 36px;
 
   width: 36px;
-
   height: 36px;
-
   padding: 0;
 
-  border: 1px solid #dddddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
+  border: 1px solid #dddddd;
   border-radius: 8px;
 
   background: #ffffff;
-
   color: #222222;
 
+  font-family: inherit;
   font-size: 22px;
-
-  line-height: 34px;
+  line-height: 1;
 
   cursor: pointer;
-
+  -webkit-tap-highlight-color: transparent;
 }
-
 
 #U9-profile-picture-modal-zoom-out:hover,
 #U9-profile-picture-modal-zoom-in:hover {
-
   background: #f5f5f5;
-
 }
 
-
 #U9-profile-picture-modal-zoom-range {
-
-  flex: 1;
+  flex: 1 1 auto;
 
   width: 100%;
-
   min-width: 0;
 
-  cursor: pointer;
+  margin: 0;
 
+  cursor: pointer;
+  accent-color: #222222;
+}
+
+#U9-profile-picture-modal-zoom-out:disabled,
+#U9-profile-picture-modal-zoom-in:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 
@@ -552,83 +490,70 @@
 ========================================================= */
 
 #U9-profile-picture-modal-editor-actions {
-
   display: flex;
+  align-items: stretch;
 
   gap: 10px;
 
   width: 320px;
-
   max-width: 100%;
-
-  margin: 18px auto 0;
-
-}
-
-
-#U9-profile-picture-modal-editor-actions button {
-
-  flex: 1;
-
   min-width: 0;
 
+  margin: 18px auto 0;
+}
+
+#U9-profile-picture-modal-editor-actions button {
+  flex: 1 1 0;
+
+  min-width: 0;
   min-height: 42px;
 
   padding: 0 12px;
 
   border-radius: 8px;
 
+  font-family: inherit;
   font-size: 14px;
+  line-height: 1.3;
+
+  overflow-wrap: anywhere;
 
   cursor: pointer;
-
+  -webkit-tap-highlight-color: transparent;
 }
-
 
 #U9-profile-picture-modal-reset,
 #U9-profile-picture-modal-change {
-
   border: 1px solid #dddddd;
 
   background: #ffffff;
-
   color: #222222;
-
 }
-
 
 #U9-profile-picture-modal-reset:hover,
 #U9-profile-picture-modal-change:hover {
-
   background: #f5f5f5;
-
 }
 
-
 #U9-profile-picture-modal-confirm {
-
   border: 0;
 
   background: #222222;
-
   color: #ffffff;
-
 }
-
 
 #U9-profile-picture-modal-confirm:hover {
-
   background: #333333;
-
 }
 
-
 #U9-profile-picture-modal-editor-actions button:disabled {
-
   opacity: 0.5;
-
   cursor: not-allowed;
+}
 
+#U9-profile-picture-modal-editor-actions button:focus-visible {
+  outline: 2px solid #777777;
+  outline-offset: 2px;
 }
 
 
@@ -637,52 +562,41 @@
 ========================================================= */
 
 #U9-profile-picture-modal-loading {
-
   position: absolute;
-
   inset: 0;
-
   z-index: 10;
 
   display: flex;
-
   flex-direction: column;
-
   align-items: center;
-
   justify-content: center;
 
+  padding: 20px;
+
   background: rgba(255, 255, 255, 0.92);
-
+  text-align: center;
 }
-
 
 #U9-profile-picture-modal-loading[hidden] {
-
   display: none !important;
-
 }
 
-
 #U9-profile-picture-modal-loading img {
+  display: block;
 
   width: 42px;
-
   height: 42px;
 
   object-fit: contain;
 
   margin-bottom: 12px;
-
 }
 
-
 #U9-profile-picture-modal-loading-text {
-
   font-size: 14px;
+  line-height: 1.5;
 
   color: #444444;
-
 }
 
 
@@ -691,272 +605,210 @@
 ========================================================= */
 
 #U9-profile-picture-modal-message {
-
   min-height: 20px;
 
-  margin-top: 14px;
+  margin: 14px 0 0;
 
   font-size: 13px;
-
   line-height: 1.5;
 
   text-align: center;
+  overflow-wrap: anywhere;
 
   color: #555555;
-
 }
-
 
 #U9-profile-picture-modal-message.U9-success {
-
   color: #188038;
-
 }
 
-
 #U9-profile-picture-modal-message.U9-error {
-
   color: #d93025;
-
 }
 
 
 /* =========================================================
-   MOBILE
+   MOBILE: MAX WIDTH 480PX
 ========================================================= */
 
 @media (max-width: 480px) {
+  #U9-profile-picture-modal {
+    padding: 10px;
+  }
 
   #U9-profile-picture-modal-content {
-
     width: 94vw;
 
     max-height: 94vh;
+    max-height: 94dvh;
 
     border-radius: 14px;
-
   }
-
 
   #U9-profile-picture-modal-body {
-
     padding: 16px;
-
   }
-
 
   #U9-profile-picture-modal-select {
-
     min-height: 260px;
-
+    padding: 24px 16px;
   }
 
-
-  /* =======================================================
-     MOBILE CROP AREA
-  ======================================================= */
+  /* Crop area */
 
   #U9-profile-picture-modal-crop-area {
-
     width: 280px;
-
     height: 280px;
 
     max-width: 100%;
-
     max-height: none;
 
     border-radius: 10px;
-
   }
 
-
-  /* =======================================================
-     MOBILE ZOOM
-  ======================================================= */
+  /* Zoom */
 
   #U9-profile-picture-modal-zoom {
-
     width: 280px;
-
     max-width: 100%;
 
     margin-top: 14px;
-
   }
-
 
   #U9-profile-picture-modal-zoom-out,
   #U9-profile-picture-modal-zoom-in {
-
-    flex: 0 0 34px;
+    flex-basis: 34px;
 
     width: 34px;
-
     height: 34px;
 
     font-size: 20px;
-
   }
 
-
-  /* =======================================================
-     MOBILE ACTIONS
-  ======================================================= */
+  /* Actions */
 
   #U9-profile-picture-modal-editor-actions {
-
     width: 280px;
-
     max-width: 100%;
 
     gap: 7px;
-
     margin-top: 14px;
-
   }
 
-
   #U9-profile-picture-modal-editor-actions button {
-
     min-height: 40px;
 
     padding: 0 8px;
 
     font-size: 13px;
-
   }
-
 }
 
 
 /* =========================================================
-   SMALL MOBILE
+   SMALL MOBILE: MAX WIDTH 400PX
 ========================================================= */
 
 @media (max-width: 400px) {
-
   #U9-profile-picture-modal-content {
-
     width: 94vw;
 
     max-height: 94vh;
-
+    max-height: 94dvh;
   }
-
 
   #U9-profile-picture-modal-body {
-
     padding: 14px;
-
   }
 
-
   #U9-profile-picture-modal-crop-area {
-
     width: 250px;
-
     height: 250px;
 
     max-width: 100%;
-
   }
-
 
   #U9-profile-picture-modal-zoom {
-
     width: 250px;
-
     max-width: 100%;
-
   }
-
 
   #U9-profile-picture-modal-editor-actions {
-
     width: 250px;
-
     max-width: 100%;
-
   }
-
 
   #U9-profile-picture-modal-editor-actions button {
-
-    font-size: 12px;
-
     padding: 0 6px;
-
+    font-size: 12px;
   }
-
 }
 
 
 /* =========================================================
-   VERY SMALL MOBILE
+   VERY SMALL MOBILE: MAX WIDTH 340PX
 ========================================================= */
 
 @media (max-width: 340px) {
+  #U9-profile-picture-modal {
+    padding: 6px;
+  }
 
   #U9-profile-picture-modal-content {
-
     width: 96vw;
 
     max-height: 95vh;
+    max-height: 95dvh;
 
     border-radius: 12px;
-
   }
-
 
   #U9-profile-picture-modal-body {
-
     padding: 12px;
-
   }
 
-
   #U9-profile-picture-modal-crop-area {
-
     width: 220px;
-
     height: 220px;
 
     max-width: 100%;
-
   }
 
-
   #U9-profile-picture-modal-zoom {
-
     width: 220px;
-
     max-width: 100%;
 
     gap: 7px;
-
   }
 
-
   #U9-profile-picture-modal-editor-actions {
-
     width: 220px;
-
     max-width: 100%;
 
     gap: 5px;
-
   }
 
-
   #U9-profile-picture-modal-editor-actions button {
-
     min-height: 38px;
 
     padding: 0 4px;
 
     font-size: 11px;
-
   }
+}
 
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  #U9-profile-picture-modal *,
+  #U9-profile-picture-modal *::before,
+  #U9-profile-picture-modal *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
