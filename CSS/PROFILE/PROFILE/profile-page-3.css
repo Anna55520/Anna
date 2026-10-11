@@ -712,3 +712,35 @@
   }
 }
 
+
+/* =================================================
+   FIX: CENTER PAGE 3 LOADING STATUS
+================================================= */
+
+#U9-profile-page3-status {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+
+  margin: 0;
+  padding: 15px 20px;
+
+  text-align: center !important;
+  font-size: 15px;
+  color: #777777;
+}
+
+/* Loading status */
+#U9-profile-page3-status.loading {
+  display: block;
+  width: 100%;
+  text-align: center !important;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  #U9-profile-page3-status {
+    padding: 12px 10px;
+    font-size: 14px;
+  }
+}
