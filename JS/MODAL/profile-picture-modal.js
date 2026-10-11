@@ -1,3 +1,4 @@
+
 /* =========================================================
    PROFILE PICTURE MODAL
 ========================================================= */
@@ -16,117 +17,61 @@ const U9_PROFILE_PICTURE_UPLOAD_API =
 ========================================================= */
 
 const profilePictureModal =
-  document.getElementById(
-    "U9-profile-picture-modal"
-  );
-
+  document.getElementById("U9-profile-picture-modal");
 
 const profilePictureModalOverlay =
-  document.getElementById(
-    "U9-profile-picture-modal-overlay"
-  );
-
+  document.getElementById("U9-profile-picture-modal-overlay");
 
 const profilePictureModalClose =
-  document.getElementById(
-    "U9-profile-picture-modal-close"
-  );
-
+  document.getElementById("U9-profile-picture-modal-close");
 
 const profilePictureModalSelect =
-  document.getElementById(
-    "U9-profile-picture-modal-select"
-  );
-
+  document.getElementById("U9-profile-picture-modal-select");
 
 const profilePictureModalSelectButton =
-  document.getElementById(
-    "U9-profile-picture-modal-select-button"
-  );
-
+  document.getElementById("U9-profile-picture-modal-select-button");
 
 const profilePictureModalFile =
-  document.getElementById(
-    "U9-profile-picture-modal-file"
-  );
-
+  document.getElementById("U9-profile-picture-modal-file");
 
 const profilePictureModalEditor =
-  document.getElementById(
-    "U9-profile-picture-modal-editor"
-  );
-
+  document.getElementById("U9-profile-picture-modal-editor");
 
 const profilePictureModalCropArea =
-  document.getElementById(
-    "U9-profile-picture-modal-crop-area"
-  );
-
+  document.getElementById("U9-profile-picture-modal-crop-area");
 
 const profilePictureModalImageContainer =
-  document.getElementById(
-    "U9-profile-picture-modal-image-container"
-  );
-
+  document.getElementById("U9-profile-picture-modal-image-container");
 
 const profilePictureModalImage =
-  document.getElementById(
-    "U9-profile-picture-modal-image"
-  );
-
+  document.getElementById("U9-profile-picture-modal-image");
 
 const profilePictureModalZoomOut =
-  document.getElementById(
-    "U9-profile-picture-modal-zoom-out"
-  );
-
+  document.getElementById("U9-profile-picture-modal-zoom-out");
 
 const profilePictureModalZoomIn =
-  document.getElementById(
-    "U9-profile-picture-modal-zoom-in"
-  );
-
+  document.getElementById("U9-profile-picture-modal-zoom-in");
 
 const profilePictureModalZoomRange =
-  document.getElementById(
-    "U9-profile-picture-modal-zoom-range"
-  );
-
+  document.getElementById("U9-profile-picture-modal-zoom-range");
 
 const profilePictureModalReset =
-  document.getElementById(
-    "U9-profile-picture-modal-reset"
-  );
-
+  document.getElementById("U9-profile-picture-modal-reset");
 
 const profilePictureModalChange =
-  document.getElementById(
-    "U9-profile-picture-modal-change"
-  );
-
+  document.getElementById("U9-profile-picture-modal-change");
 
 const profilePictureModalConfirm =
-  document.getElementById(
-    "U9-profile-picture-modal-confirm"
-  );
-
+  document.getElementById("U9-profile-picture-modal-confirm");
 
 const profilePictureModalLoading =
-  document.getElementById(
-    "U9-profile-picture-modal-loading"
-  );
-
+  document.getElementById("U9-profile-picture-modal-loading");
 
 const profilePictureModalLoadingText =
-  document.getElementById(
-    "U9-profile-picture-modal-loading-text"
-  );
-
+  document.getElementById("U9-profile-picture-modal-loading-text");
 
 const profilePictureModalMessage =
-  document.getElementById(
-    "U9-profile-picture-modal-message"
-  );
+  document.getElementById("U9-profile-picture-modal-message");
 
 
 /* =========================================================
@@ -134,30 +79,27 @@ const profilePictureModalMessage =
 ========================================================= */
 
 let profilePictureFile = null;
-
 let profilePictureObjectURL = null;
 
 let profilePictureNaturalWidth = 0;
-
 let profilePictureNaturalHeight = 0;
 
 let profilePictureBaseScale = 1;
-
 let profilePictureZoom = 1;
 
 let profilePictureX = 0;
-
 let profilePictureY = 0;
 
 let profilePictureDragging = false;
 
 let profilePictureDragStartX = 0;
-
 let profilePictureDragStartY = 0;
 
 let profilePictureStartX = 0;
-
 let profilePictureStartY = 0;
+
+/* Prevent duplicate uploads */
+let profilePictureUploading = false;
 
 
 /* =========================================================
@@ -165,9 +107,7 @@ let profilePictureStartY = 0;
 ========================================================= */
 
 const U9_PROFILE_PICTURE_OUTPUT_SIZE = 512;
-
 const U9_PROFILE_PICTURE_MIN_ZOOM = 1;
-
 const U9_PROFILE_PICTURE_MAX_ZOOM = 3;
 
 
@@ -176,13 +116,7 @@ const U9_PROFILE_PICTURE_MAX_ZOOM = 3;
 ========================================================= */
 
 function getProfilePictureToken() {
-
-  return (
-    localStorage.getItem(
-      "u9_token"
-    ) || ""
-  );
-
+  return localStorage.getItem("u9_token") || "";
 }
 
 
@@ -191,18 +125,14 @@ function getProfilePictureToken() {
 ========================================================= */
 
 function profilePictureIsLoggedIn() {
-
   if (
     window.U9User &&
     typeof window.U9User.isLoggedIn === "function"
   ) {
-
     return window.U9User.isLoggedIn();
-
   }
 
   return !!getProfilePictureToken();
-
 }
 
 
@@ -210,88 +140,43 @@ function profilePictureIsLoggedIn() {
    MESSAGE
 ========================================================= */
 
-function showProfilePictureMessage(
-  message,
-  type = ""
-) {
-
+function showProfilePictureMessage(message, type = "") {
   if (!profilePictureModalMessage) {
     return;
   }
 
-
-  profilePictureModalMessage.textContent =
-    message || "";
-
-
+  profilePictureModalMessage.textContent = message || "";
   profilePictureModalMessage.className = "";
 
-
   if (type) {
-
-    profilePictureModalMessage.classList.add(
-      `U9-${type}`
-    );
-
+    profilePictureModalMessage.classList.add(`U9-${type}`);
   }
-
 }
 
 
 /* =========================================================
    VIEW
-   SELECT / EDITOR
 ========================================================= */
 
 function showProfilePictureSelectView() {
-
-  if (
-    profilePictureModalSelect
-  ) {
-
-    profilePictureModalSelect.hidden =
-      false;
-
+  if (profilePictureModalSelect) {
+    profilePictureModalSelect.hidden = false;
   }
 
-
-  if (
-    profilePictureModalEditor
-  ) {
-
-    profilePictureModalEditor.hidden =
-      true;
-
+  if (profilePictureModalEditor) {
+    profilePictureModalEditor.hidden = true;
   }
-
 }
 
 
-/* =========================================================
-   SHOW EDITOR VIEW
-========================================================= */
-
 function showProfilePictureEditorView() {
-
-  if (
-    profilePictureModalSelect
-  ) {
-
-    profilePictureModalSelect.hidden =
-      true;
-
+  if (profilePictureModalSelect) {
+    profilePictureModalSelect.hidden = true;
   }
 
-
-  if (
-    profilePictureModalEditor
-  ) {
-
-    profilePictureModalEditor.hidden =
-      false;
-
+  if (profilePictureModalEditor) {
+    profilePictureModalEditor.hidden = false;
   }
-
 }
 
 
@@ -303,55 +188,49 @@ function setProfilePictureLoading(
   loading,
   text = "Uploading..."
 ) {
-
-  if (!profilePictureModalLoading) {
-    return;
+  if (profilePictureModalLoading) {
+    profilePictureModalLoading.hidden = !loading;
   }
 
-
-  profilePictureModalLoading.hidden =
-    !loading;
-
-
-  if (
-    profilePictureModalLoadingText
-  ) {
-
-    profilePictureModalLoadingText.textContent =
-      text;
-
+  if (profilePictureModalLoadingText) {
+    profilePictureModalLoadingText.textContent = text;
   }
 
-
-  if (
-    profilePictureModalConfirm
-  ) {
-
-    profilePictureModalConfirm.disabled =
-      loading;
-
+  if (profilePictureModalConfirm) {
+    profilePictureModalConfirm.disabled = loading;
   }
 
-
-  if (
-    profilePictureModalChange
-  ) {
-
-    profilePictureModalChange.disabled =
-      loading;
-
+  if (profilePictureModalChange) {
+    profilePictureModalChange.disabled = loading;
   }
 
-
-  if (
-    profilePictureModalReset
-  ) {
-
-    profilePictureModalReset.disabled =
-      loading;
-
+  if (profilePictureModalReset) {
+    profilePictureModalReset.disabled = loading;
   }
 
+  if (profilePictureModalSelectButton) {
+    profilePictureModalSelectButton.disabled = loading;
+  }
+
+  if (profilePictureModalZoomOut) {
+    profilePictureModalZoomOut.disabled = loading;
+  }
+
+  if (profilePictureModalZoomIn) {
+    profilePictureModalZoomIn.disabled = loading;
+  }
+
+  if (profilePictureModalZoomRange) {
+    profilePictureModalZoomRange.disabled = loading;
+  }
+}
+
+
+function profilePictureLoadingIsActive() {
+  return profilePictureUploading || (
+    profilePictureModalLoading &&
+    !profilePictureModalLoading.hidden
+  );
 }
 
 
@@ -360,74 +239,41 @@ function setProfilePictureLoading(
 ========================================================= */
 
 function openProfilePictureModal() {
-
   if (!profilePictureModal) {
     return;
   }
 
-
   if (!profilePictureIsLoggedIn()) {
-
     showProfilePictureMessage(
       "Please log in before changing your profile picture.",
       "error"
     );
-
   } else {
-
     showProfilePictureMessage("");
-
   }
-
 
   profilePictureModal.classList.add(
     "U9-profile-picture-modal-open"
   );
-
 
   profilePictureModal.setAttribute(
     "aria-hidden",
     "false"
   );
 
-
-  document.body.style.overflow =
-    "hidden";
-
-
-  /*
-     Every time the modal opens,
-     start from the image selection screen.
-  */
+  document.body.style.overflow = "hidden";
 
   showProfilePictureSelectView();
 
-
-  if (
-    profilePictureModalFile
-  ) {
-
-    profilePictureModalFile.value =
-      "";
-
+  if (profilePictureModalFile) {
+    profilePictureModalFile.value = "";
   }
 
-
-  setTimeout(
-    function () {
-
-      if (
-        profilePictureModalClose
-      ) {
-
-        profilePictureModalClose.focus();
-
-      }
-
-    },
-    0
-  );
-
+  setTimeout(function () {
+    if (profilePictureModalClose) {
+      profilePictureModalClose.focus();
+    }
+  }, 0);
 }
 
 
@@ -436,72 +282,34 @@ function openProfilePictureModal() {
 ========================================================= */
 
 function closeProfilePictureModal() {
-
   if (!profilePictureModal) {
     return;
   }
 
-
-  if (
-    profilePictureLoadingIsActive()
-  ) {
-
+  if (profilePictureLoadingIsActive()) {
     return;
-
   }
-
-
-  /*
-     Remove focus before applying aria-hidden.
-     This prevents the browser accessibility warning.
-  */
 
   if (
     document.activeElement &&
-    profilePictureModal.contains(
-      document.activeElement
-    )
+    profilePictureModal.contains(document.activeElement)
   ) {
-
     document.activeElement.blur();
-
   }
-
 
   profilePictureModal.classList.remove(
     "U9-profile-picture-modal-open"
   );
-
 
   profilePictureModal.setAttribute(
     "aria-hidden",
     "true"
   );
 
-
-  document.body.style.overflow =
-    "";
-
+  document.body.style.overflow = "";
 
   resetProfilePictureEditor();
-
-
   showProfilePictureMessage("");
-
-}
-
-
-/* =========================================================
-   LOADING STATE
-========================================================= */
-
-function profilePictureLoadingIsActive() {
-
-  return (
-    profilePictureModalLoading &&
-    !profilePictureModalLoading.hidden
-  );
-
 }
 
 
@@ -510,38 +318,22 @@ function profilePictureLoadingIsActive() {
 ========================================================= */
 
 function selectProfilePictureFile() {
-
   if (!profilePictureIsLoggedIn()) {
-
     showProfilePictureMessage(
       "Please log in before changing your profile picture.",
       "error"
     );
-
     return;
-
   }
 
+  if (profilePictureLoadingIsActive()) {
+    return;
+  }
 
-  if (
-    profilePictureModalFile
-  ) {
-
-    /*
-       Clear the value first.
-
-       This allows the user to select
-       the same image again.
-    */
-
-    profilePictureModalFile.value =
-      "";
-
-
+  if (profilePictureModalFile) {
+    profilePictureModalFile.value = "";
     profilePictureModalFile.click();
-
   }
-
 }
 
 
@@ -549,54 +341,26 @@ function selectProfilePictureFile() {
    FILE CHANGE
 ========================================================= */
 
-function handleProfilePictureFileChange(
-  event
-) {
+function handleProfilePictureFileChange(event) {
+  const files = event.target.files;
 
-  const files =
-    event.target.files;
-
-
-  if (
-    !files ||
-    !files.length
-  ) {
-
+  if (!files || !files.length) {
     return;
-
   }
 
+  const file = files[0];
 
-  const file =
-    files[0];
-
-
-  if (
-    !file.type ||
-    !file.type.startsWith("image/")
-  ) {
-
+  if (!file.type || !file.type.startsWith("image/")) {
     showProfilePictureMessage(
       "Please select a valid image file.",
       "error"
     );
 
-    /*
-       Keep the select screen visible
-       when an invalid file is selected.
-    */
-
     showProfilePictureSelectView();
-
     return;
-
   }
 
-
-  loadProfilePictureFile(
-    file
-  );
-
+  loadProfilePictureFile(file);
 }
 
 
@@ -604,173 +368,62 @@ function handleProfilePictureFileChange(
    LOAD FILE
 ========================================================= */
 
-function loadProfilePictureFile(
-  file
-) {
-
-  if (!file) {
+function loadProfilePictureFile(file) {
+  if (!file || profilePictureLoadingIsActive()) {
     return;
   }
 
-
-  /*
-     Hide any old message while
-     the new image is loading.
-  */
-
   showProfilePictureMessage("");
 
-
-  /*
-     Remove previous object URL.
-  */
-
-  if (
-    profilePictureObjectURL
-  ) {
-
-    URL.revokeObjectURL(
-      profilePictureObjectURL
-    );
-
-    profilePictureObjectURL =
-      null;
-
+  if (profilePictureObjectURL) {
+    URL.revokeObjectURL(profilePictureObjectURL);
+    profilePictureObjectURL = null;
   }
 
+  profilePictureFile = file;
+  profilePictureObjectURL = URL.createObjectURL(file);
 
-  profilePictureFile =
-    file;
+  const image = new Image();
 
+  image.onload = function () {
+    profilePictureNaturalWidth = image.naturalWidth;
+    profilePictureNaturalHeight = image.naturalHeight;
 
-  profilePictureObjectURL =
-    URL.createObjectURL(
-      file
+    showProfilePictureEditorView();
+
+    profilePictureX = 0;
+    profilePictureY = 0;
+    profilePictureZoom = U9_PROFILE_PICTURE_MIN_ZOOM;
+
+    if (profilePictureModalZoomRange) {
+      profilePictureModalZoomRange.value =
+        String(profilePictureZoom);
+    }
+
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        profilePictureImageLoaded();
+      });
+    });
+  };
+
+  image.onerror = function () {
+    showProfilePictureMessage(
+      "Unable to load this image.",
+      "error"
     );
 
+    profilePictureFile = null;
 
-  const image =
-    new Image();
+    if (profilePictureObjectURL) {
+      URL.revokeObjectURL(profilePictureObjectURL);
+      profilePictureObjectURL = null;
+    }
 
+    showProfilePictureSelectView();
+  };
 
-  image.onload =
-    function () {
-
-      profilePictureNaturalWidth =
-        image.naturalWidth;
-
-
-      profilePictureNaturalHeight =
-        image.naturalHeight;
-
-
-      /*
-         IMPORTANT
-
-         Only switch to the editor AFTER
-         the selected image has successfully
-         loaded.
-
-         This guarantees that a broken image
-         will not open the crop editor.
-      */
-
-      showProfilePictureEditorView();
-
-
-      /*
-         Clear old transform before rendering
-         the new image.
-      */
-
-      profilePictureX =
-        0;
-
-
-      profilePictureY =
-        0;
-
-
-      profilePictureZoom =
-        U9_PROFILE_PICTURE_MIN_ZOOM;
-
-
-      if (
-        profilePictureModalZoomRange
-      ) {
-
-        profilePictureModalZoomRange.value =
-          String(
-            profilePictureZoom
-          );
-
-      }
-
-
-      /*
-         Put the image into the editor.
-
-         Wait for the browser to display the editor
-         and calculate the crop area's real size.
-      */
-
-      requestAnimationFrame(
-        function () {
-
-          requestAnimationFrame(
-            function () {
-
-              profilePictureImageLoaded();
-
-            }
-          );
-
-        }
-      );
-
-    };
-
-
-  image.onerror =
-    function () {
-
-      showProfilePictureMessage(
-        "Unable to load this image.",
-        "error"
-      );
-
-
-      profilePictureFile =
-        null;
-
-
-      if (
-        profilePictureObjectURL
-      ) {
-
-        URL.revokeObjectURL(
-          profilePictureObjectURL
-        );
-
-        profilePictureObjectURL =
-          null;
-
-      }
-
-
-      /*
-         If loading fails,
-         return to the select screen.
-      */
-
-      showProfilePictureSelectView();
-
-    };
-
-
-  image.src =
-    profilePictureObjectURL;
-
+  image.src = profilePictureObjectURL;
 }
 
 
@@ -779,68 +432,38 @@ function loadProfilePictureFile(
 ========================================================= */
 
 function profilePictureImageLoaded() {
-
   if (
     !profilePictureModalImage ||
     !profilePictureObjectURL
   ) {
-
     return;
-
   }
 
+  profilePictureModalImage.onload = null;
+  profilePictureModalImage.onerror = null;
 
-  /*
-     Set the actual image source.
-  */
-
-  profilePictureModalImage.src =
-    profilePictureObjectURL;
-
-
-  /*
-     Make sure the image itself is loaded
-     before calculating its final position.
-  */
+  profilePictureModalImage.src = profilePictureObjectURL;
 
   if (
     profilePictureModalImage.complete &&
     profilePictureModalImage.naturalWidth > 0
   ) {
-
     finishProfilePictureImageSetup();
-
     return;
-
   }
 
+  profilePictureModalImage.onload = function () {
+    finishProfilePictureImageSetup();
+  };
 
-  profilePictureModalImage.onload =
-    function () {
+  profilePictureModalImage.onerror = function () {
+    showProfilePictureMessage(
+      "Unable to display this image.",
+      "error"
+    );
 
-      finishProfilePictureImageSetup();
-
-    };
-
-
-  profilePictureModalImage.onerror =
-    function () {
-
-      showProfilePictureMessage(
-        "Unable to display this image.",
-        "error"
-      );
-
-
-      /*
-         If the editor image itself fails,
-         return to the selection screen.
-      */
-
-      showProfilePictureSelectView();
-
-    };
-
+    showProfilePictureSelectView();
+  };
 }
 
 
@@ -849,84 +472,35 @@ function profilePictureImageLoaded() {
 ========================================================= */
 
 function finishProfilePictureImageSetup() {
-
-  /*
-     Wait one more frame.
-
-     This is especially important on mobile
-     because the modal may still be finishing
-     its layout.
-  */
-
-  requestAnimationFrame(
-    function () {
-
-      if (
-        !profilePictureModalCropArea
-      ) {
-
-        return;
-
-      }
-
-
-      /*
-         Make sure the crop area has a real size.
-      */
-
-      const cropWidth =
-        profilePictureModalCropArea.clientWidth;
-
-
-      const cropHeight =
-        profilePictureModalCropArea.clientHeight;
-
-
-      if (
-        cropWidth <= 0 ||
-        cropHeight <= 0
-      ) {
-
-        /*
-           If the browser still has not finished
-           calculating the layout, try again.
-        */
-
-        setTimeout(
-          function () {
-
-            finishProfilePictureImageSetup();
-
-          },
-          30
-        );
-
-        return;
-
-      }
-
-
-      profilePictureCalculateBaseScale();
-
-
-      profilePictureX =
-        0;
-
-
-      profilePictureY =
-        0;
-
-
-      limitProfilePicturePosition();
-
-      updateProfilePictureTransform();
-
-
-      showProfilePictureMessage("");
-
+  requestAnimationFrame(function () {
+    if (!profilePictureModalCropArea) {
+      return;
     }
-  );
 
+    const cropWidth =
+      profilePictureModalCropArea.clientWidth;
+
+    const cropHeight =
+      profilePictureModalCropArea.clientHeight;
+
+    if (cropWidth <= 0 || cropHeight <= 0) {
+      setTimeout(function () {
+        finishProfilePictureImageSetup();
+      }, 30);
+
+      return;
+    }
+
+    profilePictureCalculateBaseScale();
+
+    profilePictureX = 0;
+    profilePictureY = 0;
+
+    limitProfilePicturePosition();
+    updateProfilePictureTransform();
+
+    showProfilePictureMessage("");
+  });
 }
 
 
@@ -935,59 +509,32 @@ function finishProfilePictureImageSetup() {
 ========================================================= */
 
 function profilePictureCalculateBaseScale() {
-
   if (
     !profilePictureModalCropArea ||
     !profilePictureNaturalWidth ||
     !profilePictureNaturalHeight
   ) {
-
     return;
-
   }
-
 
   const cropWidth =
     profilePictureModalCropArea.clientWidth;
 
-
   const cropHeight =
     profilePictureModalCropArea.clientHeight;
 
-
-  if (
-    cropWidth <= 0 ||
-    cropHeight <= 0
-  ) {
-
+  if (cropWidth <= 0 || cropHeight <= 0) {
     return;
-
   }
 
-
   const scaleX =
-    cropWidth /
-    profilePictureNaturalWidth;
-
+    cropWidth / profilePictureNaturalWidth;
 
   const scaleY =
-    cropHeight /
-    profilePictureNaturalHeight;
-
-
-  /*
-     Cover the complete crop area.
-
-     This guarantees that there is never
-     an empty black area inside the crop frame.
-  */
+    cropHeight / profilePictureNaturalHeight;
 
   profilePictureBaseScale =
-    Math.max(
-      scaleX,
-      scaleY
-    );
-
+    Math.max(scaleX, scaleY);
 }
 
 
@@ -996,12 +543,7 @@ function profilePictureCalculateBaseScale() {
 ========================================================= */
 
 function getProfilePictureScale() {
-
-  return (
-    profilePictureBaseScale *
-    profilePictureZoom
-  );
-
+  return profilePictureBaseScale * profilePictureZoom;
 }
 
 
@@ -1010,56 +552,36 @@ function getProfilePictureScale() {
 ========================================================= */
 
 function updateProfilePictureTransform() {
-
   if (
     !profilePictureModalImage ||
     !profilePictureNaturalWidth ||
     !profilePictureNaturalHeight
   ) {
-
     return;
-
   }
 
-
-  const scale =
-    getProfilePictureScale();
-
+  const scale = getProfilePictureScale();
 
   const imageWidth =
-    profilePictureNaturalWidth *
-    scale;
-
+    profilePictureNaturalWidth * scale;
 
   const imageHeight =
-    profilePictureNaturalHeight *
-    scale;
-
-
-  /*
-     The image is positioned relative
-     to the center of the crop area.
-  */
+    profilePictureNaturalHeight * scale;
 
   profilePictureModalImage.style.width =
     `${imageWidth}px`;
 
-
   profilePictureModalImage.style.height =
     `${imageHeight}px`;
-
 
   profilePictureModalImage.style.left =
     `calc(50% + ${profilePictureX}px)`;
 
-
   profilePictureModalImage.style.top =
     `calc(50% + ${profilePictureY}px)`;
 
-
   profilePictureModalImage.style.transform =
     "translate(-50%, -50%)";
-
 }
 
 
@@ -1068,89 +590,51 @@ function updateProfilePictureTransform() {
 ========================================================= */
 
 function limitProfilePicturePosition() {
-
   if (
     !profilePictureModalCropArea ||
     !profilePictureNaturalWidth ||
     !profilePictureNaturalHeight
   ) {
-
     return;
-
   }
-
 
   const cropWidth =
     profilePictureModalCropArea.clientWidth;
 
-
   const cropHeight =
     profilePictureModalCropArea.clientHeight;
 
-
-  if (
-    cropWidth <= 0 ||
-    cropHeight <= 0
-  ) {
-
+  if (cropWidth <= 0 || cropHeight <= 0) {
     return;
-
   }
 
-
-  const scale =
-    getProfilePictureScale();
-
+  const scale = getProfilePictureScale();
 
   const imageWidth =
-    profilePictureNaturalWidth *
-    scale;
-
+    profilePictureNaturalWidth * scale;
 
   const imageHeight =
-    profilePictureNaturalHeight *
-    scale;
+    profilePictureNaturalHeight * scale;
 
+  const maxX = Math.max(
+    0,
+    (imageWidth - cropWidth) / 2
+  );
 
-  const maxX =
-    Math.max(
-      0,
-      (
-        imageWidth -
-        cropWidth
-      ) / 2
-    );
+  const maxY = Math.max(
+    0,
+    (imageHeight - cropHeight) / 2
+  );
 
+  profilePictureX = Math.max(
+    -maxX,
+    Math.min(maxX, profilePictureX)
+  );
 
-  const maxY =
-    Math.max(
-      0,
-      (
-        imageHeight -
-        cropHeight
-      ) / 2
-    );
-
-
-  profilePictureX =
-    Math.max(
-      -maxX,
-      Math.min(
-        maxX,
-        profilePictureX
-      )
-    );
-
-
-  profilePictureY =
-    Math.max(
-      -maxY,
-      Math.min(
-        maxY,
-        profilePictureY
-      )
-    );
-
+  profilePictureY = Math.max(
+    -maxY,
+    Math.min(maxY, profilePictureY)
+  );
 }
 
 
@@ -1158,46 +642,23 @@ function limitProfilePicturePosition() {
    ZOOM
 ========================================================= */
 
-function setProfilePictureZoom(
-  zoom
-) {
+function setProfilePictureZoom(zoom) {
+  const oldZoom = profilePictureZoom;
 
-  const oldZoom =
-    profilePictureZoom;
+  profilePictureZoom = Math.max(
+    U9_PROFILE_PICTURE_MIN_ZOOM,
+    Math.min(U9_PROFILE_PICTURE_MAX_ZOOM, zoom)
+  );
 
-
-  profilePictureZoom =
-    Math.max(
-      U9_PROFILE_PICTURE_MIN_ZOOM,
-      Math.min(
-        U9_PROFILE_PICTURE_MAX_ZOOM,
-        zoom
-      )
-    );
-
-
-  if (
-    profilePictureModalZoomRange
-  ) {
-
+  if (profilePictureModalZoomRange) {
     profilePictureModalZoomRange.value =
-      String(
-        profilePictureZoom
-      );
-
+      String(profilePictureZoom);
   }
 
-
-  if (
-    oldZoom !== profilePictureZoom
-  ) {
-
+  if (oldZoom !== profilePictureZoom) {
     limitProfilePicturePosition();
-
     updateProfilePictureTransform();
-
   }
-
 }
 
 
@@ -1206,119 +667,46 @@ function setProfilePictureZoom(
 ========================================================= */
 
 function resetProfilePictureEditor() {
+  profilePictureFile = null;
 
-  profilePictureFile =
-    null;
-
-
-  if (
-    profilePictureObjectURL
-  ) {
-
-    URL.revokeObjectURL(
-      profilePictureObjectURL
-    );
-
-    profilePictureObjectURL =
-      null;
-
+  if (profilePictureObjectURL) {
+    URL.revokeObjectURL(profilePictureObjectURL);
+    profilePictureObjectURL = null;
   }
 
+  profilePictureNaturalWidth = 0;
+  profilePictureNaturalHeight = 0;
+  profilePictureBaseScale = 1;
+  profilePictureZoom = 1;
+  profilePictureX = 0;
+  profilePictureY = 0;
+  profilePictureDragging = false;
 
-  profilePictureNaturalWidth =
-    0;
+  if (profilePictureModalImage) {
+    profilePictureModalImage.onload = null;
+    profilePictureModalImage.onerror = null;
+    profilePictureModalImage.removeAttribute("src");
 
-
-  profilePictureNaturalHeight =
-    0;
-
-
-  profilePictureBaseScale =
-    1;
-
-
-  profilePictureZoom =
-    1;
-
-
-  profilePictureX =
-    0;
-
-
-  profilePictureY =
-    0;
-
-
-  profilePictureDragging =
-    false;
-
-
-  if (
-    profilePictureModalImage
-  ) {
-
-    profilePictureModalImage.onload =
-      null;
-
-
-    profilePictureModalImage.onerror =
-      null;
-
-
-    profilePictureModalImage.src =
-      "";
-
-    profilePictureModalImage.style.width =
-      "";
-
-    profilePictureModalImage.style.height =
-      "";
-
-    profilePictureModalImage.style.left =
-      "";
-
-    profilePictureModalImage.style.top =
-      "";
-
-    profilePictureModalImage.style.transform =
-      "";
-
+    profilePictureModalImage.style.width = "";
+    profilePictureModalImage.style.height = "";
+    profilePictureModalImage.style.left = "";
+    profilePictureModalImage.style.top = "";
+    profilePictureModalImage.style.transform = "";
   }
 
-
-  if (
-    profilePictureModalZoomRange
-  ) {
-
-    profilePictureModalZoomRange.value =
-      "1";
-
+  if (profilePictureModalZoomRange) {
+    profilePictureModalZoomRange.value = "1";
   }
-
-
-  /*
-     Reset back to the initial
-     image selection screen.
-  */
 
   showProfilePictureSelectView();
 
-
-  if (
-    profilePictureModalImageContainer
-  ) {
-
+  if (profilePictureModalImageContainer) {
     profilePictureModalImageContainer.classList.remove(
       "U9-dragging"
     );
-
   }
 
-
-  setProfilePictureLoading(
-    false
-  );
-
+  setProfilePictureLoading(false);
 }
 
 
@@ -1326,76 +714,44 @@ function resetProfilePictureEditor() {
    POINTER DOWN
 ========================================================= */
 
-function startProfilePictureDrag(
-  event
-) {
-
+function startProfilePictureDrag(event) {
   if (
     !profilePictureFile ||
     profilePictureLoadingIsActive()
   ) {
-
     return;
-
   }
-
 
   event.preventDefault();
 
+  profilePictureDragging = true;
 
-  profilePictureDragging =
-    true;
-
-
-  if (
-    profilePictureModalImageContainer
-  ) {
-
+  if (profilePictureModalImageContainer) {
     profilePictureModalImageContainer.classList.add(
       "U9-dragging"
     );
-
   }
 
-
   const point =
-    getProfilePicturePointerPosition(
-      event
-    );
+    getProfilePicturePointerPosition(event);
 
+  profilePictureDragStartX = point.x;
+  profilePictureDragStartY = point.y;
 
-  profilePictureDragStartX =
-    point.x;
-
-
-  profilePictureDragStartY =
-    point.y;
-
-
-  profilePictureStartX =
-    profilePictureX;
-
-
-  profilePictureStartY =
-    profilePictureY;
-
+  profilePictureStartX = profilePictureX;
+  profilePictureStartY = profilePictureY;
 
   if (
     event.pointerId !== undefined &&
     profilePictureModalCropArea &&
     profilePictureModalCropArea.setPointerCapture
   ) {
-
     try {
-
       profilePictureModalCropArea.setPointerCapture(
         event.pointerId
       );
-
     } catch (error) {}
-
   }
-
 }
 
 
@@ -1403,48 +759,26 @@ function startProfilePictureDrag(
    POINTER MOVE
 ========================================================= */
 
-function moveProfilePictureDrag(
-  event
-) {
-
-  if (
-    !profilePictureDragging
-  ) {
-
+function moveProfilePictureDrag(event) {
+  if (!profilePictureDragging) {
     return;
-
   }
-
 
   event.preventDefault();
 
-
   const point =
-    getProfilePicturePointerPosition(
-      event
-    );
-
+    getProfilePicturePointerPosition(event);
 
   profilePictureX =
     profilePictureStartX +
-    (
-      point.x -
-      profilePictureDragStartX
-    );
-
+    (point.x - profilePictureDragStartX);
 
   profilePictureY =
     profilePictureStartY +
-    (
-      point.y -
-      profilePictureDragStartY
-    );
-
+    (point.y - profilePictureDragStartY);
 
   limitProfilePicturePosition();
-
   updateProfilePictureTransform();
-
 }
 
 
@@ -1452,33 +786,18 @@ function moveProfilePictureDrag(
    POINTER UP
 ========================================================= */
 
-function endProfilePictureDrag(
-  event
-) {
-
-  if (
-    !profilePictureDragging
-  ) {
-
+function endProfilePictureDrag(event) {
+  if (!profilePictureDragging) {
     return;
-
   }
 
+  profilePictureDragging = false;
 
-  profilePictureDragging =
-    false;
-
-
-  if (
-    profilePictureModalImageContainer
-  ) {
-
+  if (profilePictureModalImageContainer) {
     profilePictureModalImageContainer.classList.remove(
       "U9-dragging"
     );
-
   }
-
 
   if (
     event &&
@@ -1486,17 +805,12 @@ function endProfilePictureDrag(
     profilePictureModalCropArea &&
     profilePictureModalCropArea.releasePointerCapture
   ) {
-
     try {
-
       profilePictureModalCropArea.releasePointerCapture(
         event.pointerId
       );
-
     } catch (error) {}
-
   }
-
 }
 
 
@@ -1504,20 +818,11 @@ function endProfilePictureDrag(
    POINTER POSITION
 ========================================================= */
 
-function getProfilePicturePointerPosition(
-  event
-) {
-
+function getProfilePicturePointerPosition(event) {
   return {
-
-    x:
-      event.clientX,
-
-    y:
-      event.clientY
-
+    x: event.clientX,
+    y: event.clientY
   };
-
 }
 
 
@@ -1525,34 +830,21 @@ function getProfilePicturePointerPosition(
    WHEEL ZOOM
 ========================================================= */
 
-function handleProfilePictureWheel(
-  event
-) {
-
+function handleProfilePictureWheel(event) {
   if (
     !profilePictureFile ||
     profilePictureLoadingIsActive()
   ) {
-
     return;
-
   }
-
 
   event.preventDefault();
 
-
-  const step =
-    event.deltaY < 0
-      ? 0.08
-      : -0.08;
-
+  const step = event.deltaY < 0 ? 0.08 : -0.08;
 
   setProfilePictureZoom(
-    profilePictureZoom +
-    step
+    profilePictureZoom + step
   );
-
 }
 
 
@@ -1561,175 +853,70 @@ function handleProfilePictureWheel(
 ========================================================= */
 
 function changeProfilePicture() {
-
-  if (
-    profilePictureLoadingIsActive()
-  ) {
-
+  if (profilePictureLoadingIsActive()) {
     return;
-
   }
 
-
   selectProfilePictureFile();
-
 }
 
 
 /* =========================================================
-   GET OUTPUT FORMAT
+   OUTPUT FORMAT
 ========================================================= */
 
 function getProfilePictureOutputFormat() {
+  const fileType = (
+    profilePictureFile?.type || ""
+  ).toLowerCase().trim();
 
-  const fileType =
-    (
-      profilePictureFile?.type ||
-      ""
-    )
-      .toLowerCase()
-      .trim();
-
-
-  /*
-     PNG → PNG
-  */
-
-  if (
-    fileType ===
-    "image/png"
-  ) {
-
+  if (fileType === "image/png") {
     return {
-
-      mimeType:
-        "image/png",
-
-      extension:
-        "png",
-
-      quality:
-        undefined
-
+      mimeType: "image/png",
+      extension: "png",
+      quality: undefined
     };
-
   }
 
-
-  /*
-     JPG / JPEG → JPEG
-  */
-
   if (
-    fileType ===
-      "image/jpeg" ||
-    fileType ===
-      "image/jpg"
+    fileType === "image/jpeg" ||
+    fileType === "image/jpg"
   ) {
-
     return {
-
-      mimeType:
-        "image/jpeg",
-
-      extension:
-        "jpg",
-
-      quality:
-        0.92
-
+      mimeType: "image/jpeg",
+      extension: "jpg",
+      quality: 0.92
     };
-
   }
 
-
-  /*
-     WebP → WebP
-  */
-
-  if (
-    fileType ===
-    "image/webp"
-  ) {
-
+  if (fileType === "image/webp") {
     return {
-
-      mimeType:
-        "image/webp",
-
-      extension:
-        "webp",
-
-      quality:
-        0.92
-
+      mimeType: "image/webp",
+      extension: "webp",
+      quality: 0.92
     };
-
   }
-
-
-  /*
-     GIF and all other browser-supported
-     image formats are converted to PNG.
-
-     Canvas does not preserve GIF animation.
-  */
 
   return {
-
-    mimeType:
-      "image/png",
-
-    extension:
-      "png",
-
-    quality:
-      undefined
-
+    mimeType: "image/png",
+    extension: "png",
+    quality: undefined
   };
-
 }
 
 
-/* =========================================================
-   GET EXTENSION FROM MIME TYPE
-========================================================= */
+function getProfilePictureExtension(mimeType) {
+  const type = (mimeType || "").toLowerCase().trim();
 
-function getProfilePictureExtension(
-  mimeType
-) {
-
-  const type =
-    (
-      mimeType ||
-      ""
-    )
-      .toLowerCase()
-      .trim();
-
-
-  if (
-    type ===
-    "image/jpeg"
-  ) {
-
+  if (type === "image/jpeg") {
     return "jpg";
-
   }
 
-
-  if (
-    type ===
-    "image/webp"
-  ) {
-
+  if (type === "image/webp") {
     return "webp";
-
   }
-
 
   return "png";
-
 }
 
 
@@ -1738,399 +925,232 @@ function getProfilePictureExtension(
 ========================================================= */
 
 function createCroppedProfilePicture() {
+  return new Promise(function (resolve, reject) {
+    if (!profilePictureFile || !profilePictureObjectURL) {
+      reject(new Error("No image selected."));
+      return;
+    }
 
-  return new Promise(
-    function (
-      resolve,
-      reject
-    ) {
+    if (!profilePictureModalCropArea) {
+      reject(new Error("Crop area is unavailable."));
+      return;
+    }
 
-      if (
-        !profilePictureFile ||
-        !profilePictureObjectURL
-      ) {
+    const cropWidth =
+      profilePictureModalCropArea.clientWidth;
 
-        reject(
-          new Error(
-            "No image selected."
-          )
-        );
+    const cropHeight =
+      profilePictureModalCropArea.clientHeight;
 
+    const cropSize = Math.min(cropWidth, cropHeight);
+
+    if (cropSize <= 0) {
+      reject(new Error("Crop area is not ready."));
+      return;
+    }
+
+    const image = new Image();
+
+    image.onload = function () {
+      const canvas = document.createElement("canvas");
+
+      canvas.width = U9_PROFILE_PICTURE_OUTPUT_SIZE;
+      canvas.height = U9_PROFILE_PICTURE_OUTPUT_SIZE;
+
+      const context = canvas.getContext("2d");
+
+      if (!context) {
+        reject(new Error("Unable to create image canvas."));
         return;
-
       }
 
+      const scale = getProfilePictureScale();
 
-      if (
-        !profilePictureModalCropArea
-      ) {
+      const imageWidth =
+        image.naturalWidth * scale;
 
-        reject(
-          new Error(
-            "Crop area is unavailable."
-          )
-        );
+      const imageHeight =
+        image.naturalHeight * scale;
 
-        return;
+      const imageLeft =
+        (cropWidth - imageWidth) / 2 +
+        profilePictureX;
 
-      }
+      const imageTop =
+        (cropHeight - imageHeight) / 2 +
+        profilePictureY;
 
+      const sourceX =
+        Math.max(0, -imageLeft) / scale;
 
-      const cropWidth =
-        profilePictureModalCropArea.clientWidth;
+      const sourceY =
+        Math.max(0, -imageTop) / scale;
 
+      const visibleLeft =
+        Math.max(0, imageLeft);
 
-      const cropHeight =
-        profilePictureModalCropArea.clientHeight;
+      const visibleTop =
+        Math.max(0, imageTop);
 
+      const visibleRight =
+        Math.min(cropSize, imageLeft + imageWidth);
 
-      const cropSize =
-        Math.min(
-          cropWidth,
-          cropHeight
-        );
+      const visibleBottom =
+        Math.min(cropSize, imageTop + imageHeight);
 
+      const visibleWidth =
+        Math.max(0, visibleRight - visibleLeft);
 
-      if (
-        cropSize <= 0
-      ) {
+      const visibleHeight =
+        Math.max(0, visibleBottom - visibleTop);
 
-        reject(
-          new Error(
-            "Crop area is not ready."
-          )
-        );
+      const sourceWidth =
+        visibleWidth / scale;
 
-        return;
+      const sourceHeight =
+        visibleHeight / scale;
 
-      }
+      const outputScale =
+        U9_PROFILE_PICTURE_OUTPUT_SIZE / cropSize;
 
+      context.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
 
-      const image =
-        new Image();
+      context.drawImage(
+        image,
+        sourceX,
+        sourceY,
+        sourceWidth,
+        sourceHeight,
+        visibleLeft * outputScale,
+        visibleTop * outputScale,
+        visibleWidth * outputScale,
+        visibleHeight * outputScale
+      );
 
+      const outputFormat =
+        getProfilePictureOutputFormat();
 
-      image.onload =
-        function () {
+      canvas.toBlob(function (blob) {
+        if (
+          blob &&
+          blob.size > 0 &&
+          blob.type === outputFormat.mimeType
+        ) {
+          resolve({
+            blob: blob,
+            mimeType: blob.type,
+            extension: getProfilePictureExtension(blob.type)
+          });
 
-          const canvas =
-            document.createElement(
-              "canvas"
-            );
+          return;
+        }
 
-
-          canvas.width =
-            U9_PROFILE_PICTURE_OUTPUT_SIZE;
-
-
-          canvas.height =
-            U9_PROFILE_PICTURE_OUTPUT_SIZE;
-
-
-          const context =
-            canvas.getContext(
-              "2d"
-            );
-
-
-          if (!context) {
-
+        canvas.toBlob(function (fallbackBlob) {
+          if (!fallbackBlob || fallbackBlob.size <= 0) {
             reject(
-              new Error(
-                "Unable to create image canvas."
-              )
+              new Error("Unable to create cropped image.")
             );
-
             return;
-
           }
 
-
-          const scale =
-            getProfilePictureScale();
-
-
-          const imageWidth =
-            image.naturalWidth *
-            scale;
-
-
-          const imageHeight =
-            image.naturalHeight *
-            scale;
-
-
-          /*
-             Calculate the actual image position
-             inside the crop area.
-          */
-
-          const imageLeft =
-            (
-              cropWidth -
-              imageWidth
-            ) / 2 +
-            profilePictureX;
-
-
-          const imageTop =
-            (
-              cropHeight -
-              imageHeight
-            ) / 2 +
-            profilePictureY;
-
-
-          /*
-             Convert crop coordinates
-             into original image coordinates.
-          */
-
-          const sourceX =
-            Math.max(
-              0,
-              -imageLeft
-            ) / scale;
-
-
-          const sourceY =
-            Math.max(
-              0,
-              -imageTop
-            ) / scale;
-
-
-          const visibleLeft =
-            Math.max(
-              0,
-              imageLeft
-            );
-
-
-          const visibleTop =
-            Math.max(
-              0,
-              imageTop
-            );
-
-
-          const visibleRight =
-            Math.min(
-              cropSize,
-              imageLeft +
-              imageWidth
-            );
-
-
-          const visibleBottom =
-            Math.min(
-              cropSize,
-              imageTop +
-              imageHeight
-            );
-
-
-          const visibleWidth =
-            Math.max(
-              0,
-              visibleRight -
-              visibleLeft
-            );
-
-
-          const visibleHeight =
-            Math.max(
-              0,
-              visibleBottom -
-              visibleTop
-            );
-
-
-          const sourceWidth =
-            visibleWidth /
-            scale;
-
-
-          const sourceHeight =
-            visibleHeight /
-            scale;
-
-
-          const destinationX =
-            visibleLeft;
-
-
-          const destinationY =
-            visibleTop;
-
-
-          const outputScale =
-            U9_PROFILE_PICTURE_OUTPUT_SIZE /
-            cropSize;
-
-
-          /*
-             Draw the exact crop.
-          */
-
-          context.clearRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-          );
-
-
-          context.drawImage(
-
-            image,
-
-            sourceX,
-
-            sourceY,
-
-            sourceWidth,
-
-            sourceHeight,
-
-            destinationX *
-              outputScale,
-
-            destinationY *
-              outputScale,
-
-            visibleWidth *
-              outputScale,
-
-            visibleHeight *
-              outputScale
-
-          );
-
-
-          /* =================================================
-             IMAGE OUTPUT FORMAT
-          ================================================= */
-
-          const outputFormat =
-            getProfilePictureOutputFormat();
-
-
-          /*
-             Try to create the cropped image
-             using the correct output format.
-          */
-
-          canvas.toBlob(
-            function (blob) {
-
-              /*
-                 If the browser successfully created
-                 the requested format, use it.
-              */
-
-              if (
-                blob &&
-                blob.size > 0 &&
-                blob.type ===
-                  outputFormat.mimeType
-              ) {
-
-                resolve({
-
-                  blob:
-                    blob,
-
-                  mimeType:
-                    blob.type,
-
-                  extension:
-                    getProfilePictureExtension(
-                      blob.type
-                    )
-
-                });
-
-                return;
-
-              }
-
-
-              /*
-                 Safari and some older browsers
-                 may not support WebP Canvas export.
-
-                 In that case, automatically fall
-                 back to PNG.
-              */
-
-              canvas.toBlob(
-                function (fallbackBlob) {
-
-                  if (
-                    !fallbackBlob ||
-                    fallbackBlob.size <= 0
-                  ) {
-
-                    reject(
-                      new Error(
-                        "Unable to create cropped image."
-                      )
-                    );
-
-                    return;
-
-                  }
-
-
-                  resolve({
-
-                    blob:
-                      fallbackBlob,
-
-                    mimeType:
-                      "image/png",
-
-                    extension:
-                      "png"
-
-                  });
-
-                },
-
-                "image/png"
-
-              );
-
-            },
-
-            outputFormat.mimeType,
-
-            outputFormat.quality
-
-          );
-
-        };
-
-
-      image.onerror =
-        function () {
-
-          reject(
-            new Error(
-              "Unable to process image."
+          resolve({
+            blob: fallbackBlob,
+            mimeType: fallbackBlob.type || "image/png",
+            extension: getProfilePictureExtension(
+              fallbackBlob.type || "image/png"
             )
-          );
+          });
+        }, "image/png");
+      }, outputFormat.mimeType, outputFormat.quality);
+    };
 
-        };
+    image.onerror = function () {
+      reject(new Error("Unable to process image."));
+    };
+
+    image.src = profilePictureObjectURL;
+  });
+}
 
 
-      image.src =
-        profilePictureObjectURL;
+/* =========================================================
+   REFRESH PROFILE
+   Refresh each API at most once.
+========================================================= */
 
+async function refreshProfileAfterPictureUpload(avatarURL) {
+  /*
+     Update the main avatar immediately when the API
+     provides a URL. Add a cache-busting parameter so
+     the browser is less likely to display a cached image.
+  */
+
+  if (avatarURL) {
+    const mainAvatar = document.getElementById(
+      "U9-profile-avatar-image"
+    );
+
+    if (mainAvatar) {
+      const separator = avatarURL.includes("?") ? "&" : "?";
+      mainAvatar.src =
+        `${avatarURL}${separator}t=${Date.now()}`;
     }
-  );
+  }
 
+  /*
+     Refresh current user data once.
+     Do not reload the entire page.
+  */
+
+  if (
+    window.U9User &&
+    typeof window.U9User.refresh === "function"
+  ) {
+    try {
+      await window.U9User.refresh();
+    } catch (error) {
+      console.error(
+        "PROFILE PICTURE: USER REFRESH ERROR:",
+        error
+      );
+    }
+  }
+
+  /*
+     Refresh profile avatar once.
+     If refreshAvatar exists, use it; otherwise use refresh.
+  */
+
+  if (
+    window.U9Profile &&
+    typeof window.U9Profile.refreshAvatar === "function"
+  ) {
+    try {
+      await window.U9Profile.refreshAvatar();
+    } catch (error) {
+      console.error(
+        "PROFILE PICTURE: AVATAR REFRESH ERROR:",
+        error
+      );
+    }
+  } else if (
+    window.U9Profile &&
+    typeof window.U9Profile.refresh === "function"
+  ) {
+    try {
+      await window.U9Profile.refresh();
+    } catch (error) {
+      console.error(
+        "PROFILE PICTURE: PROFILE REFRESH ERROR:",
+        error
+      );
+    }
+  }
 }
 
 
@@ -2139,205 +1159,99 @@ function createCroppedProfilePicture() {
 ========================================================= */
 
 async function uploadProfilePicture() {
+  if (profilePictureUploading) {
+    return;
+  }
 
-  if (
-    !profilePictureIsLoggedIn()
-  ) {
-
+  if (!profilePictureIsLoggedIn()) {
     showProfilePictureMessage(
       "Please log in before changing your profile picture.",
       "error"
     );
-
     return;
-
   }
 
-
-  if (
-    !profilePictureFile
-  ) {
-
+  if (!profilePictureFile) {
     showProfilePictureMessage(
       "Please select an image first.",
       "error"
     );
-
     return;
-
   }
 
+  profilePictureUploading = true;
 
   try {
-
-    setProfilePictureLoading(
-      true,
-      "Preparing image..."
-    );
-
+    setProfilePictureLoading(true, "Preparing image...");
 
     const croppedImage =
       await createCroppedProfilePicture();
 
-
-    setProfilePictureLoading(
-      true,
-      "Uploading..."
-    );
-
-
-    const token =
-      getProfilePictureToken();
-
+    const token = getProfilePictureToken();
 
     if (!token) {
-
       throw new Error(
         "Your login session has expired. Please log in again."
       );
-
     }
 
+    setProfilePictureLoading(true, "Uploading...");
 
-    const formData =
-      new FormData();
-
-
-    /*
-       Upload the actual cropped format.
-
-       PNG  → avatar.png
-       JPEG → avatar.jpg
-       WebP → avatar.webp
-    */
+    const formData = new FormData();
 
     formData.append(
-
       "avatar",
-
       croppedImage.blob,
-
       `avatar.${croppedImage.extension}`
-
     );
 
+    const response = await fetch(
+      U9_PROFILE_PICTURE_UPLOAD_API,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      }
+    );
 
-    const response =
-      await fetch(
-        U9_PROFILE_PICTURE_UPLOAD_API,
-        {
-
-          method:
-            "POST",
-
-          headers: {
-
-            Authorization:
-              `Bearer ${token}`
-
-          },
-
-          body:
-            formData
-
-        }
-      );
-
-
-    let result =
-      null;
-
+    let result = null;
 
     try {
-
-      result =
-        await response.json();
-
+      result = await response.json();
     } catch (error) {
-
-      result =
-        null;
-
+      result = null;
     }
-
 
     if (
       response.status === 401 ||
       response.status === 403
     ) {
-
       throw new Error(
         "Your login session has expired. Please log in again."
       );
-
     }
 
-
-    if (
-      !response.ok
-    ) {
-
+    if (!response.ok) {
       throw new Error(
         result?.message ||
         result?.error ||
         "Failed to upload profile picture."
       );
-
     }
 
-
-    if (
-      result &&
-      result.success === false
-    ) {
-
+    if (result && result.success === false) {
       throw new Error(
         result.message ||
         result.error ||
         "Failed to upload profile picture."
       );
-
     }
 
-
     /*
-       Refresh current user data.
-    */
-
-    if (
-      window.U9User &&
-      typeof window.U9User.refresh === "function"
-    ) {
-
-      await window.U9User.refresh();
-
-    }
-
-
-    /*
-       Refresh profile avatar.
-    */
-
-    if (
-      window.U9Profile &&
-      typeof window.U9Profile.refreshAvatar === "function"
-    ) {
-
-      await window.U9Profile.refreshAvatar();
-
-    } else if (
-      window.U9Profile &&
-      typeof window.U9Profile.refresh === "function"
-    ) {
-
-      await window.U9Profile.refresh();
-
-    }
-
-
-    /*
-       Update avatar image directly
-       when the API returns an avatar URL.
+       The upload succeeded.
+       Refresh profile data without reloading the page.
     */
 
     const avatarURL =
@@ -2347,69 +1261,25 @@ async function uploadProfilePicture() {
       result?.data?.avatar?.url ||
       null;
 
-
-    if (
-      avatarURL
-    ) {
-
-      const mainAvatar =
-        document.getElementById(
-          "U9-profile-avatar-image"
-        );
-
-
-      if (
-        mainAvatar
-      ) {
-
-        mainAvatar.src =
-          avatarURL;
-
-      }
-
-    }
-
+    await refreshProfileAfterPictureUpload(avatarURL);
 
     showProfilePictureMessage(
       "Profile picture updated successfully.",
       "success"
     );
 
-
-    setProfilePictureLoading(
-      false
-    );
-
-
     /*
-       Upload succeeded.
-
-       Refresh the entire page so all avatar
-       components use the newly saved avatar.
+       Stop loading but keep the modal open so the user
+       can see the success message.
     */
 
-    setTimeout(
-      function () {
-
-        window.location.reload();
-
-      },
-      500
-    );
-
+    setProfilePictureLoading(false);
 
   } catch (error) {
-
     console.error(
       "PROFILE PICTURE UPLOAD ERROR:",
       error
     );
-
-
-    setProfilePictureLoading(
-      false
-    );
-
 
     showProfilePictureMessage(
       error?.message ||
@@ -2417,8 +1287,10 @@ async function uploadProfilePicture() {
       "error"
     );
 
+  } finally {
+    profilePictureUploading = false;
+    setProfilePictureLoading(false);
   }
-
 }
 
 
@@ -2427,29 +1299,28 @@ async function uploadProfilePicture() {
 ========================================================= */
 
 function bindProfileAvatarButton() {
-
-  const profileAvatar =
-    document.getElementById(
-      "U9-profile-avatar"
-    );
-
-
-  if (!profileAvatar) {
-
-    return;
-
-  }
-
-
-  profileAvatar.addEventListener(
-    "click",
-    function () {
-
-      openProfilePictureModal();
-
-    }
+  const profileAvatar = document.getElementById(
+    "U9-profile-avatar"
   );
 
+  if (!profileAvatar) {
+    return;
+  }
+
+  /*
+     Avoid attaching the same listener more than once
+     if initialization is called again.
+  */
+
+  if (profileAvatar.dataset.profilePictureBound === "true") {
+    return;
+  }
+
+  profileAvatar.dataset.profilePictureBound = "true";
+
+  profileAvatar.addEventListener("click", function () {
+    openProfilePictureModal();
+  });
 }
 
 
@@ -2457,135 +1328,73 @@ function bindProfileAvatarButton() {
    EVENTS
 ========================================================= */
 
-if (
-  profilePictureModalClose
-) {
-
+if (profilePictureModalClose) {
   profilePictureModalClose.addEventListener(
     "click",
     closeProfilePictureModal
   );
-
 }
 
-
-if (
-  profilePictureModalOverlay
-) {
-
+if (profilePictureModalOverlay) {
   profilePictureModalOverlay.addEventListener(
     "click",
     closeProfilePictureModal
   );
-
 }
 
-
-if (
-  profilePictureModalSelectButton
-) {
-
+if (profilePictureModalSelectButton) {
   profilePictureModalSelectButton.addEventListener(
     "click",
     selectProfilePictureFile
   );
-
 }
 
-
-if (
-  profilePictureModalFile
-) {
-
+if (profilePictureModalFile) {
   profilePictureModalFile.addEventListener(
     "change",
     handleProfilePictureFileChange
   );
-
 }
 
-
-if (
-  profilePictureModalChange
-) {
-
+if (profilePictureModalChange) {
   profilePictureModalChange.addEventListener(
     "click",
     changeProfilePicture
   );
-
 }
 
-
-if (
-  profilePictureModalReset
-) {
-
+if (profilePictureModalReset) {
   profilePictureModalReset.addEventListener(
     "click",
     function () {
-
-      if (
-        !profilePictureFile
-      ) {
-
+      if (!profilePictureFile) {
         return;
-
       }
-
 
       profilePictureZoom =
         U9_PROFILE_PICTURE_MIN_ZOOM;
 
-
-      if (
-        profilePictureModalZoomRange
-      ) {
-
+      if (profilePictureModalZoomRange) {
         profilePictureModalZoomRange.value =
-          String(
-            profilePictureZoom
-          );
-
+          String(profilePictureZoom);
       }
-
-
-      /*
-         Recalculate the base scale
-         using the current crop area's
-         real dimensions.
-      */
 
       profilePictureCalculateBaseScale();
 
-
-      profilePictureX =
-        0;
-
-
-      profilePictureY =
-        0;
-
+      profilePictureX = 0;
+      profilePictureY = 0;
 
       limitProfilePicturePosition();
-
       updateProfilePictureTransform();
-
     }
   );
-
 }
 
-
-if (
-  profilePictureModalConfirm
-) {
-
+if (profilePictureModalConfirm) {
   profilePictureModalConfirm.addEventListener(
     "click",
     uploadProfilePicture
   );
-
 }
 
 
@@ -2593,61 +1402,37 @@ if (
    ZOOM BUTTONS
 ========================================================= */
 
-if (
-  profilePictureModalZoomOut
-) {
-
+if (profilePictureModalZoomOut) {
   profilePictureModalZoomOut.addEventListener(
     "click",
     function () {
-
       setProfilePictureZoom(
-        profilePictureZoom -
-        0.1
+        profilePictureZoom - 0.1
       );
-
     }
   );
-
 }
 
-
-if (
-  profilePictureModalZoomIn
-) {
-
+if (profilePictureModalZoomIn) {
   profilePictureModalZoomIn.addEventListener(
     "click",
     function () {
-
       setProfilePictureZoom(
-        profilePictureZoom +
-        0.1
+        profilePictureZoom + 0.1
       );
-
     }
   );
-
 }
 
-
-if (
-  profilePictureModalZoomRange
-) {
-
+if (profilePictureModalZoomRange) {
   profilePictureModalZoomRange.addEventListener(
     "input",
     function () {
-
       setProfilePictureZoom(
-        Number(
-          profilePictureModalZoomRange.value
-        )
+        Number(profilePictureModalZoomRange.value)
       );
-
     }
   );
-
 }
 
 
@@ -2655,65 +1440,41 @@ if (
    DRAG EVENTS
 ========================================================= */
 
-if (
-  profilePictureModalCropArea
-) {
-
+if (profilePictureModalCropArea) {
   profilePictureModalCropArea.addEventListener(
     "pointerdown",
     startProfilePictureDrag
   );
-
 
   profilePictureModalCropArea.addEventListener(
     "pointermove",
     moveProfilePictureDrag
   );
 
-
   profilePictureModalCropArea.addEventListener(
     "pointerup",
     endProfilePictureDrag
   );
-
 
   profilePictureModalCropArea.addEventListener(
     "pointercancel",
     endProfilePictureDrag
   );
 
-
   profilePictureModalCropArea.addEventListener(
     "pointerleave",
     function (event) {
-
-      /*
-         Keep the drag active even when
-         the pointer briefly leaves the area.
-      */
-
-      if (
-        profilePictureDragging
-      ) {
-
-        moveProfilePictureDrag(
-          event
-        );
-
+      if (profilePictureDragging) {
+        moveProfilePictureDrag(event);
       }
-
     }
   );
-
 
   profilePictureModalCropArea.addEventListener(
     "wheel",
     handleProfilePictureWheel,
-    {
-      passive: false
-    }
+    { passive: false }
   );
-
 }
 
 
@@ -2721,82 +1482,43 @@ if (
    KEYBOARD
 ========================================================= */
 
-document.addEventListener(
-  "keydown",
-  function (event) {
-
-    if (
-      !profilePictureModal ||
-      !profilePictureModal.classList.contains(
-        "U9-profile-picture-modal-open"
-      )
-    ) {
-
-      return;
-
-    }
-
-
-    if (
-      event.key === "Escape"
-    ) {
-
-      closeProfilePictureModal();
-
-    }
-
+document.addEventListener("keydown", function (event) {
+  if (
+    !profilePictureModal ||
+    !profilePictureModal.classList.contains(
+      "U9-profile-picture-modal-open"
+    )
+  ) {
+    return;
   }
-);
+
+  if (event.key === "Escape") {
+    closeProfilePictureModal();
+  }
+});
 
 
 /* =========================================================
    RESIZE
 ========================================================= */
 
-window.addEventListener(
-  "resize",
-  function () {
-
-    if (
-      !profilePictureModal ||
-      !profilePictureModal.classList.contains(
-        "U9-profile-picture-modal-open"
-      )
-    ) {
-
-      return;
-
-    }
-
-
-    if (
-      !profilePictureFile
-    ) {
-
-      return;
-
-    }
-
-
-    /*
-       Wait for the new mobile/desktop layout
-       to finish before recalculating.
-    */
-
-    requestAnimationFrame(
-      function () {
-
-        profilePictureCalculateBaseScale();
-
-        limitProfilePicturePosition();
-
-        updateProfilePictureTransform();
-
-      }
-    );
-
+window.addEventListener("resize", function () {
+  if (
+    !profilePictureModal ||
+    !profilePictureModal.classList.contains(
+      "U9-profile-picture-modal-open"
+    ) ||
+    !profilePictureFile
+  ) {
+    return;
   }
-);
+
+  requestAnimationFrame(function () {
+    profilePictureCalculateBaseScale();
+    limitProfilePicturePosition();
+    updateProfilePictureTransform();
+  });
+});
 
 
 /* =========================================================
@@ -2804,19 +1526,10 @@ window.addEventListener(
 ========================================================= */
 
 window.U9ProfilePictureModal = {
-
-  open:
-    openProfilePictureModal,
-
-  close:
-    closeProfilePictureModal,
-
-  select:
-    selectProfilePictureFile,
-
-  reset:
-    resetProfilePictureEditor
-
+  open: openProfilePictureModal,
+  close: closeProfilePictureModal,
+  select: selectProfilePictureFile,
+  reset: resetProfilePictureEditor
 };
 
 
@@ -2825,9 +1538,7 @@ window.U9ProfilePictureModal = {
 ========================================================= */
 
 function initProfilePictureModal() {
-
   bindProfileAvatarButton();
-
 }
 
 
@@ -2835,17 +1546,11 @@ function initProfilePictureModal() {
    DOM READY
 ========================================================= */
 
-if (
-  document.readyState === "loading"
-) {
-
+if (document.readyState === "loading") {
   document.addEventListener(
     "DOMContentLoaded",
     initProfilePictureModal
   );
-
 } else {
-
   initProfilePictureModal();
-
 }
