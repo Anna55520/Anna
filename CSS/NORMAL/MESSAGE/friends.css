@@ -1,7 +1,18 @@
-
 /* =================================================
    U9 MESSAGE - FRIENDS PAGE
    File: CSS/NORMAL/MESSAGE/friends.css
+
+   Features:
+   - Scrollable friends list
+   - Friend avatar and avatar-frame overlay
+   - Responsive avatar sizes
+   - Four action buttons
+   - Loading, error and empty states
+================================================= */
+
+
+/* =================================================
+   ROOT
 ================================================= */
 
 #Message-model-friends-root {
@@ -9,7 +20,9 @@
   height: 100%;
   min-width: 0;
   min-height: 0;
+
   color: #202124;
+
   box-sizing: border-box;
 }
 
@@ -19,32 +32,58 @@
   box-sizing: border-box;
 }
 
-/* Page fills its available area.
-   Only the friend list scrolls. */
+/* Always respect the hidden attribute. */
+
+#Message-model-friends-root [hidden] {
+  display: none !important;
+}
+
+
+/* =================================================
+   FRIENDS PAGE
+   The page fills its available area.
+   Only the friend list scrolls.
+================================================= */
 
 #Message-model-friends-root .U9-friends-page {
   display: flex;
   flex-direction: column;
+
   width: 100%;
   height: 100%;
+
+  min-width: 0;
   min-height: 0;
+
   padding: 12px 18px 16px;
+
+  box-sizing: border-box;
 }
+
+
+/* =================================================
+   FRIENDS LIST
+================================================= */
 
 #Message-model-friends-root .U9-friends-list {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
+
   gap: 9px;
+
   width: 100%;
   min-width: 0;
   min-height: 0;
 
   overflow-x: hidden;
   overflow-y: auto;
+
   overscroll-behavior: contain;
+
   scrollbar-width: thin;
   scrollbar-color: #d5d9e1 transparent;
+
   -webkit-overflow-scrolling: touch;
 }
 
@@ -61,21 +100,28 @@
   border-radius: 10px;
 }
 
-/* Friend card */
+
+/* =================================================
+   FRIEND CARD
+================================================= */
 
 #Message-model-friends-root .U9-friend-card {
   display: flex;
   align-items: center;
+
   gap: 13px;
 
   width: 100%;
   min-width: 0;
+
   flex: 0 0 auto;
 
   padding: 13px 15px;
+
   border: 1px solid #e8eaf0;
   border-radius: 13px;
-  background: #fff;
+
+  background: #ffffff;
 
   transition:
     border-color 160ms ease,
@@ -85,40 +131,151 @@
 
 #Message-model-friends-root .U9-friend-card:hover {
   border-color: #d9deea;
+
   background: #fcfcfe;
+
   box-shadow: 0 3px 12px rgb(24 39 75 / 5%);
 }
 
-/* Avatar */
+
+/* =================================================
+   AVATAR STACK
+   IMPORTANT:
+   - Do not crop the outer frame.
+   - Keep the avatar wrapper square.
+   - The actual avatar is slightly inset.
+   - The frame overlays the avatar.
+================================================= */
 
 #Message-model-friends-root .U9-friend-avatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  --friend-avatar-size: 46px;
+  --friend-avatar-inset: 5px;
 
-  flex: 0 0 46px;
-  width: 46px;
-  height: 46px;
-  overflow: hidden;
+  position: relative;
 
-  border-radius: 50%;
-  background: #edf0f5;
+  display: block;
+
+  flex: 0 0 var(--friend-avatar-size);
+
+  width: var(--friend-avatar-size);
+  height: var(--friend-avatar-size);
+
+  min-width: var(--friend-avatar-size);
+  min-height: var(--friend-avatar-size);
+
+  overflow: visible;
+
+  border: 0;
+  border-radius: 0;
+
+  background: transparent;
+
+  isolation: isolate;
+
+  box-sizing: border-box;
 }
+
+
+/* =================================================
+   BASE AVATAR IMAGE
+   Overrides inline measurements from friends.js
+   so responsive sizes remain consistent.
+================================================= */
 
 #Message-model-friends-root .U9-friend-avatar-image {
+  position: absolute !important;
+
+  inset: var(--friend-avatar-inset) !important;
+
+  z-index: 1;
+
   display: block;
-  width: 100%;
-  height: 100%;
+
+  width: calc(
+    100% - var(--friend-avatar-inset) * 2
+  ) !important;
+
+  height: calc(
+    100% - var(--friend-avatar-inset) * 2
+  ) !important;
+
+  max-width: none;
+  max-height: none;
+
   object-fit: cover;
+  object-position: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: #edf0f5;
+
+  box-sizing: border-box;
 }
 
+
+/* =================================================
+   AVATAR FRAME IMAGE
+   Uses the complete wrapper size.
+   Frame artwork stays above the base avatar.
+================================================= */
+
+#Message-model-friends-root .U9-friend-avatar-frame-image {
+  position: absolute !important;
+
+  inset: 0 !important;
+
+  z-index: 2;
+
+  display: block;
+
+  width: 100% !important;
+  height: 100% !important;
+
+  max-width: none;
+  max-height: none;
+
+  object-fit: contain;
+  object-position: center;
+
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+  border-radius: 0;
+
+  background: transparent;
+
+  pointer-events: none;
+
+  box-sizing: border-box;
+}
+
+
+/* =================================================
+   AVATAR INITIALS FALLBACK
+   Used only when both the selected avatar and
+   the default avatar fail to load.
+================================================= */
+
 #Message-model-friends-root .U9-friend-avatar-fallback {
+  position: absolute;
+
+  inset: var(--friend-avatar-inset, 5px);
+
+  z-index: 1;
+
   display: flex;
+
   align-items: center;
   justify-content: center;
 
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
+
+  overflow: hidden;
+
+  border: 0;
   border-radius: 50%;
 
   background: #e8edff;
@@ -126,58 +283,90 @@
 
   font-size: 15px;
   font-weight: 700;
+  line-height: 1;
+
+  text-align: center;
+
+  box-sizing: border-box;
 }
 
-/* Username and account */
+
+/* =================================================
+   USERNAME AND ACCOUNT
+================================================= */
 
 #Message-model-friends-root .U9-friend-info {
   flex: 1 1 auto;
+
   min-width: 0;
 }
 
 #Message-model-friends-root .U9-friend-name {
   overflow: hidden;
+
   color: #202124;
+
   font-size: 15px;
   font-weight: 650;
   line-height: 1.5;
+
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 #Message-model-friends-root .U9-friend-account {
   overflow: hidden;
+
   margin-top: 3px;
 
   color: #777d87;
+
   font-size: 12px;
   line-height: 1.4;
+
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-/* Four SVG actions */
+
+/* =================================================
+   FRIEND ACTIONS
+================================================= */
 
 #Message-model-friends-root .U9-friend-actions {
   display: flex;
+
   align-items: center;
   justify-content: flex-end;
+
   flex: 0 0 auto;
+
   gap: 5px;
 }
 
+
+/* =================================================
+   ACTION BUTTON
+================================================= */
+
 #Message-model-friends-root .U9-friend-action {
   display: inline-flex;
+
   align-items: center;
   justify-content: center;
 
   flex: 0 0 34px;
+
   width: 34px;
   height: 34px;
+
+  min-width: 0;
+
   padding: 8px;
 
   border: 1px solid transparent;
   border-radius: 9px;
+
   background: transparent;
 
   cursor: pointer;
@@ -188,23 +377,36 @@
     opacity 160ms ease;
 }
 
+
+/* =================================================
+   ACTION BUTTON ICON
+================================================= */
+
 #Message-model-friends-root .U9-friend-action img {
   display: block;
+
   width: 100%;
   height: 100%;
+
   object-fit: contain;
+
   pointer-events: none;
 }
 
-/* Enabled Chat icon */
+
+/* =================================================
+   CHAT ACTION
+================================================= */
 
 #Message-model-friends-root .U9-friend-action-chat {
   border-color: #e5e9f5;
+
   background: #f3f5fc;
 }
 
 #Message-model-friends-root .U9-friend-action-chat:hover {
   border-color: #d4dcf7;
+
   background: #e9edfc;
 }
 
@@ -212,10 +414,15 @@
   background: #dfe5fb;
 }
 
-/* Placeholder actions: observe, mute, delete */
+
+/* =================================================
+   PLACEHOLDER ACTIONS
+   Observe, Mute and Delete are not enabled yet.
+================================================= */
 
 #Message-model-friends-root .U9-friend-action:disabled {
   opacity: 0.42;
+
   cursor: default;
 }
 
@@ -223,63 +430,101 @@
   filter: grayscale(1);
 }
 
-/* Loading, error and empty states */
+
+/* =================================================
+   LOADING / ERROR / STATUS
+================================================= */
 
 #Message-model-friends-root .U9-friends-state {
   width: 100%;
+
   padding: 28px 18px;
+
   color: #687080;
+
   font-size: 14px;
   line-height: 1.6;
+
   text-align: center;
+
+  overflow-wrap: anywhere;
 }
 
 #Message-model-friends-root .U9-friends-state-error {
   color: #c62828;
 }
 
+#Message-model-friends-root .U9-friends-state-loading {
+  color: #687080;
+}
+
+
+/* =================================================
+   EMPTY STATE
+================================================= */
+
 #Message-model-friends-root .U9-friends-empty {
   display: flex;
+
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
 
+  width: 100%;
+
   min-height: 220px;
+
   padding: 30px 20px;
+
   text-align: center;
+
+  box-sizing: border-box;
 }
 
 #Message-model-friends-root .U9-friends-empty-icon {
   display: flex;
+
   align-items: center;
   justify-content: center;
 
   width: 58px;
   height: 58px;
+
   margin-bottom: 14px;
+
   border-radius: 50%;
 
   background: #f0f2f7;
   color: #788197;
+
   font-size: 30px;
 }
 
 #Message-model-friends-root .U9-friends-empty-title {
   color: #30343b;
+
   font-size: 16px;
   font-weight: 700;
 }
 
 #Message-model-friends-root .U9-friends-empty-description {
   max-width: 280px;
+
   margin-top: 7px;
 
   color: #7a808c;
+
   font-size: 13px;
   line-height: 1.6;
+
+  overflow-wrap: anywhere;
 }
 
-/* Tablet */
+
+/* =================================================
+   TABLET
+================================================= */
 
 @media (max-width: 760px) {
   #Message-model-friends-root .U9-friends-page {
@@ -288,13 +533,13 @@
 
   #Message-model-friends-root .U9-friend-card {
     gap: 10px;
+
     padding: 11px;
   }
 
   #Message-model-friends-root .U9-friend-avatar {
-    flex-basis: 42px;
-    width: 42px;
-    height: 42px;
+    --friend-avatar-size: 42px;
+    --friend-avatar-inset: 4px;
   }
 
   #Message-model-friends-root .U9-friend-actions {
@@ -303,17 +548,26 @@
 
   #Message-model-friends-root .U9-friend-action {
     flex-basis: 30px;
+
     width: 30px;
     height: 30px;
+
     padding: 7px;
   }
 
   #Message-model-friends-root .U9-friend-name {
     font-size: 14px;
   }
+
+  #Message-model-friends-root .U9-friend-avatar-fallback {
+    font-size: 14px;
+  }
 }
 
-/* Small mobile */
+
+/* =================================================
+   SMALL MOBILE
+================================================= */
 
 @media (max-width: 380px) {
   #Message-model-friends-root .U9-friends-page {
@@ -323,13 +577,13 @@
 
   #Message-model-friends-root .U9-friend-card {
     gap: 7px;
+
     padding: 9px 7px;
   }
 
   #Message-model-friends-root .U9-friend-avatar {
-    flex-basis: 36px;
-    width: 36px;
-    height: 36px;
+    --friend-avatar-size: 36px;
+    --friend-avatar-inset: 3px;
   }
 
   #Message-model-friends-root .U9-friend-actions {
@@ -338,11 +592,22 @@
 
   #Message-model-friends-root .U9-friend-action {
     flex-basis: 27px;
+
     width: 27px;
     height: 29px;
+
     padding: 6px;
   }
+
+  #Message-model-friends-root .U9-friend-avatar-fallback {
+    font-size: 12px;
+  }
 }
+
+
+/* =================================================
+   REDUCED MOTION
+================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   #Message-model-friends-root .U9-friend-card,
