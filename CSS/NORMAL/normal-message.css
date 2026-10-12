@@ -1,6 +1,17 @@
 
 /* =================================================
-   MESSAGE NORMAL MODAL
+   U9 MESSAGE NORMAL MODAL
+   File: CSS/NORMAL/normal-message.css
+
+   Responsibilities:
+   - Modal and animations
+   - Message header
+   - Navigation cards
+   - Inner page container
+   - Shared page layout
+
+   Chat-specific styles belong in:
+   CSS/NORMAL/MESSAGE/chat.css
 ================================================= */
 
 
@@ -17,16 +28,16 @@
   height: calc(100vh - 115px);
   height: calc(100dvh - 115px);
 
-  box-sizing: border-box;
-
   display: flex;
   justify-content: center;
   align-items: stretch;
 
-  background-color: rgba(0, 0, 0, 0.18);
+  box-sizing: border-box;
+  overflow: hidden;
+
+  background: rgba(0, 0, 0, 0.18);
 
   z-index: 1000;
-  overflow: hidden;
 
   visibility: hidden;
   pointer-events: none;
@@ -62,16 +73,15 @@
 
   width: 100%;
   height: 100%;
-  min-height: 0;
   min-width: 0;
+  min-height: 0;
 
   box-sizing: border-box;
-
-  background-color: #ffffff;
   overflow: hidden;
 
-  transform: translateY(100%);
+  background: #ffffff;
 
+  transform: translateY(100%);
   transition: transform 0.45s ease;
 }
 
@@ -117,11 +127,14 @@
 
 
 /* =================================================
-   TITLE
+   HEADER
 ================================================= */
 
 #U9-message-normal-modal-title {
   position: relative;
+
+  display: flex;
+  align-items: center;
 
   flex: 0 0 55px;
 
@@ -129,26 +142,23 @@
   height: 55px;
   min-height: 55px;
 
-  box-sizing: border-box;
-
-  display: flex;
-  align-items: center;
-
   padding: 0 65px 0 20px;
 
+  box-sizing: border-box;
+
+  background: #ffffff;
+  border-bottom: 1px solid #eeeeee;
+
+  color: #111111;
   font-size: 20px;
   font-weight: 600;
-  color: #111111;
-
-  background-color: #ffffff;
-  border-bottom: 1px solid #eeeeee;
 
   z-index: 2;
 }
 
 
 /* =================================================
-   CLOSE / BACK BUTTON
+   HEADER CLOSE / BACK BUTTON
 ================================================= */
 
 #U9-message-normal-modal-close {
@@ -157,17 +167,21 @@
   top: 50%;
   right: 15px;
 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
   width: 36px;
   height: 36px;
-
   padding: 0;
+
   box-sizing: border-box;
 
   border: none;
-  outline: none;
   border-radius: 50%;
+  outline: none;
 
-  background-color: #f1f1f1;
+  background: #f1f1f1;
   color: #111111;
 
   font-family: inherit;
@@ -179,10 +193,6 @@
 
   transform: translateY(-50%);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
   transition:
     background-color 0.2s ease,
     color 0.2s ease,
@@ -190,7 +200,7 @@
 }
 
 #U9-message-normal-modal-close:hover {
-  background-color: #e8e8e8;
+  background: #e8e8e8;
 }
 
 #U9-message-normal-modal-close:active {
@@ -202,34 +212,29 @@
   outline-offset: 2px;
 }
 
-/* JS adds this class when an inner page is open */
-
 #U9-message-normal-modal-close.message-back-button {
   border-radius: 8px;
-  background-color: transparent;
+  background: transparent;
   font-size: 28px;
 }
 
 #U9-message-normal-modal-close.message-back-button:hover {
-  background-color: #f1f1f1;
+  background: #f1f1f1;
 }
 
 
 /* =================================================
-   COMMON LAYOUT
+   HOME / INNER PAGE LAYOUT
 ================================================= */
 
 #Message-model-navigation,
 #Message-model-pages {
-  box-sizing: border-box;
   min-width: 0;
+  box-sizing: border-box;
 }
 
 
-/* =================================================
-   HOME STATE
-   Display four cards only
-================================================= */
+/* Home: show navigation cards */
 
 #U9-message-normal-modal-content.message-home
 #Message-model-navigation {
@@ -242,10 +247,7 @@
 }
 
 
-/* =================================================
-   INNER PAGE STATE
-   Hide four cards and display page container
-================================================= */
+/* Inner page: hide navigation cards */
 
 #U9-message-normal-modal-content.message-inner-page
 #Message-model-navigation {
@@ -259,30 +261,28 @@
 
 
 /* =================================================
-   NAVIGATION CARD GRID
+   NAVIGATION GRID
 ================================================= */
 
 #Message-model-navigation {
   position: relative;
 
-  flex: 1 1 auto;
-
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-
   align-content: start;
   align-items: stretch;
+
+  flex: 1 1 auto;
 
   gap: 14px;
 
   width: 100%;
   min-height: 0;
-
   padding: 20px;
 
   box-sizing: border-box;
 
-  background-color: #ffffff;
+  background: #ffffff;
 
   overflow-x: hidden;
   overflow-y: auto;
@@ -293,7 +293,7 @@
 
 
 /* =================================================
-   NAVIGATION CARD BUTTON
+   NAVIGATION BUTTON
 ================================================= */
 
 #Message-model-navigation .Message-model-nav-button {
@@ -301,7 +301,6 @@
 
   display: flex;
   flex-direction: column;
-
   align-items: center;
   justify-content: center;
 
@@ -310,17 +309,15 @@
   width: 100%;
   min-width: 0;
   min-height: 135px;
-
   padding: 16px 12px;
 
   box-sizing: border-box;
 
   border: 1px solid #e8e8e8;
   border-radius: 14px;
-
   outline: none;
 
-  background-color: #ffffff;
+  background: #ffffff;
   color: #222222;
 
   font-family: inherit;
@@ -343,13 +340,8 @@
     transform 0.2s ease;
 }
 
-
-/* =================================================
-   CARD HOVER
-================================================= */
-
 #Message-model-navigation .Message-model-nav-button:hover {
-  background-color: #fafafa;
+  background: #fafafa;
   border-color: #cccccc;
 
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
@@ -357,27 +349,17 @@
   transform: translateY(-2px);
 }
 
-
-/* =================================================
-   CARD ACTIVE
-   No card is active on initial load
-================================================= */
-
 #Message-model-navigation .Message-model-nav-button.active {
   color: #111111;
-  background-color: #f8f8f8;
+  background: #f8f8f8;
   border-color: #333333;
+
   box-shadow: 0 0 0 1px #333333;
 }
 
 #Message-model-navigation .Message-model-nav-button.active::after {
   content: none;
 }
-
-
-/* =================================================
-   CARD KEYBOARD FOCUS
-================================================= */
 
 #Message-model-navigation .Message-model-nav-button:focus-visible {
   outline: 2px solid #555555;
@@ -392,18 +374,18 @@
 #Message-model-navigation .Message-model-nav-icon {
   display: block;
 
+  flex: 0 0 28px;
+
   width: 28px;
   height: 28px;
-
-  flex: 0 0 28px;
 
   object-fit: contain;
   object-position: center;
 
+  opacity: 0.85;
+
   pointer-events: none;
   user-select: none;
-
-  opacity: 0.85;
 
   transition:
     opacity 0.2s ease,
@@ -431,7 +413,6 @@
   color: inherit;
 
   overflow-wrap: anywhere;
-
   pointer-events: none;
 }
 
@@ -456,13 +437,14 @@
   white-space: normal;
 
   overflow-wrap: anywhere;
-
   pointer-events: none;
 }
 
 
 /* =================================================
-   PAGE CONTAINER
+   INNER PAGE CONTAINER
+
+   Chat-specific layout belongs in chat.css.
 ================================================= */
 
 #Message-model-pages {
@@ -471,19 +453,19 @@
   flex: 1 1 auto;
 
   width: 100%;
+  height: 0;
   min-width: 0;
   min-height: 0;
-  height: 0;
 
   box-sizing: border-box;
 
-  background-color: #ffffff;
+  background: #ffffff;
   overflow: hidden;
 }
 
 
 /* =================================================
-   INDIVIDUAL PAGE
+   COMMON INNER PAGE
 ================================================= */
 
 #Message-model-pages .Message-model-page {
@@ -496,7 +478,7 @@
 
   box-sizing: border-box;
 
-  background-color: #ffffff;
+  background: #ffffff;
 
   overflow-x: hidden;
   overflow-y: auto;
@@ -505,15 +487,9 @@
   -webkit-overflow-scrolling: touch;
 }
 
-
-/* HIDE INACTIVE PAGES */
-
 #Message-model-pages .Message-model-page[hidden] {
   display: none !important;
 }
-
-
-/* ACTIVE NORMAL PAGE */
 
 #Message-model-pages .Message-model-page.active {
   display: block;
@@ -521,7 +497,7 @@
 
 
 /* =================================================
-   PAGE ROOTS
+   NORMAL PAGE ROOTS
 ================================================= */
 
 #Message-model-friends-root,
@@ -535,343 +511,12 @@
 
   box-sizing: border-box;
 
-  background-color: #ffffff;
+  background: #ffffff;
 }
 
 
 /* =================================================
-   CHAT PAGE LAYOUT
-================================================= */
-
-#Message-model-pages #Message-model-chat-page.active {
-  display: flex;
-  flex-direction: column;
-
-  overflow: hidden;
-}
-
-
-/* =================================================
-   CHAT HEADER
-================================================= */
-
-#Message-model-chat-header {
-  position: relative;
-
-  flex: 0 0 64px;
-
-  display: flex;
-  align-items: center;
-
-  gap: 12px;
-
-  width: 100%;
-  min-width: 0;
-  height: 64px;
-
-  padding: 0 16px;
-
-  box-sizing: border-box;
-
-  background-color: #ffffff;
-  border-bottom: 1px solid #eeeeee;
-}
-
-
-/* CHAT BACK BUTTON */
-
-#Message-model-chat-back {
-  flex: 0 0 36px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 36px;
-  height: 36px;
-
-  padding: 0;
-
-  border: none;
-  border-radius: 8px;
-
-  background-color: transparent;
-  color: #222222;
-
-  font-family: inherit;
-  font-size: 26px;
-  line-height: 1;
-
-  cursor: pointer;
-
-  transition: background-color 0.2s ease;
-}
-
-#Message-model-chat-back:hover {
-  background-color: #f2f2f2;
-}
-
-#Message-model-chat-back:focus-visible {
-  outline: 2px solid #555555;
-  outline-offset: 2px;
-}
-
-
-/* CHAT AVATAR */
-
-#Message-model-chat-avatar {
-  display: block;
-
-  flex: 0 0 40px;
-
-  width: 40px;
-  height: 40px;
-
-  border-radius: 50%;
-
-  object-fit: cover;
-  object-position: center;
-
-  background-color: #f1f1f1;
-}
-
-
-/* CHAT USER INFO */
-
-#Message-model-chat-user-info {
-  flex: 1 1 auto;
-
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  gap: 3px;
-}
-
-#Message-model-chat-name {
-  width: 100%;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-
-  color: #111111;
-
-  font-size: 15px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-#Message-model-chat-status {
-  width: 100%;
-
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-
-  color: #888888;
-
-  font-size: 11px;
-  font-weight: 400;
-  line-height: 1.4;
-}
-
-
-/* CHAT MORE BUTTON */
-
-#Message-model-chat-more {
-  flex: 0 0 36px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 36px;
-  height: 36px;
-
-  padding: 0;
-
-  border: none;
-  border-radius: 8px;
-
-  background-color: transparent;
-  color: #333333;
-
-  font-family: inherit;
-  font-size: 25px;
-  line-height: 1;
-
-  cursor: pointer;
-
-  transition: background-color 0.2s ease;
-}
-
-#Message-model-chat-more:hover {
-  background-color: #f2f2f2;
-}
-
-#Message-model-chat-more:focus-visible {
-  outline: 2px solid #555555;
-  outline-offset: 2px;
-}
-
-
-/* =================================================
-   CHAT MESSAGES AREA
-================================================= */
-
-#Message-model-chat-messages {
-  flex: 1 1 auto;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 10px;
-
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
-
-  padding: 16px;
-
-  box-sizing: border-box;
-
-  background-color: #f8f9fb;
-
-  overflow-x: hidden;
-  overflow-y: auto;
-
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-
-/* =================================================
-   CHAT INPUT FORM
-================================================= */
-
-#Message-model-chat-form {
-  flex: 0 0 auto;
-
-  display: flex;
-  align-items: center;
-
-  gap: 10px;
-
-  width: 100%;
-  min-width: 0;
-
-  padding: 12px 14px;
-
-  box-sizing: border-box;
-
-  background-color: #ffffff;
-  border-top: 1px solid #eeeeee;
-}
-
-
-/* CHAT TEXT INPUT */
-
-#Message-model-chat-input {
-  flex: 1 1 auto;
-
-  width: 0;
-  min-width: 0;
-  height: 42px;
-
-  padding: 0 14px;
-
-  box-sizing: border-box;
-
-  border: 1px solid #e2e2e2;
-  border-radius: 22px;
-
-  outline: none;
-
-  background-color: #f8f8f8;
-  color: #222222;
-
-  font-family: inherit;
-  font-size: 14px;
-  line-height: normal;
-
-  transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-#Message-model-chat-input::placeholder {
-  color: #999999;
-}
-
-#Message-model-chat-input:focus {
-  border-color: #aaaaaa;
-  background-color: #ffffff;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04);
-}
-
-
-/* SEND BUTTON */
-
-#Message-model-chat-send {
-  flex: 0 0 42px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 42px;
-  height: 42px;
-
-  padding: 10px;
-
-  box-sizing: border-box;
-
-  border: none;
-  border-radius: 50%;
-
-  background-color: #222222;
-  color: #ffffff;
-
-  cursor: pointer;
-
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-#Message-model-chat-send:hover {
-  background-color: #444444;
-}
-
-#Message-model-chat-send:active {
-  transform: scale(0.95);
-}
-
-#Message-model-chat-send:focus-visible {
-  outline: 2px solid #555555;
-  outline-offset: 3px;
-}
-
-#Message-model-chat-send img {
-  display: block;
-
-  width: 100%;
-  height: 100%;
-
-  object-fit: contain;
-
-  filter: brightness(0) invert(1);
-
-  pointer-events: none;
-}
-
-
-/* =================================================
-   RESPONSIVE: TABLET AND DESKTOP
+   RESPONSIVE: DESKTOP
 ================================================= */
 
 @media (min-width: 769px) {
@@ -885,9 +530,9 @@
   }
 
   #Message-model-navigation .Message-model-nav-icon {
+    flex-basis: 32px;
     width: 32px;
     height: 32px;
-    flex-basis: 32px;
   }
 
   #Message-model-navigation .Message-model-nav-description {
@@ -920,9 +565,6 @@
     max-width: 100%;
   }
 
-
-  /* TITLE */
-
   #U9-message-normal-modal-title {
     flex-basis: 55px;
     height: 55px;
@@ -932,9 +574,6 @@
     font-size: 18px;
   }
 
-
-  /* CLOSE / BACK BUTTON */
-
   #U9-message-normal-modal-close {
     right: 10px;
 
@@ -942,14 +581,10 @@
     height: 36px;
   }
 
-
-  /* HOME CARD GRID */
-
   #Message-model-navigation {
     grid-template-columns: repeat(2, minmax(0, 1fr));
 
     gap: 12px;
-
     padding: 16px;
   }
 
@@ -957,9 +592,8 @@
     min-width: 0;
     min-height: 125px;
 
-    padding: 14px 8px;
-
     gap: 8px;
+    padding: 14px 8px;
 
     border-radius: 12px;
 
@@ -967,9 +601,9 @@
   }
 
   #Message-model-navigation .Message-model-nav-icon {
+    flex-basis: 25px;
     width: 25px;
     height: 25px;
-    flex-basis: 25px;
   }
 
   #Message-model-navigation .Message-model-nav-label {
@@ -979,62 +613,6 @@
   #Message-model-navigation .Message-model-nav-description {
     font-size: 10px;
     line-height: 1.45;
-  }
-
-
-  /* CHAT HEADER */
-
-  #Message-model-chat-header {
-    flex-basis: 58px;
-    height: 58px;
-
-    gap: 9px;
-
-    padding: 0 10px;
-  }
-
-  #Message-model-chat-avatar {
-    flex-basis: 36px;
-
-    width: 36px;
-    height: 36px;
-  }
-
-  #Message-model-chat-name {
-    font-size: 14px;
-  }
-
-  #Message-model-chat-status {
-    font-size: 10px;
-  }
-
-
-  /* CHAT MESSAGES */
-
-  #Message-model-chat-messages {
-    padding: 12px;
-  }
-
-
-  /* CHAT INPUT */
-
-  #Message-model-chat-form {
-    gap: 8px;
-    padding: 10px;
-  }
-
-  #Message-model-chat-input {
-    height: 40px;
-    padding: 0 12px;
-
-    font-size: 13px;
-  }
-
-  #Message-model-chat-send {
-    flex-basis: 40px;
-
-    width: 40px;
-    height: 40px;
   }
 }
 
@@ -1051,17 +629,17 @@
 
   #Message-model-navigation .Message-model-nav-button {
     min-height: 115px;
-    padding: 12px 6px;
 
     gap: 7px;
+    padding: 12px 6px;
 
     font-size: 12px;
   }
 
   #Message-model-navigation .Message-model-nav-icon {
+    flex-basis: 23px;
     width: 23px;
     height: 23px;
-    flex-basis: 23px;
   }
 
   #Message-model-navigation .Message-model-nav-label {
@@ -1070,11 +648,6 @@
 
   #Message-model-navigation .Message-model-nav-description {
     font-size: 9px;
-  }
-
-  #Message-model-chat-header {
-    gap: 7px;
-    padding: 0 8px;
   }
 }
 
@@ -1088,10 +661,7 @@
   #U9-message-normal-modal-content,
   #U9-message-normal-modal-close,
   #Message-model-navigation .Message-model-nav-button,
-  #Message-model-navigation .Message-model-nav-icon,
-  #Message-model-chat-back,
-  #Message-model-chat-more,
-  #Message-model-chat-send {
+  #Message-model-navigation .Message-model-nav-icon {
     transition: none;
   }
 
