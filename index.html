@@ -1356,25 +1356,24 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
   </div>
 
-
   <!-- =================================================
       MESSAGE MODAL
   ================================================= -->
 
-  <div id="Message-model-modal">
+  <div id="U9-message-normal-modal">
 
-    <div id="Message-model-modal-content">
+    <div id="U9-message-normal-modal-content">
 
       <!-- =============================================
           MESSAGE TITLE
       ============================================= -->
 
-      <div id="Message-model-title">
+      <div id="U9-message-normal-modal-title">
 
         Message
 
         <button
-          id="Message-model-close"
+          id="U9-message-normal-modal-close"
           type="button"
           aria-label="Close Message"
         >
@@ -1393,10 +1392,12 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
         <!-- FRIENDS -->
 
         <button
-          id="Message-model-friend-button"
+          id="Message-model-friends-button"
           class="Message-model-nav-button active"
           type="button"
-          data-page="friend"
+          data-page="friends"
+          aria-controls="Message-model-friends-page"
+          aria-selected="true"
         >
 
           <img
@@ -1415,10 +1416,12 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
         <!-- ADD FRIENDS -->
 
         <button
-          id="Message-model-add-friend-button"
+          id="Message-model-add-friends-button"
           class="Message-model-nav-button"
           type="button"
-          data-page="add-friend"
+          data-page="add-friends"
+          aria-controls="Message-model-add-friends-page"
+          aria-selected="false"
         >
 
           <img
@@ -1441,6 +1444,8 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           class="Message-model-nav-button"
           type="button"
           data-page="group"
+          aria-controls="Message-model-group-page"
+          aria-selected="false"
         >
 
           <img
@@ -1463,6 +1468,8 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           class="Message-model-nav-button"
           type="button"
           data-page="customer-service"
+          aria-controls="Message-model-customer-service-page"
+          aria-selected="false"
         >
 
           <img
@@ -1486,26 +1493,29 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
       <div id="Message-model-pages">
 
-        <!-- FRIEND PAGE -->
+        <!-- FRIENDS PAGE -->
 
         <section
-          id="Message-model-friend-page"
+          id="Message-model-friends-page"
           class="Message-model-page active"
+          aria-hidden="false"
         >
 
-          <div id="Message-model-friend-root"></div>
+          <div id="Message-model-friends-root"></div>
 
         </section>
 
 
-        <!-- ADD FRIEND PAGE -->
+        <!-- ADD FRIENDS PAGE -->
 
         <section
-          id="Message-model-add-friend-page"
+          id="Message-model-add-friends-page"
           class="Message-model-page"
+          aria-hidden="true"
+          hidden
         >
 
-          <div id="Message-model-add-friend-root"></div>
+          <div id="Message-model-add-friends-root"></div>
 
         </section>
 
@@ -1515,6 +1525,8 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
         <section
           id="Message-model-group-page"
           class="Message-model-page"
+          aria-hidden="true"
+          hidden
         >
 
           <div id="Message-model-group-root"></div>
@@ -1527,6 +1539,8 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
         <section
           id="Message-model-customer-service-page"
           class="Message-model-page"
+          aria-hidden="true"
+          hidden
         >
 
           <div id="Message-model-customer-service-root"></div>
@@ -2103,7 +2117,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
       </div>
     </section>
   </div>
-
 
   <!-- =================================================
       JS
