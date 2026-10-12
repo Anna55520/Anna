@@ -68,13 +68,21 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
   <!-- NORMAL -->
 
+  <!-- message -->
   <link rel="stylesheet" href="CSS/NORMAL/normal-message.css">
+  <link rel="stylesheet" href="CSS/NORMAL/MESSAGE/add-friends.css">
+  <link rel="stylesheet" href="CSS/NORMAL/MESSAGE/customer-service.css">
+  <link rel="stylesheet" href="CSS/NORMAL/MESSAGE/friends.css">
+  <link rel="stylesheet" href="CSS/NORMAL/MESSAGE/group.css">
+
+  <!-- inbox -->
   <link rel="stylesheet" href="CSS/NORMAL/normal-inbox.css">
+
+  <!-- gift -->
   <link rel="stylesheet" href="CSS/NORMAL/normal-gift.css">
 
-
+  <!-- history -->
   <link rel="stylesheet" href="CSS/NORMAL/normal-history.css">
-
   <link rel="stylesheet" href="CSS/NORMAL/HISTORY/shop-page.css">
   <link rel="stylesheet" href="CSS/NORMAL/HISTORY/save-page.css">
   <link rel="stylesheet" href="CSS/NORMAL/HISTORY/order-page.css">
@@ -1353,19 +1361,22 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
       MESSAGE MODAL
   ================================================= -->
 
-  <div id="U9-message-normal-modal">
+  <div id="Message-model-modal">
 
+    <div id="Message-model-modal-content">
 
-    <div id="U9-message-normal-modal-content">
+      <!-- =============================================
+          MESSAGE TITLE
+      ============================================= -->
 
-
-      <div id="U9-message-normal-modal-title">
+      <div id="Message-model-title">
 
         Message
 
         <button
-          id="U9-message-normal-modal-close"
+          id="Message-model-close"
           type="button"
+          aria-label="Close Message"
         >
           ×
         </button>
@@ -1373,11 +1384,160 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
       </div>
 
 
+      <!-- =============================================
+          MESSAGE NAVIGATION
+      ============================================= -->
+
+      <div id="Message-model-navigation">
+
+        <!-- FRIENDS -->
+
+        <button
+          id="Message-model-friend-button"
+          class="Message-model-nav-button active"
+          type="button"
+          data-page="friend"
+        >
+
+          <img
+            class="Message-model-nav-icon"
+            src="/SSVG/account/account-edit-button.svg"
+            alt=""
+          >
+
+          <span class="Message-model-nav-label">
+            Friend
+          </span>
+
+        </button>
+
+
+        <!-- ADD FRIENDS -->
+
+        <button
+          id="Message-model-add-friend-button"
+          class="Message-model-nav-button"
+          type="button"
+          data-page="add-friend"
+        >
+
+          <img
+            class="Message-model-nav-icon"
+            src="/SSVG/account/account-edit-button.svg"
+            alt=""
+          >
+
+          <span class="Message-model-nav-label">
+            Add Friend
+          </span>
+
+        </button>
+
+
+        <!-- GROUP -->
+
+        <button
+          id="Message-model-group-button"
+          class="Message-model-nav-button"
+          type="button"
+          data-page="group"
+        >
+
+          <img
+            class="Message-model-nav-icon"
+            src="/SSVG/account/account-edit-button.svg"
+            alt=""
+          >
+
+          <span class="Message-model-nav-label">
+            Group
+          </span>
+
+        </button>
+
+
+        <!-- CUSTOMER SERVICE -->
+
+        <button
+          id="Message-model-customer-service-button"
+          class="Message-model-nav-button"
+          type="button"
+          data-page="customer-service"
+        >
+
+          <img
+            class="Message-model-nav-icon"
+            src="/SSVG/account/account-edit-button.svg"
+            alt=""
+          >
+
+          <span class="Message-model-nav-label">
+            Customer Service
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <!-- =============================================
+          MESSAGE PAGES
+      ============================================= -->
+
+      <div id="Message-model-pages">
+
+        <!-- FRIEND PAGE -->
+
+        <section
+          id="Message-model-friend-page"
+          class="Message-model-page active"
+        >
+
+          <div id="Message-model-friend-root"></div>
+
+        </section>
+
+
+        <!-- ADD FRIEND PAGE -->
+
+        <section
+          id="Message-model-add-friend-page"
+          class="Message-model-page"
+        >
+
+          <div id="Message-model-add-friend-root"></div>
+
+        </section>
+
+
+        <!-- GROUP PAGE -->
+
+        <section
+          id="Message-model-group-page"
+          class="Message-model-page"
+        >
+
+          <div id="Message-model-group-root"></div>
+
+        </section>
+
+
+        <!-- CUSTOMER SERVICE PAGE -->
+
+        <section
+          id="Message-model-customer-service-page"
+          class="Message-model-page"
+        >
+
+          <div id="Message-model-customer-service-root"></div>
+
+        </section>
+
+      </div>
+
     </div>
 
-
   </div>
-
 
   <!-- =================================================
       INBOX MODAL
@@ -2005,12 +2165,20 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
       NORMAL
   ================================================= -->
 
+  <!-- message -->
   <script src="JS/NORMAL/normal-message.js"></script>
+  <script src="JS/NORMAL/MESSAGE/add-friends.js"></script>
+  <script src="JS/NORMAL/MESSAGE/customer-service.js"></script>
+  <script src="JS/NORMAL/MESSAGE/friends.js"></script>
+  <script src="JS/NORMAL/MESSAGE/group.js"></script>
 
+  <!-- inbox -->
   <script src="JS/NORMAL/normal-inbox.js"></script>
 
+  <!-- gift -->
   <script src="JS/NORMAL/normal-gift.js"></script>
 
+  <!-- history -->
   <script src="JS/NORMAL/normal-history.js"></script>
   <script src="JS/NORMAL/HISTORY/shop-page.js"></script>
   <script src="JS/NORMAL/HISTORY/save-page.js"></script>
