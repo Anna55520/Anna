@@ -4,14 +4,15 @@
    File: CSS/NORMAL/normal-message.css
 
    Responsibilities:
-   - Modal and animations
-   - Message header
-   - Navigation cards
+   - Message modal and animations
+   - Header and navigation
    - Message home layout
-   - Friends and joined groups list layout
-   - Shared inner page layout
+   - Home friends and groups
+   - Home friend avatar and frame
+   - SVG chat button
+   - Shared inner-page layout
 
-   Chat-specific styles belong in:
+   Chat-specific styles:
    CSS/NORMAL/MESSAGE/chat.css
 ================================================= */
 
@@ -21,8 +22,10 @@
 ================================================= */
 
 #U9-message-normal-modal {
+  --message-modal-top: 115px;
+
   position: fixed;
-  top: 115px;
+  top: var(--message-modal-top);
   left: 0;
 
   display: flex;
@@ -30,8 +33,8 @@
   align-items: stretch;
 
   width: 100%;
-  height: calc(100vh - 115px);
-  height: calc(100dvh - 115px);
+  height: calc(100vh - var(--message-modal-top));
+  height: calc(100dvh - var(--message-modal-top));
 
   box-sizing: border-box;
   overflow: hidden;
@@ -49,16 +52,28 @@
     visibility 0s linear 0.45s;
 }
 
-
-/* =================================================
-   TOOLBAR COLLAPSED
-================================================= */
-
 #U9-message-normal-modal.message-toolbar-collapsed {
-  top: 60px;
+  --message-modal-top: 60px;
+}
 
-  height: calc(100vh - 60px);
-  height: calc(100dvh - 60px);
+#U9-message-normal-modal.modal-open {
+  visibility: visible;
+  pointer-events: auto;
+
+  transition:
+    top 0.35s ease,
+    height 0.35s ease,
+    visibility 0s;
+}
+
+#U9-message-normal-modal.modal-closing {
+  visibility: visible;
+  pointer-events: none;
+
+  transition:
+    top 0.35s ease,
+    height 0.35s ease,
+    visibility 0s;
 }
 
 
@@ -74,6 +89,7 @@
 
   width: 100%;
   height: 100%;
+
   min-width: 0;
   min-height: 0;
 
@@ -86,39 +102,9 @@
   transition: transform 0.45s ease;
 }
 
-
-/* =================================================
-   OPEN
-================================================= */
-
-#U9-message-normal-modal.modal-open {
-  visibility: visible;
-  pointer-events: auto;
-
-  transition:
-    top 0.35s ease,
-    height 0.35s ease,
-    visibility 0s;
-}
-
 #U9-message-normal-modal.modal-open
 #U9-message-normal-modal-content {
   transform: translateY(0);
-}
-
-
-/* =================================================
-   CLOSING
-================================================= */
-
-#U9-message-normal-modal.modal-closing {
-  visibility: visible;
-  pointer-events: none;
-
-  transition:
-    top 0.35s ease,
-    height 0.35s ease,
-    visibility 0s;
 }
 
 #U9-message-normal-modal.modal-closing
@@ -148,8 +134,8 @@
 
   box-sizing: border-box;
 
-  background: #78ace9;
   border: none;
+  background: #78ace9;
 
   color: #ffffff;
   font-size: 20px;
@@ -158,11 +144,6 @@
 
   z-index: 2;
 }
-
-
-/* =================================================
-   HEADER TITLE TEXT
-================================================= */
 
 #U9-message-normal-modal-title-text {
   position: absolute;
@@ -194,7 +175,6 @@
 
   top: 50%;
   left: 12px;
-  right: auto;
 
   display: flex;
   align-items: center;
@@ -227,24 +207,15 @@
     transform 0.2s ease;
 }
 
-
-/* Home close icon */
-
 #U9-message-normal-modal-close.message-home-close {
   color: #ffffff;
   font-size: 30px;
 }
 
-
-/* Back button */
-
 #U9-message-normal-modal-close.message-back-button {
   background: transparent;
   color: #ffffff;
 }
-
-
-/* Back SVG */
 
 #U9-message-normal-modal-close img {
   display: block;
@@ -259,9 +230,6 @@
   pointer-events: none;
   user-select: none;
 }
-
-
-/* Header button hover */
 
 #U9-message-normal-modal-close:hover {
   background: rgba(255, 255, 255, 0.16);
@@ -288,9 +256,6 @@
   box-sizing: border-box;
 }
 
-
-/* Message home */
-
 #Message-model-home {
   display: flex;
   flex: 1 1 auto;
@@ -308,9 +273,6 @@
   -webkit-overflow-scrolling: touch;
 }
 
-
-/* Home state */
-
 #U9-message-normal-modal-content.message-home
 #Message-model-home {
   display: flex;
@@ -320,9 +282,6 @@
 #Message-model-pages {
   display: none;
 }
-
-
-/* Inner page state */
 
 #U9-message-normal-modal-content.message-inner-page
 #Message-model-home {
@@ -338,7 +297,6 @@
 
 /* =================================================
    NAVIGATION GRID
-   Four buttons in one horizontal row
 ================================================= */
 
 #Message-model-navigation {
@@ -355,19 +313,18 @@
 
   width: 100%;
   min-width: 0;
+
   padding: 12px 14px;
 
   box-sizing: border-box;
 
   background: #ffffff;
-
   overflow: visible;
 }
 
 
 /* =================================================
-   NAVIGATION BUTTON
-   Smaller compact cards
+   NAVIGATION BUTTONS
 ================================================= */
 
 #Message-model-navigation .Message-model-nav-button {
@@ -383,6 +340,7 @@
   width: 100%;
   min-width: 0;
   min-height: 76px;
+
   padding: 8px 3px;
 
   box-sizing: border-box;
@@ -414,11 +372,7 @@
     transform 0.2s ease;
 }
 
-
-/* Navigation hover */
-
-#Message-model-navigation
-.Message-model-nav-button:hover {
+#Message-model-navigation .Message-model-nav-button:hover {
   background: #fafafa;
   border-color: #cccccc;
 
@@ -427,11 +381,7 @@
   transform: translateY(-1px);
 }
 
-
-/* Navigation active */
-
-#Message-model-navigation
-.Message-model-nav-button.active {
+#Message-model-navigation .Message-model-nav-button.active {
   color: #111111;
   background: #f8f8f8;
   border-color: #333333;
@@ -439,23 +389,18 @@
   box-shadow: 0 0 0 1px #333333;
 }
 
-#Message-model-navigation
-.Message-model-nav-button.active::after {
+#Message-model-navigation .Message-model-nav-button.active::after {
   content: none;
 }
 
-
-/* Navigation focus */
-
-#Message-model-navigation
-.Message-model-nav-button:focus-visible {
+#Message-model-navigation .Message-model-nav-button:focus-visible {
   outline: 2px solid #555555;
   outline-offset: 2px;
 }
 
 
 /* =================================================
-   NAVIGATION ICON
+   NAVIGATION ICONS AND LABELS
 ================================================= */
 
 #Message-model-navigation .Message-model-nav-icon {
@@ -479,17 +424,11 @@
     transform 0.2s ease;
 }
 
-#Message-model-navigation
-.Message-model-nav-button:hover
+#Message-model-navigation .Message-model-nav-button:hover
 .Message-model-nav-icon {
   opacity: 1;
   transform: scale(1.05);
 }
-
-
-/* =================================================
-   NAVIGATION LABEL
-================================================= */
 
 #Message-model-navigation .Message-model-nav-label {
   display: block;
@@ -498,7 +437,6 @@
   max-width: 100%;
 
   color: inherit;
-
   font-size: inherit;
   line-height: 1.25;
 
@@ -506,18 +444,13 @@
   pointer-events: none;
 }
 
-
-/* =================================================
-   NAVIGATION DESCRIPTION
-================================================= */
-
 #Message-model-navigation .Message-model-nav-description {
   display: none;
 }
 
 
 /* =================================================
-   HOME: FRIENDS / GROUPS SECTIONS
+   HOME FRIENDS / GROUPS SECTIONS
 ================================================= */
 
 #Message-model-friends-list-section,
@@ -527,6 +460,7 @@
 
   width: 100%;
   min-width: 0;
+
   padding: 0 16px;
 
   box-sizing: border-box;
@@ -534,20 +468,20 @@
   background: #ffffff;
 }
 
-
-/* Section heading */
-
 .Message-model-list-heading {
-  margin: 12px 0 8px;
+  margin: 12px 0 10px;
 
-  color: #222222;
+  color: #252a34;
   font-size: 15px;
-  font-weight: 600;
-  line-height: 1.4;
+  font-weight: 650;
+  line-height: 1.45;
+  letter-spacing: 0.1px;
 }
 
 
-/* List containers */
+/* =================================================
+   HOME LISTS
+================================================= */
 
 #Message-model-friends-list,
 #Message-model-groups-list {
@@ -560,463 +494,29 @@
   box-sizing: border-box;
 }
 
+#Message-model-friends-list {
+  --home-avatar-slot-size: 58px;
+  --home-avatar-image-size: 37px;
+  --home-avatar-frame-size: 71px;
 
-/* =================================================
-   CONTACT ROW
-   Shared by friend and group list items
-================================================= */
+  --home-row-gap: 13px;
+  --home-row-min-height: 82px;
+  --home-row-padding-y: 11px;
+  --home-row-padding-x: 14px;
 
-.Message-model-contact-row {
-  display: flex;
-  align-items: center;
+  --home-chat-button-size: 38px;
+  --home-chat-icon-size: 22px;
 
-  gap: 12px;
+  gap: 9px;
 
-  width: 100%;
-  min-width: 0;
-  min-height: 66px;
-  padding: 10px 2px;
+  padding: 2px 1px 8px;
 
-  box-sizing: border-box;
-
-  border-bottom: 1px solid #eeeeee;
-  background: #ffffff;
-}
-
-
-/* Contact avatar */
-
-.Message-model-contact-avatar {
-  display: block;
-
-  flex: 0 0 44px;
-
-  width: 44px;
-  height: 44px;
-
-  border: none;
-  border-radius: 50%;
-
-  object-fit: cover;
-  object-position: center;
-
-  background: #f0f0f0;
-}
-
-
-/* Contact name */
-
-.Message-model-contact-name {
-  flex: 1 1 auto;
-
-  min-width: 0;
-
-  overflow: hidden;
-
-  color: #222222;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.4;
-
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-
-/* Chat button */
-
-.Message-model-contact-chat {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  flex: 0 0 38px;
-
-  width: 38px;
-  height: 38px;
-  padding: 8px;
-
-  box-sizing: border-box;
-
-  border: none;
-  border-radius: 50%;
-
-  background: #eef5fd;
-
-  cursor: pointer;
-
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-
-/* Chat SVG */
-
-.Message-model-contact-chat img {
-  display: block;
-
-  width: 22px;
-  height: 22px;
-
-  object-fit: contain;
-
-  pointer-events: none;
-  user-select: none;
-}
-
-
-/* Chat button hover */
-
-.Message-model-contact-chat:hover {
-  background: #dcecff;
-}
-
-.Message-model-contact-chat:active {
-  transform: scale(0.94);
-}
-
-.Message-model-contact-chat:focus-visible {
-  outline: 2px solid #78ace9;
-  outline-offset: 2px;
-}
-
-
-/* Empty list */
-
-.Message-model-empty {
-  display: block;
-
-  width: 100%;
-  padding: 12px 0;
-
-  box-sizing: border-box;
-
-  color: #888888;
-  font-size: 13px;
-  line-height: 1.5;
+  overflow: visible;
 }
 
 
 /* =================================================
-   INNER PAGE CONTAINER
-================================================= */
-
-#Message-model-pages {
-  position: relative;
-
-  display: none;
-
-  flex: 1 1 auto;
-
-  width: 100%;
-  height: 0;
-  min-width: 0;
-  min-height: 0;
-
-  box-sizing: border-box;
-
-  background: #ffffff;
-  overflow: hidden;
-}
-
-
-/* =================================================
-   COMMON INNER PAGE
-================================================= */
-
-#Message-model-pages .Message-model-page {
-  position: relative;
-
-  width: 100%;
-  height: 100%;
-  min-width: 0;
-  min-height: 0;
-
-  box-sizing: border-box;
-
-  background: #ffffff;
-
-  overflow-x: hidden;
-  overflow-y: auto;
-
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-
-/* Hidden pages */
-
-#Message-model-pages .Message-model-page[hidden] {
-  display: none !important;
-}
-
-
-/* Active pages */
-
-#Message-model-pages .Message-model-page.active {
-  display: block;
-}
-
-
-/* =================================================
-   NORMAL PAGE ROOTS
-================================================= */
-
-#Message-model-friends-root,
-#Message-model-add-friends-root,
-#Message-model-group-root,
-#Message-model-customer-service-root {
-  position: relative;
-
-  width: 100%;
-  min-height: 100%;
-
-  box-sizing: border-box;
-
-  background: #ffffff;
-}
-
-
-/* =================================================
-   RESPONSIVE: DESKTOP
-================================================= */
-
-@media (min-width: 769px) {
-  #Message-model-navigation {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-
-    gap: 10px;
-    padding: 14px 18px;
-  }
-
-  #Message-model-navigation .Message-model-nav-button {
-    min-height: 82px;
-    padding: 9px 5px;
-
-    font-size: 12px;
-  }
-
-  #Message-model-navigation .Message-model-nav-icon {
-    flex-basis: 24px;
-    width: 24px;
-    height: 24px;
-  }
-
-  #Message-model-navigation .Message-model-nav-description {
-    display: none;
-  }
-
-  #Message-model-friends-list-section,
-  #Message-model-groups-list-section {
-    padding-right: 24px;
-    padding-left: 24px;
-  }
-}
-
-
-/* =================================================
-   RESPONSIVE: MOBILE
-================================================= */
-
-@media (max-width: 480px) {
-  #U9-message-normal-modal {
-    top: 115px;
-
-    height: calc(100vh - 115px);
-    height: calc(100dvh - 115px);
-  }
-
-  #U9-message-normal-modal.message-toolbar-collapsed {
-    top: 60px;
-
-    height: calc(100vh - 60px);
-    height: calc(100dvh - 60px);
-  }
-
-  #U9-message-normal-modal-content {
-    width: 100%;
-    max-width: 100%;
-  }
-
-  #U9-message-normal-modal-title {
-    flex-basis: 55px;
-    height: 55px;
-
-    padding: 0 50px;
-
-    font-size: 18px;
-  }
-
-  #U9-message-normal-modal-title-text {
-    left: 50px;
-    right: 50px;
-  }
-
-  #U9-message-normal-modal-close {
-    left: 8px;
-
-    width: 36px;
-    height: 36px;
-  }
-
-  #U9-message-normal-modal-close img {
-    width: 22px;
-    height: 22px;
-  }
-
-  /* Keep all four navigation buttons in one row */
-
-  #Message-model-navigation {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-
-    gap: 6px;
-    padding: 10px 8px;
-  }
-
-  #Message-model-navigation .Message-model-nav-button {
-    min-width: 0;
-    min-height: 70px;
-
-    gap: 5px;
-    padding: 7px 2px;
-
-    border-radius: 9px;
-
-    font-size: 10px;
-  }
-
-  #Message-model-navigation .Message-model-nav-icon {
-    flex-basis: 20px;
-    width: 20px;
-    height: 20px;
-  }
-
-  #Message-model-navigation .Message-model-nav-label {
-    font-size: 10px;
-    line-height: 1.25;
-  }
-
-  #Message-model-navigation .Message-model-nav-description {
-    display: none;
-  }
-
-  #Message-model-friends-list-section,
-  #Message-model-groups-list-section {
-    padding-right: 12px;
-    padding-left: 12px;
-  }
-
-  .Message-model-list-heading {
-    margin-top: 10px;
-    font-size: 14px;
-  }
-
-  .Message-model-contact-row {
-    gap: 10px;
-    min-height: 62px;
-  }
-
-  .Message-model-contact-avatar {
-    flex-basis: 40px;
-    width: 40px;
-    height: 40px;
-  }
-
-  .Message-model-contact-name {
-    font-size: 13px;
-  }
-
-  .Message-model-contact-chat {
-    flex-basis: 36px;
-    width: 36px;
-    height: 36px;
-  }
-
-  .Message-model-contact-chat img {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-
-/* =================================================
-   RESPONSIVE: VERY SMALL MOBILE
-================================================= */
-
-@media (max-width: 360px) {
-  #Message-model-navigation {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-
-    gap: 4px;
-    padding: 8px 6px;
-  }
-
-  #Message-model-navigation .Message-model-nav-button {
-    min-height: 64px;
-
-    gap: 4px;
-    padding: 6px 1px;
-
-    font-size: 9px;
-  }
-
-  #Message-model-navigation .Message-model-nav-icon {
-    flex-basis: 18px;
-    width: 18px;
-    height: 18px;
-  }
-
-  #Message-model-navigation .Message-model-nav-label {
-    font-size: 9px;
-    line-height: 1.2;
-  }
-
-  #Message-model-navigation .Message-model-nav-description {
-    display: none;
-  }
-
-  #Message-model-friends-list-section,
-  #Message-model-groups-list-section {
-    padding-right: 10px;
-    padding-left: 10px;
-  }
-}
-
-
-/* =================================================
-   REDUCED MOTION
-================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-  #U9-message-normal-modal,
-  #U9-message-normal-modal-content,
-  #U9-message-normal-modal-close,
-  #Message-model-navigation .Message-model-nav-button,
-  #Message-model-navigation .Message-model-nav-icon,
-  .Message-model-contact-chat {
-    transition: none;
-  }
-
-  #Message-model-navigation
-  .Message-model-nav-button:hover {
-    transform: none;
-  }
-
-  .Message-model-contact-chat:active {
-    transform: none;
-  }
-}
-
-
-/* =================================================
-   U9 MESSAGE HOME - FRIEND LIST
-   Home friend preview with avatar + frame + name + chat
-================================================= */
-
-
-/* =================================================
-   HOME FRIEND ROW
+   HOME FRIEND CARD
 ================================================= */
 
 #Message-model-friends-list .Message-model-home-friend-row {
@@ -1026,42 +526,59 @@
   flex-direction: row;
   align-items: center;
 
-  gap: 12px;
+  gap: var(--home-row-gap);
 
   width: 100%;
   min-width: 0;
-  min-height: 68px;
+  min-height: var(--home-row-min-height);
 
-  padding: 10px 2px;
+  flex: 0 0 auto;
 
-  border-bottom: 1px solid #eeeeee;
+  padding:
+    var(--home-row-padding-y)
+    var(--home-row-padding-x);
+
+  border: 1px solid #e8eaf0;
+  border-radius: 13px;
+
   background: #ffffff;
 
+  box-shadow: 0 2px 6px rgb(24 39 75 / 3%);
+
   overflow: visible;
+
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+#Message-model-friends-list .Message-model-home-friend-row:hover {
+  border-color: #d9deea;
+  background: #fcfcfe;
+
+  box-shadow: 0 3px 12px rgb(24 39 75 / 5%);
 }
 
 
 /* =================================================
-   AVATAR STACK
-   The wrapper reserves layout space for the frame.
+   HOME AVATAR STACK
 ================================================= */
 
 #Message-model-friends-list .Message-model-contact-avatar-stack {
-  --home-avatar-slot: 48px;
-  --home-avatar-image-size: 31px;
-  --home-avatar-frame-size: 58px;
-
   position: relative;
 
   display: block;
 
-  flex: 0 0 var(--home-avatar-slot);
+  flex: 0 0 var(--home-avatar-slot-size);
 
-  width: var(--home-avatar-slot);
-  height: var(--home-avatar-slot);
+  width: var(--home-avatar-slot-size);
+  height: var(--home-avatar-slot-size);
 
-  min-width: var(--home-avatar-slot);
-  min-height: var(--home-avatar-slot);
+  min-width: var(--home-avatar-slot-size);
+  min-height: var(--home-avatar-slot-size);
+
+  margin: 0;
 
   overflow: visible;
 
@@ -1093,7 +610,6 @@
   z-index: 1;
 
   display: block;
-
   flex: none !important;
 
   width: var(--home-avatar-image-size) !important;
@@ -1116,7 +632,7 @@
   border: 0;
   border-radius: 50%;
 
-  background: #f0f0f0;
+  background: #f0f2f7;
 
   box-sizing: border-box;
 }
@@ -1124,7 +640,6 @@
 
 /* =================================================
    HOME AVATAR FRAME
-   Centered over the avatar but larger than it.
 ================================================= */
 
 #Message-model-friends-list
@@ -1170,11 +685,10 @@
 
 
 /* =================================================
-   AVATAR FALLBACK
+   HOME AVATAR FALLBACK
 ================================================= */
 
-#Message-model-friends-list
-.Message-model-contact-avatar-fallback {
+#Message-model-friends-list .Message-model-contact-avatar-fallback {
   position: absolute;
 
   top: 50%;
@@ -1183,7 +697,6 @@
   z-index: 1;
 
   display: flex;
-
   align-items: center;
   justify-content: center;
 
@@ -1194,6 +707,7 @@
 
   transform: translate(-50%, -50%);
 
+  border: 0;
   border-radius: 50%;
 
   background: #e8edff;
@@ -1209,11 +723,10 @@
 
 /* =================================================
    HOME FRIEND NAME
-   Account is intentionally not shown here.
+   The account is intentionally omitted.
 ================================================= */
 
-#Message-model-friends-list
-.Message-model-home-friend-row
+#Message-model-friends-list .Message-model-home-friend-row
 .Message-model-contact-name {
   display: block;
 
@@ -1222,14 +735,14 @@
   min-width: 0;
 
   margin: 0;
+  padding: 0;
 
   overflow: hidden;
 
-  color: #222222;
-
+  color: #242933;
   font-size: 14px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.5;
 
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1238,185 +751,379 @@
 
 /* =================================================
    HOME CHAT BUTTON
+   Current SVG:
+   /SSVG/account/account-edit-button.svg
+
+   Change background-image here when the new
+   message icon SVG is ready.
 ================================================= */
 
-#Message-model-friends-list
-.Message-model-home-friend-row
+#Message-model-friends-list .Message-model-home-friend-row
 .Message-model-contact-chat {
-  display: flex;
-
+  display: inline-flex;
   align-items: center;
   justify-content: center;
 
-  flex: 0 0 38px;
+  flex: 0 0 var(--home-chat-button-size);
 
-  width: 38px;
-  height: 38px;
+  width: var(--home-chat-button-size);
+  height: var(--home-chat-button-size);
 
-  min-width: 38px;
+  min-width: var(--home-chat-button-size);
 
   margin: 0;
-  padding: 8px;
+  padding: 0;
 
-  border: 1px solid #e2eaf7;
-  border-radius: 50%;
+  border: 1px solid #e5e9f2;
+  border-radius: 10px;
 
-  background: #eef5fd;
+  background-color: #f5f7fc;
+  background-image: url("/SSVG/account/account-edit-button.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: var(--home-chat-icon-size) var(--home-chat-icon-size);
+
   color: #477fbd;
 
   cursor: pointer;
 
+  box-shadow: none;
+
   transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
 
   box-sizing: border-box;
 }
 
 
-/* Chat SVG */
+/* The temporary icon is supplied by CSS. */
 
-#Message-model-friends-list
-.Message-model-contact-chat-icon {
-  display: block;
-
-  flex: 0 0 auto;
-
-  width: 22px;
-  height: 22px;
-
-  color: inherit;
-
-  pointer-events: none;
+#Message-model-friends-list .Message-model-home-friend-row
+.Message-model-contact-chat .Message-model-contact-chat-icon {
+  display: none !important;
 }
 
-
-/* Chat hover / active / focus */
-
-#Message-model-friends-list
-.Message-model-contact-chat:hover {
+#Message-model-friends-list .Message-model-contact-chat:hover {
   border-color: #cbdcf5;
-  background: #deebfc;
+  background-color: #eaf2ff;
+
+  box-shadow: 0 2px 7px rgb(45 92 160 / 9%);
 }
 
-#Message-model-friends-list
-.Message-model-contact-chat:active {
+#Message-model-friends-list .Message-model-contact-chat:active {
   transform: scale(0.94);
+  box-shadow: none;
 }
 
-#Message-model-friends-list
-.Message-model-contact-chat:focus-visible {
+#Message-model-friends-list .Message-model-contact-chat:focus-visible {
   outline: 2px solid #78ace9;
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 
 /* =================================================
-   HOME FRIEND LIST STATUS
+   HOME LIST STATUS / EMPTY / ERROR
 ================================================= */
 
-#Message-model-friends-list
-.Message-model-home-friends-state {
+.Message-model-empty {
   display: block;
 
   width: 100%;
+  padding: 12px 0;
 
-  padding: 14px 4px;
+  box-sizing: border-box;
 
   color: #888888;
+  font-size: 13px;
+  line-height: 1.5;
+}
 
+#Message-model-friends-list .Message-model-home-friends-state {
+  margin: 0;
+  padding: 20px 14px;
+
+  border: 1px solid #e8eaf0;
+  border-radius: 12px;
+
+  background: #fafbfe;
+
+  color: #78808e;
   font-size: 13px;
   line-height: 1.6;
 
   text-align: center;
-
   overflow-wrap: anywhere;
 }
 
-#Message-model-friends-list
-.Message-model-home-friends-error {
+#Message-model-friends-list .Message-model-home-friends-error {
+  border-color: #f0d5d5;
+  background: #fffafa;
   color: #c62828;
 }
 
 
 /* =================================================
-   MOBILE
+   SHARED INNER PAGE CONTAINER
 ================================================= */
 
-@media (max-width: 480px) {
-  #Message-model-friends-list
-  .Message-model-contact-avatar-stack {
-    --home-avatar-slot: 44px;
-    --home-avatar-image-size: 29px;
-    --home-avatar-frame-size: 53px;
-  }
+#Message-model-pages {
+  position: relative;
 
-  #Message-model-friends-list
-  .Message-model-home-friend-row {
+  display: none;
+  flex: 1 1 auto;
+
+  width: 100%;
+  height: 0;
+
+  min-width: 0;
+  min-height: 0;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+  overflow: hidden;
+}
+
+#Message-model-pages .Message-model-page {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  min-width: 0;
+  min-height: 0;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+#Message-model-pages .Message-model-page[hidden] {
+  display: none !important;
+}
+
+#Message-model-pages .Message-model-page.active {
+  display: block;
+}
+
+
+/* =================================================
+   NORMAL PAGE ROOTS
+================================================= */
+
+#Message-model-friends-root,
+#Message-model-add-friends-root,
+#Message-model-group-root,
+#Message-model-customer-service-root {
+  position: relative;
+
+  width: 100%;
+  min-height: 100%;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+}
+
+
+/* =================================================
+   RESPONSIVE: DESKTOP
+================================================= */
+
+@media (min-width: 769px) {
+  #Message-model-navigation {
     gap: 10px;
-
-    min-height: 64px;
-
-    padding-top: 9px;
-    padding-bottom: 9px;
+    padding: 14px 18px;
   }
 
-  #Message-model-friends-list
-  .Message-model-home-friend-row
-  .Message-model-contact-name {
-    font-size: 13px;
+  #Message-model-navigation .Message-model-nav-button {
+    min-height: 82px;
+    padding: 9px 5px;
+    font-size: 12px;
   }
 
-  #Message-model-friends-list
-  .Message-model-home-friend-row
-  .Message-model-contact-chat {
-    flex-basis: 35px;
-
-    width: 35px;
-    height: 35px;
-
-    min-width: 35px;
-
-    padding: 7px;
+  #Message-model-navigation .Message-model-nav-icon {
+    flex-basis: 24px;
+    width: 24px;
+    height: 24px;
   }
 
-  #Message-model-friends-list
-  .Message-model-contact-chat-icon {
-    width: 21px;
-    height: 21px;
+  #Message-model-friends-list-section,
+  #Message-model-groups-list-section {
+    padding-right: 24px;
+    padding-left: 24px;
   }
 }
 
 
 /* =================================================
-   VERY SMALL MOBILE
+   RESPONSIVE: MOBILE
 ================================================= */
 
-@media (max-width: 360px) {
-  #Message-model-friends-list
-  .Message-model-contact-avatar-stack {
-    --home-avatar-slot: 40px;
-    --home-avatar-image-size: 26px;
-    --home-avatar-frame-size: 48px;
+@media (max-width: 480px) {
+  #U9-message-normal-modal-title {
+    padding-right: 50px;
+    padding-left: 50px;
+    font-size: 18px;
   }
 
-  #Message-model-friends-list
-  .Message-model-home-friend-row {
+  #U9-message-normal-modal-title-text {
+    left: 50px;
+    right: 50px;
+  }
+
+  #U9-message-normal-modal-close {
+    left: 8px;
+  }
+
+  #U9-message-normal-modal-close img {
+    width: 22px;
+    height: 22px;
+  }
+
+  #Message-model-navigation {
+    gap: 6px;
+    padding: 10px 8px;
+  }
+
+  #Message-model-navigation .Message-model-nav-button {
+    min-height: 70px;
+    gap: 5px;
+    padding: 7px 2px;
+    border-radius: 9px;
+    font-size: 10px;
+  }
+
+  #Message-model-navigation .Message-model-nav-icon {
+    flex-basis: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  #Message-model-navigation .Message-model-nav-label {
+    font-size: 10px;
+    line-height: 1.25;
+  }
+
+  #Message-model-friends-list-section,
+  #Message-model-groups-list-section {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .Message-model-list-heading {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  #Message-model-friends-list {
+    --home-avatar-slot-size: 52px;
+    --home-avatar-image-size: 34px;
+    --home-avatar-frame-size: 65px;
+
+    --home-row-gap: 11px;
+    --home-row-min-height: 72px;
+    --home-row-padding-y: 9px;
+    --home-row-padding-x: 11px;
+
+    --home-chat-button-size: 35px;
+    --home-chat-icon-size: 21px;
+
     gap: 8px;
   }
 
-  #Message-model-friends-list
-  .Message-model-home-friend-row
+  #Message-model-friends-list .Message-model-home-friend-row {
+    border-radius: 12px;
+  }
+
+  #Message-model-friends-list .Message-model-home-friend-row
+  .Message-model-contact-name {
+    font-size: 13px;
+  }
+
+  .Message-model-contact-row {
+    gap: 10px;
+    min-height: 62px;
+  }
+
+  .Message-model-contact-avatar {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .Message-model-contact-name {
+    font-size: 13px;
+  }
+
   .Message-model-contact-chat {
-    flex-basis: 32px;
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+  }
 
-    width: 32px;
-    height: 32px;
+  .Message-model-contact-chat img {
+    width: 20px;
+    height: 20px;
+  }
+}
 
-    min-width: 32px;
 
-    padding: 6px;
+/* =================================================
+   RESPONSIVE: VERY SMALL MOBILE
+================================================= */
+
+@media (max-width: 360px) {
+  #Message-model-navigation {
+    gap: 4px;
+    padding: 8px 6px;
+  }
+
+  #Message-model-navigation .Message-model-nav-button {
+    min-height: 64px;
+    gap: 4px;
+    padding: 6px 1px;
+    font-size: 9px;
+  }
+
+  #Message-model-navigation .Message-model-nav-icon {
+    flex-basis: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  #Message-model-navigation .Message-model-nav-label {
+    font-size: 9px;
+    line-height: 1.2;
+  }
+
+  #Message-model-friends-list-section,
+  #Message-model-groups-list-section {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+
+  #Message-model-friends-list {
+    --home-avatar-slot-size: 44px;
+    --home-avatar-image-size: 29px;
+    --home-avatar-frame-size: 55px;
+
+    --home-row-gap: 8px;
+    --home-row-min-height: 64px;
+    --home-row-padding-y: 9px;
+    --home-row-padding-x: 9px;
+
+    --home-chat-button-size: 32px;
+    --home-chat-icon-size: 19px;
   }
 }
 
@@ -1426,8 +1133,20 @@
 ================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-  #Message-model-friends-list
+  #U9-message-normal-modal,
+  #U9-message-normal-modal-content,
+  #U9-message-normal-modal-close,
+  #Message-model-navigation .Message-model-nav-button,
+  #Message-model-navigation .Message-model-nav-icon,
+  #Message-model-friends-list .Message-model-home-friend-row,
+  #Message-model-friends-list .Message-model-contact-chat,
   .Message-model-contact-chat {
     transition: none;
+  }
+
+  #Message-model-navigation .Message-model-nav-button:hover,
+  #Message-model-friends-list .Message-model-contact-chat:active,
+  .Message-model-contact-chat:active {
+    transform: none;
   }
 }
