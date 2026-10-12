@@ -1151,27 +1151,21 @@ async function u9ProfileRefreshAvatar() {
 }
 
 
+
 /* =========================
    LOAD PROFILE
+   Do not show the loading SVG
+   when normally opening Profile.
 ========================= */
 
 async function u9ProfileLoad() {
   /*
-   * Show loading indicator but keep profile info visible.
+   * Do not call u9ProfileShowLoading() here.
+   * Opening Profile should not show the loading SVG.
    */
-
-  u9ProfileShowLoading();
-
-  /*
-   * Reset avatar and return to main page.
-   */
-
-  u9ProfileResetAvatar();
-  u9ProfileShowMainPage();
 
   if (!window.U9User) {
     console.warn("U9User is not available.");
-
     u9ProfileHideLoading();
     return;
   }
@@ -1194,8 +1188,8 @@ async function u9ProfileLoad() {
     }
 
     /*
-     * Fetch refreshed user data.
-     * If refresh fails, cached information remains visible.
+     * Refresh user data in the background.
+     * Keep the existing information visible.
      */
 
     let latestUser = null;
@@ -1216,10 +1210,6 @@ async function u9ProfileLoad() {
     if (user) {
       u9ProfileDisplayUser(user);
 
-      /*
-       * Load avatar/frame from the latest available user data.
-       */
-
       const avatarLoaded =
         await u9ProfileLoadAvatarFromUser(user);
 
@@ -1231,13 +1221,20 @@ async function u9ProfileLoad() {
     }
 
     console.log("Profile Loaded:", user);
+
   } catch (error) {
     console.error("Load profile failed:", error);
     u9ProfileResetAvatar();
+
   } finally {
+    /*
+     * Keep the profile information visible.
+     * Do not display the loading SVG.
+     */
     u9ProfileHideLoading();
   }
 }
+
 
 
 /* =========================
