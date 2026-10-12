@@ -33,6 +33,29 @@ const messagePages =
     "#Message-model-pages .Message-model-page"
   );
 
+const headerToolToggle =
+  document.getElementById(
+    "U9-page-header-tool-toggle"
+  );
+
+
+/* =========================
+   TOOLBAR STATE
+========================= */
+
+function setMessageToolbarCollapsed(collapsed) {
+
+  if (!messageModal) {
+    return;
+  }
+
+  messageModal.classList.toggle(
+    "Message-model-toolbar-collapsed",
+    collapsed
+  );
+
+}
+
 
 /* =========================
    OPEN MESSAGE MODAL
@@ -197,7 +220,7 @@ function switchMessagePage(pageName) {
   });
 
 
-  /* UPDATE PAGES */
+  /* UPDATE PAGE VISIBILITY */
 
   messagePages.forEach(function (page) {
 
@@ -244,6 +267,47 @@ if (messageNavigation) {
       switchMessagePage(pageName);
 
     }
+  );
+
+}
+
+
+/* =========================
+   HEADER TOOL TOGGLE
+========================= */
+
+/*
+  注意：
+  这里监听顶部按钮的点击，并同步 Message
+  模态框的位置。
+
+  如果你的 Header JS 已经通过其他方式统一
+  管理所有弹窗的位置，请避免重复切换状态。
+*/
+
+if (headerToolToggle) {
+
+  headerToolToggle.addEventListener(
+    "click",
+    function () {
+
+      const isCollapsed =
+        messageModal &&
+        messageModal.classList.contains(
+          "Message-model-toolbar-collapsed"
+        );
+
+      setMessageToolbarCollapsed(
+        !isCollapsed
+      );
+
+    }
+  );
+
+} else {
+
+  console.warn(
+    "U9-page-header-tool-toggle was not found."
   );
 
 }
