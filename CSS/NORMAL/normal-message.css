@@ -1007,3 +1007,427 @@
     transform: none;
   }
 }
+
+
+/* =================================================
+   U9 MESSAGE HOME - FRIEND LIST
+   Home friend preview with avatar + frame + name + chat
+================================================= */
+
+
+/* =================================================
+   HOME FRIEND ROW
+================================================= */
+
+#Message-model-friends-list .Message-model-home-friend-row {
+  position: relative;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  gap: 12px;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 68px;
+
+  padding: 10px 2px;
+
+  border-bottom: 1px solid #eeeeee;
+  background: #ffffff;
+
+  overflow: visible;
+}
+
+
+/* =================================================
+   AVATAR STACK
+   The wrapper reserves layout space for the frame.
+================================================= */
+
+#Message-model-friends-list .Message-model-contact-avatar-stack {
+  --home-avatar-slot: 48px;
+  --home-avatar-image-size: 31px;
+  --home-avatar-frame-size: 58px;
+
+  position: relative;
+
+  display: block;
+
+  flex: 0 0 var(--home-avatar-slot);
+
+  width: var(--home-avatar-slot);
+  height: var(--home-avatar-slot);
+
+  min-width: var(--home-avatar-slot);
+  min-height: var(--home-avatar-slot);
+
+  overflow: visible;
+
+  border: 0;
+  border-radius: 0;
+
+  background: transparent;
+
+  isolation: isolate;
+
+  box-sizing: border-box;
+}
+
+
+/* =================================================
+   HOME BASE AVATAR
+================================================= */
+
+#Message-model-friends-list
+.Message-model-contact-avatar-stack
+.Message-model-contact-avatar {
+  position: absolute !important;
+
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  z-index: 1;
+
+  display: block;
+
+  flex: none !important;
+
+  width: var(--home-avatar-image-size) !important;
+  height: var(--home-avatar-image-size) !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  transform: translate(-50%, -50%) !important;
+
+  object-fit: cover;
+  object-position: center;
+
+  border: 0;
+  border-radius: 50%;
+
+  background: #f0f0f0;
+
+  box-sizing: border-box;
+}
+
+
+/* =================================================
+   HOME AVATAR FRAME
+   Centered over the avatar but larger than it.
+================================================= */
+
+#Message-model-friends-list
+.Message-model-contact-avatar-stack
+.Message-model-contact-avatar-frame {
+  position: absolute !important;
+
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  z-index: 2;
+
+  display: block;
+
+  width: var(--home-avatar-frame-size) !important;
+  height: var(--home-avatar-frame-size) !important;
+
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  transform: translate(-50%, -50%) !important;
+
+  object-fit: contain;
+  object-position: center;
+
+  border: 0;
+  border-radius: 0;
+
+  background: transparent;
+
+  pointer-events: none;
+
+  box-sizing: border-box;
+}
+
+
+/* =================================================
+   AVATAR FALLBACK
+================================================= */
+
+#Message-model-friends-list
+.Message-model-contact-avatar-fallback {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  z-index: 1;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: var(--home-avatar-image-size);
+  height: var(--home-avatar-image-size);
+
+  overflow: hidden;
+
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+
+  background: #e8edff;
+  color: #4058a8;
+
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+
+  box-sizing: border-box;
+}
+
+
+/* =================================================
+   HOME FRIEND NAME
+   Account is intentionally not shown here.
+================================================= */
+
+#Message-model-friends-list
+.Message-model-home-friend-row
+.Message-model-contact-name {
+  display: block;
+
+  flex: 1 1 auto;
+
+  min-width: 0;
+
+  margin: 0;
+
+  overflow: hidden;
+
+  color: #222222;
+
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* =================================================
+   HOME CHAT BUTTON
+================================================= */
+
+#Message-model-friends-list
+.Message-model-home-friend-row
+.Message-model-contact-chat {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 38px;
+
+  width: 38px;
+  height: 38px;
+
+  min-width: 38px;
+
+  margin: 0;
+  padding: 8px;
+
+  border: 1px solid #e2eaf7;
+  border-radius: 50%;
+
+  background: #eef5fd;
+  color: #477fbd;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+
+  box-sizing: border-box;
+}
+
+
+/* Chat SVG */
+
+#Message-model-friends-list
+.Message-model-contact-chat-icon {
+  display: block;
+
+  flex: 0 0 auto;
+
+  width: 22px;
+  height: 22px;
+
+  color: inherit;
+
+  pointer-events: none;
+}
+
+
+/* Chat hover / active / focus */
+
+#Message-model-friends-list
+.Message-model-contact-chat:hover {
+  border-color: #cbdcf5;
+  background: #deebfc;
+}
+
+#Message-model-friends-list
+.Message-model-contact-chat:active {
+  transform: scale(0.94);
+}
+
+#Message-model-friends-list
+.Message-model-contact-chat:focus-visible {
+  outline: 2px solid #78ace9;
+  outline-offset: 2px;
+}
+
+
+/* =================================================
+   HOME FRIEND LIST STATUS
+================================================= */
+
+#Message-model-friends-list
+.Message-model-home-friends-state {
+  display: block;
+
+  width: 100%;
+
+  padding: 14px 4px;
+
+  color: #888888;
+
+  font-size: 13px;
+  line-height: 1.6;
+
+  text-align: center;
+
+  overflow-wrap: anywhere;
+}
+
+#Message-model-friends-list
+.Message-model-home-friends-error {
+  color: #c62828;
+}
+
+
+/* =================================================
+   MOBILE
+================================================= */
+
+@media (max-width: 480px) {
+  #Message-model-friends-list
+  .Message-model-contact-avatar-stack {
+    --home-avatar-slot: 44px;
+    --home-avatar-image-size: 29px;
+    --home-avatar-frame-size: 53px;
+  }
+
+  #Message-model-friends-list
+  .Message-model-home-friend-row {
+    gap: 10px;
+
+    min-height: 64px;
+
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+
+  #Message-model-friends-list
+  .Message-model-home-friend-row
+  .Message-model-contact-name {
+    font-size: 13px;
+  }
+
+  #Message-model-friends-list
+  .Message-model-home-friend-row
+  .Message-model-contact-chat {
+    flex-basis: 35px;
+
+    width: 35px;
+    height: 35px;
+
+    min-width: 35px;
+
+    padding: 7px;
+  }
+
+  #Message-model-friends-list
+  .Message-model-contact-chat-icon {
+    width: 21px;
+    height: 21px;
+  }
+}
+
+
+/* =================================================
+   VERY SMALL MOBILE
+================================================= */
+
+@media (max-width: 360px) {
+  #Message-model-friends-list
+  .Message-model-contact-avatar-stack {
+    --home-avatar-slot: 40px;
+    --home-avatar-image-size: 26px;
+    --home-avatar-frame-size: 48px;
+  }
+
+  #Message-model-friends-list
+  .Message-model-home-friend-row {
+    gap: 8px;
+  }
+
+  #Message-model-friends-list
+  .Message-model-home-friend-row
+  .Message-model-contact-chat {
+    flex-basis: 32px;
+
+    width: 32px;
+    height: 32px;
+
+    min-width: 32px;
+
+    padding: 6px;
+  }
+}
+
+
+/* =================================================
+   REDUCED MOTION
+================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  #Message-model-friends-list
+  .Message-model-contact-chat {
+    transition: none;
+  }
+}
