@@ -6,7 +6,9 @@
 
 #Message-model-friends-root {
   width: 100%;
+  height: 100%;
   min-width: 0;
+  min-height: 0;
   color: #202124;
   box-sizing: border-box;
 }
@@ -17,73 +19,88 @@
   box-sizing: border-box;
 }
 
+/* Page fills its available area.
+   Only the friend list scrolls. */
+
 #Message-model-friends-root .U9-friends-page {
-  width: 100%;
-  padding: 20px;
-}
-
-#Message-model-friends-root .U9-friends-heading {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-#Message-model-friends-root .U9-friends-title {
-  font-size: 20px;
-  line-height: 1.4;
-  font-weight: 700;
-  color: #202124;
-}
-
-#Message-model-friends-root .U9-friends-count {
-  flex: 0 0 auto;
-  padding: 5px 10px;
-  border-radius: 20px;
-  background: #f0f2f5;
-  color: #606770;
-  font-size: 12px;
-  font-weight: 600;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  padding: 12px 18px 16px;
 }
 
 #Message-model-friends-root .U9-friends-list {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
-  gap: 10px;
+  gap: 9px;
   width: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #d5d9e1 transparent;
+  -webkit-overflow-scrolling: touch;
 }
+
+#Message-model-friends-root .U9-friends-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+#Message-model-friends-root .U9-friends-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#Message-model-friends-root .U9-friends-list::-webkit-scrollbar-thumb {
+  background: #d5d9e1;
+  border-radius: 10px;
+}
+
+/* Friend card */
 
 #Message-model-friends-root .U9-friend-card {
   display: flex;
   align-items: center;
   gap: 13px;
+
   width: 100%;
   min-width: 0;
+  flex: 0 0 auto;
+
   padding: 13px 15px;
-  border: 1px solid #e8e9ed;
-  border-radius: 14px;
-  background: #ffffff;
+  border: 1px solid #e8eaf0;
+  border-radius: 13px;
+  background: #fff;
+
   transition:
     border-color 160ms ease,
-    box-shadow 160ms ease,
-    background-color 160ms ease;
+    background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 #Message-model-friends-root .U9-friend-card:hover {
-  border-color: #d5d9e0;
-  background: #fcfcfd;
-  box-shadow: 0 3px 12px rgb(0 0 0 / 4%);
+  border-color: #d9deea;
+  background: #fcfcfe;
+  box-shadow: 0 3px 12px rgb(24 39 75 / 5%);
 }
+
+/* Avatar */
 
 #Message-model-friends-root .U9-friend-avatar {
   display: flex;
   align-items: center;
   justify-content: center;
+
   flex: 0 0 46px;
   width: 46px;
   height: 46px;
   overflow: hidden;
+
   border-radius: 50%;
   background: #edf0f5;
 }
@@ -99,15 +116,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   width: 100%;
   height: 100%;
   border-radius: 50%;
+
   background: #e8edff;
   color: #4058a8;
+
   font-size: 15px;
   font-weight: 700;
-  letter-spacing: 0.3px;
 }
+
+/* Username and account */
 
 #Message-model-friends-root .U9-friend-info {
   flex: 1 1 auto;
@@ -127,6 +148,7 @@
 #Message-model-friends-root .U9-friend-account {
   overflow: hidden;
   margin-top: 3px;
+
   color: #777d87;
   font-size: 12px;
   line-height: 1.4;
@@ -134,38 +156,71 @@
   white-space: nowrap;
 }
 
-#Message-model-friends-root .U9-friend-chat-button {
+/* Four SVG actions */
+
+#Message-model-friends-root .U9-friend-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  gap: 5px;
+}
+
+#Message-model-friends-root .U9-friend-action {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 auto;
-  min-width: 76px;
-  min-height: 36px;
-  padding: 8px 15px;
-  border: 0;
+
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  padding: 8px;
+
+  border: 1px solid transparent;
   border-radius: 9px;
-  background: #315efb;
-  color: #ffffff;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 600;
+  background: transparent;
+
   cursor: pointer;
+
   transition:
     background-color 160ms ease,
-    transform 160ms ease;
+    border-color 160ms ease,
+    opacity 160ms ease;
 }
 
-#Message-model-friends-root .U9-friend-chat-button:hover {
-  background: #244bd7;
+#Message-model-friends-root .U9-friend-action img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
 }
 
-#Message-model-friends-root .U9-friend-chat-button:active {
-  transform: scale(0.97);
+/* Enabled Chat icon */
+
+#Message-model-friends-root .U9-friend-action-chat {
+  border-color: #e5e9f5;
+  background: #f3f5fc;
 }
 
-#Message-model-friends-root .U9-friend-chat-button:focus-visible {
-  outline: 3px solid rgb(49 94 251 / 30%);
-  outline-offset: 3px;
+#Message-model-friends-root .U9-friend-action-chat:hover {
+  border-color: #d4dcf7;
+  background: #e9edfc;
+}
+
+#Message-model-friends-root .U9-friend-action-chat:active {
+  background: #dfe5fb;
+}
+
+/* Placeholder actions: observe, mute, delete */
+
+#Message-model-friends-root .U9-friend-action:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+
+#Message-model-friends-root .U9-friend-action:disabled img {
+  filter: grayscale(1);
 }
 
 /* Loading, error and empty states */
@@ -188,6 +243,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   min-height: 220px;
   padding: 30px 20px;
   text-align: center;
@@ -197,10 +253,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   width: 58px;
   height: 58px;
   margin-bottom: 14px;
   border-radius: 50%;
+
   background: #f0f2f7;
   color: #788197;
   font-size: 30px;
@@ -215,26 +273,22 @@
 #Message-model-friends-root .U9-friends-empty-description {
   max-width: 280px;
   margin-top: 7px;
+
   color: #7a808c;
   font-size: 13px;
   line-height: 1.6;
 }
 
-/* Tablet and mobile */
+/* Tablet */
 
-@media (max-width: 600px) {
+@media (max-width: 760px) {
   #Message-model-friends-root .U9-friends-page {
-    padding: 15px 12px;
-  }
-
-  #Message-model-friends-root .U9-friends-heading {
-    margin-bottom: 14px;
+    padding: 10px 12px 14px;
   }
 
   #Message-model-friends-root .U9-friend-card {
     gap: 10px;
     padding: 11px;
-    border-radius: 12px;
   }
 
   #Message-model-friends-root .U9-friend-avatar {
@@ -243,21 +297,56 @@
     height: 42px;
   }
 
+  #Message-model-friends-root .U9-friend-actions {
+    gap: 2px;
+  }
+
+  #Message-model-friends-root .U9-friend-action {
+    flex-basis: 30px;
+    width: 30px;
+    height: 30px;
+    padding: 7px;
+  }
+
   #Message-model-friends-root .U9-friend-name {
     font-size: 14px;
   }
+}
 
-  #Message-model-friends-root .U9-friend-chat-button {
-    min-width: 62px;
-    min-height: 34px;
-    padding: 7px 11px;
-    font-size: 12px;
+/* Small mobile */
+
+@media (max-width: 380px) {
+  #Message-model-friends-root .U9-friends-page {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+  #Message-model-friends-root .U9-friend-card {
+    gap: 7px;
+    padding: 9px 7px;
+  }
+
+  #Message-model-friends-root .U9-friend-avatar {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  #Message-model-friends-root .U9-friend-actions {
+    gap: 0;
+  }
+
+  #Message-model-friends-root .U9-friend-action {
+    flex-basis: 27px;
+    width: 27px;
+    height: 29px;
+    padding: 6px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   #Message-model-friends-root .U9-friend-card,
-  #Message-model-friends-root .U9-friend-chat-button {
+  #Message-model-friends-root .U9-friend-action {
     transition: none;
   }
 }
