@@ -3,14 +3,19 @@
    MESSAGE NORMAL MODAL
 ========================= */
 
-/* MODAL */
 
-#U9-message-normal-modal {
+/* =========================
+   MODAL
+========================= */
+
+#Message-model-modal {
   position: fixed;
   top: 115px;
   left: 0;
+
   width: 100%;
   height: calc(100vh - 115px);
+
   box-sizing: border-box;
 
   display: flex;
@@ -18,71 +23,100 @@
   align-items: stretch;
 
   background-color: rgba(0, 0, 0, 0.18);
+
   z-index: 1000;
   overflow: hidden;
 
   visibility: hidden;
   pointer-events: none;
 
-  transition: top 0.35s ease, height 0.35s ease;
+  transition:
+    top 0.35s ease,
+    height 0.35s ease;
 }
 
-/* TOOLBAR COLLAPSED */
 
-#U9-message-normal-modal.message-toolbar-collapsed {
+/* =========================
+   TOOLBAR COLLAPSED
+========================= */
+
+#Message-model-modal.Message-model-toolbar-collapsed {
   top: 60px;
   height: calc(100vh - 60px);
 }
 
-/* MODAL CONTENT */
 
-#U9-message-normal-modal-content {
+/* =========================
+   MODAL CONTENT
+========================= */
+
+#Message-model-modal-content {
   position: relative;
+
   width: 100%;
   height: 100%;
+
   box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
 
   background-color: #ffffff;
   overflow: hidden;
 
   transform: translateY(100%);
+
   transition: transform 0.45s ease;
 }
 
-/* OPEN */
 
-#U9-message-normal-modal.modal-open {
+/* =========================
+   OPEN
+========================= */
+
+#Message-model-modal.Message-model-open {
   visibility: visible;
   pointer-events: auto;
 }
 
-#U9-message-normal-modal.modal-open
-#U9-message-normal-modal-content {
+#Message-model-modal.Message-model-open
+#Message-model-modal-content {
   transform: translateY(0);
 }
 
-/* CLOSING */
 
-#U9-message-normal-modal.modal-closing {
+/* =========================
+   CLOSING
+========================= */
+
+#Message-model-modal.Message-model-closing {
   visibility: visible;
   pointer-events: none;
 }
 
-#U9-message-normal-modal.modal-closing
-#U9-message-normal-modal-content {
+#Message-model-modal.Message-model-closing
+#Message-model-modal-content {
   transform: translateY(100%);
 }
 
-/* TITLE */
 
-#U9-message-normal-modal-title {
+/* =========================
+   TITLE
+========================= */
+
+#Message-model-title {
   position: relative;
+
+  flex: 0 0 55px;
+
   width: 100%;
   height: 55px;
+
   box-sizing: border-box;
 
   display: flex;
   align-items: center;
+
   padding: 0 60px 0 20px;
 
   font-size: 20px;
@@ -93,15 +127,20 @@
   border-bottom: 1px solid #eeeeee;
 }
 
-/* CLOSE BUTTON */
 
-#U9-message-normal-modal-close {
+/* =========================
+   CLOSE BUTTON
+========================= */
+
+#Message-model-close {
   position: absolute;
+
   top: 50%;
   right: 15px;
 
   width: 36px;
   height: 36px;
+
   padding: 0;
 
   border: none;
@@ -111,66 +150,302 @@
   background-color: #f1f1f1;
   color: #111111;
 
+  font-family: inherit;
   font-size: 24px;
   font-weight: 400;
   line-height: 1;
 
   cursor: pointer;
+
   transform: translateY(-50%);
 
   display: flex;
   align-items: center;
   justify-content: center;
+
+  -webkit-tap-highlight-color: transparent;
 }
+
 
 /* CLOSE HOVER */
 
-#U9-message-normal-modal-close:hover {
+#Message-model-close:hover {
   background-color: #e8e8e8;
 }
 
+
 /* CLOSE ACTIVE */
 
-#U9-message-normal-modal-close:active {
+#Message-model-close:active {
   transform: translateY(-50%) scale(0.94);
 }
 
-/* MOBILE */
+
+/* =========================
+   MESSAGE NAVIGATION
+========================= */
+
+#Message-model-navigation {
+  flex: 0 0 112px;
+
+  position: relative;
+
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  width: 100%;
+  min-height: 112px;
+
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+  border-bottom: 1px solid #eeeeee;
+}
+
+
+/* =========================
+   NAVIGATION BUTTON
+========================= */
+
+#Message-model-navigation .Message-model-nav-button {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+
+  min-width: 0;
+  padding: 12px 4px;
+
+  border: none;
+  border-radius: 0;
+
+  background-color: #ffffff;
+  color: #555555;
+
+  font-family: inherit;
+
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+
+/* NAVIGATION HOVER */
+
+#Message-model-navigation
+.Message-model-nav-button:hover {
+  background-color: #f7f7f7;
+}
+
+
+/* NAVIGATION ACTIVE */
+
+#Message-model-navigation
+.Message-model-nav-button.active {
+  background-color: #fafafa;
+  color: #111111;
+}
+
+
+/* ACTIVE INDICATOR */
+
+#Message-model-navigation
+.Message-model-nav-button.active::after {
+  position: absolute;
+
+  right: 20%;
+  bottom: 0;
+  left: 20%;
+
+  height: 3px;
+
+  border-radius: 3px 3px 0 0;
+
+  background-color: #111111;
+
+  content: "";
+}
+
+
+/* =========================
+   NAVIGATION ICON
+========================= */
+
+#Message-model-navigation .Message-model-nav-icon {
+  display: block;
+
+  width: 32px;
+  height: 32px;
+
+  object-fit: contain;
+
+  flex: 0 0 auto;
+}
+
+
+/* =========================
+   NAVIGATION LABEL
+========================= */
+
+#Message-model-navigation .Message-model-nav-label {
+  display: block;
+
+  max-width: 100%;
+
+  overflow-wrap: anywhere;
+
+  font-size: 13px;
+  line-height: 1.3;
+
+  text-align: center;
+}
+
+
+/* =========================
+   MESSAGE PAGES CONTAINER
+========================= */
+
+#Message-model-pages {
+  position: relative;
+
+  flex: 1 1 auto;
+
+  width: 100%;
+  min-height: 0;
+
+  box-sizing: border-box;
+
+  overflow: hidden;
+
+  background-color: #ffffff;
+}
+
+
+/* =========================
+   INDIVIDUAL PAGE
+========================= */
+
+#Message-model-pages .Message-model-page {
+  display: none;
+
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  box-sizing: border-box;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  background-color: #ffffff;
+}
+
+
+/* ACTIVE PAGE */
+
+#Message-model-pages .Message-model-page.active {
+  display: block;
+}
+
+
+/* =========================
+   MOBILE
+========================= */
 
 @media (max-width: 480px) {
-  #U9-message-normal-modal {
+
+  #Message-model-modal {
     top: 115px;
     height: calc(100vh - 115px);
   }
 
-  #U9-message-normal-modal.message-toolbar-collapsed {
+  #Message-model-modal.Message-model-toolbar-collapsed {
     top: 60px;
     height: calc(100vh - 60px);
   }
 
-  #U9-message-normal-modal-content {
+  #Message-model-modal-content {
     width: 100%;
     max-width: 100%;
   }
 
-  #U9-message-normal-modal-title {
+
+  /* TITLE */
+
+  #Message-model-title {
+    flex-basis: 55px;
+
     height: 55px;
+
     padding: 0 55px 0 15px;
+
     font-size: 18px;
   }
 
-  #U9-message-normal-modal-close {
+
+  /* CLOSE BUTTON */
+
+  #Message-model-close {
     right: 10px;
+
     width: 36px;
     height: 36px;
   }
+
+
+  /* NAVIGATION */
+
+  #Message-model-navigation {
+    flex-basis: 100px;
+
+    min-height: 100px;
+  }
+
+
+  /* NAVIGATION BUTTON */
+
+  #Message-model-navigation .Message-model-nav-button {
+    gap: 7px;
+    padding: 10px 2px;
+  }
+
+
+  /* ICON */
+
+  #Message-model-navigation .Message-model-nav-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+
+  /* LABEL */
+
+  #Message-model-navigation .Message-model-nav-label {
+    font-size: 11px;
+  }
+
 }
 
-/* REDUCED MOTION */
+
+/* =========================
+   REDUCED MOTION
+========================= */
 
 @media (prefers-reduced-motion: reduce) {
-  #U9-message-normal-modal,
-  #U9-message-normal-modal-content {
+
+  #Message-model-modal,
+  #Message-model-modal-content,
+  #Message-model-close,
+  #Message-model-navigation .Message-model-nav-button {
     transition: none;
   }
+
 }
