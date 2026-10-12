@@ -7,8 +7,9 @@
    - Modal and animations
    - Message header
    - Navigation cards
-   - Inner page container
-   - Shared page layout
+   - Message home layout
+   - Friends and joined groups list layout
+   - Shared inner page layout
 
    Chat-specific styles belong in:
    CSS/NORMAL/MESSAGE/chat.css
@@ -24,13 +25,13 @@
   top: 115px;
   left: 0;
 
-  width: 100%;
-  height: calc(100vh - 115px);
-  height: calc(100dvh - 115px);
-
   display: flex;
   justify-content: center;
   align-items: stretch;
+
+  width: 100%;
+  height: calc(100vh - 115px);
+  height: calc(100dvh - 115px);
 
   box-sizing: border-box;
   overflow: hidden;
@@ -127,7 +128,7 @@
 
 
 /* =================================================
-   HEADER
+   MESSAGE HEADER
 ================================================= */
 
 #U9-message-normal-modal-title {
@@ -135,6 +136,7 @@
 
   display: flex;
   align-items: center;
+  justify-content: center;
 
   flex: 0 0 55px;
 
@@ -142,18 +144,44 @@
   height: 55px;
   min-height: 55px;
 
-  padding: 0 65px 0 20px;
+  padding: 0 55px;
 
   box-sizing: border-box;
 
-  background: #ffffff;
-  border-bottom: 1px solid #eeeeee;
+  background: #78ace9;
+  border: none;
 
-  color: #111111;
+  color: #ffffff;
   font-size: 20px;
   font-weight: 600;
+  text-align: center;
 
   z-index: 2;
+}
+
+
+/* =================================================
+   HEADER TITLE TEXT
+================================================= */
+
+#U9-message-normal-modal-title-text {
+  position: absolute;
+
+  left: 55px;
+  right: 55px;
+
+  display: block;
+
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+
+  color: #ffffff;
+  font-size: inherit;
+  font-weight: inherit;
+  text-align: center;
+
+  pointer-events: none;
 }
 
 
@@ -165,7 +193,8 @@
   position: absolute;
 
   top: 50%;
-  right: 15px;
+  left: 12px;
+  right: auto;
 
   display: flex;
   align-items: center;
@@ -178,14 +207,14 @@
   box-sizing: border-box;
 
   border: none;
-  border-radius: 50%;
+  border-radius: 8px;
   outline: none;
 
-  background: #f1f1f1;
-  color: #111111;
+  background: transparent;
+  color: #ffffff;
 
   font-family: inherit;
-  font-size: 24px;
+  font-size: 30px;
   font-weight: 400;
   line-height: 1;
 
@@ -195,12 +224,48 @@
 
   transition:
     background-color 0.2s ease,
-    color 0.2s ease,
     transform 0.2s ease;
 }
 
+
+/* Home close icon */
+
+#U9-message-normal-modal-close.message-home-close {
+  color: #ffffff;
+  font-size: 30px;
+}
+
+
+/* Back button */
+
+#U9-message-normal-modal-close.message-back-button {
+  background: transparent;
+  color: #ffffff;
+}
+
+
+/* Back SVG */
+
+#U9-message-normal-modal-close img {
+  display: block;
+
+  width: 23px;
+  height: 23px;
+
+  object-fit: contain;
+
+  /* Make a dark SVG appear white */
+  filter: brightness(0) invert(1);
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* Header button hover */
+
 #U9-message-normal-modal-close:hover {
-  background: #e8e8e8;
+  background: rgba(255, 255, 255, 0.16);
 }
 
 #U9-message-normal-modal-close:active {
@@ -208,18 +273,8 @@
 }
 
 #U9-message-normal-modal-close:focus-visible {
-  outline: 2px solid #555555;
+  outline: 2px solid #ffffff;
   outline-offset: 2px;
-}
-
-#U9-message-normal-modal-close.message-back-button {
-  border-radius: 8px;
-  background: transparent;
-  font-size: 28px;
-}
-
-#U9-message-normal-modal-close.message-back-button:hover {
-  background: #f1f1f1;
 }
 
 
@@ -227,6 +282,7 @@
    HOME / INNER PAGE LAYOUT
 ================================================= */
 
+#Message-model-home,
 #Message-model-navigation,
 #Message-model-pages {
   min-width: 0;
@@ -234,11 +290,31 @@
 }
 
 
-/* Home: show navigation cards */
+/* Message home */
+
+#Message-model-home {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+
+  width: 100%;
+  min-height: 0;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  background: #ffffff;
+
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+/* Home state */
 
 #U9-message-normal-modal-content.message-home
-#Message-model-navigation {
-  display: grid;
+#Message-model-home {
+  display: flex;
 }
 
 #U9-message-normal-modal-content.message-home
@@ -247,10 +323,10 @@
 }
 
 
-/* Inner page: hide navigation cards */
+/* Inner page state */
 
 #U9-message-normal-modal-content.message-inner-page
-#Message-model-navigation {
+#Message-model-home {
   display: none;
 }
 
@@ -272,23 +348,19 @@
   align-content: start;
   align-items: stretch;
 
-  flex: 1 1 auto;
+  flex: 0 0 auto;
 
   gap: 14px;
 
   width: 100%;
-  min-height: 0;
+  min-width: 0;
   padding: 20px;
 
   box-sizing: border-box;
 
   background: #ffffff;
 
-  overflow-x: hidden;
-  overflow-y: auto;
-
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
 }
 
 
@@ -340,7 +412,11 @@
     transform 0.2s ease;
 }
 
-#Message-model-navigation .Message-model-nav-button:hover {
+
+/* Navigation hover */
+
+#Message-model-navigation
+.Message-model-nav-button:hover {
   background: #fafafa;
   border-color: #cccccc;
 
@@ -349,7 +425,11 @@
   transform: translateY(-2px);
 }
 
-#Message-model-navigation .Message-model-nav-button.active {
+
+/* Navigation active */
+
+#Message-model-navigation
+.Message-model-nav-button.active {
   color: #111111;
   background: #f8f8f8;
   border-color: #333333;
@@ -357,11 +437,16 @@
   box-shadow: 0 0 0 1px #333333;
 }
 
-#Message-model-navigation .Message-model-nav-button.active::after {
+#Message-model-navigation
+.Message-model-nav-button.active::after {
   content: none;
 }
 
-#Message-model-navigation .Message-model-nav-button:focus-visible {
+
+/* Navigation focus */
+
+#Message-model-navigation
+.Message-model-nav-button:focus-visible {
   outline: 2px solid #555555;
   outline-offset: 3px;
 }
@@ -442,13 +527,195 @@
 
 
 /* =================================================
-   INNER PAGE CONTAINER
+   HOME: FRIENDS / GROUPS SECTIONS
+================================================= */
 
-   Chat-specific layout belongs in chat.css.
+#Message-model-friends-list-section,
+#Message-model-groups-list-section {
+  display: block;
+  flex: 0 0 auto;
+
+  width: 100%;
+  min-width: 0;
+  padding: 0 16px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+}
+
+
+/* Section heading */
+
+.Message-model-list-heading {
+  margin: 12px 0 8px;
+
+  color: #222222;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+
+/* List containers */
+
+#Message-model-friends-list,
+#Message-model-groups-list {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  box-sizing: border-box;
+}
+
+
+/* =================================================
+   CONTACT ROW
+   Shared by friend and group list items
+================================================= */
+
+.Message-model-contact-row {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 66px;
+  padding: 10px 2px;
+
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #eeeeee;
+  background: #ffffff;
+}
+
+
+/* Contact avatar */
+
+.Message-model-contact-avatar {
+  display: block;
+
+  flex: 0 0 44px;
+
+  width: 44px;
+  height: 44px;
+
+  border: none;
+  border-radius: 50%;
+
+  object-fit: cover;
+  object-position: center;
+
+  background: #f0f0f0;
+}
+
+
+/* Contact name */
+
+.Message-model-contact-name {
+  flex: 1 1 auto;
+
+  min-width: 0;
+
+  overflow: hidden;
+
+  color: #222222;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* Chat button */
+
+.Message-model-contact-chat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 38px;
+
+  width: 38px;
+  height: 38px;
+  padding: 8px;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #eef5fd;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+/* Chat SVG */
+
+.Message-model-contact-chat img {
+  display: block;
+
+  width: 22px;
+  height: 22px;
+
+  object-fit: contain;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* Chat button hover */
+
+.Message-model-contact-chat:hover {
+  background: #dcecff;
+}
+
+.Message-model-contact-chat:active {
+  transform: scale(0.94);
+}
+
+.Message-model-contact-chat:focus-visible {
+  outline: 2px solid #78ace9;
+  outline-offset: 2px;
+}
+
+
+/* Empty list */
+
+.Message-model-empty {
+  display: block;
+
+  width: 100%;
+  padding: 12px 0;
+
+  box-sizing: border-box;
+
+  color: #888888;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+
+/* =================================================
+   INNER PAGE CONTAINER
 ================================================= */
 
 #Message-model-pages {
   position: relative;
+
+  display: none;
 
   flex: 1 1 auto;
 
@@ -487,9 +754,15 @@
   -webkit-overflow-scrolling: touch;
 }
 
+
+/* Hidden pages */
+
 #Message-model-pages .Message-model-page[hidden] {
   display: none !important;
 }
+
+
+/* Active pages */
 
 #Message-model-pages .Message-model-page.active {
   display: block;
@@ -538,6 +811,12 @@
   #Message-model-navigation .Message-model-nav-description {
     font-size: 12px;
   }
+
+  #Message-model-friends-list-section,
+  #Message-model-groups-list-section {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
 }
 
 
@@ -569,16 +848,26 @@
     flex-basis: 55px;
     height: 55px;
 
-    padding: 0 55px 0 15px;
+    padding: 0 50px;
 
     font-size: 18px;
   }
 
+  #U9-message-normal-modal-title-text {
+    left: 50px;
+    right: 50px;
+  }
+
   #U9-message-normal-modal-close {
-    right: 10px;
+    left: 8px;
 
     width: 36px;
     height: 36px;
+  }
+
+  #U9-message-normal-modal-close img {
+    width: 22px;
+    height: 22px;
   }
 
   #Message-model-navigation {
@@ -613,6 +902,43 @@
   #Message-model-navigation .Message-model-nav-description {
     font-size: 10px;
     line-height: 1.45;
+  }
+
+  #Message-model-friends-list-section,
+  #Message-model-groups-list-section {
+    padding-right: 12px;
+    padding-left: 12px;
+  }
+
+  .Message-model-list-heading {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  .Message-model-contact-row {
+    gap: 10px;
+    min-height: 62px;
+  }
+
+  .Message-model-contact-avatar {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .Message-model-contact-name {
+    font-size: 13px;
+  }
+
+  .Message-model-contact-chat {
+    flex-basis: 36px;
+    width: 36px;
+    height: 36px;
+  }
+
+  .Message-model-contact-chat img {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -649,6 +975,12 @@
   #Message-model-navigation .Message-model-nav-description {
     font-size: 9px;
   }
+
+  #Message-model-friends-list-section,
+  #Message-model-groups-list-section {
+    padding-right: 10px;
+    padding-left: 10px;
+  }
 }
 
 
@@ -661,11 +993,17 @@
   #U9-message-normal-modal-content,
   #U9-message-normal-modal-close,
   #Message-model-navigation .Message-model-nav-button,
-  #Message-model-navigation .Message-model-nav-icon {
+  #Message-model-navigation .Message-model-nav-icon,
+  .Message-model-contact-chat {
     transition: none;
   }
 
-  #Message-model-navigation .Message-model-nav-button:hover {
+  #Message-model-navigation
+  .Message-model-nav-button:hover {
+    transform: none;
+  }
+
+  .Message-model-contact-chat:active {
     transform: none;
   }
 }
