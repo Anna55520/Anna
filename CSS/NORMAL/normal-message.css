@@ -38,7 +38,6 @@
 
 /* =========================
    TOOLBAR COLLAPSED
-   U9 HEADER TOOL TOGGLE
 ========================= */
 
 #Message-model-modal.Message-model-toolbar-collapsed {
@@ -54,13 +53,14 @@
 #Message-model-modal-content {
   position: relative;
 
-  width: 100%;
-  height: 100%;
-
-  box-sizing: border-box;
-
   display: flex;
   flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+
+  box-sizing: border-box;
 
   background-color: #ffffff;
   overflow: hidden;
@@ -112,6 +112,7 @@
 
   width: 100%;
   height: 55px;
+  min-height: 55px;
 
   box-sizing: border-box;
 
@@ -122,8 +123,8 @@
 
   font-size: 20px;
   font-weight: 600;
-
   color: #111111;
+
   background-color: #ffffff;
 
   border-bottom: 1px solid #eeeeee;
@@ -188,19 +189,19 @@
 ========================= */
 
 #Message-model-navigation {
-  flex: 0 0 112px;
+  display: flex;
+  align-items: stretch;
 
-  position: relative;
-
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  flex: 0 0 48px;
 
   width: 100%;
-  min-height: 112px;
+  height: 48px;
+  min-height: 48px;
 
   box-sizing: border-box;
 
   background-color: #ffffff;
+
   border-bottom: 1px solid #eeeeee;
 }
 
@@ -209,40 +210,43 @@
    NAVIGATION BUTTON
 ========================= */
 
-#Message-model-navigation .Message-model-nav-button {
+.Message-model-nav-button {
   position: relative;
+
+  flex: 1 1 0;
+  min-width: 0;
 
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 
-  gap: 8px;
+  gap: 4px;
 
-  min-width: 0;
-  padding: 12px 4px;
+  padding: 5px 6px;
 
   border: none;
   border-radius: 0;
 
   background-color: #ffffff;
-  color: #555555;
+  color: #666666;
 
   font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
 
   cursor: pointer;
 
-  -webkit-tap-highlight-color: transparent;
-
   transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
+    color 0.2s ease,
+    background-color 0.2s ease;
+
+  -webkit-tap-highlight-color: transparent;
 }
 
 
 /* NAVIGATION HOVER */
 
-#Message-model-navigation
 .Message-model-nav-button:hover {
   background-color: #f7f7f7;
 }
@@ -250,16 +254,14 @@
 
 /* NAVIGATION ACTIVE */
 
-#Message-model-navigation
 .Message-model-nav-button.active {
-  background-color: #fafafa;
   color: #111111;
+  font-weight: 600;
 }
 
 
 /* ACTIVE INDICATOR */
 
-#Message-model-navigation
 .Message-model-nav-button.active::after {
   position: absolute;
 
@@ -281,11 +283,11 @@
    NAVIGATION ICON
 ========================= */
 
-#Message-model-navigation .Message-model-nav-icon {
+.Message-model-nav-icon {
   display: block;
 
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
 
   flex: 0 0 auto;
 
@@ -297,17 +299,16 @@
    NAVIGATION LABEL
 ========================= */
 
-#Message-model-navigation .Message-model-nav-label {
+.Message-model-nav-label {
   display: block;
 
   max-width: 100%;
 
-  overflow-wrap: anywhere;
-
-  font-size: 13px;
-  line-height: 1.3;
+  font-size: 11px;
+  line-height: 1.2;
 
   text-align: center;
+  overflow-wrap: anywhere;
 }
 
 
@@ -318,28 +319,10 @@
 #Message-model-pages {
   position: relative;
 
-  flex: 1 1 auto;
+  flex: 1 1 0;
 
   width: 100%;
-  min-height: 0;
-
-  box-sizing: border-box;
-
-  overflow: hidden;
-
-  background-color: #ffffff;
-}
-
-
-/* =========================
-   INDIVIDUAL PAGE
-========================= */
-
-#Message-model-pages .Message-model-page {
-  display: none;
-
-  width: 100%;
-  height: 100%;
+  height: auto;
   min-height: 0;
 
   box-sizing: border-box;
@@ -348,13 +331,60 @@
   overflow-y: auto;
 
   background-color: #ffffff;
+
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+/* =========================
+   INDIVIDUAL PAGE
+========================= */
+
+.Message-model-page {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+
+  box-sizing: border-box;
+
+  padding: 0;
+
+  background-color: #ffffff;
+
+  overflow-wrap: anywhere;
+}
+
+
+/* HIDDEN PAGE */
+
+.Message-model-page[hidden] {
+  display: none !important;
 }
 
 
 /* ACTIVE PAGE */
 
-#Message-model-pages .Message-model-page.active {
+.Message-model-page.active {
   display: block;
+}
+
+
+/* =========================
+   PAGE ROOTS
+========================= */
+
+#Message-model-friend-root,
+#Message-model-add-friend-root,
+#Message-model-group-root,
+#Message-model-customer-service-root {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+
+  box-sizing: border-box;
+
+  overflow-wrap: anywhere;
 }
 
 
@@ -389,6 +419,7 @@
     flex-basis: 55px;
 
     height: 55px;
+    min-height: 55px;
 
     padding: 0 55px 0 15px;
 
@@ -409,33 +440,33 @@
   /* NAVIGATION */
 
   #Message-model-navigation {
-    flex-basis: 100px;
+    flex-basis: 48px;
 
-    min-height: 100px;
+    height: 48px;
+    min-height: 48px;
   }
 
 
   /* NAVIGATION BUTTON */
 
-  #Message-model-navigation .Message-model-nav-button {
-    gap: 7px;
-
-    padding: 10px 2px;
+  .Message-model-nav-button {
+    gap: 3px;
+    padding: 4px 2px;
   }
 
 
   /* ICON */
 
-  #Message-model-navigation .Message-model-nav-icon {
-    width: 28px;
-    height: 28px;
+  .Message-model-nav-icon {
+    width: 23px;
+    height: 23px;
   }
 
 
   /* LABEL */
 
-  #Message-model-navigation .Message-model-nav-label {
-    font-size: 11px;
+  .Message-model-nav-label {
+    font-size: 10px;
   }
 
 }
@@ -449,8 +480,7 @@
 
   #Message-model-modal,
   #Message-model-modal-content,
-  #Message-model-close,
-  #Message-model-navigation .Message-model-nav-button {
+  .Message-model-nav-button {
     transition: none;
   }
 
