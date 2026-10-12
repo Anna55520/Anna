@@ -11,9 +11,11 @@
   position: fixed;
   top: 115px;
   left: 0;
+
   width: 100%;
   height: calc(100vh - 115px);
   height: calc(100dvh - 115px);
+
   box-sizing: border-box;
 
   display: flex;
@@ -21,13 +23,17 @@
   align-items: stretch;
 
   background-color: rgba(0, 0, 0, 0.18);
+
   z-index: 1000;
   overflow: hidden;
 
   visibility: hidden;
   pointer-events: none;
 
-  transition: top 0.35s ease, height 0.35s ease;
+  transition:
+    top 0.35s ease,
+    height 0.35s ease,
+    visibility 0s linear 0.45s;
 }
 
 /* =========================
@@ -36,6 +42,7 @@
 
 #U9-message-normal-modal.message-toolbar-collapsed {
   top: 60px;
+
   height: calc(100vh - 60px);
   height: calc(100dvh - 60px);
 }
@@ -46,18 +53,21 @@
 
 #U9-message-normal-modal-content {
   position: relative;
+
   display: flex;
   flex-direction: column;
 
   width: 100%;
   height: 100%;
   min-height: 0;
+
   box-sizing: border-box;
 
   background-color: #ffffff;
   overflow: hidden;
 
   transform: translateY(100%);
+
   transition: transform 0.45s ease;
 }
 
@@ -68,6 +78,11 @@
 #U9-message-normal-modal.modal-open {
   visibility: visible;
   pointer-events: auto;
+
+  transition:
+    top 0.35s ease,
+    height 0.35s ease,
+    visibility 0s;
 }
 
 #U9-message-normal-modal.modal-open
@@ -82,6 +97,11 @@
 #U9-message-normal-modal.modal-closing {
   visibility: visible;
   pointer-events: none;
+
+  transition:
+    top 0.35s ease,
+    height 0.35s ease,
+    visibility 0s;
 }
 
 #U9-message-normal-modal.modal-closing
@@ -95,14 +115,17 @@
 
 #U9-message-normal-modal-title {
   position: relative;
+
   flex: 0 0 55px;
 
   width: 100%;
   height: 55px;
+
   box-sizing: border-box;
 
   display: flex;
   align-items: center;
+
   padding: 0 60px 0 20px;
 
   font-size: 20px;
@@ -121,11 +144,13 @@
 
 #U9-message-normal-modal-close {
   position: absolute;
+
   top: 50%;
   right: 15px;
 
   width: 36px;
   height: 36px;
+
   padding: 0;
   box-sizing: border-box;
 
@@ -141,13 +166,16 @@
   line-height: 1;
 
   cursor: pointer;
+
   transform: translateY(-50%);
 
   display: flex;
   align-items: center;
   justify-content: center;
 
-  transition: background-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 #U9-message-normal-modal-close:hover {
@@ -172,108 +200,130 @@
   box-sizing: border-box;
 }
 
-/*
-  The navigation bar sits below the title.
-  The page content fills the remaining height.
-*/
+/* =========================
+   NAVIGATION CARD GRID
+   Four separate cards
+========================= */
 
 #Message-model-navigation {
   position: relative;
+
   flex: 0 0 auto;
 
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  align-content: start;
   align-items: stretch;
 
+  gap: 14px;
+
   width: 100%;
-  min-height: 64px;
+  padding: 20px;
+
   box-sizing: border-box;
 
   background-color: #ffffff;
-  border-bottom: 1px solid #eeeeee;
 
-  overflow-x: auto;
-  overflow-y: hidden;
-  overscroll-behavior-x: contain;
+  border-bottom: none;
 
-  scrollbar-width: thin;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
 
 /* =========================
-   NAVIGATION BUTTON
+   NAVIGATION CARD BUTTON
 ========================= */
 
 .Message-model-nav-button {
   position: relative;
-  flex: 1 0 0;
 
   display: flex;
   flex-direction: column;
+
   align-items: center;
   justify-content: center;
-  gap: 5px;
 
-  min-width: 90px;
-  min-height: 64px;
-  padding: 9px 12px;
+  gap: 10px;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 145px;
+
+  padding: 20px 12px;
 
   box-sizing: border-box;
-  border: none;
-  border-radius: 0;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 14px;
+
   outline: none;
 
   background-color: #ffffff;
-  color: #777777;
+  color: #222222;
 
   font-family: inherit;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.3;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+
   text-align: center;
-  white-space: nowrap;
+  white-space: normal;
 
   cursor: pointer;
 
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.035);
+
   transition:
     color 0.2s ease,
-    background-color 0.2s ease;
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
 
-/* NAVIGATION HOVER */
+/* =========================
+   CARD HOVER
+========================= */
 
 .Message-model-nav-button:hover {
-  background-color: #f7f7f7;
-  color: #222222;
+  background-color: #fafafa;
+  border-color: #cccccc;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.07);
+
+  transform: translateY(-2px);
 }
 
-/* NAVIGATION ACTIVE */
+/* =========================
+   CARD ACTIVE
+========================= */
 
 .Message-model-nav-button.active {
   color: #111111;
-  font-weight: 600;
-  background-color: #ffffff;
+
+  background-color: #f8f8f8;
+  border-color: #333333;
+
+  box-shadow: 0 0 0 1px #333333;
 }
 
-/* ACTIVE INDICATOR */
+/* Remove old horizontal underline */
 
 .Message-model-nav-button.active::after {
-  content: "";
-  position: absolute;
-  left: 18%;
-  right: 18%;
-  bottom: 0;
-
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-
-  background-color: #222222;
+  content: none;
 }
 
-/* KEYBOARD FOCUS */
+/* =========================
+   CARD KEYBOARD FOCUS
+========================= */
 
 .Message-model-nav-button:focus-visible {
   outline: 2px solid #555555;
-  outline-offset: -3px;
+  outline-offset: 3px;
 }
 
 /* =========================
@@ -283,9 +333,10 @@
 .Message-model-nav-icon {
   display: block;
 
-  width: 22px;
-  height: 22px;
-  flex: 0 0 22px;
+  width: 30px;
+  height: 30px;
+
+  flex: 0 0 30px;
 
   object-fit: contain;
   object-position: center;
@@ -293,8 +344,11 @@
   pointer-events: none;
   user-select: none;
 
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
+  opacity: 0.8;
+
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .Message-model-nav-button:hover
@@ -302,6 +356,7 @@
 .Message-model-nav-button.active
 .Message-model-nav-icon {
   opacity: 1;
+  transform: scale(1.05);
 }
 
 /* =========================
@@ -310,10 +365,35 @@
 
 .Message-model-nav-label {
   display: block;
+
+  width: 100%;
   max-width: 100%;
 
-  overflow: hidden;
+  overflow-wrap: anywhere;
   text-overflow: ellipsis;
+
+  pointer-events: none;
+}
+
+/* =========================
+   NAVIGATION DESCRIPTION
+   Optional description under title
+========================= */
+
+.Message-model-nav-description {
+  display: block;
+
+  width: 100%;
+  max-width: 240px;
+
+  color: #888888;
+
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+
+  text-align: center;
+  white-space: normal;
 
   pointer-events: none;
 }
@@ -324,10 +404,12 @@
 
 #Message-model-pages {
   position: relative;
+
   flex: 1 1 auto;
 
   width: 100%;
   min-height: 0;
+
   box-sizing: border-box;
 
   background-color: #ffffff;
@@ -344,9 +426,11 @@
   width: 100%;
   height: 100%;
   min-height: 0;
+
   box-sizing: border-box;
 
   background-color: #ffffff;
+
   overflow-x: hidden;
   overflow-y: auto;
 
@@ -378,6 +462,7 @@
 
   width: 100%;
   min-height: 100%;
+
   box-sizing: border-box;
 
   background-color: #ffffff;
@@ -387,17 +472,20 @@
    RESPONSIVE: TABLET
 ========================= */
 
-@media (max-width: 768px) {
+@media (min-width: 769px) {
+  #Message-model-navigation {
+    gap: 18px;
+    padding: 24px;
+  }
+
   .Message-model-nav-button {
-    min-width: 82px;
-    padding: 9px 8px;
-    font-size: 12px;
+    min-height: 160px;
   }
 
   .Message-model-nav-icon {
-    width: 21px;
-    height: 21px;
-    flex-basis: 21px;
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
   }
 }
 
@@ -408,12 +496,14 @@
 @media (max-width: 480px) {
   #U9-message-normal-modal {
     top: 115px;
+
     height: calc(100vh - 115px);
     height: calc(100dvh - 115px);
   }
 
   #U9-message-normal-modal.message-toolbar-collapsed {
     top: 60px;
+
     height: calc(100vh - 60px);
     height: calc(100dvh - 60px);
   }
@@ -428,7 +518,9 @@
   #U9-message-normal-modal-title {
     flex-basis: 55px;
     height: 55px;
+
     padding: 0 55px 0 15px;
+
     font-size: 18px;
   }
 
@@ -436,41 +528,45 @@
 
   #U9-message-normal-modal-close {
     right: 10px;
+
     width: 36px;
     height: 36px;
   }
 
-  /* MOBILE NAVIGATION */
+  /* MOBILE CARD GRID */
 
   #Message-model-navigation {
-    min-height: 60px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 12px;
+
+    padding: 16px;
   }
 
   .Message-model-nav-button {
-    flex: 1 0 0;
-
     min-width: 0;
-    min-height: 60px;
-    padding: 8px 3px;
-    gap: 4px;
+    min-height: 130px;
 
-    font-size: 11px;
-  }
+    padding: 16px 8px;
 
-  .Message-model-nav-button.active::after {
-    left: 15%;
-    right: 15%;
-    height: 3px;
+    gap: 8px;
+
+    border-radius: 12px;
+
+    font-size: 13px;
   }
 
   .Message-model-nav-icon {
-    width: 20px;
-    height: 20px;
-    flex-basis: 20px;
+    width: 27px;
+    height: 27px;
+    flex-basis: 27px;
   }
 
   .Message-model-nav-label {
-    width: 100%;
+    font-size: 13px;
+  }
+
+  .Message-model-nav-description {
     font-size: 11px;
   }
 
@@ -490,19 +586,31 @@
 ========================= */
 
 @media (max-width: 360px) {
+  #Message-model-navigation {
+    gap: 9px;
+    padding: 12px;
+  }
+
   .Message-model-nav-button {
-    padding-left: 2px;
-    padding-right: 2px;
-    font-size: 10px;
+    min-height: 115px;
+    padding: 12px 6px;
+
+    gap: 7px;
+
+    font-size: 12px;
   }
 
   .Message-model-nav-icon {
-    width: 19px;
-    height: 19px;
-    flex-basis: 19px;
+    width: 24px;
+    height: 24px;
+    flex-basis: 24px;
   }
 
   .Message-model-nav-label {
+    font-size: 12px;
+  }
+
+  .Message-model-nav-description {
     font-size: 10px;
   }
 }
@@ -518,5 +626,9 @@
   .Message-model-nav-button,
   .Message-model-nav-icon {
     transition: none;
+  }
+
+  .Message-model-nav-button:hover {
+    transform: none;
   }
 }
