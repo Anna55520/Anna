@@ -3,7 +3,9 @@
    MESSAGE NORMAL MODAL
 ========================= */
 
-/* MODAL */
+/* =========================
+   MODAL
+========================= */
 
 #U9-message-normal-modal {
   position: fixed;
@@ -11,6 +13,7 @@
   left: 0;
   width: 100%;
   height: calc(100vh - 115px);
+  height: calc(100dvh - 115px);
   box-sizing: border-box;
 
   display: flex;
@@ -27,19 +30,28 @@
   transition: top 0.35s ease, height 0.35s ease;
 }
 
-/* TOOLBAR COLLAPSED */
+/* =========================
+   TOOLBAR COLLAPSED
+========================= */
 
 #U9-message-normal-modal.message-toolbar-collapsed {
   top: 60px;
   height: calc(100vh - 60px);
+  height: calc(100dvh - 60px);
 }
 
-/* MODAL CONTENT */
+/* =========================
+   MODAL CONTENT
+========================= */
 
 #U9-message-normal-modal-content {
   position: relative;
+  display: flex;
+  flex-direction: column;
+
   width: 100%;
   height: 100%;
+  min-height: 0;
   box-sizing: border-box;
 
   background-color: #ffffff;
@@ -49,7 +61,9 @@
   transition: transform 0.45s ease;
 }
 
-/* OPEN */
+/* =========================
+   OPEN
+========================= */
 
 #U9-message-normal-modal.modal-open {
   visibility: visible;
@@ -61,7 +75,9 @@
   transform: translateY(0);
 }
 
-/* CLOSING */
+/* =========================
+   CLOSING
+========================= */
 
 #U9-message-normal-modal.modal-closing {
   visibility: visible;
@@ -73,10 +89,14 @@
   transform: translateY(100%);
 }
 
-/* TITLE */
+/* =========================
+   TITLE
+========================= */
 
 #U9-message-normal-modal-title {
   position: relative;
+  flex: 0 0 55px;
+
   width: 100%;
   height: 55px;
   box-sizing: border-box;
@@ -91,9 +111,13 @@
 
   background-color: #ffffff;
   border-bottom: 1px solid #eeeeee;
+
+  z-index: 2;
 }
 
-/* CLOSE BUTTON */
+/* =========================
+   CLOSE BUTTON
+========================= */
 
 #U9-message-normal-modal-close {
   position: absolute;
@@ -103,6 +127,7 @@
   width: 36px;
   height: 36px;
   padding: 0;
+  box-sizing: border-box;
 
   border: none;
   outline: none;
@@ -121,31 +146,276 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
 
-/* CLOSE HOVER */
+  transition: background-color 0.2s ease;
+}
 
 #U9-message-normal-modal-close:hover {
   background-color: #e8e8e8;
 }
 
-/* CLOSE ACTIVE */
-
 #U9-message-normal-modal-close:active {
   transform: translateY(-50%) scale(0.94);
 }
 
-/* MOBILE */
+#U9-message-normal-modal-close:focus-visible {
+  outline: 2px solid #555555;
+  outline-offset: 2px;
+}
+
+/* =========================
+   MESSAGE MODEL LAYOUT
+========================= */
+
+#Message-model-navigation,
+#Message-model-pages {
+  box-sizing: border-box;
+}
+
+/*
+  The navigation bar sits below the title.
+  The page content fills the remaining height.
+*/
+
+#Message-model-navigation {
+  position: relative;
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: stretch;
+
+  width: 100%;
+  min-height: 64px;
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+  border-bottom: 1px solid #eeeeee;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* =========================
+   NAVIGATION BUTTON
+========================= */
+
+.Message-model-nav-button {
+  position: relative;
+  flex: 1 0 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+
+  min-width: 90px;
+  min-height: 64px;
+  padding: 9px 12px;
+
+  box-sizing: border-box;
+  border: none;
+  border-radius: 0;
+  outline: none;
+
+  background-color: #ffffff;
+  color: #777777;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.3;
+  text-align: center;
+  white-space: nowrap;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+/* NAVIGATION HOVER */
+
+.Message-model-nav-button:hover {
+  background-color: #f7f7f7;
+  color: #222222;
+}
+
+/* NAVIGATION ACTIVE */
+
+.Message-model-nav-button.active {
+  color: #111111;
+  font-weight: 600;
+  background-color: #ffffff;
+}
+
+/* ACTIVE INDICATOR */
+
+.Message-model-nav-button.active::after {
+  content: "";
+  position: absolute;
+  left: 18%;
+  right: 18%;
+  bottom: 0;
+
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+
+  background-color: #222222;
+}
+
+/* KEYBOARD FOCUS */
+
+.Message-model-nav-button:focus-visible {
+  outline: 2px solid #555555;
+  outline-offset: -3px;
+}
+
+/* =========================
+   NAVIGATION ICON
+========================= */
+
+.Message-model-nav-icon {
+  display: block;
+
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+
+  object-fit: contain;
+  object-position: center;
+
+  pointer-events: none;
+  user-select: none;
+
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.Message-model-nav-button:hover
+.Message-model-nav-icon,
+.Message-model-nav-button.active
+.Message-model-nav-icon {
+  opacity: 1;
+}
+
+/* =========================
+   NAVIGATION LABEL
+========================= */
+
+.Message-model-nav-label {
+  display: block;
+  max-width: 100%;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  pointer-events: none;
+}
+
+/* =========================
+   PAGE CONTAINER
+========================= */
+
+#Message-model-pages {
+  position: relative;
+  flex: 1 1 auto;
+
+  width: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+/* =========================
+   INDIVIDUAL PAGE
+========================= */
+
+.Message-model-page {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* HIDE INACTIVE PAGES */
+
+.Message-model-page[hidden] {
+  display: none !important;
+}
+
+/* ACTIVE PAGE */
+
+.Message-model-page.active {
+  display: block;
+}
+
+/* =========================
+   PAGE ROOTS
+========================= */
+
+#Message-model-friends-root,
+#Message-model-add-friends-root,
+#Message-model-group-root,
+#Message-model-customer-service-root {
+  position: relative;
+
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+}
+
+/* =========================
+   RESPONSIVE: TABLET
+========================= */
+
+@media (max-width: 768px) {
+  .Message-model-nav-button {
+    min-width: 82px;
+    padding: 9px 8px;
+    font-size: 12px;
+  }
+
+  .Message-model-nav-icon {
+    width: 21px;
+    height: 21px;
+    flex-basis: 21px;
+  }
+}
+
+/* =========================
+   RESPONSIVE: MOBILE
+========================= */
 
 @media (max-width: 480px) {
   #U9-message-normal-modal {
     top: 115px;
     height: calc(100vh - 115px);
+    height: calc(100dvh - 115px);
   }
 
   #U9-message-normal-modal.message-toolbar-collapsed {
     top: 60px;
     height: calc(100vh - 60px);
+    height: calc(100dvh - 60px);
   }
 
   #U9-message-normal-modal-content {
@@ -153,24 +423,100 @@
     max-width: 100%;
   }
 
+  /* TITLE */
+
   #U9-message-normal-modal-title {
+    flex-basis: 55px;
     height: 55px;
     padding: 0 55px 0 15px;
     font-size: 18px;
   }
+
+  /* CLOSE BUTTON */
 
   #U9-message-normal-modal-close {
     right: 10px;
     width: 36px;
     height: 36px;
   }
+
+  /* MOBILE NAVIGATION */
+
+  #Message-model-navigation {
+    min-height: 60px;
+  }
+
+  .Message-model-nav-button {
+    flex: 1 0 0;
+
+    min-width: 0;
+    min-height: 60px;
+    padding: 8px 3px;
+    gap: 4px;
+
+    font-size: 11px;
+  }
+
+  .Message-model-nav-button.active::after {
+    left: 15%;
+    right: 15%;
+    height: 3px;
+  }
+
+  .Message-model-nav-icon {
+    width: 20px;
+    height: 20px;
+    flex-basis: 20px;
+  }
+
+  .Message-model-nav-label {
+    width: 100%;
+    font-size: 11px;
+  }
+
+  /* PAGE CONTENT */
+
+  #Message-model-pages {
+    min-height: 0;
+  }
+
+  .Message-model-page {
+    min-height: 0;
+  }
 }
 
-/* REDUCED MOTION */
+/* =========================
+   VERY SMALL MOBILE
+========================= */
+
+@media (max-width: 360px) {
+  .Message-model-nav-button {
+    padding-left: 2px;
+    padding-right: 2px;
+    font-size: 10px;
+  }
+
+  .Message-model-nav-icon {
+    width: 19px;
+    height: 19px;
+    flex-basis: 19px;
+  }
+
+  .Message-model-nav-label {
+    font-size: 10px;
+  }
+}
+
+/* =========================
+   REDUCED MOTION
+========================= */
 
 @media (prefers-reduced-motion: reduce) {
   #U9-message-normal-modal,
-  #U9-message-normal-modal-content {
+  #U9-message-normal-modal-content,
+  #U9-message-normal-modal-close,
+  .Message-model-nav-button,
+  .Message-model-nav-icon {
     transition: none;
   }
 }
