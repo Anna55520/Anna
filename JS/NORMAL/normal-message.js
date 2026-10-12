@@ -1,14 +1,23 @@
 
 /* =================================================
-   MESSAGE NORMAL MODAL
+   U9 MESSAGE NORMAL MODAL
+   File: JS/NORMAL/normal-message.js
+
+   Responsibilities:
+   - Open and close Message modal
+   - Navigate between Message pages
+   - Open Chat page
+   - Pass the selected user to chat.js
+
+   Chat UI and behavior belong in:
+   JS/NORMAL/MESSAGE/chat.js
 ================================================= */
 
 (function () {
   "use strict";
 
-
   /* =================================================
-     ELEMENTS
+     MODAL ELEMENTS
   ================================================= */
 
   const messageModal = document.getElementById(
@@ -34,11 +43,6 @@
   const messagePagesContainer = document.getElementById(
     "Message-model-pages"
   );
-
-  const chatPage = document.getElementById(
-    "Message-model-chat-page"
-  );
-
 
   /* =================================================
      PAGE CONFIGURATION
@@ -74,95 +78,52 @@
     }
   };
 
-
-  /* =================================================
-     CHAT ELEMENTS
-  ================================================= */
-
-  const chatBackButton = document.getElementById(
-    "Message-model-chat-back"
-  );
-
-  const chatAvatar = document.getElementById(
-    "Message-model-chat-avatar"
-  );
-
-  const chatName = document.getElementById(
-    "Message-model-chat-name"
-  );
-
-  const chatStatus = document.getElementById(
-    "Message-model-chat-status"
-  );
-
-  const chatMessages = document.getElementById(
-    "Message-model-chat-messages"
-  );
-
-  const chatForm = document.getElementById(
-    "Message-model-chat-form"
-  );
-
-  const chatInput = document.getElementById(
-    "Message-model-chat-input"
-  );
-
-
   /* =================================================
      STATE
 
-     null = Message home
-     page key = an internal page
-     "chat" = chat page
+     null  = Message home
+     key   = normal inner page
+     chat  = Chat page
   ================================================= */
 
   let currentMessagePage = null;
-
   let currentChatUser = null;
-
   let closeAnimationTimer = null;
-
+  let messageInitialized = false;
 
   /* =================================================
-     GET PAGE ELEMENTS
+     PAGE ELEMENTS
   ================================================= */
 
   function getMessagePageElements() {
     const elements = {};
 
-    Object.keys(messagePageConfig).forEach(
-      function (pageKey) {
-        const config = messagePageConfig[pageKey];
+    Object.keys(messagePageConfig).forEach(function (key) {
+      const config = messagePageConfig[key];
 
-        elements[pageKey] = {
-          button: document.getElementById(
-            config.buttonId
-          ),
-
-          page: document.getElementById(
-            config.pageId
-          )
-        };
-      }
-    );
+      elements[key] = {
+        button: document.getElementById(config.buttonId),
+        page: document.getElementById(config.pageId)
+      };
+    });
 
     return elements;
   }
 
+  function getChatPage() {
+    return document.getElementById(
+      "Message-model-chat-page"
+    );
+  }
 
   /* =================================================
-     SET HEADER TITLE
+     HEADER TITLE
   ================================================= */
 
   function setMessageHeader(isInnerPage) {
     if (!messageModalTitle || !messageModalClose) {
       return;
     }
-
-    /*
-     * Change only the title text node.
-     * Do not replace the close/back button.
-     */
 
     const titleTextNode = Array.from(
       messageModalTitle.childNodes
@@ -179,15 +140,12 @@
       isInnerPage &&
       messagePageConfig[currentMessagePage]
     ) {
-      title =
-        messagePageConfig[currentMessagePage].title;
+      title = messagePageConfig[currentMessagePage].title;
     } else if (
       isInnerPage &&
       currentMessagePage === "chat"
     ) {
-      title = chatName
-        ? chatName.textContent.trim() || "Chat"
-        : "Chat";
+      title = currentChatUser?.name || "Chat";
     }
 
     if (titleTextNode) {
@@ -196,450 +154,250 @@
 
     if (isInnerPage) {
       messageModalClose.textContent = "←";
-
       messageModalClose.setAttribute(
         "aria-label",
         "Back to Message"
       );
-
       messageModalClose.classList.add(
         "message-back-button"
       );
     } else {
       messageModalClose.textContent = "×";
-
       messageModalClose.setAttribute(
         "aria-label",
         "Close Message"
       );
-
       messageModalClose.classList.remove(
         "message-back-button"
       );
     }
   }
 
-
   /* =================================================
-     HIDE ALL INTERNAL PAGES
+     HIDE ALL PAGES
   ================================================= */
 
   function hideAllMessagePages() {
     const pageElements = getMessagePageElements();
 
-    Object.keys(pageElements).forEach(
-      function (pageKey) {
-        const page = pageElements[pageKey].page;
+    Object.keys(pageElements).forEach(function (key) {
+      const page = pageElements[key].page;
 
-        if (!page) {
-          return;
-        }
+      if (!page) return;
 
-        page.classList.remove("active");
-        page.hidden = true;
+      page.classList.remove("active");
+      page.hidden = true;
+      page.setAttribute("aria-hidden", "true");
+    });
 
-        page.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-      }
-    );
+    const chatPage = getChatPage();
 
     if (chatPage) {
       chatPage.classList.remove("active");
       chatPage.hidden = true;
-
-      chatPage.setAttribute(
-        "aria-hidden",
-        "true"
-      );
+      chatPage.setAttribute("aria-hidden", "true");
     }
   }
 
+  function clearNavigationSelection() {
+    const pageElements = getMessagePageElements();
+
+    Object.keys(pageElements).forEach(function (key) {
+      const button = pageElements[key].button;
+
+      if (!button) return;
+
+      button.classList.remove("active");
+      button.setAttribute("aria-selected", "false");
+    });
+  }
 
   /* =================================================
      MESSAGE HOME
-
-     Show the four navigation cards.
   ================================================= */
 
   function showMessageHome() {
-    if (!messageModalContent) {
-      console.warn(
-        "Message Modal content element is missing."
-      );
-
-      return false;
-    }
+    if (!messageModalContent) return false;
 
     currentMessagePage = null;
+    currentChatUser = null;
 
-    /*
-     * Show home layout.
-     */
+    messageModalContent.classList.add("message-home");
+    messageModalContent.classList.remove("message-inner-page");
 
-    messageModalContent.classList.add(
-      "message-home"
-    );
-
-    messageModalContent.classList.remove(
-      "message-inner-page"
-    );
-
-    /*
-     * Remove all active navigation states.
-     */
-
-    const pageElements = getMessagePageElements();
-
-    Object.keys(pageElements).forEach(
-      function (pageKey) {
-        const button = pageElements[pageKey].button;
-
-        if (!button) {
-          return;
-        }
-
-        button.classList.remove("active");
-
-        button.setAttribute(
-          "aria-selected",
-          "false"
-        );
-      }
-    );
-
-    /*
-     * Hide all pages, including Chat.
-     */
-
+    clearNavigationSelection();
     hideAllMessagePages();
-
-    /*
-     * Restore the Message title and close button.
-     */
-
     setMessageHeader(false);
 
     return true;
   }
 
-
   /* =================================================
-     INITIALIZE INNER PAGE
+     INITIALIZE NORMAL PAGE
   ================================================= */
 
   function initializeInnerPage(pageKey) {
     const config = messagePageConfig[pageKey];
 
-    if (!config || !config.initializer) {
-      return;
-    }
+    if (!config || !config.initializer) return;
 
     const initializer = window[config.initializer];
 
-    if (typeof initializer !== "function") {
-      /*
-       * The corresponding page JS may not have
-       * been loaded yet. This is not fatal.
-       */
-
-      return;
-    }
+    if (typeof initializer !== "function") return;
 
     try {
       initializer();
     } catch (error) {
       console.error(
-        "Failed to initialize Message page:",
+        "U9 Message: Page initialization failed:",
         pageKey,
         error
       );
     }
   }
 
-
   /* =================================================
-     SWITCH MESSAGE PAGE
-
-     Called when one of the four cards is clicked.
+     SWITCH NORMAL PAGE
   ================================================= */
 
   function switchMessagePage(pageKey) {
     const config = messagePageConfig[pageKey];
 
     if (!config) {
-      console.warn(
-        "Unknown Message page:",
-        pageKey
-      );
-
+      console.warn("U9 Message: Unknown page:", pageKey);
       return false;
     }
 
-    const pageElements = getMessagePageElements();
-    const targetElements = pageElements[pageKey];
+    const elements = getMessagePageElements();
+    const target = elements[pageKey];
 
-    if (
-      !targetElements ||
-      !targetElements.button ||
-      !targetElements.page
-    ) {
+    if (!target || !target.button || !target.page) {
       console.warn(
-        "Message page elements are missing:",
+        "U9 Message: Page elements are missing:",
         pageKey
       );
-
       return false;
     }
 
     currentMessagePage = pageKey;
+    currentChatUser = null;
 
-    /*
-     * Switch from home layout to inner-page layout.
-     */
+    messageModalContent?.classList.remove("message-home");
+    messageModalContent?.classList.add("message-inner-page");
 
-    if (messageModalContent) {
-      messageModalContent.classList.remove(
-        "message-home"
-      );
-
-      messageModalContent.classList.add(
-        "message-inner-page"
-      );
-    }
-
-    /*
-     * Update navigation button states.
-     */
-
-    Object.keys(pageElements).forEach(
-      function (key) {
-        const button = pageElements[key].button;
-
-        if (!button) {
-          return;
-        }
-
-        const isActive = key === pageKey;
-
-        button.classList.toggle(
-          "active",
-          isActive
-        );
-
-        button.setAttribute(
-          "aria-selected",
-          String(isActive)
-        );
-      }
-    );
-
-    /*
-     * Hide all pages first.
-     */
-
+    clearNavigationSelection();
     hideAllMessagePages();
 
-    /*
-     * Display the selected page.
-     */
+    target.button.classList.add("active");
+    target.button.setAttribute("aria-selected", "true");
 
-    targetElements.page.hidden = false;
-
-    targetElements.page.classList.add("active");
-
-    targetElements.page.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    /*
-     * Update header title and back button.
-     */
+    target.page.hidden = false;
+    target.page.classList.add("active");
+    target.page.setAttribute("aria-hidden", "false");
 
     setMessageHeader(true);
-
-    /*
-     * Initialize the page if its JS is available.
-     */
-
     initializeInnerPage(pageKey);
 
     return true;
   }
 
-
   /* =================================================
      OPEN CHAT PAGE
 
-     Example:
-     openMessageChat({
-       id: "friend-uuid",
-       name: "Anna",
-       avatar: "/path/to/avatar.png"
-     });
+     This function only:
+     1. Receives the selected user
+     2. Switches to the Chat page
+     3. Passes the user to chat.js
+
+     Chat UI and message operations belong in chat.js.
   ================================================= */
 
   function openMessageChat(user) {
+    const chatPage = getChatPage();
+
     if (!chatPage || !messageModalContent) {
       console.warn(
-        "Message Chat page is missing."
+        "U9 Message: #Message-model-chat-page was not found."
       );
-
       return false;
     }
 
-    if (!user || typeof user !== "object") {
+    if (!user || typeof user !== "object" || !user.id) {
       console.warn(
-        "A chat user object is required."
+        "U9 Message: A valid chat user is required."
       );
-
       return false;
     }
-
-    /*
-     * Remember the current conversation partner.
-     */
 
     currentChatUser = {
-      id: user.id || null,
-      name: user.name || "Chat",
-      avatar: user.avatar || null,
-      status: user.status || "Conversation",
+      id: String(user.id),
+      name: user.name || "User",
+      avatar: user.avatar || "",
+      status: user.status || "Friend",
       type: user.type || "friend"
     };
 
-    /*
-     * Set chat header information.
-     */
-
-    if (chatName) {
-      chatName.textContent = currentChatUser.name;
-    }
-
-    if (chatStatus) {
-      chatStatus.textContent = currentChatUser.status;
-    }
-
-    if (chatAvatar && currentChatUser.avatar) {
-      chatAvatar.src = currentChatUser.avatar;
-    }
-
-    /*
-     * Show the inner-page layout.
-     */
-
     currentMessagePage = "chat";
 
-    messageModalContent.classList.remove(
-      "message-home"
-    );
+    messageModalContent.classList.remove("message-home");
+    messageModalContent.classList.add("message-inner-page");
 
-    messageModalContent.classList.add(
-      "message-inner-page"
-    );
-
-    /*
-     * Clear navigation selection because Chat
-     * is not one of the four navigation cards.
-     */
-
-    const pageElements = getMessagePageElements();
-
-    Object.keys(pageElements).forEach(
-      function (pageKey) {
-        const button = pageElements[pageKey].button;
-
-        if (!button) {
-          return;
-        }
-
-        button.classList.remove("active");
-
-        button.setAttribute(
-          "aria-selected",
-          "false"
-        );
-      }
-    );
-
-    /*
-     * Hide all normal pages.
-     */
-
+    clearNavigationSelection();
     hideAllMessagePages();
 
-    /*
-     * Show Chat.
-     */
-
     chatPage.hidden = false;
-
     chatPage.classList.add("active");
-
-    chatPage.setAttribute(
-      "aria-hidden",
-      "false"
-    );
-
-    /*
-     * The top button becomes a back button.
-     */
+    chatPage.setAttribute("aria-hidden", "false");
 
     setMessageHeader(true);
 
     /*
-     * Call an optional Chat page initializer.
+     * Chat.js owns all Chat UI behavior.
+     * If it has not loaded, the page can still open.
      */
-
-    if (
-      typeof window.initializeChatPage === "function"
-    ) {
+    if (typeof window.initializeChatPage === "function") {
       try {
         window.initializeChatPage(currentChatUser);
       } catch (error) {
         console.error(
-          "Failed to initialize Chat page:",
+          "U9 Message: Chat initialization failed.",
           error
         );
       }
+    } else {
+      console.warn(
+        "U9 Message: chat.js has not registered initializeChatPage()."
+      );
     }
 
     return true;
   }
 
-
   /* =================================================
-     CLOSE CHAT AND RETURN TO PREVIOUS MESSAGE PAGE
+     CLOSE CHAT
+
+     Chat.js calls this when the Chat page's own
+     back button is clicked.
   ================================================= */
 
   function closeMessageChat() {
-    /*
-     * If Chat was opened from Friend, return to Friend.
-     * Otherwise return to the four-card home.
-     */
-
-    const previousPage = window.messageChatReturnPage;
+    const returnPage = window.messageChatReturnPage;
 
     window.messageChatReturnPage = null;
+    currentChatUser = null;
 
     if (
-      previousPage &&
-      messagePageConfig[previousPage]
+      returnPage &&
+      messagePageConfig[returnPage]
     ) {
-      return switchMessagePage(previousPage);
+      return switchMessagePage(returnPage);
     }
 
     return showMessageHome();
   }
 
-
   /* =================================================
-     HEADER BUTTON ACTION
-
-     Inner page: return to home.
-     Home: close the entire modal.
+     HEADER BUTTON
   ================================================= */
 
   function handleMessageHeaderButton() {
@@ -648,56 +406,41 @@
       return;
     }
 
-    if (window.U9WindowManager) {
+    if (
+      window.U9WindowManager &&
+      typeof window.U9WindowManager.close === "function"
+    ) {
       window.U9WindowManager.close("message");
     } else {
       closeMessageModal();
     }
   }
 
-
   /* =================================================
-     OPEN MESSAGE MODAL
+     OPEN MODAL
   ================================================= */
 
   function openMessageModal() {
     if (!messageModal || !messageModalContent) {
-      console.warn(
-        "Message Modal elements are missing."
-      );
-
+      console.warn("U9 Message: Modal elements are missing.");
       return false;
     }
-
-    /*
-     * Clear any pending closing animation.
-     */
 
     if (closeAnimationTimer !== null) {
       clearTimeout(closeAnimationTimer);
       closeAnimationTimer = null;
     }
 
-    messageModal.classList.remove(
-      "modal-closing"
-    );
-
-    /*
-     * Each opening starts at the four-card home.
-     */
+    messageModal.classList.remove("modal-closing");
 
     showMessageHome();
-
-    messageModal.classList.add(
-      "modal-open"
-    );
+    messageModal.classList.add("modal-open");
 
     return true;
   }
 
-
   /* =================================================
-     CLOSE MESSAGE MODAL
+     CLOSE MODAL
   ================================================= */
 
   function closeMessageModal() {
@@ -705,48 +448,27 @@
       return false;
     }
 
-    /*
-     * Already closed or closing.
-     */
-
-    if (
-      !messageModal.classList.contains("modal-open")
-    ) {
+    if (!messageModal.classList.contains("modal-open")) {
       return true;
     }
 
-    messageModal.classList.remove(
-      "modal-open"
-    );
-
-    messageModal.classList.add(
-      "modal-closing"
-    );
-
-    /*
-     * Clear a previous fallback timer.
-     */
+    messageModal.classList.remove("modal-open");
+    messageModal.classList.add("modal-closing");
 
     if (closeAnimationTimer !== null) {
       clearTimeout(closeAnimationTimer);
     }
 
     function finishClose() {
-      if (
-        !messageModal.classList.contains(
-          "modal-closing"
-        )
-      ) {
+      if (!messageModal.classList.contains("modal-closing")) {
         return;
       }
 
-      messageModal.classList.remove(
-        "modal-closing"
-      );
+      messageModal.classList.remove("modal-closing");
 
       messageModalContent.removeEventListener(
         "transitionend",
-        handleCloseAnimation
+        handleCloseTransition
       );
 
       if (closeAnimationTimer !== null) {
@@ -755,7 +477,7 @@
       }
     }
 
-    function handleCloseAnimation(event) {
+    function handleCloseTransition(event) {
       if (
         event.target !== messageModalContent ||
         event.propertyName !== "transform"
@@ -768,77 +490,49 @@
 
     messageModalContent.addEventListener(
       "transitionend",
-      handleCloseAnimation
+      handleCloseTransition
     );
 
-    /*
-     * Fallback if transitionend does not fire.
-     */
-
-    closeAnimationTimer = setTimeout(
-      finishClose,
-      700
-    );
+    closeAnimationTimer = setTimeout(finishClose, 700);
 
     return true;
   }
 
-
   /* =================================================
-     INITIALIZE NAVIGATION EVENTS
+     NAVIGATION EVENTS
   ================================================= */
 
   function initializeMessageNavigation() {
-    if (
-      !messageNavigation ||
-      !messagePagesContainer
-    ) {
+    if (!messageNavigation || !messagePagesContainer) {
       console.warn(
-        "Message navigation or pages container is missing."
+        "U9 Message: Navigation or page container is missing."
       );
-
       return false;
     }
 
-    const pageElements = getMessagePageElements();
+    const elements = getMessagePageElements();
 
-    /*
-     * Bind the four navigation buttons.
-     */
+    Object.keys(elements).forEach(function (pageKey) {
+      const button = elements[pageKey].button;
 
-    Object.keys(pageElements).forEach(
-      function (pageKey) {
-        const button = pageElements[pageKey].button;
-
-        if (!button) {
-          console.warn(
-            "Message navigation button is missing:",
-            pageKey
-          );
-
-          return;
-        }
-
-        if (
-          button.dataset.messageNavigationBound === "true"
-        ) {
-          return;
-        }
-
-        button.dataset.messageNavigationBound = "true";
-
-        button.addEventListener(
-          "click",
-          function () {
-            switchMessagePage(pageKey);
-          }
+      if (!button) {
+        console.warn(
+          "U9 Message: Navigation button is missing:",
+          pageKey
         );
+        return;
       }
-    );
 
-    /*
-     * Bind the top close/back button.
-     */
+      if (button.dataset.messageNavigationBound === "true") {
+        return;
+      }
+
+      button.dataset.messageNavigationBound = "true";
+
+      button.addEventListener("click", function () {
+        switchMessagePage(pageKey);
+      });
+    });
 
     if (
       messageModalClose &&
@@ -852,31 +546,10 @@
       );
     }
 
-    /*
-     * Bind the Chat back button.
-     */
-
-    if (
-      chatBackButton &&
-      chatBackButton.dataset.messageChatBackBound !== "true"
-    ) {
-      chatBackButton.dataset.messageChatBackBound = "true";
-
-      chatBackButton.addEventListener(
-        "click",
-        closeMessageChat
-      );
-    }
-
-    /*
-     * Initial state: show the four cards only.
-     */
-
     showMessageHome();
 
     return true;
   }
-
 
   /* =================================================
      WINDOW MANAGER
@@ -888,58 +561,54 @@
       typeof window.U9WindowManager.register !== "function"
     ) {
       console.warn(
-        "U9WindowManager is not available when Message Modal was initialized."
+        "U9 Message: U9WindowManager is not available yet."
       );
-
       return false;
     }
 
-    window.U9WindowManager.register(
-      "message",
-      {
-        open: openMessageModal,
+    window.U9WindowManager.register("message", {
+      open: openMessageModal,
+      close: closeMessageModal,
 
-        close: closeMessageModal,
+      isOpen: function () {
+        if (!messageModal) return false;
 
-        isOpen: function () {
-          if (!messageModal) {
-            return false;
-          }
-
-          return (
-            messageModal.classList.contains("modal-open") ||
-            messageModal.classList.contains("modal-closing")
-          );
-        }
+        return (
+          messageModal.classList.contains("modal-open") ||
+          messageModal.classList.contains("modal-closing")
+        );
       }
-    );
+    });
 
     return true;
   }
 
-
   /* =================================================
-     GLOBAL FUNCTIONS
+     PUBLIC API
   ================================================= */
 
   window.openMessageModal = openMessageModal;
-
   window.closeMessageModal = closeMessageModal;
-
   window.showMessageHome = showMessageHome;
-
   window.switchMessagePage = switchMessagePage;
-
   window.openMessageChat = openMessageChat;
-
   window.closeMessageChat = closeMessageChat;
 
+  window.getCurrentMessageChatUser = function () {
+    return currentChatUser
+      ? { ...currentChatUser }
+      : null;
+  };
 
   /* =================================================
      INITIALIZE
   ================================================= */
 
   function initializeMessageModal() {
+    if (messageInitialized) return;
+
+    messageInitialized = true;
+
     initializeMessageNavigation();
     registerMessageWindowManager();
   }
