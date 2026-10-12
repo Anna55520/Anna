@@ -1,11 +1,13 @@
+
 /* =================================================
    U9 MESSAGE - FRIENDS PAGE
    File: CSS/NORMAL/MESSAGE/friends.css
 
    Features:
    - Scrollable friends list
-   - Friend avatar and avatar-frame overlay
-   - Responsive avatar sizes
+   - Selected avatar and avatar frame
+   - Avatar frame surrounds the base avatar
+   - Responsive avatar/frame sizes
    - Four action buttons
    - Loading, error and empty states
 ================================================= */
@@ -18,6 +20,7 @@
 #Message-model-friends-root {
   width: 100%;
   height: 100%;
+
   min-width: 0;
   min-height: 0;
 
@@ -32,8 +35,6 @@
   box-sizing: border-box;
 }
 
-/* Always respect the hidden attribute. */
-
 #Message-model-friends-root [hidden] {
   display: none !important;
 }
@@ -41,8 +42,6 @@
 
 /* =================================================
    FRIENDS PAGE
-   The page fills its available area.
-   Only the friend list scrolls.
 ================================================= */
 
 #Message-model-friends-root .U9-friends-page {
@@ -73,6 +72,7 @@
   gap: 9px;
 
   width: 100%;
+
   min-width: 0;
   min-height: 0;
 
@@ -106,6 +106,8 @@
 ================================================= */
 
 #Message-model-friends-root .U9-friend-card {
+  position: relative;
+
   display: flex;
   align-items: center;
 
@@ -123,6 +125,8 @@
 
   background: #ffffff;
 
+  overflow: visible;
+
   transition:
     border-color 160ms ease,
     background-color 160ms ease,
@@ -131,7 +135,6 @@
 
 #Message-model-friends-root .U9-friend-card:hover {
   border-color: #d9deea;
-
   background: #fcfcfe;
 
   box-shadow: 0 3px 12px rgb(24 39 75 / 5%);
@@ -140,16 +143,24 @@
 
 /* =================================================
    AVATAR STACK
-   IMPORTANT:
-   - Do not crop the outer frame.
-   - Keep the avatar wrapper square.
-   - The actual avatar is slightly inset.
-   - The frame overlays the avatar.
+
+   The wrapper reserves enough horizontal space for
+   the larger frame so the frame does not crowd the
+   username or action buttons.
+
+   Desktop:
+   - Layout slot: 58px
+   - Base avatar: 37px
+   - Frame: 71px
+
+   The base-avatar/frame ratio follows the proportions
+   used in the Profile page.
 ================================================= */
 
 #Message-model-friends-root .U9-friend-avatar {
-  --friend-avatar-size: 46px;
-  --friend-avatar-inset: 5px;
+  --friend-avatar-size: 58px;
+  --friend-avatar-image-size: 37px;
+  --friend-frame-size: 71px;
 
   position: relative;
 
@@ -178,29 +189,36 @@
 
 /* =================================================
    BASE AVATAR IMAGE
-   Overrides inline measurements from friends.js
-   so responsive sizes remain consistent.
+
+   The actual avatar is centered and remains smaller
+   than the frame. CSS overrides inline styles from
+   friends.js.
 ================================================= */
 
 #Message-model-friends-root .U9-friend-avatar-image {
   position: absolute !important;
 
-  inset: var(--friend-avatar-inset) !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  inset: auto !important;
 
   z-index: 1;
 
   display: block;
 
-  width: calc(
-    100% - var(--friend-avatar-inset) * 2
-  ) !important;
+  width: var(--friend-avatar-image-size) !important;
+  height: var(--friend-avatar-image-size) !important;
 
-  height: calc(
-    100% - var(--friend-avatar-inset) * 2
-  ) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
 
-  max-width: none;
-  max-height: none;
+  max-width: none !important;
+  max-height: none !important;
+
+  transform: translate(-50%, -50%) !important;
 
   object-fit: cover;
   object-position: center;
@@ -216,30 +234,42 @@
 
 /* =================================================
    AVATAR FRAME IMAGE
-   Uses the complete wrapper size.
-   Frame artwork stays above the base avatar.
+
+   The frame is centered independently of the avatar.
+   It is larger than the base avatar and extends
+   outside the avatar's layout slot.
 ================================================= */
 
 #Message-model-friends-root .U9-friend-avatar-frame-image {
   position: absolute !important;
 
-  inset: 0 !important;
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  inset: auto !important;
 
   z-index: 2;
 
   display: block;
 
-  width: 100% !important;
-  height: 100% !important;
+  width: var(--friend-frame-size) !important;
+  height: var(--friend-frame-size) !important;
 
-  max-width: none;
-  max-height: none;
+  min-width: 0 !important;
+  min-height: 0 !important;
+
+  max-width: none !important;
+  max-height: none !important;
+
+  transform: translate(-50%, -50%) !important;
 
   object-fit: contain;
   object-position: center;
 
-  margin: 0;
-  padding: 0;
+  margin: 0 !important;
+  padding: 0 !important;
 
   border: 0;
   border-radius: 0;
@@ -254,14 +284,20 @@
 
 /* =================================================
    AVATAR INITIALS FALLBACK
-   Used only when both the selected avatar and
-   the default avatar fail to load.
+
+   This appears only when the selected avatar and
+   the default avatar cannot load.
 ================================================= */
 
 #Message-model-friends-root .U9-friend-avatar-fallback {
-  position: absolute;
+  position: absolute !important;
 
-  inset: var(--friend-avatar-inset, 5px);
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  inset: auto !important;
 
   z-index: 1;
 
@@ -270,10 +306,15 @@
   align-items: center;
   justify-content: center;
 
-  width: auto;
-  height: auto;
+  width: var(--friend-avatar-image-size) !important;
+  height: var(--friend-avatar-image-size) !important;
+
+  max-width: none !important;
+  max-height: none !important;
 
   overflow: hidden;
+
+  transform: translate(-50%, -50%) !important;
 
   border: 0;
   border-radius: 50%;
@@ -422,7 +463,6 @@
 
 #Message-model-friends-root .U9-friend-action:disabled {
   opacity: 0.42;
-
   cursor: default;
 }
 
@@ -465,14 +505,12 @@
 
 #Message-model-friends-root .U9-friends-empty {
   display: flex;
-
   flex-direction: column;
 
   align-items: center;
   justify-content: center;
 
   width: 100%;
-
   min-height: 220px;
 
   padding: 30px 20px;
@@ -533,13 +571,13 @@
 
   #Message-model-friends-root .U9-friend-card {
     gap: 10px;
-
     padding: 11px;
   }
 
   #Message-model-friends-root .U9-friend-avatar {
-    --friend-avatar-size: 42px;
-    --friend-avatar-inset: 4px;
+    --friend-avatar-size: 52px;
+    --friend-avatar-image-size: 34px;
+    --friend-frame-size: 65px;
   }
 
   #Message-model-friends-root .U9-friend-actions {
@@ -577,13 +615,13 @@
 
   #Message-model-friends-root .U9-friend-card {
     gap: 7px;
-
-    padding: 9px 7px;
+    padding: 9px 10px;
   }
 
   #Message-model-friends-root .U9-friend-avatar {
-    --friend-avatar-size: 36px;
-    --friend-avatar-inset: 3px;
+    --friend-avatar-size: 44px;
+    --friend-avatar-image-size: 29px;
+    --friend-frame-size: 55.4px;
   }
 
   #Message-model-friends-root .U9-friend-actions {
