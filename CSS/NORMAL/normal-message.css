@@ -1,11 +1,12 @@
 
-/* =========================
+/* =================================================
    MESSAGE NORMAL MODAL
-========================= */
+================================================= */
 
-/* =========================
+
+/* =================================================
    MODAL
-========================= */
+================================================= */
 
 #U9-message-normal-modal {
   position: fixed;
@@ -36,9 +37,10 @@
     visibility 0s linear 0.45s;
 }
 
-/* =========================
+
+/* =================================================
    TOOLBAR COLLAPSED
-========================= */
+================================================= */
 
 #U9-message-normal-modal.message-toolbar-collapsed {
   top: 60px;
@@ -47,9 +49,10 @@
   height: calc(100dvh - 60px);
 }
 
-/* =========================
+
+/* =================================================
    MODAL CONTENT
-========================= */
+================================================= */
 
 #U9-message-normal-modal-content {
   position: relative;
@@ -60,6 +63,7 @@
   width: 100%;
   height: 100%;
   min-height: 0;
+  min-width: 0;
 
   box-sizing: border-box;
 
@@ -71,9 +75,10 @@
   transition: transform 0.45s ease;
 }
 
-/* =========================
+
+/* =================================================
    OPEN
-========================= */
+================================================= */
 
 #U9-message-normal-modal.modal-open {
   visibility: visible;
@@ -90,9 +95,10 @@
   transform: translateY(0);
 }
 
-/* =========================
+
+/* =================================================
    CLOSING
-========================= */
+================================================= */
 
 #U9-message-normal-modal.modal-closing {
   visibility: visible;
@@ -109,9 +115,10 @@
   transform: translateY(100%);
 }
 
-/* =========================
+
+/* =================================================
    TITLE
-========================= */
+================================================= */
 
 #U9-message-normal-modal-title {
   position: relative;
@@ -120,13 +127,14 @@
 
   width: 100%;
   height: 55px;
+  min-height: 55px;
 
   box-sizing: border-box;
 
   display: flex;
   align-items: center;
 
-  padding: 0 60px 0 20px;
+  padding: 0 65px 0 20px;
 
   font-size: 20px;
   font-weight: 600;
@@ -138,9 +146,10 @@
   z-index: 2;
 }
 
-/* =========================
-   CLOSE BUTTON
-========================= */
+
+/* =================================================
+   CLOSE / BACK BUTTON
+================================================= */
 
 #U9-message-normal-modal-close {
   position: absolute;
@@ -161,6 +170,7 @@
   background-color: #f1f1f1;
   color: #111111;
 
+  font-family: inherit;
   font-size: 24px;
   font-weight: 400;
   line-height: 1;
@@ -175,6 +185,7 @@
 
   transition:
     background-color 0.2s ease,
+    color 0.2s ease,
     transform 0.2s ease;
 }
 
@@ -191,24 +202,70 @@
   outline-offset: 2px;
 }
 
-/* =========================
-   MESSAGE MODEL LAYOUT
-========================= */
+/* JS adds this class when an inner page is open */
+
+#U9-message-normal-modal-close.message-back-button {
+  border-radius: 8px;
+  background-color: transparent;
+  font-size: 28px;
+}
+
+#U9-message-normal-modal-close.message-back-button:hover {
+  background-color: #f1f1f1;
+}
+
+
+/* =================================================
+   COMMON LAYOUT
+================================================= */
 
 #Message-model-navigation,
 #Message-model-pages {
   box-sizing: border-box;
+  min-width: 0;
 }
 
-/* =========================
+
+/* =================================================
+   HOME STATE
+   Display four cards only
+================================================= */
+
+#U9-message-normal-modal-content.message-home
+#Message-model-navigation {
+  display: grid;
+}
+
+#U9-message-normal-modal-content.message-home
+#Message-model-pages {
+  display: none;
+}
+
+
+/* =================================================
+   INNER PAGE STATE
+   Hide four cards and display page container
+================================================= */
+
+#U9-message-normal-modal-content.message-inner-page
+#Message-model-navigation {
+  display: none;
+}
+
+#U9-message-normal-modal-content.message-inner-page
+#Message-model-pages {
+  display: block;
+}
+
+
+/* =================================================
    NAVIGATION CARD GRID
-   Four separate cards
-========================= */
+================================================= */
 
 #Message-model-navigation {
   position: relative;
 
-  flex: 0 0 auto;
+  flex: 1 1 auto;
 
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -219,13 +276,13 @@
   gap: 14px;
 
   width: 100%;
+  min-height: 0;
+
   padding: 20px;
 
   box-sizing: border-box;
 
   background-color: #ffffff;
-
-  border-bottom: none;
 
   overflow-x: hidden;
   overflow-y: auto;
@@ -234,11 +291,12 @@
   -webkit-overflow-scrolling: touch;
 }
 
-/* =========================
-   NAVIGATION CARD BUTTON
-========================= */
 
-.Message-model-nav-button {
+/* =================================================
+   NAVIGATION CARD BUTTON
+================================================= */
+
+#Message-model-navigation .Message-model-nav-button {
   position: relative;
 
   display: flex;
@@ -247,13 +305,13 @@
   align-items: center;
   justify-content: center;
 
-  gap: 10px;
+  gap: 9px;
 
   width: 100%;
   min-width: 0;
-  min-height: 145px;
+  min-height: 135px;
 
-  padding: 20px 12px;
+  padding: 16px 12px;
 
   box-sizing: border-box;
 
@@ -285,11 +343,12 @@
     transform 0.2s ease;
 }
 
-/* =========================
-   CARD HOVER
-========================= */
 
-.Message-model-nav-button:hover {
+/* =================================================
+   CARD HOVER
+================================================= */
+
+#Message-model-navigation .Message-model-nav-button:hover {
   background-color: #fafafa;
   border-color: #cccccc;
 
@@ -298,45 +357,45 @@
   transform: translateY(-2px);
 }
 
-/* =========================
+
+/* =================================================
    CARD ACTIVE
-========================= */
+   No card is active on initial load
+================================================= */
 
-.Message-model-nav-button.active {
+#Message-model-navigation .Message-model-nav-button.active {
   color: #111111;
-
   background-color: #f8f8f8;
   border-color: #333333;
-
   box-shadow: 0 0 0 1px #333333;
 }
 
-/* Remove old horizontal underline */
-
-.Message-model-nav-button.active::after {
+#Message-model-navigation .Message-model-nav-button.active::after {
   content: none;
 }
 
-/* =========================
-   CARD KEYBOARD FOCUS
-========================= */
 
-.Message-model-nav-button:focus-visible {
+/* =================================================
+   CARD KEYBOARD FOCUS
+================================================= */
+
+#Message-model-navigation .Message-model-nav-button:focus-visible {
   outline: 2px solid #555555;
   outline-offset: 3px;
 }
 
-/* =========================
-   NAVIGATION ICON
-========================= */
 
-.Message-model-nav-icon {
+/* =================================================
+   NAVIGATION ICON
+================================================= */
+
+#Message-model-navigation .Message-model-nav-icon {
   display: block;
 
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
 
-  flex: 0 0 30px;
+  flex: 0 0 28px;
 
   object-fit: contain;
   object-position: center;
@@ -344,43 +403,44 @@
   pointer-events: none;
   user-select: none;
 
-  opacity: 0.8;
+  opacity: 0.85;
 
   transition:
     opacity 0.2s ease,
     transform 0.2s ease;
 }
 
+#Message-model-navigation
 .Message-model-nav-button:hover
-.Message-model-nav-icon,
-.Message-model-nav-button.active
 .Message-model-nav-icon {
   opacity: 1;
   transform: scale(1.05);
 }
 
-/* =========================
-   NAVIGATION LABEL
-========================= */
 
-.Message-model-nav-label {
+/* =================================================
+   NAVIGATION LABEL
+================================================= */
+
+#Message-model-navigation .Message-model-nav-label {
   display: block;
 
   width: 100%;
   max-width: 100%;
 
+  color: inherit;
+
   overflow-wrap: anywhere;
-  text-overflow: ellipsis;
 
   pointer-events: none;
 }
 
-/* =========================
-   NAVIGATION DESCRIPTION
-   Optional description under title
-========================= */
 
-.Message-model-nav-description {
+/* =================================================
+   NAVIGATION DESCRIPTION
+================================================= */
+
+#Message-model-navigation .Message-model-nav-description {
   display: block;
 
   width: 100%;
@@ -388,19 +448,22 @@
 
   color: #888888;
 
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 400;
   line-height: 1.5;
 
   text-align: center;
   white-space: normal;
 
+  overflow-wrap: anywhere;
+
   pointer-events: none;
 }
 
-/* =========================
+
+/* =================================================
    PAGE CONTAINER
-========================= */
+================================================= */
 
 #Message-model-pages {
   position: relative;
@@ -408,7 +471,9 @@
   flex: 1 1 auto;
 
   width: 100%;
+  min-width: 0;
   min-height: 0;
+  height: 0;
 
   box-sizing: border-box;
 
@@ -416,15 +481,17 @@
   overflow: hidden;
 }
 
-/* =========================
-   INDIVIDUAL PAGE
-========================= */
 
-.Message-model-page {
+/* =================================================
+   INDIVIDUAL PAGE
+================================================= */
+
+#Message-model-pages .Message-model-page {
   position: relative;
 
   width: 100%;
   height: 100%;
+  min-width: 0;
   min-height: 0;
 
   box-sizing: border-box;
@@ -438,21 +505,24 @@
   -webkit-overflow-scrolling: touch;
 }
 
+
 /* HIDE INACTIVE PAGES */
 
-.Message-model-page[hidden] {
+#Message-model-pages .Message-model-page[hidden] {
   display: none !important;
 }
 
-/* ACTIVE PAGE */
 
-.Message-model-page.active {
+/* ACTIVE NORMAL PAGE */
+
+#Message-model-pages .Message-model-page.active {
   display: block;
 }
 
-/* =========================
+
+/* =================================================
    PAGE ROOTS
-========================= */
+================================================= */
 
 #Message-model-friends-root,
 #Message-model-add-friends-root,
@@ -468,9 +538,341 @@
   background-color: #ffffff;
 }
 
-/* =========================
-   RESPONSIVE: TABLET
-========================= */
+
+/* =================================================
+   CHAT PAGE LAYOUT
+================================================= */
+
+#Message-model-pages #Message-model-chat-page.active {
+  display: flex;
+  flex-direction: column;
+
+  overflow: hidden;
+}
+
+
+/* =================================================
+   CHAT HEADER
+================================================= */
+
+#Message-model-chat-header {
+  position: relative;
+
+  flex: 0 0 64px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  width: 100%;
+  min-width: 0;
+  height: 64px;
+
+  padding: 0 16px;
+
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+  border-bottom: 1px solid #eeeeee;
+}
+
+
+/* CHAT BACK BUTTON */
+
+#Message-model-chat-back {
+  flex: 0 0 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 8px;
+
+  background-color: transparent;
+  color: #222222;
+
+  font-family: inherit;
+  font-size: 26px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition: background-color 0.2s ease;
+}
+
+#Message-model-chat-back:hover {
+  background-color: #f2f2f2;
+}
+
+#Message-model-chat-back:focus-visible {
+  outline: 2px solid #555555;
+  outline-offset: 2px;
+}
+
+
+/* CHAT AVATAR */
+
+#Message-model-chat-avatar {
+  display: block;
+
+  flex: 0 0 40px;
+
+  width: 40px;
+  height: 40px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+  object-position: center;
+
+  background-color: #f1f1f1;
+}
+
+
+/* CHAT USER INFO */
+
+#Message-model-chat-user-info {
+  flex: 1 1 auto;
+
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  gap: 3px;
+}
+
+#Message-model-chat-name {
+  width: 100%;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: #111111;
+
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+#Message-model-chat-status {
+  width: 100%;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  color: #888888;
+
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+
+/* CHAT MORE BUTTON */
+
+#Message-model-chat-more {
+  flex: 0 0 36px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 8px;
+
+  background-color: transparent;
+  color: #333333;
+
+  font-family: inherit;
+  font-size: 25px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition: background-color 0.2s ease;
+}
+
+#Message-model-chat-more:hover {
+  background-color: #f2f2f2;
+}
+
+#Message-model-chat-more:focus-visible {
+  outline: 2px solid #555555;
+  outline-offset: 2px;
+}
+
+
+/* =================================================
+   CHAT MESSAGES AREA
+================================================= */
+
+#Message-model-chat-messages {
+  flex: 1 1 auto;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+
+  padding: 16px;
+
+  box-sizing: border-box;
+
+  background-color: #f8f9fb;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+
+/* =================================================
+   CHAT INPUT FORM
+================================================= */
+
+#Message-model-chat-form {
+  flex: 0 0 auto;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  width: 100%;
+  min-width: 0;
+
+  padding: 12px 14px;
+
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+  border-top: 1px solid #eeeeee;
+}
+
+
+/* CHAT TEXT INPUT */
+
+#Message-model-chat-input {
+  flex: 1 1 auto;
+
+  width: 0;
+  min-width: 0;
+  height: 42px;
+
+  padding: 0 14px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #e2e2e2;
+  border-radius: 22px;
+
+  outline: none;
+
+  background-color: #f8f8f8;
+  color: #222222;
+
+  font-family: inherit;
+  font-size: 14px;
+  line-height: normal;
+
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+#Message-model-chat-input::placeholder {
+  color: #999999;
+}
+
+#Message-model-chat-input:focus {
+  border-color: #aaaaaa;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.04);
+}
+
+
+/* SEND BUTTON */
+
+#Message-model-chat-send {
+  flex: 0 0 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  padding: 10px;
+
+  box-sizing: border-box;
+
+  border: none;
+  border-radius: 50%;
+
+  background-color: #222222;
+  color: #ffffff;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+#Message-model-chat-send:hover {
+  background-color: #444444;
+}
+
+#Message-model-chat-send:active {
+  transform: scale(0.95);
+}
+
+#Message-model-chat-send:focus-visible {
+  outline: 2px solid #555555;
+  outline-offset: 3px;
+}
+
+#Message-model-chat-send img {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: contain;
+
+  filter: brightness(0) invert(1);
+
+  pointer-events: none;
+}
+
+
+/* =================================================
+   RESPONSIVE: TABLET AND DESKTOP
+================================================= */
 
 @media (min-width: 769px) {
   #Message-model-navigation {
@@ -478,20 +880,25 @@
     padding: 24px;
   }
 
-  .Message-model-nav-button {
-    min-height: 160px;
+  #Message-model-navigation .Message-model-nav-button {
+    min-height: 150px;
   }
 
-  .Message-model-nav-icon {
-    width: 34px;
-    height: 34px;
-    flex-basis: 34px;
+  #Message-model-navigation .Message-model-nav-icon {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+  }
+
+  #Message-model-navigation .Message-model-nav-description {
+    font-size: 12px;
   }
 }
 
-/* =========================
+
+/* =================================================
    RESPONSIVE: MOBILE
-========================= */
+================================================= */
 
 @media (max-width: 480px) {
   #U9-message-normal-modal {
@@ -513,6 +920,7 @@
     max-width: 100%;
   }
 
+
   /* TITLE */
 
   #U9-message-normal-modal-title {
@@ -524,7 +932,8 @@
     font-size: 18px;
   }
 
-  /* CLOSE BUTTON */
+
+  /* CLOSE / BACK BUTTON */
 
   #U9-message-normal-modal-close {
     right: 10px;
@@ -533,7 +942,8 @@
     height: 36px;
   }
 
-  /* MOBILE CARD GRID */
+
+  /* HOME CARD GRID */
 
   #Message-model-navigation {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -543,11 +953,11 @@
     padding: 16px;
   }
 
-  .Message-model-nav-button {
+  #Message-model-navigation .Message-model-nav-button {
     min-width: 0;
-    min-height: 130px;
+    min-height: 125px;
 
-    padding: 16px 8px;
+    padding: 14px 8px;
 
     gap: 8px;
 
@@ -556,34 +966,82 @@
     font-size: 13px;
   }
 
-  .Message-model-nav-icon {
-    width: 27px;
-    height: 27px;
-    flex-basis: 27px;
+  #Message-model-navigation .Message-model-nav-icon {
+    width: 25px;
+    height: 25px;
+    flex-basis: 25px;
   }
 
-  .Message-model-nav-label {
+  #Message-model-navigation .Message-model-nav-label {
     font-size: 13px;
   }
 
-  .Message-model-nav-description {
-    font-size: 11px;
+  #Message-model-navigation .Message-model-nav-description {
+    font-size: 10px;
+    line-height: 1.45;
   }
 
-  /* PAGE CONTENT */
 
-  #Message-model-pages {
-    min-height: 0;
+  /* CHAT HEADER */
+
+  #Message-model-chat-header {
+    flex-basis: 58px;
+    height: 58px;
+
+    gap: 9px;
+
+    padding: 0 10px;
   }
 
-  .Message-model-page {
-    min-height: 0;
+  #Message-model-chat-avatar {
+    flex-basis: 36px;
+
+    width: 36px;
+    height: 36px;
+  }
+
+  #Message-model-chat-name {
+    font-size: 14px;
+  }
+
+  #Message-model-chat-status {
+    font-size: 10px;
+  }
+
+
+  /* CHAT MESSAGES */
+
+  #Message-model-chat-messages {
+    padding: 12px;
+  }
+
+
+  /* CHAT INPUT */
+
+  #Message-model-chat-form {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  #Message-model-chat-input {
+    height: 40px;
+    padding: 0 12px;
+
+    font-size: 13px;
+  }
+
+  #Message-model-chat-send {
+    flex-basis: 40px;
+
+    width: 40px;
+    height: 40px;
   }
 }
 
-/* =========================
-   VERY SMALL MOBILE
-========================= */
+
+/* =================================================
+   RESPONSIVE: VERY SMALL MOBILE
+================================================= */
 
 @media (max-width: 360px) {
   #Message-model-navigation {
@@ -591,7 +1049,7 @@
     padding: 12px;
   }
 
-  .Message-model-nav-button {
+  #Message-model-navigation .Message-model-nav-button {
     min-height: 115px;
     padding: 12px 6px;
 
@@ -600,35 +1058,44 @@
     font-size: 12px;
   }
 
-  .Message-model-nav-icon {
-    width: 24px;
-    height: 24px;
-    flex-basis: 24px;
+  #Message-model-navigation .Message-model-nav-icon {
+    width: 23px;
+    height: 23px;
+    flex-basis: 23px;
   }
 
-  .Message-model-nav-label {
+  #Message-model-navigation .Message-model-nav-label {
     font-size: 12px;
   }
 
-  .Message-model-nav-description {
-    font-size: 10px;
+  #Message-model-navigation .Message-model-nav-description {
+    font-size: 9px;
+  }
+
+  #Message-model-chat-header {
+    gap: 7px;
+    padding: 0 8px;
   }
 }
 
-/* =========================
+
+/* =================================================
    REDUCED MOTION
-========================= */
+================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   #U9-message-normal-modal,
   #U9-message-normal-modal-content,
   #U9-message-normal-modal-close,
-  .Message-model-nav-button,
-  .Message-model-nav-icon {
+  #Message-model-navigation .Message-model-nav-button,
+  #Message-model-navigation .Message-model-nav-icon,
+  #Message-model-chat-back,
+  #Message-model-chat-more,
+  #Message-model-chat-send {
     transition: none;
   }
 
-  .Message-model-nav-button:hover {
+  #Message-model-navigation .Message-model-nav-button:hover {
     transform: none;
   }
 }
