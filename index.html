@@ -1357,15 +1357,21 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
   </div>
 
+
   <!-- =================================================
       MESSAGE MODAL
   ================================================= -->
 
   <div id="U9-message-normal-modal">
 
-    <div id="U9-message-normal-modal-content">
+    <div
+      id="U9-message-normal-modal-content"
+      class="message-home"
+    >
 
-      <!-- TITLE -->
+      <!-- =========================
+          TITLE
+      ========================= -->
 
       <div id="U9-message-normal-modal-title">
         Message
@@ -1379,7 +1385,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
 
       <!-- =========================
-          MESSAGE NAVIGATION
+          MESSAGE HOME NAVIGATION
       ========================= -->
 
       <div
@@ -1392,13 +1398,14 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
         <button
           id="Message-model-friends-button"
-          class="Message-model-nav-button active"
+          class="Message-model-nav-button"
           type="button"
           role="tab"
           data-page="friends"
           aria-controls="Message-model-friends-page"
-          aria-selected="true"
+          aria-selected="false"
         >
+
           <img
             class="Message-model-nav-icon"
             src="/SSVG/account/account-edit-button.svg"
@@ -1408,6 +1415,11 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           <span class="Message-model-nav-label">
             Friend
           </span>
+
+          <span class="Message-model-nav-description">
+            Your accepted friends
+          </span>
+
         </button>
 
 
@@ -1422,6 +1434,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           aria-controls="Message-model-add-friends-page"
           aria-selected="false"
         >
+
           <img
             class="Message-model-nav-icon"
             src="/SSVG/account/account-edit-button.svg"
@@ -1431,6 +1444,11 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           <span class="Message-model-nav-label">
             Add Friend
           </span>
+
+          <span class="Message-model-nav-description">
+            Search accounts and friend requests
+          </span>
+
         </button>
 
 
@@ -1445,6 +1463,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           aria-controls="Message-model-group-page"
           aria-selected="false"
         >
+
           <img
             class="Message-model-nav-icon"
             src="/SSVG/account/account-edit-button.svg"
@@ -1454,6 +1473,11 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           <span class="Message-model-nav-label">
             Group
           </span>
+
+          <span class="Message-model-nav-description">
+            Search, request and join groups
+          </span>
+
         </button>
 
 
@@ -1468,6 +1492,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           aria-controls="Message-model-customer-service-page"
           aria-selected="false"
         >
+
           <img
             class="Message-model-nav-icon"
             src="/SSVG/account/account-edit-button.svg"
@@ -1477,6 +1502,11 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           <span class="Message-model-nav-label">
             Customer Service
           </span>
+
+          <span class="Message-model-nav-description">
+            Contact platform support
+          </span>
+
         </button>
 
       </div>
@@ -1488,19 +1518,27 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
       <div id="Message-model-pages">
 
-        <!-- FRIENDS PAGE -->
+
+        <!-- =========================
+            FRIENDS PAGE
+        ========================= -->
 
         <section
           id="Message-model-friends-page"
-          class="Message-model-page active"
+          class="Message-model-page"
           role="tabpanel"
-          aria-hidden="false"
+          aria-hidden="true"
+          hidden
         >
+
           <div id="Message-model-friends-root"></div>
+
         </section>
 
 
-        <!-- ADD FRIENDS PAGE -->
+        <!-- =========================
+            ADD FRIENDS PAGE
+        ========================= -->
 
         <section
           id="Message-model-add-friends-page"
@@ -1509,11 +1547,15 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           aria-hidden="true"
           hidden
         >
+
           <div id="Message-model-add-friends-root"></div>
+
         </section>
 
 
-        <!-- GROUP PAGE -->
+        <!-- =========================
+            GROUP PAGE
+        ========================= -->
 
         <section
           id="Message-model-group-page"
@@ -1522,11 +1564,15 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           aria-hidden="true"
           hidden
         >
+
           <div id="Message-model-group-root"></div>
+
         </section>
 
 
-        <!-- CUSTOMER SERVICE PAGE -->
+        <!-- =========================
+            CUSTOMER SERVICE PAGE
+        ========================= -->
 
         <section
           id="Message-model-customer-service-page"
@@ -1535,11 +1581,15 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           aria-hidden="true"
           hidden
         >
+
           <div id="Message-model-customer-service-root"></div>
+
         </section>
 
 
-        <!-- CHAT PAGE -->
+        <!-- =========================
+            CHAT PAGE
+        ========================= -->
 
         <section
           id="Message-model-chat-page"
@@ -1552,6 +1602,8 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
           <div id="Message-model-chat-header">
 
+            <!-- BACK BUTTON -->
+
             <button
               id="Message-model-chat-back"
               type="button"
@@ -1560,11 +1612,17 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
               ←
             </button>
 
+
+            <!-- CHAT AVATAR -->
+
             <img
               id="Message-model-chat-avatar"
               src="/SSVG/account/account-edit-button.svg"
               alt=""
             >
+
+
+            <!-- CHAT USER INFO -->
 
             <div id="Message-model-chat-user-info">
 
@@ -1577,6 +1635,9 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
               </div>
 
             </div>
+
+
+            <!-- MORE OPTIONS -->
 
             <button
               id="Message-model-chat-more"
@@ -1619,15 +1680,18 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
               type="submit"
               aria-label="Send message"
             >
+
               <img
                 src="/SSVG/account/account-edit-button.svg"
                 alt=""
               >
+
             </button>
 
           </form>
 
         </section>
+
 
       </div>
 
