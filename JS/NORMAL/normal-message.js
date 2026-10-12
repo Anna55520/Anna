@@ -3,347 +3,262 @@
    MESSAGE NORMAL MODAL
 ========================= */
 
-(function () {
-  "use strict";
+
+/* =========================
+   ELEMENTS
+========================= */
+
+const messageModal =
+  document.getElementById(
+    "U9-message-normal-modal"
+  );
 
 
-  /* =========================
-     ELEMENTS
-  ========================= */
-
-  const messageModal =
-    document.getElementById(
-      "Message-model-modal"
-    );
-
-  const messageModalContent =
-    document.getElementById(
-      "Message-model-modal-content"
-    );
-
-  const messageModalClose =
-    document.getElementById(
-      "Message-model-close"
-    );
-
-  const messageNavigation =
-    document.getElementById(
-      "Message-model-navigation"
-    );
-
-  const messagePages =
-    document.querySelectorAll(
-      "#Message-model-pages .Message-model-page"
-    );
+const messageModalContent =
+  document.getElementById(
+    "U9-message-normal-modal-content"
+  );
 
 
-  /* =========================
-     TOOLBAR STATE
-  ========================= */
+const messageModalClose =
+  document.getElementById(
+    "U9-message-normal-modal-close"
+  );
 
-  function setMessageToolbarCollapsed(collapsed) {
-    if (!messageModal) {
-      return false;
-    }
 
-    messageModal.classList.toggle(
-      "Message-model-toolbar-collapsed",
-      Boolean(collapsed)
-    );
+/* =========================
+   OPEN MESSAGE MODAL
+========================= */
 
-    return true;
+function openMessageModal() {
+
+  if (
+    !messageModal ||
+    !messageModalContent
+  ) {
+
+    return false;
+
   }
 
 
-  /* =========================
-     OPEN MESSAGE MODAL
-  ========================= */
+  messageModal.classList.remove(
+    "modal-closing"
+  );
 
-  function openMessageModal() {
-    if (
-      !messageModal ||
-      !messageModalContent
-    ) {
-      console.error(
-        "U9 Message: Modal elements not found."
-      );
 
-      return false;
-    }
+  messageModal.classList.add(
+    "modal-open"
+  );
 
-    messageModal.classList.remove(
-      "Message-model-closing"
-    );
 
-    messageModal.classList.add(
-      "Message-model-open"
-    );
+  return true;
 
-    return true;
+}
+
+
+/* =========================
+   CLOSE MESSAGE MODAL
+========================= */
+
+function closeMessageModal() {
+
+  if (
+    !messageModal ||
+    !messageModalContent
+  ) {
+
+    return false;
+
   }
 
 
-  /* =========================
-     CLOSE MESSAGE MODAL
-  ========================= */
+  if (
+    !messageModal.classList.contains(
+      "modal-open"
+    )
+  ) {
 
-  function closeMessageModal() {
+    return true;
+
+  }
+
+
+  messageModal.classList.remove(
+    "modal-open"
+  );
+
+
+  messageModal.classList.add(
+    "modal-closing"
+  );
+
+
+  let closeFinished =
+    false;
+
+
+  function finishClose() {
+
     if (
-      !messageModal ||
-      !messageModalContent
+      closeFinished
     ) {
-      return false;
+
+      return;
+
     }
 
-    if (
-      !messageModal.classList.contains(
-        "Message-model-open"
-      )
-    ) {
-      return true;
-    }
+
+    closeFinished =
+      true;
+
 
     messageModal.classList.remove(
-      "Message-model-open"
+      "modal-closing"
     );
 
-    messageModal.classList.add(
-      "Message-model-closing"
-    );
 
-    let closeFinished = false;
-
-    function finishClose() {
-      if (closeFinished) {
-        return;
-      }
-
-      closeFinished = true;
-
-      messageModal.classList.remove(
-        "Message-model-closing"
-      );
-
-      messageModalContent.removeEventListener(
-        "transitionend",
-        handleCloseAnimation
-      );
-    }
-
-    function handleCloseAnimation(event) {
-      if (
-        event.target !== messageModalContent ||
-        event.propertyName !== "transform"
-      ) {
-        return;
-      }
-
-      finishClose();
-    }
-
-    messageModalContent.addEventListener(
+    messageModalContent.removeEventListener(
       "transitionend",
       handleCloseAnimation
     );
 
-    setTimeout(
-      finishClose,
-      700
-    );
-
-    return true;
   }
 
 
-  /* =========================
-     SWITCH MESSAGE PAGE
-  ========================= */
-
-  function switchMessagePage(pageName) {
-    if (
-      !messageNavigation ||
-      !messagePages.length
-    ) {
-      console.error(
-        "U9 Message: Navigation or pages not found."
-      );
-
-      return false;
-    }
-
-    const targetPage =
-      document.getElementById(
-        "Message-model-" + pageName + "-page"
-      );
+  function handleCloseAnimation(
+    event
+  ) {
 
     if (
-      !targetPage ||
-      !targetPage.classList.contains(
-        "Message-model-page"
-      )
+      event.propertyName !==
+      "transform"
     ) {
-      console.error(
-        "U9 Message: Invalid page:",
-        pageName
-      );
 
-      return false;
+      return;
+
     }
 
 
-    /* UPDATE BUTTONS */
+    finishClose();
 
-    const buttons =
-      messageNavigation.querySelectorAll(
-        ".Message-model-nav-button"
-      );
-
-    buttons.forEach(function (button) {
-      const isActive =
-        button.dataset.page === pageName;
-
-      button.classList.toggle(
-        "active",
-        isActive
-      );
-
-      button.setAttribute(
-        "aria-pressed",
-        String(isActive)
-      );
-    });
-
-
-    /* UPDATE PAGES */
-
-    messagePages.forEach(function (page) {
-      const isActive =
-        page === targetPage;
-
-      page.hidden = !isActive;
-
-      page.classList.toggle(
-        "active",
-        isActive
-      );
-
-      page.setAttribute(
-        "aria-hidden",
-        String(!isActive)
-      );
-    });
-
-    return true;
   }
 
 
-  /* =========================
-     NAVIGATION EVENTS
-  ========================= */
-
-  if (messageNavigation) {
-    messageNavigation.addEventListener(
-      "click",
-      function (event) {
-        const button =
-          event.target.closest(
-            ".Message-model-nav-button"
-          );
-
-        if (
-          !button ||
-          !messageNavigation.contains(button)
-        ) {
-          return;
-        }
-
-        const pageName =
-          button.dataset.page;
-
-        if (pageName) {
-          switchMessagePage(pageName);
-        }
-      }
-    );
-  }
+  messageModalContent.addEventListener(
+    "transitionend",
+    handleCloseAnimation
+  );
 
 
-  /* =========================
-     WINDOW MANAGER
-  ========================= */
+  setTimeout(
+    finishClose,
+    700
+  );
 
-  if (window.U9WindowManager) {
-    window.U9WindowManager.register(
-      "message",
-      {
-        open: openMessageModal,
 
-        close: closeMessageModal,
+  return true;
 
-        isOpen: function () {
-          if (!messageModal) {
+}
+
+
+/* =========================
+   WINDOW MANAGER
+========================= */
+
+if (
+  window.U9WindowManager
+) {
+
+  U9WindowManager.register(
+    "message",
+    {
+
+      open:
+        openMessageModal,
+
+      close:
+        closeMessageModal,
+
+      isOpen:
+        function () {
+
+          if (
+            !messageModal
+          ) {
+
             return false;
+
           }
+
 
           return (
             messageModal.classList.contains(
-              "Message-model-open"
+              "modal-open"
             ) ||
+
             messageModal.classList.contains(
-              "Message-model-closing"
+              "modal-closing"
             )
           );
+
         }
+
+    }
+  );
+
+}
+
+else {
+
+  console.warn(
+    "U9WindowManager is not available when Message Modal was initialized."
+  );
+
+}
+
+
+/* =========================
+   GLOBAL FUNCTIONS
+========================= */
+
+window.openMessageModal =
+  openMessageModal;
+
+
+window.closeMessageModal =
+  closeMessageModal;
+
+
+/* =========================
+   CLOSE BUTTON
+========================= */
+
+if (
+  messageModalClose
+) {
+
+  messageModalClose.addEventListener(
+    "click",
+    function () {
+
+      if (
+        window.U9WindowManager
+      ) {
+
+        U9WindowManager.close(
+          "message"
+        );
+
       }
-    );
-  } else {
-    console.warn(
-      "U9WindowManager is not available when Message Modal was initialized."
-    );
-  }
 
+      else {
 
-  /* =========================
-     GLOBAL FUNCTIONS
-  ========================= */
+        closeMessageModal();
 
-  window.openMessageModal =
-    openMessageModal;
-
-  window.closeMessageModal =
-    closeMessageModal;
-
-  window.switchMessagePage =
-    switchMessagePage;
-
-  window.setMessageToolbarCollapsed =
-    setMessageToolbarCollapsed;
-
-
-  /* =========================
-     CLOSE BUTTON
-  ========================= */
-
-  if (messageModalClose) {
-    messageModalClose.addEventListener(
-      "click",
-      function () {
-        if (window.U9WindowManager) {
-          window.U9WindowManager.close(
-            "message"
-          );
-        } else {
-          closeMessageModal();
-        }
       }
-    );
-  }
 
+    }
+  );
 
-  /* =========================
-     INITIAL PAGE
-  ========================= */
-
-  switchMessagePage("friend");
-
-})();
+}
