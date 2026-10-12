@@ -531,3 +531,98 @@
     height: 64px;
   }
 }
+
+
+/* =========================================================
+   FIX: CHAT PAGE HEIGHT AND FLEX LAYOUT
+   Append to the END of chat.css
+========================================================= */
+
+/* The pages wrapper must own the remaining modal height */
+#U9-message-normal-modal-content.message-inner-page
+#Message-model-pages {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+
+  width: 100%;
+  height: auto;
+  min-height: 0;
+
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Chat page fills the entire pages wrapper */
+#Message-model-chat-page {
+  display: none;
+
+  flex: 1 1 0;
+  flex-direction: column;
+
+  width: 100%;
+  height: auto;
+  min-height: 0;
+
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Only show the active chat page */
+#Message-model-chat-page.is-active:not([hidden]) {
+  display: flex;
+}
+
+/* Header stays at the top */
+#Message-model-chat-header {
+  position: relative;
+
+  flex: 0 0 auto;
+
+  width: 100%;
+}
+
+/* Message history occupies all available middle space */
+#Message-model-chat-messages {
+  position: relative;
+
+  display: flex;
+  flex: 1 1 0;
+
+  width: 100%;
+  height: auto;
+  min-height: 0;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  box-sizing: border-box;
+}
+
+/* Input stays at the bottom */
+#Message-model-chat-form {
+  position: relative;
+
+  display: flex;
+  flex: 0 0 auto;
+
+  width: 100%;
+  min-height: 68px;
+  margin: 0;
+
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+/* Prevent other page styles from hiding the form */
+#Message-model-chat-page.is-active:not([hidden])
+#Message-model-chat-form {
+  display: flex;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  #Message-model-chat-form {
+    min-height: 62px;
+  }
+}
