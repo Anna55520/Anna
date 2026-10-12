@@ -3,19 +3,14 @@
    MESSAGE NORMAL MODAL
 ========================= */
 
+/* MODAL */
 
-/* =========================
-   MODAL
-========================= */
-
-#Message-model-modal {
+#U9-message-normal-modal {
   position: fixed;
   top: 115px;
   left: 0;
-
   width: 100%;
   height: calc(100vh - 115px);
-
   box-sizing: border-box;
 
   display: flex;
@@ -23,102 +18,71 @@
   align-items: stretch;
 
   background-color: rgba(0, 0, 0, 0.18);
-
   z-index: 1000;
   overflow: hidden;
 
   visibility: hidden;
   pointer-events: none;
 
-  transition:
-    top 0.35s ease,
-    height 0.35s ease;
+  transition: top 0.35s ease, height 0.35s ease;
 }
 
+/* TOOLBAR COLLAPSED */
 
-/* =========================
-   TOOLBAR COLLAPSED
-========================= */
-
-#Message-model-modal.Message-model-toolbar-collapsed {
+#U9-message-normal-modal.message-toolbar-collapsed {
   top: 60px;
   height: calc(100vh - 60px);
 }
 
+/* MODAL CONTENT */
 
-/* =========================
-   MODAL CONTENT
-========================= */
-
-#Message-model-modal-content {
+#U9-message-normal-modal-content {
   position: relative;
-
-  display: flex;
-  flex-direction: column;
-
   width: 100%;
   height: 100%;
-  min-height: 0;
-
   box-sizing: border-box;
 
   background-color: #ffffff;
   overflow: hidden;
 
   transform: translateY(100%);
-
   transition: transform 0.45s ease;
 }
 
+/* OPEN */
 
-/* =========================
-   OPEN
-========================= */
-
-#Message-model-modal.Message-model-open {
+#U9-message-normal-modal.modal-open {
   visibility: visible;
   pointer-events: auto;
 }
 
-#Message-model-modal.Message-model-open
-#Message-model-modal-content {
+#U9-message-normal-modal.modal-open
+#U9-message-normal-modal-content {
   transform: translateY(0);
 }
 
+/* CLOSING */
 
-/* =========================
-   CLOSING
-========================= */
-
-#Message-model-modal.Message-model-closing {
+#U9-message-normal-modal.modal-closing {
   visibility: visible;
   pointer-events: none;
 }
 
-#Message-model-modal.Message-model-closing
-#Message-model-modal-content {
+#U9-message-normal-modal.modal-closing
+#U9-message-normal-modal-content {
   transform: translateY(100%);
 }
 
+/* TITLE */
 
-/* =========================
-   TITLE
-========================= */
-
-#Message-model-title {
+#U9-message-normal-modal-title {
   position: relative;
-
-  flex: 0 0 55px;
-
   width: 100%;
   height: 55px;
-  min-height: 55px;
-
   box-sizing: border-box;
 
   display: flex;
   align-items: center;
-
   padding: 0 60px 0 20px;
 
   font-size: 20px;
@@ -126,24 +90,18 @@
   color: #111111;
 
   background-color: #ffffff;
-
   border-bottom: 1px solid #eeeeee;
 }
 
+/* CLOSE BUTTON */
 
-/* =========================
-   CLOSE BUTTON
-========================= */
-
-#Message-model-close {
+#U9-message-normal-modal-close {
   position: absolute;
-
   top: 50%;
   right: 15px;
 
   width: 36px;
   height: 36px;
-
   padding: 0;
 
   border: none;
@@ -153,335 +111,66 @@
   background-color: #f1f1f1;
   color: #111111;
 
-  font-family: inherit;
   font-size: 24px;
   font-weight: 400;
   line-height: 1;
 
   cursor: pointer;
-
   transform: translateY(-50%);
 
   display: flex;
   align-items: center;
   justify-content: center;
-
-  -webkit-tap-highlight-color: transparent;
 }
-
 
 /* CLOSE HOVER */
 
-#Message-model-close:hover {
+#U9-message-normal-modal-close:hover {
   background-color: #e8e8e8;
 }
 
-
 /* CLOSE ACTIVE */
 
-#Message-model-close:active {
+#U9-message-normal-modal-close:active {
   transform: translateY(-50%) scale(0.94);
 }
 
-
-/* =========================
-   MESSAGE NAVIGATION
-========================= */
-
-#Message-model-navigation {
-  display: flex;
-  align-items: stretch;
-
-  flex: 0 0 48px;
-
-  width: 100%;
-  height: 48px;
-  min-height: 48px;
-
-  box-sizing: border-box;
-
-  background-color: #ffffff;
-
-  border-bottom: 1px solid #eeeeee;
-}
-
-
-/* =========================
-   NAVIGATION BUTTON
-========================= */
-
-.Message-model-nav-button {
-  position: relative;
-
-  flex: 1 1 0;
-  min-width: 0;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-
-  gap: 4px;
-
-  padding: 5px 6px;
-
-  border: none;
-  border-radius: 0;
-
-  background-color: #ffffff;
-  color: #666666;
-
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 500;
-
-  cursor: pointer;
-
-  transition:
-    color 0.2s ease,
-    background-color 0.2s ease;
-
-  -webkit-tap-highlight-color: transparent;
-}
-
-
-/* NAVIGATION HOVER */
-
-.Message-model-nav-button:hover {
-  background-color: #f7f7f7;
-}
-
-
-/* NAVIGATION ACTIVE */
-
-.Message-model-nav-button.active {
-  color: #111111;
-  font-weight: 600;
-}
-
-
-/* ACTIVE INDICATOR */
-
-.Message-model-nav-button.active::after {
-  position: absolute;
-
-  right: 20%;
-  bottom: 0;
-  left: 20%;
-
-  height: 3px;
-
-  border-radius: 3px 3px 0 0;
-
-  background-color: #111111;
-
-  content: "";
-}
-
-
-/* =========================
-   NAVIGATION ICON
-========================= */
-
-.Message-model-nav-icon {
-  display: block;
-
-  width: 28px;
-  height: 28px;
-
-  flex: 0 0 auto;
-
-  object-fit: contain;
-}
-
-
-/* =========================
-   NAVIGATION LABEL
-========================= */
-
-.Message-model-nav-label {
-  display: block;
-
-  max-width: 100%;
-
-  font-size: 11px;
-  line-height: 1.2;
-
-  text-align: center;
-  overflow-wrap: anywhere;
-}
-
-
-/* =========================
-   MESSAGE PAGES CONTAINER
-========================= */
-
-#Message-model-pages {
-  position: relative;
-
-  flex: 1 1 0;
-
-  width: 100%;
-  height: auto;
-  min-height: 0;
-
-  box-sizing: border-box;
-
-  overflow-x: hidden;
-  overflow-y: auto;
-
-  background-color: #ffffff;
-
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-}
-
-
-/* =========================
-   INDIVIDUAL PAGE
-========================= */
-
-.Message-model-page {
-  width: 100%;
-  min-width: 0;
-  min-height: 100%;
-
-  box-sizing: border-box;
-
-  padding: 0;
-
-  background-color: #ffffff;
-
-  overflow-wrap: anywhere;
-}
-
-
-/* HIDDEN PAGE */
-
-.Message-model-page[hidden] {
-  display: none !important;
-}
-
-
-/* ACTIVE PAGE */
-
-.Message-model-page.active {
-  display: block;
-}
-
-
-/* =========================
-   PAGE ROOTS
-========================= */
-
-#Message-model-friend-root,
-#Message-model-add-friend-root,
-#Message-model-group-root,
-#Message-model-customer-service-root {
-  width: 100%;
-  min-width: 0;
-  min-height: 100%;
-
-  box-sizing: border-box;
-
-  overflow-wrap: anywhere;
-}
-
-
-/* =========================
-   MOBILE
-========================= */
+/* MOBILE */
 
 @media (max-width: 480px) {
-
-  #Message-model-modal {
+  #U9-message-normal-modal {
     top: 115px;
     height: calc(100vh - 115px);
   }
 
-  #Message-model-modal.Message-model-toolbar-collapsed {
+  #U9-message-normal-modal.message-toolbar-collapsed {
     top: 60px;
     height: calc(100vh - 60px);
   }
 
-
-  /* MODAL CONTENT */
-
-  #Message-model-modal-content {
+  #U9-message-normal-modal-content {
     width: 100%;
     max-width: 100%;
   }
 
-
-  /* TITLE */
-
-  #Message-model-title {
-    flex-basis: 55px;
-
+  #U9-message-normal-modal-title {
     height: 55px;
-    min-height: 55px;
-
     padding: 0 55px 0 15px;
-
     font-size: 18px;
   }
 
-
-  /* CLOSE BUTTON */
-
-  #Message-model-close {
+  #U9-message-normal-modal-close {
     right: 10px;
-
     width: 36px;
     height: 36px;
   }
-
-
-  /* NAVIGATION */
-
-  #Message-model-navigation {
-    flex-basis: 48px;
-
-    height: 48px;
-    min-height: 48px;
-  }
-
-
-  /* NAVIGATION BUTTON */
-
-  .Message-model-nav-button {
-    gap: 3px;
-    padding: 4px 2px;
-  }
-
-
-  /* ICON */
-
-  .Message-model-nav-icon {
-    width: 23px;
-    height: 23px;
-  }
-
-
-  /* LABEL */
-
-  .Message-model-nav-label {
-    font-size: 10px;
-  }
-
 }
 
-
-/* =========================
-   REDUCED MOTION
-========================= */
+/* REDUCED MOTION */
 
 @media (prefers-reduced-motion: reduce) {
-
-  #Message-model-modal,
-  #Message-model-modal-content,
-  .Message-model-nav-button {
+  #U9-message-normal-modal,
+  #U9-message-normal-modal-content {
     transition: none;
   }
-
 }
