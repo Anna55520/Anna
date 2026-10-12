@@ -1,17 +1,24 @@
 
-/* =========================================================
-   U9 MESSAGE CHAT PAGE
-   Shared by:
-   - Friend chat
-   - Group chat
-   - Customer service chat
+/* =================================================
+   U9 MESSAGE CHAT
+   File: JS/NORMAL/MESSAGE/chat.js
 
-   Required page:
-   #Message-model-chat-page
+   Features:
+   - Connect Chat UI to message-api
+   - Load one-to-one conversation messages
+   - Send text messages
+   - Refresh messages every 4 seconds
+   - Show sender / receiver message bubbles
+   - Keep existing chat HTML IDs
+   - Stop refreshing after leaving Chat
+   - Show useful API and authentication errors
 
-   Backend integration:
-   window.U9ChatAdapter (optional; documented below)
-========================================================= */
+   API:
+   POST /functions/v1/message-api
+   Actions:
+   - list_messages
+   - send_message
+================================================= */
 
 (function () {
   "use strict";
@@ -22,12 +29,36 @@
 
   window.__U9ChatPageInitialized = true;
 
-  /* =======================================================
-     DOM
-  ======================================================= */
+  /* =================================================
+     CONFIGURATION
+  ================================================= */
+
+  const SUPABASE_URL =
+    "https://tvtakmswbzawaweytimx.supabase.co";
+
+  const MESSAGE_API_URL =
+    SUPABASE_URL + "/functions/v1/message-api";
+
+  const ME_API_URL =
+    SUPABASE_URL + "/functions/v1/me";
+
+  const DEFAULT_AVATAR =
+    "/SSVG/account/account-edit-button.svg";
+
+  const POLL_INTERVAL_MS = 4000;
+
+  const MAX_MESSAGE_LENGTH = 5000;
+
+  /* =================================================
+     DOM ELEMENTS
+  ================================================= */
 
   const chatPage = document.getElementById(
     "Message-model-chat-page"
+  );
+
+  const chatBackButton = document.getElementById(
+    "Message-model-chat-back"
   );
 
   const chatAvatar = document.getElementById(
@@ -42,7 +73,7 @@
     "Message-model-chat-status"
   );
 
-  const chatMore = document.getElementById(
+  const chatMoreButton = document.getElementById(
     "Message-model-chat-more"
   );
 
@@ -58,391 +89,488 @@
     "Message-model-chat-input"
   );
 
-  const chatSend = document.getElementById(
+  const chatSendButton = document.getElementById(
     "Message-model-chat-send"
   );
 
-  const emptyState = document.getElementById(
-    "Message-model-chat-empty"
-  );
-
-  const emptyAvatar = document.getElementById(
-    "Message-model-chat-empty-avatar"
-  );
-
-  const emptyName = document.getElementById(
-    "Message-model-chat-empty-name"
-  );
-
-  const emptyDescription = document.getElementById(
-    "Message-model-chat-empty-description"
-  );
-
-  /* =======================================================
+  /* =================================================
      STATE
-  ======================================================= */
+  ================================================= */
 
   let currentChatUser = null;
-  let currentMessages = [];
-  let isSending = false;
-  let loadGeneration = 0;
-  let unsubscribeRealtime = null;
 
-  const DEFAULT_AVATAR =
-    "/SSVG/account/account-edit-button.svg";
+  let currentUserId = null;
 
-  const CHAT_TYPES = {
-    friend: {
-      status: "Friend",
-      emptyDescription: "Start a conversation"
-    },
+  let currentUserLookupAttempted = false;
 
-    group: {
-      status: "Group conversation",
-      emptyDescription: "Start a conversation with the group"
-    },
+  let currentUserLookupPromise = null;
 
-    customer_service: {
-      status: "Customer service",
-      emptyDescription: "How can we help you?"
+  let isChatActive = false;
+
+  let isLoadingMessages = false;
+
+  let isSendingMessage = false;
+
+  let pollTimer = null;
+
+  let lastRenderedSignature = null;
+
+  let currentRequestVersion = 0;
+
+  let chatEventsBound = false;
+
+  /* =================================================
+     IMAGE URL
+  ================================================= */
+
+  function normalizeImageURL(value, fallback) {
+    if (typeof value !== "string") {
+      return fallback;
     }
-  };
 
-  /* =======================================================
-     HELPERS
-  ======================================================= */
+    const url = value.trim();
 
-  function normalizeType(type) {
-    const value = String(type || "friend")
-      .trim()
-      .toLowerCase()
-      .replace(/[\s-]+/g, "_");
+    if (!url) {
+      return fallback;
+    }
 
-    if (
-      value === "group" ||
-      value === "groups"
-    ) {
-      return "group";
+    if (/^https?:\/\//i.test(url)) {
+      return url;
     }
 
     if (
-      value === "customer_service" ||
-      value === "customer" ||
-      value === "support" ||
-      value === "service"
+      url.startsWith("/") &&
+      !url.startsWith("//")
     ) {
-      return "customer_service";
+      return url;
     }
 
-    return "friend";
+    if (
+      /^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(url)
+    ) {
+      return url;
+    }
+
+    return fallback;
   }
 
-  function normalizeUser(user) {
-    if (!user || typeof user !== "object") {
-      return null;
+  /* =================================================
+     SESSION TOKEN
+  ================================================= */
+
+  function getSessionToken() {
+    const keys = [
+      "u9_token",
+      "u9_access_token",
+      "access_token",
+      "authToken",
+      "token"
+    ];
+
+    for (const key of keys) {
+      try {
+        const value = localStorage.getItem(key);
+
+        if (value && value.trim()) {
+          return value.trim();
+        }
+      } catch (error) {
+        console.warn(
+          "U9 Chat: Cannot read session storage."
+        );
+
+        return "";
+      }
     }
 
-    const type = normalizeType(user.type);
+    return "";
+  }
 
-    const id =
-      user.id ||
-      user.user_id ||
-      user.group_id ||
-      user.conversation_id ||
-      null;
+  /* =================================================
+     REQUEST HEADERS
+  ================================================= */
 
-    if (!id) {
+  function getRequestHeaders() {
+    const headers = {
+      "Content-Type": "application/json"
+    };
+
+    const token = getSessionToken();
+
+    if (token) {
+      headers.Authorization = "Bearer " + token;
+    }
+
+    return headers;
+  }
+
+  /* =================================================
+     CALL MESSAGE API
+  ================================================= */
+
+  async function callMessageAPI(action, payload = {}) {
+    let response;
+
+    try {
+      response = await fetch(
+        MESSAGE_API_URL,
+        {
+          method: "POST",
+          headers: getRequestHeaders(),
+          credentials: "include",
+          cache: "no-store",
+          body: JSON.stringify({
+            action,
+            ...payload
+          })
+        }
+      );
+    } catch (error) {
       console.error(
-        "U9 Chat: A chat target ID is required.",
-        user
+        "U9 Chat: Cannot reach message-api.",
+        error
       );
 
+      const networkError = new Error(
+        "Could not connect to the messaging server. Check the message-api deployment and CORS settings."
+      );
+
+      networkError.cause = error;
+
+      throw networkError;
+    }
+
+    let result;
+
+    try {
+      result = await response.json();
+    } catch (error) {
+      throw new Error(
+        "The messaging server returned an invalid response."
+      );
+    }
+
+    if (
+      !response.ok ||
+      !result ||
+      result.success !== true
+    ) {
+      const apiError = new Error(
+        result?.error ||
+        "The messaging request failed."
+      );
+
+      apiError.status = response.status;
+
+      throw apiError;
+    }
+
+    return result;
+  }
+
+  /* =================================================
+     USER ID: READ EXISTING USER STATE
+  ================================================= */
+
+  function readCurrentUserId() {
+    const userObjects = [];
+
+    try {
+      if (
+        window.U9User &&
+        typeof window.U9User.get === "function"
+      ) {
+        userObjects.push(window.U9User.get());
+      }
+    } catch (error) {
+      console.warn(
+        "U9 Chat: Could not read U9User.",
+        error
+      );
+    }
+
+    userObjects.push(
+      window.currentUser,
+      window.currentUserData,
+      window.U9_CURRENT_USER
+    );
+
+    if (window.currentUserUUID) {
+      return String(window.currentUserUUID);
+    }
+
+    if (window.currentUserId) {
+      return String(window.currentUserId);
+    }
+
+    for (const user of userObjects) {
+      if (
+        user &&
+        typeof user === "object" &&
+        user.id
+      ) {
+        return String(user.id);
+      }
+    }
+
+    try {
+      const keys = [
+        "u9_user_id",
+        "currentUserUUID",
+        "currentUserId"
+      ];
+
+      for (const key of keys) {
+        const value = localStorage.getItem(key);
+
+        if (value && value.trim()) {
+          return value.trim();
+        }
+      }
+
+      const jsonKeys = [
+        "u9_user",
+        "currentUser"
+      ];
+
+      for (const key of jsonKeys) {
+        const value = localStorage.getItem(key);
+
+        if (!value) {
+          continue;
+        }
+
+        try {
+          const parsed = JSON.parse(value);
+
+          const id =
+            parsed?.id ||
+            parsed?.user?.id;
+
+          if (id) {
+            return String(id);
+          }
+        } catch {
+          // Ignore non-JSON storage values.
+        }
+      }
+    } catch (error) {
+      console.warn(
+        "U9 Chat: Could not read cached user ID.",
+        error
+      );
+    }
+
+    return null;
+  }
+
+  /* =================================================
+     USER ID: FALL BACK TO /ME
+  ================================================= */
+
+  async function resolveCurrentUserId() {
+    const cachedId = readCurrentUserId();
+
+    if (cachedId) {
+      currentUserId = cachedId;
+      return currentUserId;
+    }
+
+    if (currentUserId) {
+      return currentUserId;
+    }
+
+    if (currentUserLookupAttempted) {
       return null;
     }
 
-    const config = CHAT_TYPES[type];
-
-    return {
-      id: String(id),
-      name: String(
-        user.name ||
-        user.username ||
-        user.group_name ||
-        (type === "customer_service"
-          ? "Customer Service"
-          : type === "group"
-            ? "Group"
-            : "User")
-      ),
-      avatar: String(user.avatar || DEFAULT_AVATAR),
-      type: type,
-      status: String(user.status || config.status),
-      conversationId: user.conversationId ||
-        user.conversation_id ||
-        null,
-      metadata: user.metadata || null
-    };
-  }
-
-  function setImageSource(img, src) {
-    if (!img) return;
-
-    img.onerror = function () {
-      img.onerror = null;
-      img.src = DEFAULT_AVATAR;
-    };
-
-    img.src = src || DEFAULT_AVATAR;
-  }
-
-  function getAdapter() {
-    return window.U9ChatAdapter || null;
-  }
-
-  function dispatchChatEvent(name, detail) {
-    window.dispatchEvent(
-      new CustomEvent(name, {
-        detail: detail || {}
-      })
-    );
-  }
-
-  function getEmptyDescription(user) {
-    if (!user) {
-      return "Start a conversation";
+    if (currentUserLookupPromise) {
+      return currentUserLookupPromise;
     }
 
-    const config = CHAT_TYPES[user.type];
+    currentUserLookupAttempted = true;
 
-    return config.emptyDescription;
+    currentUserLookupPromise = (async function () {
+      try {
+        const response = await fetch(
+          ME_API_URL,
+          {
+            method: "GET",
+            headers: getRequestHeaders(),
+            credentials: "include",
+            cache: "no-store"
+          }
+        );
+
+        const result = await response.json()
+          .catch(function () {
+            return {};
+          });
+
+        if (!response.ok) {
+          console.warn(
+            "U9 Chat: /me user lookup failed.",
+            response.status,
+            result?.message
+          );
+
+          return null;
+        }
+
+        const id =
+          result?.user?.id ||
+          result?.id ||
+          null;
+
+        if (id) {
+          currentUserId = String(id);
+        }
+
+        return currentUserId;
+      } catch (error) {
+        console.warn(
+          "U9 Chat: Could not resolve current user ID.",
+          error
+        );
+
+        return null;
+      } finally {
+        currentUserLookupPromise = null;
+      }
+    })();
+
+    return currentUserLookupPromise;
   }
 
-  function scrollToBottom() {
-    if (!chatMessages) return;
-
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
-
-  function setSendingState(sending) {
-    isSending = sending;
-
-    if (chatSend) {
-      chatSend.disabled = sending;
-    }
-
-    if (chatInput) {
-      chatInput.disabled = sending;
-    }
-
-    if (chatForm) {
-      chatForm.setAttribute(
-        "aria-busy",
-        sending ? "true" : "false"
-      );
-    }
-  }
-
-  /* =======================================================
-     HEADER
-  ======================================================= */
+  /* =================================================
+     CHAT HEADER
+  ================================================= */
 
   function updateChatHeader(user) {
-    if (!user) return;
-
-    setImageSource(chatAvatar, user.avatar);
-    setImageSource(emptyAvatar, user.avatar);
-
     if (chatName) {
-      chatName.textContent = user.name;
+      chatName.textContent =
+        user?.name ||
+        user?.username ||
+        "Chat";
     }
 
     if (chatStatus) {
-      chatStatus.textContent = user.status;
+      chatStatus.textContent =
+        user?.status ||
+        "Friend";
     }
 
-    if (emptyName) {
-      emptyName.textContent = user.name;
-    }
+    if (chatAvatar) {
+      chatAvatar.onerror = null;
 
-    if (emptyDescription) {
-      emptyDescription.textContent =
-        getEmptyDescription(user);
-    }
+      chatAvatar.dataset.fallbackStage = "0";
 
-    if (chatPage) {
-      chatPage.dataset.chatType = user.type;
-      chatPage.dataset.chatTargetId = user.id;
+      chatAvatar.src = normalizeImageURL(
+        user?.avatar_url ||
+        user?.avatar ||
+        user?.avatarUrl,
+        DEFAULT_AVATAR
+      );
+
+      chatAvatar.onerror = function () {
+        if (
+          chatAvatar.dataset.fallbackStage === "0"
+        ) {
+          chatAvatar.dataset.fallbackStage = "1";
+
+          if (chatAvatar.src.endsWith(DEFAULT_AVATAR)) {
+            chatAvatar.onerror = null;
+            return;
+          }
+
+          chatAvatar.src = DEFAULT_AVATAR;
+          return;
+        }
+
+        chatAvatar.onerror = null;
+      };
     }
   }
 
-  /* =======================================================
-     EMPTY STATE
-  ======================================================= */
+  /* =================================================
+     STATUS MESSAGE
+  ================================================= */
 
-  function updateEmptyState() {
-    if (!chatMessages || !emptyState) {
+  function createNotice(message, type = "info") {
+    const notice = document.createElement("div");
+
+    notice.className =
+      "U9-chat-system-message U9-chat-system-message-" +
+      type;
+
+    notice.textContent = message;
+
+    notice.setAttribute("role", "status");
+
+    notice.style.padding = "12px 14px";
+    notice.style.margin = "10px 0";
+    notice.style.borderRadius = "10px";
+    notice.style.fontSize = "13px";
+    notice.style.lineHeight = "1.5";
+    notice.style.overflowWrap = "anywhere";
+
+    if (type === "error") {
+      notice.style.background = "#fff1f1";
+      notice.style.color = "#b42318";
+    } else {
+      notice.style.background = "#f3f6fb";
+      notice.style.color = "#687080";
+    }
+
+    return notice;
+  }
+
+  function showChatNotice(message, type = "info") {
+    if (!chatMessages) {
       return;
     }
 
-    const hasMessages = currentMessages.length > 0;
+    chatMessages.innerHTML = "";
 
-    emptyState.hidden = hasMessages;
-
-    if (hasMessages) {
-      chatMessages.style.alignItems = "stretch";
-    } else {
-      chatMessages.style.alignItems = "stretch";
-    }
-  }
-
-  /* =======================================================
-     MESSAGE NORMALIZATION
-  ======================================================= */
-
-  function normalizeMessage(message) {
-    if (!message || typeof message !== "object") {
-      return null;
-    }
-
-    const text = String(
-      message.text ??
-      message.content ??
-      message.message ??
-      ""
-    );
-
-    if (!text.trim()) {
-      return null;
-    }
-
-    return {
-      id: String(
-        message.id ||
-        message.message_id ||
-        (
-          "local-" +
-          Date.now() +
-          "-" +
-          Math.random().toString(36).slice(2)
-        )
-      ),
-
-      text: text,
-
-      senderId: String(
-        message.senderId ??
-        message.sender_id ??
-        ""
-      ),
-
-      senderName: String(
-        message.senderName ??
-        message.sender_name ??
-        message.username ??
-        ""
-      ),
-
-      senderAvatar: String(
-        message.senderAvatar ??
-        message.sender_avatar ??
-        DEFAULT_AVATAR
-      ),
-
-      createdAt:
-        message.createdAt ||
-        message.created_at ||
-        new Date().toISOString(),
-
-      status: message.status || "sent"
-    };
-  }
-
-  function isOwnMessage(message) {
-    const myId =
-      window.currentUserUUID ||
-      window.currentUserId ||
-      null;
-
-    return Boolean(
-      myId &&
-      message.senderId &&
-      String(myId) === String(message.senderId)
+    chatMessages.appendChild(
+      createNotice(message, type)
     );
   }
 
-  /* =======================================================
-     RENDER MESSAGE
-     Use textContent to avoid rendering message text as HTML.
-  ======================================================= */
-
-  function createMessageElement(message) {
-    const own = isOwnMessage(message);
-
-    const row = document.createElement("div");
-    row.className =
-      "chat-message-row " +
-      (own ? "is-own" : "is-other");
-
-    row.dataset.messageId = message.id;
-
-    if (!own) {
-      const avatar = document.createElement("img");
-      avatar.className = "chat-message-avatar";
-      avatar.alt = "";
-      setImageSource(
-        avatar,
-        message.senderAvatar ||
-          (currentChatUser && currentChatUser.avatar) ||
-          DEFAULT_AVATAR
-      );
-
-      row.appendChild(avatar);
+  function appendChatNotice(message, type = "error") {
+    if (!chatMessages) {
+      return;
     }
 
-    const content = document.createElement("div");
-    content.className = "chat-message-content";
+    const existing = chatMessages.querySelector(
+      ".U9-chat-temporary-notice"
+    );
 
-    if (!own && message.senderName) {
-      const sender = document.createElement("div");
-      sender.className = "chat-message-sender";
-      sender.textContent = message.senderName;
-      content.appendChild(sender);
+    if (existing) {
+      existing.remove();
     }
 
-    const bubble = document.createElement("div");
-    bubble.className = "chat-message-bubble";
-    bubble.textContent = message.text;
+    const notice = createNotice(message, type);
 
-    content.appendChild(bubble);
+    notice.classList.add(
+      "U9-chat-temporary-notice"
+    );
 
-    const time = document.createElement("div");
-    time.className = "chat-message-time";
-    time.textContent = formatMessageTime(message.createdAt);
-
-    content.appendChild(time);
-    row.appendChild(content);
-
-    if (own) {
-      const avatar = document.createElement("img");
-      avatar.className = "chat-message-avatar";
-      avatar.alt = "";
-      setImageSource(
-        avatar,
-        window.currentUserAvatar || DEFAULT_AVATAR
-      );
-
-      row.appendChild(avatar);
-    }
-
-    return row;
+    chatMessages.appendChild(notice);
   }
+
+  /* =================================================
+     TIME FORMAT
+  ================================================= */
 
   function formatMessageTime(value) {
-    if (!value) return "";
+    if (!value) {
+      return "";
+    }
 
     const date = new Date(value);
 
-    if (Number.isNaN(date.getTime())) {
+    if (!Number.isFinite(date.getTime())) {
       return "";
     }
 
@@ -452,463 +580,746 @@
     });
   }
 
-  function renderMessages(messages, options) {
-    if (!chatMessages || !emptyState) {
+  /* =================================================
+     MESSAGE BUBBLE
+  ================================================= */
+
+  function createMessageElement(message) {
+    const isOwnMessage =
+      Boolean(
+        currentUserId &&
+        String(message.sender_id) ===
+          String(currentUserId)
+      );
+
+    const row = document.createElement("div");
+
+    row.className =
+      "U9-chat-message-row " +
+      (
+        isOwnMessage
+          ? "U9-chat-message-own"
+          : "U9-chat-message-other"
+      );
+
+    row.style.display = "flex";
+    row.style.width = "100%";
+    row.style.margin = "5px 0";
+    row.style.justifyContent =
+      isOwnMessage ? "flex-end" : "flex-start";
+
+    const bubble = document.createElement("div");
+
+    bubble.className =
+      "U9-chat-message-bubble " +
+      (
+        isOwnMessage
+          ? "U9-chat-bubble-own"
+          : "U9-chat-bubble-other"
+      );
+
+    bubble.style.maxWidth = "min(78%, 520px)";
+    bubble.style.padding = "10px 13px";
+    bubble.style.borderRadius = "15px";
+    bubble.style.overflowWrap = "anywhere";
+    bubble.style.boxSizing = "border-box";
+
+    bubble.style.background =
+      isOwnMessage ? "#dcecff" : "#f0f2f5";
+
+    bubble.style.color = "#222222";
+
+    if (message.deleted_at) {
+      const deleted = document.createElement("div");
+
+      deleted.textContent = "This message was deleted.";
+      deleted.style.fontStyle = "italic";
+      deleted.style.opacity = "0.65";
+
+      bubble.appendChild(deleted);
+    } else if (message.message_type === "image") {
+      const mediaURL = normalizeImageURL(
+        message.media_path,
+        ""
+      );
+
+      if (mediaURL) {
+        const image = document.createElement("img");
+
+        image.src = mediaURL;
+        image.alt = "Image message";
+        image.loading = "lazy";
+
+        image.style.display = "block";
+        image.style.maxWidth = "100%";
+        image.style.maxHeight = "280px";
+        image.style.borderRadius = "8px";
+        image.style.objectFit = "contain";
+
+        bubble.appendChild(image);
+      } else {
+        const imageLabel = document.createElement("div");
+
+        imageLabel.textContent = "Image message";
+        bubble.appendChild(imageLabel);
+      }
+
+      if (message.content && message.content !== "[image]") {
+        const caption = document.createElement("div");
+
+        caption.textContent = message.content;
+        caption.style.marginTop = "6px";
+
+        bubble.appendChild(caption);
+      }
+    } else {
+      const text = document.createElement("div");
+
+      text.className = "U9-chat-message-text";
+      text.textContent = message.content || "";
+
+      text.style.whiteSpace = "pre-wrap";
+      text.style.overflowWrap = "anywhere";
+      text.style.fontSize = "14px";
+      text.style.lineHeight = "1.5";
+
+      bubble.appendChild(text);
+    }
+
+    const time = document.createElement("div");
+
+    time.className = "U9-chat-message-time";
+
+    time.textContent =
+      formatMessageTime(message.created_at);
+
+    time.style.marginTop = "5px";
+    time.style.fontSize = "10px";
+    time.style.lineHeight = "1.3";
+    time.style.opacity = "0.62";
+    time.style.textAlign = "right";
+
+    bubble.appendChild(time);
+    row.appendChild(bubble);
+
+    return row;
+  }
+
+  /* =================================================
+     RENDER MESSAGES
+  ================================================= */
+
+  function getMessagesSignature(messages) {
+    return messages
+      .map(function (message) {
+        return [
+          message.id,
+          message.edited_at || "",
+          message.deleted_at || ""
+        ].join(":");
+      })
+      .join("|");
+  }
+
+  function renderMessages(messages, force = false) {
+    if (!chatMessages) {
       return;
     }
 
-    const settings = options || {};
-    const shouldScroll = settings.scroll !== false;
+    const nextMessages = Array.isArray(messages)
+      ? messages
+      : [];
 
-    currentMessages = (Array.isArray(messages) ? messages : [])
-      .map(normalizeMessage)
-      .filter(Boolean);
-
-    /*
-      Rebuild the message list without deleting the empty-state
-      container, which is also used for the no-message view.
-    */
-    chatMessages.replaceChildren(emptyState);
-
-    currentMessages.forEach(function (message) {
-      chatMessages.appendChild(
-        createMessageElement(message)
-      );
-    });
-
-    updateEmptyState();
-
-    if (shouldScroll) {
-      requestAnimationFrame(scrollToBottom);
-    }
-  }
-
-  /* =======================================================
-     PUBLIC: REPLACE MESSAGE LIST
-  ======================================================= */
-
-  function setChatMessages(messages) {
-    renderMessages(messages);
-  }
-
-  /* =======================================================
-     PUBLIC: ADD A SINGLE MESSAGE
-  ======================================================= */
-
-  function addChatMessage(message) {
-    const normalized = normalizeMessage(message);
-
-    if (!normalized) return;
-
-    const exists = currentMessages.some(function (item) {
-      return item.id === normalized.id;
-    });
-
-    if (exists) return;
-
-    currentMessages.push(normalized);
-    renderMessages(currentMessages);
-  }
-
-  /* =======================================================
-     LOAD MESSAGE HISTORY
-     
-     Adapter contract:
-     U9ChatAdapter.loadMessages(target)
-       -> Promise<Array<Message>>
-  ======================================================= */
-
-  async function loadChatMessages(user) {
-    const generation = ++loadGeneration;
-    currentMessages = [];
-    renderMessages([]);
-
-    const adapter = getAdapter();
+    const signature =
+      getMessagesSignature(nextMessages);
 
     if (
-      !adapter ||
-      typeof adapter.loadMessages !== "function"
+      !force &&
+      signature === lastRenderedSignature
     ) {
-      /*
-        UI-only mode. No backend has been configured yet.
-      */
-      dispatchChatEvent("u9:chat:load-required", {
-        target: user
-      });
-
       return;
     }
 
+    const wasNearBottom =
+      chatMessages.scrollHeight -
+      chatMessages.scrollTop -
+      chatMessages.clientHeight < 100;
+
+    const oldScrollTop = chatMessages.scrollTop;
+
+    chatMessages.innerHTML = "";
+
+    const list = document.createElement("div");
+
+    list.className = "U9-chat-message-list";
+
+    list.style.display = "flex";
+    list.style.flexDirection = "column";
+    list.style.width = "100%";
+    list.style.minHeight = "100%";
+    list.style.boxSizing = "border-box";
+    list.style.padding = "12px 14px";
+
+    if (nextMessages.length === 0) {
+      const empty = document.createElement("div");
+
+      empty.className = "U9-chat-empty";
+
+      empty.textContent =
+        "No messages yet. Say hello!";
+
+      empty.style.margin = "auto";
+      empty.style.padding = "24px 12px";
+      empty.style.textAlign = "center";
+      empty.style.color = "#858b96";
+      empty.style.fontSize = "13px";
+      empty.style.lineHeight = "1.6";
+
+      list.appendChild(empty);
+    } else {
+      nextMessages.forEach(function (message) {
+        list.appendChild(
+          createMessageElement(message)
+        );
+      });
+    }
+
+    chatMessages.appendChild(list);
+
+    lastRenderedSignature = signature;
+
+    if (wasNearBottom) {
+      chatMessages.scrollTop =
+        chatMessages.scrollHeight;
+    } else {
+      chatMessages.scrollTop = oldScrollTop;
+    }
+  }
+
+  /* =================================================
+     API ERROR TEXT
+  ================================================= */
+
+  function getReadableError(error) {
+    const message = String(
+      error?.message || ""
+    );
+
+    if (
+      error?.status === 401 ||
+      /authentication required|invalid session|session expired|unauthorized/i.test(
+        message
+      )
+    ) {
+      return "Your login session has expired. Please sign in again.";
+    }
+
+    if (
+      error?.status === 403 &&
+      /friend/i.test(message)
+    ) {
+      return "You must be friends before chatting.";
+    }
+
+    if (
+      error?.status === 403 &&
+      /origin/i.test(message)
+    ) {
+      return "This website is not authorized by message-api. Check the CORS origin list.";
+    }
+
+    return message ||
+      "Could not load messages. Please try again.";
+  }
+
+  /* =================================================
+     LOAD CHAT MESSAGES
+  ================================================= */
+
+  async function loadChatMessages(options = {}) {
+    const silent = options.silent === true;
+
+    if (
+      !isChatActive ||
+      !currentChatUser?.id ||
+      !chatMessages
+    ) {
+      return [];
+    }
+
+    if (isLoadingMessages) {
+      return [];
+    }
+
+    isLoadingMessages = true;
+
+    const requestVersion = currentRequestVersion;
+
+    const targetId = String(currentChatUser.id);
+
     try {
-      const result = await adapter.loadMessages(user);
+      await resolveCurrentUserId();
+
+      const result = await callMessageAPI(
+        "list_messages",
+        {
+          other_user_id: targetId,
+          limit: 100
+        }
+      );
 
       if (
-        generation !== loadGeneration ||
-        !currentChatUser ||
-        currentChatUser.id !== user.id ||
-        currentChatUser.type !== user.type
+        !isChatActive ||
+        requestVersion !== currentRequestVersion ||
+        String(currentChatUser?.id) !== targetId
       ) {
-        return;
+        return [];
       }
 
-      renderMessages(Array.isArray(result) ? result : []);
+      const messages = Array.isArray(result.messages)
+        ? result.messages
+        : [];
 
+      renderMessages(messages);
+
+      if (chatStatus) {
+        chatStatus.textContent =
+          currentChatUser.status || "Friend";
+      }
+
+      return messages;
     } catch (error) {
       console.error(
-        "U9 Chat: Failed to load message history.",
+        "U9 Chat: Failed to load messages.",
         error
       );
 
-      dispatchChatEvent("u9:chat:load-error", {
-        target: user,
-        error: error
-      });
-    }
-  }
-
-  /* =======================================================
-     REALTIME SUBSCRIPTION
-
-     Adapter contract:
-     U9ChatAdapter.subscribe(target, onMessage)
-       -> optional unsubscribe function
-  ======================================================= */
-
-  function stopRealtimeSubscription() {
-    if (typeof unsubscribeRealtime === "function") {
-      try {
-        unsubscribeRealtime();
-      } catch (error) {
-        console.warn(
-          "U9 Chat: Failed to stop realtime subscription.",
-          error
-        );
+      if (
+        !isChatActive ||
+        requestVersion !== currentRequestVersion
+      ) {
+        return [];
       }
-    }
 
-    unsubscribeRealtime = null;
+      const errorMessage =
+        getReadableError(error);
+
+      if (silent && lastRenderedSignature !== null) {
+        appendChatNotice(errorMessage, "error");
+      } else {
+        showChatNotice(errorMessage, "error");
+      }
+
+      return [];
+    } finally {
+      isLoadingMessages = false;
+    }
   }
 
-  function startRealtimeSubscription(user) {
-    stopRealtimeSubscription();
+  /* =================================================
+     SEND CHAT MESSAGE
+  ================================================= */
 
-    const adapter = getAdapter();
+  async function sendChatMessage(event) {
+    if (event) {
+      event.preventDefault();
+    }
 
     if (
-      !adapter ||
-      typeof adapter.subscribe !== "function"
+      !isChatActive ||
+      !currentChatUser?.id ||
+      !chatInput
     ) {
       return;
     }
 
-    try {
-      const unsubscribe = adapter.subscribe(
-        user,
-        function (message) {
-          if (
-            !currentChatUser ||
-            currentChatUser.id !== user.id ||
-            currentChatUser.type !== user.type
-          ) {
-            return;
-          }
+    if (isSendingMessage) {
+      return;
+    }
 
-          addChatMessage(message);
-        }
+    const content = chatInput.value.trim();
+
+    if (!content) {
+      chatInput.focus();
+      return;
+    }
+
+    if (content.length > MAX_MESSAGE_LENGTH) {
+      appendChatNotice(
+        `Messages cannot exceed ${MAX_MESSAGE_LENGTH} characters.`,
+        "error"
       );
 
-      if (typeof unsubscribe === "function") {
-        unsubscribeRealtime = unsubscribe;
-      }
-    } catch (error) {
-      console.error(
-        "U9 Chat: Failed to subscribe to realtime messages.",
-        error
+      return;
+    }
+
+    const targetId = String(currentChatUser.id);
+
+    isSendingMessage = true;
+
+    if (chatSendButton) {
+      chatSendButton.disabled = true;
+      chatSendButton.setAttribute(
+        "aria-busy",
+        "true"
       );
     }
-  }
-
-  /* =======================================================
-     INITIALIZE CHAT PAGE
-     Called by normal-message.js:
-       window.initializeChatPage(user)
-  ======================================================= */
-
-  async function initializeChatPage(userData) {
-    const user = normalizeUser(userData);
-
-    if (!user) {
-      return false;
-    }
-
-    stopRealtimeSubscription();
-    currentChatUser = user;
-    currentMessages = [];
-
-    updateChatHeader(user);
-    renderMessages([]);
-
-    if (chatInput) {
-      chatInput.value = "";
-      chatInput.placeholder =
-        user.type === "customer_service"
-          ? "Message customer service..."
-          : user.type === "group"
-            ? "Message the group..."
-            : "Type a message...";
-    }
-
-    if (chatPage) {
-      chatPage.classList.add("is-active");
-      chatPage.hidden = false;
-      chatPage.setAttribute("aria-hidden", "false");
-    }
-
-    if (chatInput) {
-      chatInput.disabled = false;
-    }
-
-    if (chatSend) {
-      chatSend.disabled = false;
-    }
-
-    dispatchChatEvent("u9:chat:opened", {
-      target: user
-    });
-
-    await loadChatMessages(user);
-
-    if (
-      currentChatUser &&
-      currentChatUser.id === user.id &&
-      currentChatUser.type === user.type
-    ) {
-      startRealtimeSubscription(user);
-    }
-
-    return true;
-  }
-
-  /* =======================================================
-     SEND MESSAGE
-     
-     Adapter contract:
-     U9ChatAdapter.sendMessage(target, payload)
-       -> Promise<Message>
-     
-     Do not display a message as successfully sent unless the
-     adapter confirms success.
-  ======================================================= */
-
-  async function sendChatMessage(text) {
-    if (!currentChatUser || isSending) {
-      return false;
-    }
-
-    const messageText = String(text || "").trim();
-
-    if (!messageText) {
-      return false;
-    }
-
-    const adapter = getAdapter();
-
-    if (
-      !adapter ||
-      typeof adapter.sendMessage !== "function"
-    ) {
-      dispatchChatEvent("u9:chat:send-required", {
-        target: currentChatUser,
-        text: messageText
-      });
-
-      showChatNotice(
-        "Messaging is not connected to the server yet."
-      );
-
-      return false;
-    }
-
-    setSendingState(true);
 
     try {
-      const sentMessage = await adapter.sendMessage(
-        currentChatUser,
+      await callMessageAPI(
+        "send_message",
         {
-          text: messageText
+          receiver_id: targetId,
+          message_type: "text",
+          content
         }
       );
 
-      if (!sentMessage) {
-        throw new Error(
-          "The server did not confirm the message."
-        );
-      }
+      /*
+       * Clear the input only after the server confirms
+       * the message was accepted.
+       */
+      chatInput.value = "";
 
-      addChatMessage(sentMessage);
+      await loadChatMessages();
 
-      dispatchChatEvent("u9:chat:message-sent", {
-        target: currentChatUser,
-        message: sentMessage
-      });
-
-      return true;
-
+      chatInput.focus();
     } catch (error) {
       console.error(
         "U9 Chat: Failed to send message.",
         error
       );
 
-      dispatchChatEvent("u9:chat:send-error", {
-        target: currentChatUser,
-        text: messageText,
-        error: error
-      });
+      appendChatNotice(
+        getReadableError(error),
+        "error"
+      );
+    } finally {
+      isSendingMessage = false;
 
-      showChatNotice(
-        "Message failed to send. Please try again."
+      if (chatSendButton) {
+        chatSendButton.disabled = false;
+        chatSendButton.removeAttribute("aria-busy");
+      }
+    }
+  }
+
+  /* =================================================
+     POLLING
+  ================================================= */
+
+  function stopMessagePolling() {
+    if (pollTimer !== null) {
+      clearTimeout(pollTimer);
+      pollTimer = null;
+    }
+  }
+
+  function scheduleMessagePolling() {
+    stopMessagePolling();
+
+    if (
+      !isChatActive ||
+      !currentChatUser?.id
+    ) {
+      return;
+    }
+
+    pollTimer = setTimeout(
+      async function () {
+        pollTimer = null;
+
+        if (!isChatActive) {
+          return;
+        }
+
+        await loadChatMessages({
+          silent: true
+        });
+
+        scheduleMessagePolling();
+      },
+      POLL_INTERVAL_MS
+    );
+  }
+
+  /* =================================================
+     BACK BUTTON
+  ================================================= */
+
+  function handleChatBack() {
+    if (
+      typeof window.closeMessageChat === "function"
+    ) {
+      window.closeMessageChat();
+      return;
+    }
+
+    window.closeChatPage();
+
+    if (
+      typeof window.showMessageHome === "function"
+    ) {
+      window.showMessageHome();
+    }
+  }
+
+  /* =================================================
+     BIND UI EVENTS ONCE
+  ================================================= */
+
+  function bindChatEvents() {
+    if (chatEventsBound) {
+      return;
+    }
+
+    chatEventsBound = true;
+
+    if (chatForm) {
+      chatForm.addEventListener(
+        "submit",
+        sendChatMessage
+      );
+    }
+
+    if (chatBackButton) {
+      chatBackButton.addEventListener(
+        "click",
+        handleChatBack
+      );
+    }
+
+    if (chatInput) {
+      chatInput.addEventListener(
+        "input",
+        function () {
+          if (chatInput.value.length > MAX_MESSAGE_LENGTH) {
+            chatInput.value =
+              chatInput.value.slice(
+                0,
+                MAX_MESSAGE_LENGTH
+              );
+          }
+        }
+      );
+    }
+
+    if (chatAvatar) {
+      chatAvatar.onerror = function () {
+        if (
+          chatAvatar.getAttribute("src") !==
+          DEFAULT_AVATAR
+        ) {
+          chatAvatar.src = DEFAULT_AVATAR;
+        } else {
+          chatAvatar.onerror = null;
+        }
+      };
+    }
+
+    if (chatMoreButton) {
+      chatMoreButton.addEventListener(
+        "click",
+        function () {
+          console.info(
+            "U9 Chat: More options are not implemented yet."
+          );
+        }
+      );
+    }
+  }
+
+  /* =================================================
+     INITIALIZE CHAT PAGE
+     Called by normal-message.js:
+       initializeChatPage(user)
+  ================================================= */
+
+  async function initializeChatPage(user) {
+    if (
+      !chatPage ||
+      !chatMessages ||
+      !chatForm ||
+      !chatInput
+    ) {
+      console.error(
+        "U9 Chat: Required chat HTML elements are missing."
       );
 
       return false;
-
-    } finally {
-      setSendingState(false);
-
-      if (chatInput) {
-        chatInput.focus();
-      }
     }
-  }
 
-  /* =======================================================
-     SMALL NOTICE
-  ======================================================= */
+    if (
+      !user ||
+      !(
+        user.id ||
+        user.user_id
+      )
+    ) {
+      console.error(
+        "U9 Chat: A valid chat user ID is required.",
+        user
+      );
 
-  function showChatNotice(message) {
-    if (!chatMessages) return;
+      return false;
+    }
 
-    let notice = document.getElementById(
-      "Message-model-chat-notice"
+    bindChatEvents();
+
+    const nextUserId = String(
+      user.id || user.user_id
     );
 
-    if (!notice) {
-      notice = document.createElement("div");
-      notice.id = "Message-model-chat-notice";
+    const changedConversation =
+      !currentChatUser ||
+      String(currentChatUser.id) !== nextUserId;
 
-      Object.assign(notice.style, {
-        flex: "0 0 auto",
-        margin: "0 0 12px",
-        padding: "10px 12px",
-        color: "#8b5b13",
-        background: "#fff4d9",
-        borderRadius: "8px",
-        fontSize: "12px",
-        lineHeight: "1.5",
-        overflowWrap: "anywhere"
-      });
+    if (changedConversation) {
+      currentRequestVersion++;
 
-      chatMessages.appendChild(notice);
+      stopMessagePolling();
+
+      isLoadingMessages = false;
+
+      lastRenderedSignature = null;
     }
 
-    notice.textContent = message;
-    notice.hidden = false;
-  }
+    currentChatUser = {
+      ...user,
+      id: nextUserId
+    };
 
-  /* =======================================================
-     FORM EVENTS
-  ======================================================= */
+    isChatActive = true;
 
-  if (chatForm) {
-    chatForm.addEventListener("submit", async function (event) {
-      event.preventDefault();
+    chatPage.hidden = false;
 
-      if (!chatInput || isSending) {
-        return;
+    chatPage.classList.add(
+      "active",
+      "is-active"
+    );
+
+    chatPage.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    updateChatHeader(currentChatUser);
+
+    if (changedConversation) {
+      showChatNotice(
+        "Loading conversation...",
+        "info"
+      );
+    }
+
+    await loadChatMessages();
+
+    if (
+      isChatActive &&
+      currentChatUser &&
+      String(currentChatUser.id) === nextUserId
+    ) {
+      scheduleMessagePolling();
+
+      if (
+        document.activeElement !== chatInput &&
+        !chatInput.value
+      ) {
+        chatInput.focus({
+          preventScroll: true
+        });
       }
+    }
 
-      const text = chatInput.value.trim();
-
-      if (!text) return;
-
-      const success = await sendChatMessage(text);
-
-      if (success && chatInput) {
-        chatInput.value = "";
+    console.log(
+      "U9 Chat Page initialized.",
+      {
+        friendId: nextUserId,
+        friendName: currentChatUser.name || "User"
       }
-    });
+    );
+
+    return true;
   }
 
-  /* =======================================================
-     MORE OPTIONS
-     Dispatch an event so a menu can be added later.
-  ======================================================= */
-
-  if (chatMore) {
-    chatMore.addEventListener("click", function () {
-      if (!currentChatUser) return;
-
-      dispatchChatEvent("u9:chat:more", {
-        target: currentChatUser
-      });
-    });
-  }
-
-  /* =======================================================
-     CLEANUP
-  ======================================================= */
+  /* =================================================
+     CLOSE CHAT PAGE
+     Called by normal-message.js when leaving Chat.
+  ================================================= */
 
   function closeChatPage() {
-    loadGeneration += 1;
-    stopRealtimeSubscription();
+    isChatActive = false;
+
+    currentRequestVersion++;
+
+    stopMessagePolling();
 
     currentChatUser = null;
-    currentMessages = [];
+
+    isLoadingMessages = false;
+
+    isSendingMessage = false;
+
+    lastRenderedSignature = null;
 
     if (chatPage) {
-      chatPage.classList.remove("is-active");
+      chatPage.classList.remove(
+        "active",
+        "is-active"
+      );
+
       chatPage.hidden = true;
-      chatPage.setAttribute("aria-hidden", "true");
-      delete chatPage.dataset.chatType;
-      delete chatPage.dataset.chatTargetId;
+
+      chatPage.setAttribute(
+        "aria-hidden",
+        "true"
+      );
     }
+
+    if (chatSendButton) {
+      chatSendButton.disabled = false;
+      chatSendButton.removeAttribute("aria-busy");
+    }
+
+    console.log("U9 Chat Page closed.");
   }
 
-  /* =======================================================
+  /* =================================================
      PUBLIC API
-  ======================================================= */
+  ================================================= */
 
-  window.initializeChatPage = initializeChatPage;
-  window.renderChatMessages = setChatMessages;
-  window.addChatMessage = addChatMessage;
-  window.sendChatMessage = sendChatMessage;
-  window.closeChatPage = closeChatPage;
+  window.initializeChatPage =
+    initializeChatPage;
 
-  window.getCurrentChatTarget = function () {
-    return currentChatUser
-      ? { ...currentChatUser }
-      : null;
-  };
+  window.closeChatPage =
+    closeChatPage;
 
-  window.getCurrentChatMessages = function () {
-    return currentMessages.map(function (message) {
-      return { ...message };
-    });
-  };
+  window.loadChatMessages =
+    loadChatMessages;
 
-  /* =======================================================
-     INITIAL PAGE STATE
-  ======================================================= */
+  window.sendChatMessage =
+    sendChatMessage;
 
-  if (chatPage) {
-    chatPage.classList.remove("is-active");
-    chatPage.hidden = true;
-    chatPage.setAttribute("aria-hidden", "true");
+  /* =================================================
+     INITIALIZE
+  ================================================= */
+
+  function initializeChatModule() {
+    bindChatEvents();
+
+    console.log(
+      "U9 Chat module ready. Waiting for a conversation."
+    );
   }
 
-  if (chatMessages && emptyState) {
-    renderMessages([]);
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeChatModule,
+      { once: true }
+    );
+  } else {
+    initializeChatModule();
   }
 
-  console.log("U9 Chat Page initialized.");
 })();
