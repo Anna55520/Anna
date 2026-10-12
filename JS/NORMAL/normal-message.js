@@ -3,404 +3,347 @@
    MESSAGE NORMAL MODAL
 ========================= */
 
-
-/* =========================
-   ELEMENTS
-========================= */
-
-const messageModal =
-  document.getElementById(
-    "Message-model-modal"
-  );
-
-const messageModalContent =
-  document.getElementById(
-    "Message-model-modal-content"
-  );
-
-const messageModalClose =
-  document.getElementById(
-    "Message-model-close"
-  );
-
-const messageNavigation =
-  document.getElementById(
-    "Message-model-navigation"
-  );
-
-const messagePages =
-  document.querySelectorAll(
-    "#Message-model-pages .Message-model-page"
-  );
-
-const headerToolToggle =
-  document.getElementById(
-    "U9-page-header-tool-toggle"
-  );
+(function () {
+  "use strict";
 
 
-/* =========================
-   TOOLBAR STATE
-========================= */
+  /* =========================
+     ELEMENTS
+  ========================= */
 
-function setMessageToolbarCollapsed(collapsed) {
+  const messageModal =
+    document.getElementById(
+      "Message-model-modal"
+    );
 
-  if (!messageModal) {
-    return;
-  }
+  const messageModalContent =
+    document.getElementById(
+      "Message-model-modal-content"
+    );
 
-  messageModal.classList.toggle(
-    "Message-model-toolbar-collapsed",
-    collapsed
-  );
+  const messageModalClose =
+    document.getElementById(
+      "Message-model-close"
+    );
 
-}
+  const messageNavigation =
+    document.getElementById(
+      "Message-model-navigation"
+    );
 
-
-/* =========================
-   OPEN MESSAGE MODAL
-========================= */
-
-function openMessageModal() {
-
-  if (
-    !messageModal ||
-    !messageModalContent
-  ) {
-    return false;
-  }
-
-  messageModal.classList.remove(
-    "Message-model-closing"
-  );
-
-  messageModal.classList.add(
-    "Message-model-open"
-  );
-
-  return true;
-}
+  const messagePages =
+    document.querySelectorAll(
+      "#Message-model-pages .Message-model-page"
+    );
 
 
-/* =========================
-   CLOSE MESSAGE MODAL
-========================= */
+  /* =========================
+     TOOLBAR STATE
+  ========================= */
 
-function closeMessageModal() {
+  function setMessageToolbarCollapsed(collapsed) {
+    if (!messageModal) {
+      return false;
+    }
 
-  if (
-    !messageModal ||
-    !messageModalContent
-  ) {
-    return false;
-  }
+    messageModal.classList.toggle(
+      "Message-model-toolbar-collapsed",
+      Boolean(collapsed)
+    );
 
-  if (
-    !messageModal.classList.contains(
-      "Message-model-open"
-    )
-  ) {
     return true;
   }
 
-  messageModal.classList.remove(
-    "Message-model-open"
-  );
 
-  messageModal.classList.add(
-    "Message-model-closing"
-  );
+  /* =========================
+     OPEN MESSAGE MODAL
+  ========================= */
 
-  let closeFinished = false;
+  function openMessageModal() {
+    if (
+      !messageModal ||
+      !messageModalContent
+    ) {
+      console.error(
+        "U9 Message: Modal elements not found."
+      );
 
-  function finishClose() {
-
-    if (closeFinished) {
-      return;
+      return false;
     }
-
-    closeFinished = true;
 
     messageModal.classList.remove(
       "Message-model-closing"
     );
 
-    messageModalContent.removeEventListener(
-      "transitionend",
-      handleCloseAnimation
+    messageModal.classList.add(
+      "Message-model-open"
     );
 
+    return true;
   }
 
-  function handleCloseAnimation(event) {
 
+  /* =========================
+     CLOSE MESSAGE MODAL
+  ========================= */
+
+  function closeMessageModal() {
     if (
-      event.target !== messageModalContent ||
-      event.propertyName !== "transform"
+      !messageModal ||
+      !messageModalContent
     ) {
-      return;
+      return false;
     }
 
-    finishClose();
-  }
+    if (
+      !messageModal.classList.contains(
+        "Message-model-open"
+      )
+    ) {
+      return true;
+    }
 
-  messageModalContent.addEventListener(
-    "transitionend",
-    handleCloseAnimation
-  );
-
-  setTimeout(
-    finishClose,
-    700
-  );
-
-  return true;
-}
-
-
-/* =========================
-   SWITCH MESSAGE PAGE
-========================= */
-
-function switchMessagePage(pageName) {
-
-  if (
-    !messageNavigation ||
-    !messagePages.length
-  ) {
-    console.warn(
-      "Message navigation or pages not found."
+    messageModal.classList.remove(
+      "Message-model-open"
     );
 
-    return false;
-  }
-
-  const targetPage =
-    document.getElementById(
-      "Message-model-" + pageName + "-page"
+    messageModal.classList.add(
+      "Message-model-closing"
     );
 
-  if (
-    !targetPage ||
-    !targetPage.classList.contains(
-      "Message-model-page"
-    )
-  ) {
-    console.warn(
-      "Message page not found:",
-      pageName
-    );
+    let closeFinished = false;
 
-    return false;
-  }
+    function finishClose() {
+      if (closeFinished) {
+        return;
+      }
 
+      closeFinished = true;
 
-  /* UPDATE NAVIGATION BUTTONS */
+      messageModal.classList.remove(
+        "Message-model-closing"
+      );
 
-  const navigationButtons =
-    messageNavigation.querySelectorAll(
-      ".Message-model-nav-button"
-    );
+      messageModalContent.removeEventListener(
+        "transitionend",
+        handleCloseAnimation
+      );
+    }
 
-  navigationButtons.forEach(function (button) {
-
-    const isActive =
-      button.dataset.page === pageName;
-
-    button.classList.toggle(
-      "active",
-      isActive
-    );
-
-    button.setAttribute(
-      "aria-pressed",
-      String(isActive)
-    );
-
-  });
-
-
-  /* UPDATE PAGE VISIBILITY */
-
-  messagePages.forEach(function (page) {
-
-    page.classList.toggle(
-      "active",
-      page === targetPage
-    );
-
-  });
-
-  return true;
-}
-
-
-/* =========================
-   NAVIGATION CLICK EVENTS
-========================= */
-
-if (messageNavigation) {
-
-  messageNavigation.addEventListener(
-    "click",
-    function (event) {
-
-      const button =
-        event.target.closest(
-          ".Message-model-nav-button"
-        );
-
+    function handleCloseAnimation(event) {
       if (
-        !button ||
-        !messageNavigation.contains(button)
+        event.target !== messageModalContent ||
+        event.propertyName !== "transform"
       ) {
         return;
       }
 
-      const pageName =
-        button.dataset.page;
-
-      if (!pageName) {
-        return;
-      }
-
-      switchMessagePage(pageName);
-
+      finishClose();
     }
-  );
 
-}
+    messageModalContent.addEventListener(
+      "transitionend",
+      handleCloseAnimation
+    );
+
+    setTimeout(
+      finishClose,
+      700
+    );
+
+    return true;
+  }
 
 
-/* =========================
-   HEADER TOOL TOGGLE
-========================= */
+  /* =========================
+     SWITCH MESSAGE PAGE
+  ========================= */
 
-/*
-  注意：
-  这里监听顶部按钮的点击，并同步 Message
-  模态框的位置。
-
-  如果你的 Header JS 已经通过其他方式统一
-  管理所有弹窗的位置，请避免重复切换状态。
-*/
-
-if (headerToolToggle) {
-
-  headerToolToggle.addEventListener(
-    "click",
-    function () {
-
-      const isCollapsed =
-        messageModal &&
-        messageModal.classList.contains(
-          "Message-model-toolbar-collapsed"
-        );
-
-      setMessageToolbarCollapsed(
-        !isCollapsed
+  function switchMessagePage(pageName) {
+    if (
+      !messageNavigation ||
+      !messagePages.length
+    ) {
+      console.error(
+        "U9 Message: Navigation or pages not found."
       );
 
+      return false;
     }
-  );
 
-} else {
+    const targetPage =
+      document.getElementById(
+        "Message-model-" + pageName + "-page"
+      );
 
-  console.warn(
-    "U9-page-header-tool-toggle was not found."
-  );
+    if (
+      !targetPage ||
+      !targetPage.classList.contains(
+        "Message-model-page"
+      )
+    ) {
+      console.error(
+        "U9 Message: Invalid page:",
+        pageName
+      );
 
-}
+      return false;
+    }
 
 
-/* =========================
-   WINDOW MANAGER
-========================= */
+    /* UPDATE BUTTONS */
 
-if (window.U9WindowManager) {
+    const buttons =
+      messageNavigation.querySelectorAll(
+        ".Message-model-nav-button"
+      );
 
-  window.U9WindowManager.register(
-    "message",
-    {
+    buttons.forEach(function (button) {
+      const isActive =
+        button.dataset.page === pageName;
 
-      open: openMessageModal,
+      button.classList.toggle(
+        "active",
+        isActive
+      );
 
-      close: closeMessageModal,
+      button.setAttribute(
+        "aria-pressed",
+        String(isActive)
+      );
+    });
 
-      isOpen: function () {
 
-        if (!messageModal) {
-          return false;
+    /* UPDATE PAGES */
+
+    messagePages.forEach(function (page) {
+      const isActive =
+        page === targetPage;
+
+      page.hidden = !isActive;
+
+      page.classList.toggle(
+        "active",
+        isActive
+      );
+
+      page.setAttribute(
+        "aria-hidden",
+        String(!isActive)
+      );
+    });
+
+    return true;
+  }
+
+
+  /* =========================
+     NAVIGATION EVENTS
+  ========================= */
+
+  if (messageNavigation) {
+    messageNavigation.addEventListener(
+      "click",
+      function (event) {
+        const button =
+          event.target.closest(
+            ".Message-model-nav-button"
+          );
+
+        if (
+          !button ||
+          !messageNavigation.contains(button)
+        ) {
+          return;
         }
 
-        return (
-          messageModal.classList.contains(
-            "Message-model-open"
-          ) ||
+        const pageName =
+          button.dataset.page;
 
-          messageModal.classList.contains(
-            "Message-model-closing"
-          )
-        );
-
+        if (pageName) {
+          switchMessagePage(pageName);
+        }
       }
-
-    }
-  );
-
-} else {
-
-  console.warn(
-    "U9WindowManager is not available when Message Modal was initialized."
-  );
-
-}
+    );
+  }
 
 
-/* =========================
-   GLOBAL FUNCTIONS
-========================= */
+  /* =========================
+     WINDOW MANAGER
+  ========================= */
 
-window.openMessageModal =
-  openMessageModal;
+  if (window.U9WindowManager) {
+    window.U9WindowManager.register(
+      "message",
+      {
+        open: openMessageModal,
 
-window.closeMessageModal =
-  closeMessageModal;
+        close: closeMessageModal,
 
-window.switchMessagePage =
-  switchMessagePage;
+        isOpen: function () {
+          if (!messageModal) {
+            return false;
+          }
 
-
-/* =========================
-   CLOSE BUTTON
-========================= */
-
-if (messageModalClose) {
-
-  messageModalClose.addEventListener(
-    "click",
-    function () {
-
-      if (window.U9WindowManager) {
-
-        window.U9WindowManager.close(
-          "message"
-        );
-
-      } else {
-
-        closeMessageModal();
-
+          return (
+            messageModal.classList.contains(
+              "Message-model-open"
+            ) ||
+            messageModal.classList.contains(
+              "Message-model-closing"
+            )
+          );
+        }
       }
+    );
+  } else {
+    console.warn(
+      "U9WindowManager is not available when Message Modal was initialized."
+    );
+  }
 
-    }
-  );
 
-}
+  /* =========================
+     GLOBAL FUNCTIONS
+  ========================= */
+
+  window.openMessageModal =
+    openMessageModal;
+
+  window.closeMessageModal =
+    closeMessageModal;
+
+  window.switchMessagePage =
+    switchMessagePage;
+
+  window.setMessageToolbarCollapsed =
+    setMessageToolbarCollapsed;
 
 
-/* =========================
-   DEFAULT PAGE
-========================= */
+  /* =========================
+     CLOSE BUTTON
+  ========================= */
 
-switchMessagePage("friend");
+  if (messageModalClose) {
+    messageModalClose.addEventListener(
+      "click",
+      function () {
+        if (window.U9WindowManager) {
+          window.U9WindowManager.close(
+            "message"
+          );
+        } else {
+          closeMessageModal();
+        }
+      }
+    );
+  }
+
+
+  /* =========================
+     INITIAL PAGE
+  ========================= */
+
+  switchMessagePage("friend");
+
+})();
