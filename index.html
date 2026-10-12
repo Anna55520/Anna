@@ -1369,151 +1369,222 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
       class="message-home"
     >
 
-      <!-- MESSAGE HEADER -->
-       
+      <!-- =========================
+          MESSAGE HEADER
+      ========================= -->
+
       <header id="U9-message-normal-modal-title">
+
+        <!-- HEADER BACK / CLOSE BUTTON -->
 
         <button
           id="U9-message-normal-modal-close"
+          class="message-home-close"
           type="button"
           aria-label="Close Message"
         >
-          <img
-            id="U9-message-normal-modal-back-icon"
-            src="/SSVG/account/back.svg"
-            alt=""
-          >
+          ×
         </button>
 
-        <span id="U9-message-normal-modal-title-text">Message</span>
+        <!-- CENTER TITLE -->
+
+        <span id="U9-message-normal-modal-title-text">
+          Message
+        </span>
 
       </header>
 
 
       <!-- =========================
-          MESSAGE HOME NAVIGATION
+          MESSAGE HOME
       ========================= -->
 
-      <div
-        id="Message-model-navigation"
-        role="tablist"
-        aria-label="Message navigation"
-      >
+      <div id="Message-model-home">
 
-        <!-- FRIENDS -->
+        <!-- =========================
+            FOUR NAVIGATION BUTTONS
+        ========================= -->
 
-        <button
-          id="Message-model-friends-button"
-          class="Message-model-nav-button"
-          type="button"
-          role="tab"
-          data-page="friends"
-          aria-controls="Message-model-friends-page"
-          aria-selected="false"
+        <nav
+          id="Message-model-navigation"
+          role="tablist"
+          aria-label="Message navigation"
         >
 
-          <img
-            class="Message-model-nav-icon"
-            src="/SSVG/account/account-edit-button.svg"
-            alt=""
+          <!-- FRIENDS -->
+
+          <button
+            id="Message-model-friends-button"
+            class="Message-model-nav-button"
+            type="button"
+            role="tab"
+            data-page="friends"
+            aria-controls="Message-model-friends-page"
+            aria-selected="false"
           >
 
-          <span class="Message-model-nav-label">
-            Friend
-          </span>
+            <img
+              class="Message-model-nav-icon"
+              src="/SSVG/account/account-edit-button.svg"
+              alt=""
+            >
 
-          <span class="Message-model-nav-description">
-            Your accepted friends
-          </span>
+            <span class="Message-model-nav-label">
+              Friend
+            </span>
 
-        </button>
+            <span class="Message-model-nav-description">
+              Your accepted friends
+            </span>
+
+          </button>
 
 
-        <!-- ADD FRIENDS -->
+          <!-- ADD FRIENDS -->
 
-        <button
-          id="Message-model-add-friends-button"
-          class="Message-model-nav-button"
-          type="button"
-          role="tab"
-          data-page="add-friends"
-          aria-controls="Message-model-add-friends-page"
-          aria-selected="false"
+          <button
+            id="Message-model-add-friends-button"
+            class="Message-model-nav-button"
+            type="button"
+            role="tab"
+            data-page="add-friends"
+            aria-controls="Message-model-add-friends-page"
+            aria-selected="false"
+          >
+
+            <img
+              class="Message-model-nav-icon"
+              src="/SSVG/account/account-edit-button.svg"
+              alt=""
+            >
+
+            <span class="Message-model-nav-label">
+              Add Friend
+            </span>
+
+            <span class="Message-model-nav-description">
+              Search accounts and friend requests
+            </span>
+
+          </button>
+
+
+          <!-- GROUP -->
+
+          <button
+            id="Message-model-group-button"
+            class="Message-model-nav-button"
+            type="button"
+            role="tab"
+            data-page="group"
+            aria-controls="Message-model-group-page"
+            aria-selected="false"
+          >
+
+            <img
+              class="Message-model-nav-icon"
+              src="/SSVG/account/account-edit-button.svg"
+              alt=""
+            >
+
+            <span class="Message-model-nav-label">
+              Group
+            </span>
+
+            <span class="Message-model-nav-description">
+              Search, request and join groups
+            </span>
+
+          </button>
+
+
+          <!-- CUSTOMER SERVICE -->
+
+          <button
+            id="Message-model-customer-service-button"
+            class="Message-model-nav-button"
+            type="button"
+            role="tab"
+            data-page="customer-service"
+            aria-controls="Message-model-customer-service-page"
+            aria-selected="false"
+          >
+
+            <img
+              class="Message-model-nav-icon"
+              src="/SSVG/account/account-edit-button.svg"
+              alt=""
+            >
+
+            <span class="Message-model-nav-label">
+              Customer Service
+            </span>
+
+            <span class="Message-model-nav-description">
+              Contact platform support
+            </span>
+
+          </button>
+
+        </nav>
+
+
+        <!-- =========================
+            ACCEPTED FRIENDS LIST
+        ========================= -->
+
+        <section
+          id="Message-model-friends-list-section"
+          aria-label="Accepted friends"
         >
 
-          <img
-            class="Message-model-nav-icon"
-            src="/SSVG/account/account-edit-button.svg"
-            alt=""
-          >
+          <h3 class="Message-model-list-heading">
+            Friends
+          </h3>
 
-          <span class="Message-model-nav-label">
-            Add Friend
-          </span>
+          <div id="Message-model-friends-list">
 
-          <span class="Message-model-nav-description">
-            Search accounts and friend requests
-          </span>
+            <!-- friends.js / message home renderer inserts rows here -->
 
-        </button>
+            <div
+              class="Message-model-empty"
+              id="Message-model-friends-list-empty"
+            >
+              No friends to display.
+            </div>
+
+          </div>
+
+        </section>
 
 
-        <!-- GROUP -->
+        <!-- =========================
+            JOINED GROUPS LIST
+        ========================= -->
 
-        <button
-          id="Message-model-group-button"
-          class="Message-model-nav-button"
-          type="button"
-          role="tab"
-          data-page="group"
-          aria-controls="Message-model-group-page"
-          aria-selected="false"
+        <section
+          id="Message-model-groups-list-section"
+          aria-label="Joined groups"
         >
 
-          <img
-            class="Message-model-nav-icon"
-            src="/SSVG/account/account-edit-button.svg"
-            alt=""
-          >
+          <h3 class="Message-model-list-heading">
+            Groups
+          </h3>
 
-          <span class="Message-model-nav-label">
-            Group
-          </span>
+          <div id="Message-model-groups-list">
 
-          <span class="Message-model-nav-description">
-            Search, request and join groups
-          </span>
+            <!-- group list renderer inserts rows here -->
 
-        </button>
+            <div
+              class="Message-model-empty"
+              id="Message-model-groups-list-empty"
+            >
+              No groups to display.
+            </div>
 
+          </div>
 
-        <!-- CUSTOMER SERVICE -->
-
-        <button
-          id="Message-model-customer-service-button"
-          class="Message-model-nav-button"
-          type="button"
-          role="tab"
-          data-page="customer-service"
-          aria-controls="Message-model-customer-service-page"
-          aria-selected="false"
-        >
-
-          <img
-            class="Message-model-nav-icon"
-            src="/SSVG/account/account-edit-button.svg"
-            alt=""
-          >
-
-          <span class="Message-model-nav-label">
-            Customer Service
-          </span>
-
-          <span class="Message-model-nav-description">
-            Contact platform support
-          </span>
-
-        </button>
+        </section>
 
       </div>
 
@@ -1604,20 +1675,11 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           hidden
         >
 
-          <!-- CHAT HEADER -->
+          <!-- CHAT HEADER
+              Back button is handled by the main Message Header.
+          -->
 
           <div id="Message-model-chat-header">
-
-            <!-- BACK BUTTON -->
-
-            <button
-              id="Message-model-chat-back"
-              type="button"
-              aria-label="Back to Message"
-            >
-              ←
-            </button>
-
 
             <!-- CHAT AVATAR -->
 
@@ -1626,7 +1688,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
               src="/SSVG/account/account-edit-button.svg"
               alt=""
             >
-
 
             <!-- CHAT USER INFO -->
 
@@ -1641,7 +1702,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
               </div>
 
             </div>
-
 
             <!-- MORE OPTIONS -->
 
@@ -1697,7 +1757,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           </form>
 
         </section>
-
 
       </div>
 
