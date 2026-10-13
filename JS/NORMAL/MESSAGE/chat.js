@@ -4,20 +4,18 @@
    File: JS/NORMAL/MESSAGE/chat.js
 
    Features:
-   - Connect Chat UI to message-api
-   - Load one-to-one conversation messages
-   - Send text messages
+   - Connect one-to-one chat to message-api
+   - Connect group chat to group-api
+   - Load and send text messages in both modes
    - Refresh messages every 4 seconds
    - Show sender / receiver message bubbles
    - Keep existing chat HTML IDs
    - Stop refreshing after leaving Chat
    - Show useful API and authentication errors
 
-   API:
-   POST /functions/v1/message-api
-   Actions:
-   - list_messages
-   - send_message
+   APIs:
+   - message-api: list_messages, send_message
+   - group-api: list_group_messages, send_group_message
 ================================================= */
 
 (function () {
@@ -38,6 +36,9 @@
 
   const MESSAGE_API_URL =
     SUPABASE_URL + "/functions/v1/message-api";
+
+  const GROUP_API_URL =
+    SUPABASE_URL + "/functions/v1/group-api";
 
   const ME_API_URL =
     SUPABASE_URL + "/functions/v1/me";
@@ -262,6 +263,82 @@
 
       apiError.status = response.status;
 
+      throw apiError;
+    }
+
+    return result;
+  }
+
+  /* =================================================
+     CALL GROUP API
+
+     Group messages use the separate group-api function.
+     Never pass a group UUID to message-api as receiver_id.
+  ================================================= */
+
+  function getGroupSessionToken() {
+    for (const key of [
+      "u9_token",
+      "u9_session",
+      "session_token",
+      "access_token"
+    ]) {
+      try {
+        const value = localStorage.getItem(key);
+        if (value && value.trim()) return value.trim();
+      } catch (_) {
+        // Try the U9 session cookie below.
+      }
+    }
+
+    try {
+      const match = document.cookie.match(/(?:^|;\s*)u9_session=([^;]+)/);
+      if (match?.[1]) return decodeURIComponent(match[1]);
+    } catch (_) {
+      // group-api will report an authentication error if needed.
+    }
+
+    return "";
+  }
+
+  async function callGroupAPI(action, payload = {}) {
+    const headers = { "Content-Type": "application/json" };
+    const token = getGroupSessionToken();
+    if (token) headers.Authorization = "Bearer " + token;
+
+    let response;
+    try {
+      response = await fetch(GROUP_API_URL, {
+        method: "POST",
+        headers,
+        credentials: "include",
+        cache: "no-store",
+        body: JSON.stringify({ action, ...payload })
+      });
+    } catch (error) {
+      const networkError = new Error(
+        "Could not connect to the group messaging server. Check the group-api deployment and CORS settings."
+      );
+      networkError.cause = error;
+      throw networkError;
+    }
+
+    let result;
+    try {
+      result = await response.json();
+    } catch (_) {
+      const invalidResponse = new Error(
+        `The group server returned an invalid response (${response.status}).`
+      );
+      invalidResponse.status = response.status;
+      throw invalidResponse;
+    }
+
+    if (!response.ok || !result || result.success !== true) {
+      const apiError = new Error(
+        result?.error || "The group messaging request failed."
+      );
+      apiError.status = response.status;
       throw apiError;
     }
 
@@ -618,7 +695,9 @@
           : "U9-chat-bubble-other"
       );
 
-    bubble.style.maxWidth = "min(78%, 520px)";
+    bubble.style.maxWidth = currentChatUser?.type === "group"
+      ? "100%"
+      : "min(78%, 520px)";
     bubble.style.padding = "10px 13px";
     bubble.style.borderRadius = "15px";
     bubble.style.overflowWrap = "anywhere";
@@ -700,7 +779,40 @@
     time.style.textAlign = "right";
 
     bubble.appendChild(time);
-    row.appendChild(bubble);
+
+    if (
+      currentChatUser?.type === "group" &&
+      !isOwnMessage
+    ) {
+      const content = document.createElement("div");
+      content.className = "U9-chat-message-content";
+      content.style.display = "flex";
+      content.style.flexDirection = "column";
+      content.style.alignItems = "flex-start";
+      content.style.gap = "4px";
+      content.style.flex = "0 1 auto";
+      content.style.minWidth = "0";
+      content.style.maxWidth = "min(78%, 520px)";
+
+      const sender = document.createElement("div");
+      sender.className = "U9-chat-message-sender";
+      sender.textContent = String(
+        message.sender_username ||
+        message.sender_name ||
+        "Group member"
+      );
+      sender.style.maxWidth = "100%";
+      sender.style.color = "#7e899a";
+      sender.style.fontSize = "11px";
+      sender.style.lineHeight = "1.3";
+      sender.style.overflowWrap = "anywhere";
+
+      content.appendChild(sender);
+      content.appendChild(bubble);
+      row.appendChild(content);
+    } else {
+      row.appendChild(bubble);
+    }
 
     return row;
   }
@@ -825,7 +937,9 @@
       error?.status === 403 &&
       /origin/i.test(message)
     ) {
-      return "This website is not authorized by message-api. Check the CORS origin list.";
+      return currentChatUser?.type === "group"
+        ? "This website is not authorized by group-api. Check the group-api CORS origin list."
+        : "This website is not authorized by message-api. Check the message-api CORS origin list.";
     }
 
     return message ||
@@ -856,22 +970,32 @@
     const requestVersion = currentRequestVersion;
 
     const targetId = String(currentChatUser.id);
+    const targetType = String(currentChatUser.type || "friend");
 
     try {
       await resolveCurrentUserId();
 
-      const result = await callMessageAPI(
-        "list_messages",
-        {
-          other_user_id: targetId,
-          limit: 100
-        }
-      );
+      const result = targetType === "group"
+        ? await callGroupAPI(
+            "list_group_messages",
+            {
+              group_id: String(currentChatUser.group_id || targetId),
+              limit: 100
+            }
+          )
+        : await callMessageAPI(
+            "list_messages",
+            {
+              other_user_id: targetId,
+              limit: 100
+            }
+          );
 
       if (
         !isChatActive ||
         requestVersion !== currentRequestVersion ||
-        String(currentChatUser?.id) !== targetId
+        String(currentChatUser?.id) !== targetId ||
+        String(currentChatUser?.type || "friend") !== targetType
       ) {
         return [];
       }
@@ -954,6 +1078,7 @@
     }
 
     const targetId = String(currentChatUser.id);
+    const targetType = String(currentChatUser.type || "friend");
 
     isSendingMessage = true;
 
@@ -966,14 +1091,25 @@
     }
 
     try {
-      await callMessageAPI(
-        "send_message",
-        {
-          receiver_id: targetId,
-          message_type: "text",
-          content
-        }
-      );
+      if (targetType === "group") {
+        await callGroupAPI(
+          "send_group_message",
+          {
+            group_id: String(currentChatUser.group_id || targetId),
+            message_type: "text",
+            content
+          }
+        );
+      } else {
+        await callMessageAPI(
+          "send_message",
+          {
+            receiver_id: targetId,
+            message_type: "text",
+            content
+          }
+        );
+      }
 
       /*
        * Clear the input only after the server confirms
@@ -1167,12 +1303,17 @@
     bindChatEvents();
 
     const nextUserId = String(
-      user.id || user.user_id
+      user.id || user.user_id || user.group_id || user.groupId
+    );
+    const nextChatType = String(
+      user.type ||
+      (user.group_id || user.groupId ? "group" : "friend")
     );
 
     const changedConversation =
       !currentChatUser ||
-      String(currentChatUser.id) !== nextUserId;
+      String(currentChatUser.id) !== nextUserId ||
+      String(currentChatUser.type || "friend") !== nextChatType;
 
     if (changedConversation) {
       currentRequestVersion++;
@@ -1186,7 +1327,11 @@
 
     currentChatUser = {
       ...user,
-      id: nextUserId
+      id: nextUserId,
+      type: nextChatType,
+      group_id: nextChatType === "group"
+        ? String(user.group_id || user.groupId || nextUserId)
+        : (user.group_id || null)
     };
 
     isChatActive = true;
@@ -1217,7 +1362,8 @@
     if (
       isChatActive &&
       currentChatUser &&
-      String(currentChatUser.id) === nextUserId
+      String(currentChatUser.id) === nextUserId &&
+      String(currentChatUser.type || "friend") === nextChatType
     ) {
       scheduleMessagePolling();
 
@@ -1234,8 +1380,9 @@
     console.log(
       "U9 Chat Page initialized.",
       {
-        friendId: nextUserId,
-        friendName: currentChatUser.name || "User"
+        chatType: nextChatType,
+        targetId: nextUserId,
+        targetName: currentChatUser.name || "User"
       }
     );
 
