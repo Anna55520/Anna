@@ -24,6 +24,11 @@
   const MESSAGE_API_URL =
     "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/message-api";
 
+  // Group listing uses the separate group-api Edge Function.
+  // Do not route group requests through message-api.
+  const GROUP_API_URL =
+    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/group-api";
+
   const BACK_ICON_URL =
     "/SSVG/account/back.svg";
 
@@ -81,6 +86,9 @@
   let homeFriends = [];
   let homeFriendsById = new Map();
 
+  let homeGroupsRequest = null;
+  let homeGroups = [];
+
   /* =================================================
      DOM HELPERS
   ================================================= */
@@ -114,6 +122,10 @@
 
   function getHomeFriendsList() {
     return getElement("Message-model-friends-list");
+  }
+
+  function getHomeGroupsList() {
+    return getElement("Message-model-groups-list");
   }
 
   /* =================================================
@@ -299,6 +311,112 @@
       error.status = response.status;
 
       throw error;
+    }
+
+    return result;
+  }
+
+
+  /* =================================================
+     GROUP API
+
+     Uses the separate group-api Edge Function and the
+     same U9 custom-session token/cookie convention as
+     JS/NORMAL/MESSAGE/group.js.
+     This does not change or replace message-api.
+  ================================================= */
+
+  function getGroupSessionToken() {
+    for (const key of [
+      "u9_token",
+      "u9_session",
+      "session_token",
+      "access_token"
+    ]) {
+      try {
+        const token = localStorage.getItem(key);
+
+        if (token && token.trim()) {
+          return token.trim();
+        }
+      } catch (error) {
+        // Fall back to the U9 session cookie.
+      }
+    }
+
+    try {
+      const match = document.cookie.match(
+        /(?:^|;\s*)u9_session=([^;]+)/
+      );
+
+      if (match?.[1]) {
+        return decodeURIComponent(match[1]);
+      }
+    } catch (error) {
+      // The API will report an authentication error if needed.
+    }
+
+    return "";
+  }
+
+  async function callGroupAPI(action, payload = {}) {
+    const headers = {
+      "Content-Type": "application/json"
+    };
+
+    const token = getGroupSessionToken();
+
+    if (token) {
+      headers.Authorization = "Bearer " + token;
+    }
+
+    let response;
+
+    try {
+      response = await fetch(
+        GROUP_API_URL,
+        {
+          method: "POST",
+          headers,
+          credentials: "include",
+          cache: "no-store",
+          body: JSON.stringify({
+            action,
+            ...payload
+          })
+        }
+      );
+    } catch (error) {
+      const networkError = new Error(
+        "Network error while loading groups. Check your connection and try again."
+      );
+      networkError.cause = error;
+      throw networkError;
+    }
+
+    let result;
+
+    try {
+      result = await response.json();
+    } catch (error) {
+      const invalidResponseError = new Error(
+        `Invalid response from group server (${response.status}).`
+      );
+      invalidResponseError.status = response.status;
+      throw invalidResponseError;
+    }
+
+    if (
+      !response.ok ||
+      !result ||
+      result.success !== true
+    ) {
+      const requestError = new Error(
+        result?.error ||
+        `Group request failed (${response.status}).`
+      );
+      requestError.status = response.status;
+      throw requestError;
     }
 
     return result;
@@ -799,6 +917,251 @@
   }
 
   /* =================================================
+     HOME GROUPS: NORMALIZE API RESPONSE
+
+     group-api list_my_groups returns:
+     {
+       success: true,
+       groups: [
+         { group: { id, name, description, avatar_url },
+           membership: { role, status } }
+       ]
+     }
+  ================================================= */
+
+  function normalizeHomeGroups(items) {
+    if (!Array.isArray(items)) {
+      return [];
+    }
+
+    return items
+      .map(function (item) {
+        const group = item?.group || item;
+        const membership = item?.membership || {};
+
+        if (!group || !group.id) {
+          return null;
+        }
+
+        if (
+          membership.status &&
+          membership.status !== "active"
+        ) {
+          return null;
+        }
+
+        return {
+          id: String(group.id),
+          name: String(group.name || "Unnamed group"),
+          description: String(group.description || ""),
+          avatar_url: normalizeImageURL(
+            group.avatar_url,
+            ""
+          ),
+          role: String(membership.role || "member"),
+          status: String(membership.status || "active")
+        };
+      })
+      .filter(Boolean);
+  }
+
+  /* =================================================
+     HOME GROUPS: EMPTY / ERROR STATE
+  ================================================= */
+
+  function renderHomeGroupsMessage(message, type = "info") {
+    const container = getHomeGroupsList();
+
+    if (!container) {
+      return;
+    }
+
+    container.innerHTML = `
+      <div
+        class="Message-model-empty Message-model-home-groups-state Message-model-home-groups-${escapeHTML(type)}"
+        role="${type === "error" ? "alert" : "status"}"
+      >
+        ${escapeHTML(message)}
+      </div>
+    `;
+  }
+
+  /* =================================================
+     HOME GROUPS: RENDER ONE GROUP
+  ================================================= */
+
+  function renderHomeGroup(group) {
+    const avatarMarkup = group.avatar_url
+      ? `
+        <img
+          class="Message-model-home-group-avatar-image"
+          data-home-group-image="true"
+          src="${escapeHTML(group.avatar_url)}"
+          alt=""
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          draggable="false"
+        >
+      `
+      : `<span class="Message-model-home-group-avatar-fallback" aria-hidden="true">G</span>`;
+
+    const roleLabel = {
+      owner: "Owner",
+      admin: "Admin",
+      member: "Member"
+    }[group.role] || "Member";
+
+    const description = group.description.trim()
+      ? group.description
+      : "No group description has been added.";
+
+    return `
+      <article
+        class="Message-model-home-group-row"
+        data-home-group-id="${escapeHTML(group.id)}"
+      >
+        <div class="Message-model-home-group-avatar" aria-hidden="true">
+          ${avatarMarkup}
+        </div>
+
+        <div class="Message-model-home-group-main">
+          <div class="Message-model-home-group-topline">
+            <div class="Message-model-home-group-name">
+              ${escapeHTML(group.name)}
+            </div>
+            <span class="Message-model-home-group-role">
+              ${escapeHTML(roleLabel)}
+            </span>
+          </div>
+
+          <div class="Message-model-home-group-description">
+            ${escapeHTML(description)}
+          </div>
+
+          <div class="Message-model-home-group-id">
+            Group ID: ${escapeHTML(group.id)}
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  /* =================================================
+     HOME GROUPS: RENDER LIST
+  ================================================= */
+
+  function renderHomeGroups(groups) {
+    const container = getHomeGroupsList();
+
+    if (!container) {
+      return;
+    }
+
+    homeGroups = Array.isArray(groups) ? groups : [];
+
+    if (homeGroups.length === 0) {
+      renderHomeGroupsMessage("No groups to display.");
+      return;
+    }
+
+    container.innerHTML = homeGroups
+      .map(renderHomeGroup)
+      .join("");
+  }
+
+  /* =================================================
+     HOME GROUPS: IMAGE FALLBACK
+  ================================================= */
+
+  function handleHomeGroupsImageError(event) {
+    const image = event.target;
+
+    if (
+      !(image instanceof HTMLImageElement) ||
+      image.dataset.homeGroupImage !== "true"
+    ) {
+      return;
+    }
+
+    const fallback = document.createElement("span");
+    fallback.className = "Message-model-home-group-avatar-fallback";
+    fallback.textContent = "G";
+    fallback.setAttribute("aria-hidden", "true");
+    image.replaceWith(fallback);
+  }
+
+  /* =================================================
+     HOME GROUPS: LOAD FROM group-api
+  ================================================= */
+
+  function loadHomeGroups() {
+    const container = getHomeGroupsList();
+
+    if (!container) {
+      return Promise.resolve([]);
+    }
+
+    if (homeGroupsRequest) {
+      return homeGroupsRequest;
+    }
+
+    renderHomeGroupsMessage("Loading groups…", "loading");
+
+    if (container.dataset.homeGroupsErrorBound !== "true") {
+      container.dataset.homeGroupsErrorBound = "true";
+      container.addEventListener(
+        "error",
+        handleHomeGroupsImageError,
+        true
+      );
+    }
+
+    homeGroupsRequest = (async function () {
+      try {
+        const result = await callGroupAPI("list_my_groups");
+        const groups = normalizeHomeGroups(result.groups);
+
+        renderHomeGroups(groups);
+
+        console.log(
+          "U9 Message Home: Groups loaded.",
+          { count: groups.length }
+        );
+
+        return groups;
+      } catch (error) {
+        console.error(
+          "U9 Message Home: Failed to load groups.",
+          error
+        );
+
+        if (
+          error?.status === 401 ||
+          /authentication required|invalid session|session expired|unauthorized/i.test(
+            String(error?.message || "")
+          )
+        ) {
+          renderHomeGroupsMessage(
+            "Please sign in again to load your groups.",
+            "error"
+          );
+        } else {
+          renderHomeGroupsMessage(
+            "Could not load groups. Please try again.",
+            "error"
+          );
+        }
+
+        return [];
+      } finally {
+        homeGroupsRequest = null;
+      }
+    })();
+
+    return homeGroupsRequest;
+  }
+
+  /* =================================================
      MODAL ELEMENTS
   ================================================= */
 
@@ -1123,10 +1486,11 @@
     hideAllMessagePages();
 
     /*
-     * Load home friends whenever the user returns to
-     * Message home. Groups remain unchanged.
+     * Refresh both friends and joined groups whenever
+     * the user opens or returns to Message home.
      */
     loadHomeFriends();
+    loadHomeGroups();
 
     return true;
   }
@@ -1711,6 +2075,10 @@
 
   window.refreshMessageHomeFriends = function () {
     return loadHomeFriends();
+  };
+
+  window.refreshMessageHomeGroups = function () {
+    return loadHomeGroups();
   };
 
   window.getCurrentMessageChatUser = function () {
