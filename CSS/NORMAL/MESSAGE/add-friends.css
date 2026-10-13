@@ -1,1 +1,368 @@
+/* =========================================================
+   U9 MESSAGE - ADD FRIEND PAGE
+   Green background.
+   Scoped only to Add Friend page.
+========================================================= */
 
+#Message-model-add-friends-page {
+  box-sizing: border-box;
+  min-height: 480px;
+  padding: 22px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: linear-gradient(
+    135deg,
+    #e8f9ed 0%,
+    #c9f0d3 55%,
+    #a9e5bb 100%
+  );
+  border-radius: 14px;
+}
+
+#Message-model-add-friends-root {
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  color: #173d27;
+  font-family: inherit;
+}
+
+#Message-model-add-friends-root *,
+#Message-model-add-friends-root *::before,
+#Message-model-add-friends-root *::after {
+  box-sizing: border-box;
+}
+
+#Message-model-add-friends-root .u9-af-container {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+#Message-model-add-friends-root .u9-af-heading {
+  margin: 0 0 6px;
+  color: #155b31;
+  font-size: 25px;
+  line-height: 1.3;
+  font-weight: 750;
+}
+
+#Message-model-add-friends-root .u9-af-subtitle {
+  margin: 0;
+  color: #497458;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+#Message-model-add-friends-root .u9-af-panel {
+  margin-top: 20px;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(46, 139, 76, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(30, 105, 53, 0.08);
+}
+
+#Message-model-add-friends-root .u9-af-label {
+  display: block;
+  margin: 0 0 8px;
+  color: #244b31;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+#Message-model-add-friends-root .u9-af-search-row {
+  display: flex;
+  align-items: stretch;
+  gap: 10px;
+}
+
+#Message-model-add-friends-root .u9-af-input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 11px 14px;
+  color: #203b29;
+  background: #fff;
+  border: 1px solid #bfddc7;
+  border-radius: 10px;
+  outline: none;
+  font: inherit;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#Message-model-add-friends-root .u9-af-input::placeholder {
+  color: #93a99a;
+}
+
+#Message-model-add-friends-root .u9-af-input:focus {
+  border-color: #26974d;
+  box-shadow: 0 0 0 3px rgba(38, 151, 77, 0.12);
+}
+
+#Message-model-add-friends-root .u9-af-textarea {
+  min-height: 82px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+#Message-model-add-friends-root .u9-af-button {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 17px;
+  color: #fff;
+  background: #258a46;
+  border: 1px solid #258a46;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.2s,
+    opacity 0.2s;
+}
+
+#Message-model-add-friends-root .u9-af-button:hover:not(:disabled) {
+  background: #176f35;
+  border-color: #176f35;
+}
+
+#Message-model-add-friends-root .u9-af-button:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+#Message-model-add-friends-root .u9-af-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+#Message-model-add-friends-root .u9-af-counter {
+  margin-top: 6px;
+  color: #789080;
+  font-size: 12px;
+  text-align: right;
+}
+
+#Message-model-add-friends-root .u9-af-feedback {
+  display: none;
+  margin-top: 14px;
+  padding: 11px 13px;
+  border-radius: 9px;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#Message-model-add-friends-root .u9-af-feedback.is-visible {
+  display: block;
+}
+
+#Message-model-add-friends-root .u9-af-feedback.is-info {
+  color: #245b35;
+  background: #edf8ef;
+  border: 1px solid #d3ecd8;
+}
+
+#Message-model-add-friends-root .u9-af-feedback.is-success {
+  color: #176b34;
+  background: #e3f8e9;
+  border: 1px solid #b9e7c5;
+}
+
+#Message-model-add-friends-root .u9-af-feedback.is-error {
+  color: #9c2929;
+  background: #fff0f0;
+  border: 1px solid #f4cccc;
+}
+
+#Message-model-add-friends-root .u9-af-results-heading {
+  margin: 25px 0 12px;
+  color: #205a32;
+  font-size: 16px;
+  font-weight: 750;
+}
+
+#Message-model-add-friends-root .u9-af-results-status {
+  margin: 0;
+  padding: 15px;
+  color: #5a7963;
+  font-size: 13px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+#Message-model-add-friends-root .u9-af-results {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+#Message-model-add-friends-root .u9-af-user-card {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #d6ebdc;
+  border-radius: 13px;
+  box-shadow: 0 3px 10px rgba(26, 94, 46, 0.04);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+#Message-model-add-friends-root .u9-af-user-card:hover {
+  border-color: #a5d9b4;
+  box-shadow: 0 5px 16px rgba(26, 94, 46, 0.08);
+}
+
+#Message-model-add-friends-root .u9-af-avatar-wrap {
+  position: relative;
+  flex: 0 0 54px;
+  width: 54px;
+  height: 54px;
+}
+
+#Message-model-add-friends-root .u9-af-avatar {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #edf4ef;
+  transform: translate(-50%, -50%);
+}
+
+#Message-model-add-friends-root .u9-af-frame {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: 50%;
+  display: block;
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+#Message-model-add-friends-root .u9-af-user-details {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#Message-model-add-friends-root .u9-af-username {
+  margin: 0;
+  color: #214c30;
+  font-size: 15px;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+#Message-model-add-friends-root .u9-af-account {
+  margin: 5px 0 0;
+  color: #72907b;
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+#Message-model-add-friends-root .u9-af-user-action {
+  flex: 0 0 auto;
+}
+
+#Message-model-add-friends-root .u9-af-request-button {
+  min-width: 112px;
+  min-height: 38px;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+#Message-model-add-friends-root .u9-af-request-button.is-complete {
+  color: #39704a;
+  background: #edf7ef;
+  border-color: #d6e9da;
+}
+
+#Message-model-add-friends-root .u9-af-request-button.is-complete:hover {
+  color: #39704a;
+  background: #edf7ef;
+  border-color: #d6e9da;
+}
+
+@media (max-width: 600px) {
+  #Message-model-add-friends-page {
+    min-height: 420px;
+    padding: 13px;
+    border-radius: 10px;
+  }
+
+  #Message-model-add-friends-root .u9-af-heading {
+    font-size: 22px;
+  }
+
+  #Message-model-add-friends-root .u9-af-panel {
+    margin-top: 16px;
+    padding: 15px;
+    border-radius: 13px;
+  }
+
+  #Message-model-add-friends-root .u9-af-search-row {
+    gap: 7px;
+  }
+
+  #Message-model-add-friends-root .u9-af-search-row .u9-af-button {
+    padding: 10px 13px;
+  }
+
+  #Message-model-add-friends-root .u9-af-user-card {
+    gap: 9px;
+    padding: 10px;
+  }
+
+  #Message-model-add-friends-root .u9-af-avatar-wrap {
+    flex-basis: 48px;
+    width: 48px;
+    height: 48px;
+  }
+
+  #Message-model-add-friends-root .u9-af-avatar {
+    width: 38px;
+    height: 38px;
+  }
+
+  #Message-model-add-friends-root .u9-af-frame {
+    width: 48px;
+    height: 48px;
+  }
+
+  #Message-model-add-friends-root .u9-af-request-button {
+    min-width: 88px;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  #Message-model-add-friends-root .u9-af-user-card {
+    flex-wrap: wrap;
+  }
+
+  #Message-model-add-friends-root .u9-af-user-action {
+    width: 100%;
+    padding-left: 57px;
+  }
+
+  #Message-model-add-friends-root .u9-af-request-button {
+    width: 100%;
+  }
+}
