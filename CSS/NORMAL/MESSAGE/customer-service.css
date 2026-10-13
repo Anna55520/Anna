@@ -499,7 +499,7 @@
   }
 
   #Message-model-customer-service-root .u9-cs-row-button {
-    width: 100%;
+    width: calc(100% - 47px);
     min-height: 36px;
     margin-left: 47px;
   }
