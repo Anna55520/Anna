@@ -1042,6 +1042,22 @@
             Group ID: ${escapeHTML(group.id)}
           </div>
         </div>
+
+        <button
+          class="Message-model-home-group-chat"
+          type="button"
+          data-home-chat-group-id="${escapeHTML(group.id)}"
+          aria-label="Open group chat with ${escapeHTML(group.name)}"
+          title="Open Group Chat"
+        >
+          <img
+            class="Message-model-home-group-chat-icon"
+            src="/SSVG/account/account-edit-button.svg"
+            alt=""
+            aria-hidden="true"
+            draggable="false"
+          >
+        </button>
       </article>
     `;
   }
@@ -1067,6 +1083,54 @@
     container.innerHTML = homeGroups
       .map(renderHomeGroup)
       .join("");
+  }
+
+  /* =================================================
+     HOME GROUPS: OPEN GROUP CHAT
+
+     Uses the existing Chat Page through normal-message.js.
+     The selected group UUID is never passed as a friend ID.
+  ================================================= */
+
+  function handleHomeGroupsClick(event) {
+    const button = event.target.closest("[data-home-chat-group-id]");
+
+    if (!button) {
+      return;
+    }
+
+    const groupId = String(button.dataset.homeChatGroupId || "");
+    const group = homeGroups.find(function (item) {
+      return String(item.id) === groupId;
+    });
+
+    if (!group) {
+      console.warn("U9 Message Home: Group was not found.", groupId);
+      return;
+    }
+
+    if (typeof window.openMessageGroupChat !== "function") {
+      console.error(
+        "U9 Message Home: openMessageGroupChat() is unavailable."
+      );
+      return;
+    }
+
+    // Message home should be the return destination when Back is pressed.
+    window.messageChatReturnPage = null;
+
+    const opened = window.openMessageGroupChat({
+      groupId: group.id,
+      group: group,
+      membership: {
+        role: group.role,
+        status: group.status
+      }
+    });
+
+    if (!opened) {
+      console.error("U9 Message Home: Could not open group chat.", groupId);
+    }
   }
 
   /* =================================================
@@ -1106,6 +1170,11 @@
     }
 
     renderHomeGroupsMessage("Loading groups…", "loading");
+
+    if (container.dataset.homeGroupsClickBound !== "true") {
+      container.dataset.homeGroupsClickBound = "true";
+      container.addEventListener("click", handleHomeGroupsClick);
+    }
 
     if (container.dataset.homeGroupsErrorBound !== "true") {
       container.dataset.homeGroupsErrorBound = "true";
