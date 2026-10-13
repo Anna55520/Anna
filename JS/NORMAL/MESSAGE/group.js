@@ -585,17 +585,32 @@
   }
 
   function openGroupChat(groupId) {
-    const group = myGroups.find((item) => String((item.group || item).id) === String(groupId));
-    const detail = {
-      groupId,
-      group: group?.group || group || null
-    };
+    const groupIdValue = String(groupId || "").trim();
+    const item = myGroups.find((entry) => String((entry.group || entry).id) === groupIdValue);
+    const group = item?.group || item || null;
 
-    // Integration hook for chat.js when group-chat support is added.
-    window.dispatchEvent(new CustomEvent("u9:open-group-chat", { detail }));
+    if (!groupIdValue) {
+      setNotice("Cannot open group chat: group ID is missing.", "error");
+      return;
+    }
 
-    // Current chat.js is 1:1 only. Do not silently pass a group to it.
-    setNotice("You are a member of this group. Group chat will open after group support is added to chat.js.");
+    if (typeof window.openMessageGroupChat !== "function") {
+      setNotice("Chat page is not ready. Refresh the page and try again.", "error");
+      console.error("U9 Group: normal-message.js has not registered the group chat bridge.");
+      return;
+    }
+
+    setNotice();
+
+    // Keep the documented integration event, which normal-message.js
+    // routes into the existing Chat Page using group-chat mode.
+    window.dispatchEvent(new CustomEvent("u9:open-group-chat", {
+      detail: {
+        groupId: groupIdValue,
+        group,
+        membership: item?.membership || null
+      }
+    }));
   }
 
   function bindEvents() {
