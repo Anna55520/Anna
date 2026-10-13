@@ -1678,22 +1678,33 @@
     const avatarFrameURL =
       getUserAvatarFrameURL(user);
 
+    const chatType = String(
+      user.type ||
+      (user.group_id || user.groupId ? "group" : "friend")
+    );
+
+    const chatTargetId = String(
+      user.id ||
+      user.user_id ||
+      user.group_id ||
+      user.groupId ||
+      user.conversation_id
+    );
+
     currentChatUser = {
-      id: String(
-        user.id ||
-        user.user_id ||
-        user.group_id ||
-        user.conversation_id
-      ),
+      id: chatTargetId,
+      group_id: chatType === "group"
+        ? String(user.group_id || user.groupId || chatTargetId)
+        : null,
 
       name: String(
         user.name ||
         user.username ||
         user.group_name ||
         (
-          user.type === "customer_service"
+          chatType === "customer_service"
             ? "Customer Service"
-            : user.type === "group"
+            : chatType === "group"
               ? "Group"
               : "User"
         )
@@ -1728,7 +1739,7 @@
         )
       ),
 
-      type: user.type || "friend",
+      type: chatType,
 
       conversationId:
         user.conversationId ||
@@ -1802,6 +1813,68 @@
     );
 
     return true;
+  }
+
+  /* =================================================
+     GROUP CHAT BRIDGE
+
+     group.js emits u9:open-group-chat with a group ID and
+     group details. Route that event through the existing
+     Chat Page instead of creating a second modal.
+  ================================================= */
+
+  function openMessageGroupChat(detail) {
+    const input = detail && typeof detail === "object"
+      ? detail
+      : {};
+
+    const group = input.group && typeof input.group === "object"
+      ? input.group
+      : input;
+
+    const groupId = String(
+      input.groupId ||
+      input.group_id ||
+      group.id ||
+      ""
+    ).trim();
+
+    if (!groupId) {
+      console.warn("U9 Message: Cannot open group chat without a group ID.");
+      return false;
+    }
+
+    return openMessageChat({
+      id: groupId,
+      group_id: groupId,
+      group_name: group.name || input.group_name || "Group",
+      name: group.name || input.group_name || "Group",
+      description: group.description || "",
+      avatar_url: group.avatar_url || "",
+      type: "group",
+      status: "Group chat",
+      metadata: {
+        group_id: groupId,
+        role: input.membership?.role || input.role || null
+      }
+    });
+  }
+
+  function handleOpenGroupChatEvent(event) {
+    const opened = openMessageGroupChat(event?.detail);
+
+    if (!opened) {
+      console.error("U9 Message: Group chat could not be opened.");
+    }
+  }
+
+  function bindGroupChatEvents() {
+    if (window.__U9MessageGroupChatEventBound) {
+      return;
+    }
+
+    window.__U9MessageGroupChatEventBound = true;
+    window.addEventListener("u9:open-group-chat", handleOpenGroupChatEvent);
   }
 
   /* =================================================
@@ -2071,6 +2144,7 @@
   window.switchMessagePage = switchMessagePage;
 
   window.openMessageChat = openMessageChat;
+  window.openMessageGroupChat = openMessageGroupChat;
   window.closeMessageChat = closeMessageChat;
 
   window.refreshMessageHomeFriends = function () {
@@ -2103,6 +2177,7 @@
     messageInitialized = true;
 
     bindHomeFriendsEvents();
+    bindGroupChatEvents();
     initializeMessageNavigation();
     registerMessageWindowManager();
 
