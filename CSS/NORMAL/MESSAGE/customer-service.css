@@ -1,1 +1,517 @@
+/* =========================================================
+   U9 MESSAGE â€” CUSTOMER SERVICE PAGE
+   File: CSS/NORMAL/MESSAGE/customer-service.css
 
+   Scope: Customer Service page content only.
+   The shared Message modal and Chat Page remain styled by
+   normal-message.css and chat.css.
+========================================================= */
+
+#Message-model-customer-service-root {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  color: #202938;
+  font-family: inherit;
+}
+
+#Message-model-customer-service-root *,
+#Message-model-customer-service-root *::before,
+#Message-model-customer-service-root *::after {
+  box-sizing: border-box;
+}
+
+#Message-model-customer-service-root .u9-cs-page {
+  width: 100%;
+  max-width: 980px;
+  min-height: 100%;
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 30px);
+  background: #f6f8fb;
+}
+
+#Message-model-customer-service-root .u9-cs-hero {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+  margin: 0 0 22px;
+}
+
+#Message-model-customer-service-root .u9-cs-hero-icon {
+  display: flex;
+  flex: 0 0 54px;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border: 1px solid #d9e7f8;
+  border-radius: 16px;
+  background: #e8f2ff;
+}
+
+#Message-model-customer-service-root .u9-cs-hero-icon img {
+  display: block;
+  width: 27px;
+  height: 27px;
+  object-fit: contain;
+}
+
+#Message-model-customer-service-root .u9-cs-hero-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#Message-model-customer-service-root .u9-cs-eyebrow {
+  margin: 0 0 5px;
+  color: #5482b8;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  line-height: 1.3;
+}
+
+#Message-model-customer-service-root .u9-cs-title {
+  margin: 0;
+  color: #172335;
+  font-size: clamp(21px, 3vw, 27px);
+  font-weight: 750;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+#Message-model-customer-service-root .u9-cs-subtitle {
+  margin: 7px 0 0;
+  color: #748196;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+#Message-model-customer-service-root .u9-cs-primary-button,
+#Message-model-customer-service-root .u9-cs-secondary-button,
+#Message-model-customer-service-root .u9-cs-row-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 15px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, transform 0.18s ease, opacity 0.18s ease;
+}
+
+#Message-model-customer-service-root .u9-cs-primary-button {
+  flex: 0 0 auto;
+  background: #367fe4;
+  color: #fff;
+  box-shadow: 0 5px 13px rgba(54, 127, 228, 0.16);
+}
+
+#Message-model-customer-service-root .u9-cs-primary-button:hover {
+  background: #286fd1;
+}
+
+#Message-model-customer-service-root .u9-cs-secondary-button {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 8px 12px;
+  border-color: #dce4ef;
+  background: #fff;
+  color: #526176;
+}
+
+#Message-model-customer-service-root .u9-cs-secondary-button:hover {
+  border-color: #b7cce7;
+  background: #f8fbff;
+}
+
+#Message-model-customer-service-root .u9-cs-row-button {
+  flex: 0 0 auto;
+  min-height: 35px;
+  padding: 8px 11px;
+  border-color: #d8e6f8;
+  background: #eff6ff;
+  color: #2d69b5;
+  white-space: nowrap;
+}
+
+#Message-model-customer-service-root .u9-cs-row-button:hover {
+  border-color: #a8c9f2;
+  background: #e2efff;
+}
+
+#Message-model-customer-service-root button:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+#Message-model-customer-service-root button:focus-visible {
+  outline: 3px solid rgba(54, 127, 228, 0.32);
+  outline-offset: 2px;
+}
+
+#Message-model-customer-service-root .u9-cs-notice {
+  margin: 0 0 16px;
+  padding: 11px 13px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+#Message-model-customer-service-root .u9-cs-notice[hidden] {
+  display: none !important;
+}
+
+#Message-model-customer-service-root .u9-cs-notice.is-info {
+  border-color: #d4e6fb;
+  background: #eff7ff;
+  color: #325f91;
+}
+
+#Message-model-customer-service-root .u9-cs-notice.is-success {
+  border-color: #c9eadb;
+  background: #effaf4;
+  color: #236e48;
+}
+
+#Message-model-customer-service-root .u9-cs-notice.is-error {
+  border-color: #f4d1d1;
+  background: #fff3f3;
+  color: #a62c2c;
+}
+
+#Message-model-customer-service-root .u9-cs-start-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 0 22px;
+  padding: clamp(17px, 3vw, 25px);
+  border: 1px solid #dce9fa;
+  border-radius: 17px;
+  background: linear-gradient(135deg, #eef6ff 0%, #fff 78%);
+  box-shadow: 0 6px 20px rgba(36, 76, 125, 0.045);
+}
+
+#Message-model-customer-service-root .u9-cs-start-copy {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+}
+
+#Message-model-customer-service-root .u9-cs-status-dot {
+  display: block;
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  margin-top: 7px;
+  border-radius: 50%;
+  background: #20b26b;
+  box-shadow: 0 0 0 4px rgba(32, 178, 107, 0.12);
+}
+
+#Message-model-customer-service-root .u9-cs-start-card h3 {
+  margin: 0;
+  color: #1d2d42;
+  font-size: 17px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+#Message-model-customer-service-root .u9-cs-start-card p {
+  margin: 6px 0 0;
+  color: #6e7e92;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+#Message-model-customer-service-root .u9-cs-panel {
+  margin: 0 0 20px;
+  padding: clamp(16px, 2.6vw, 22px);
+  border: 1px solid #e5eaf1;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 5px 16px rgba(25, 45, 73, 0.035);
+}
+
+#Message-model-customer-service-root .u9-cs-panel[hidden] {
+  display: none !important;
+}
+
+#Message-model-customer-service-root .u9-cs-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 0 0 15px;
+}
+
+#Message-model-customer-service-root .u9-cs-panel-header h3 {
+  margin: 0;
+  color: #213047;
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+#Message-model-customer-service-root .u9-cs-panel-header p:not(.u9-cs-eyebrow) {
+  margin: 5px 0 0;
+  color: #7a8798;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+#Message-model-customer-service-root .u9-cs-count {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 29px;
+  height: 29px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #edf4fd;
+  color: #376ba9;
+  font-size: 12px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+#Message-model-customer-service-root .u9-cs-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  min-width: 0;
+}
+
+#Message-model-customer-service-root .u9-cs-conversation-row {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  padding: 13px;
+  border: 1px solid #edf0f5;
+  border-radius: 12px;
+  background: #fff;
+  transition: border-color 0.18s ease, background-color 0.18s ease;
+}
+
+#Message-model-customer-service-root .u9-cs-conversation-row:hover {
+  border-color: #d9e6f6;
+  background: #fbfdff;
+}
+
+#Message-model-customer-service-root .u9-cs-conversation-avatar {
+  display: flex;
+  flex: 0 0 42px;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid #d7e7fa;
+  border-radius: 13px;
+  background: #eef6ff;
+  color: #3972b7;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+#Message-model-customer-service-root .u9-cs-conversation-details {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#Message-model-customer-service-root .u9-cs-conversation-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px 9px;
+  min-width: 0;
+}
+
+#Message-model-customer-service-root .u9-cs-conversation-title-row h4 {
+  margin: 0;
+  color: #26364c;
+  font-size: 13px;
+  font-weight: 750;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+#Message-model-customer-service-root .u9-cs-status-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 22px;
+  padding: 4px 7px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+#Message-model-customer-service-root .u9-cs-status-pill.is-open {
+  border-color: #f3e2b4;
+  background: #fff8e5;
+  color: #916615;
+}
+
+#Message-model-customer-service-root .u9-cs-status-pill.is-assigned {
+  border-color: #c9e9d8;
+  background: #eefaf3;
+  color: #2a7b4d;
+}
+
+#Message-model-customer-service-root .u9-cs-status-pill.is-closed {
+  border-color: #e0e4eb;
+  background: #f3f5f8;
+  color: #737d8c;
+}
+
+#Message-model-customer-service-root .u9-cs-conversation-meta,
+#Message-model-customer-service-root .u9-cs-conversation-id {
+  margin: 5px 0 0;
+  color: #7d899a;
+  font-size: 11px;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+#Message-model-customer-service-root .u9-cs-agent-panel {
+  border-color: #d9e5f5;
+}
+
+#Message-model-customer-service-root .u9-cs-agent-avatar {
+  border-color: #d3e6dc;
+  background: #eef8f2;
+  color: #2f7b52;
+}
+
+#Message-model-customer-service-root .u9-cs-footnote {
+  margin: 0;
+  padding: 2px 3px 8px;
+  color: #8a95a5;
+  font-size: 11px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+#Message-model-customer-service-root .u9-cs-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 115px;
+  padding: 20px 14px;
+  border: 1px dashed #dfe6ef;
+  border-radius: 12px;
+  background: #fbfcfe;
+  color: #8390a2;
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+#Message-model-customer-service-root .u9-cs-empty strong {
+  color: #637287;
+  font-size: 13px;
+}
+
+#Message-model-customer-service-root .u9-cs-empty-icon {
+  color: #6a94c7;
+  font-size: 24px;
+  line-height: 1;
+}
+
+@media (max-width: 640px) {
+  #Message-model-customer-service-root .u9-cs-page {
+    padding: 15px 12px 20px;
+  }
+
+  #Message-model-customer-service-root .u9-cs-hero {
+    align-items: flex-start;
+    gap: 11px;
+    margin-bottom: 17px;
+  }
+
+  #Message-model-customer-service-root .u9-cs-hero-icon {
+    flex-basis: 43px;
+    width: 43px;
+    height: 43px;
+    border-radius: 13px;
+  }
+
+  #Message-model-customer-service-root .u9-cs-hero-icon img {
+    width: 23px;
+    height: 23px;
+  }
+
+  #Message-model-customer-service-root .u9-cs-subtitle {
+    font-size: 12px;
+  }
+
+  #Message-model-customer-service-root .u9-cs-refresh {
+    min-height: 33px;
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+
+  #Message-model-customer-service-root .u9-cs-start-card {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 16px;
+    padding: 17px;
+  }
+
+  #Message-model-customer-service-root .u9-cs-primary-button {
+    width: 100%;
+  }
+
+  #Message-model-customer-service-root .u9-cs-conversation-row {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 11px;
+  }
+
+  #Message-model-customer-service-root .u9-cs-conversation-avatar {
+    flex-basis: 37px;
+    width: 37px;
+    height: 37px;
+    border-radius: 11px;
+  }
+
+  #Message-model-customer-service-root .u9-cs-conversation-details {
+    flex-basis: calc(100% - 50px);
+  }
+
+  #Message-model-customer-service-root .u9-cs-row-button {
+    width: 100%;
+    min-height: 36px;
+    margin-left: 47px;
+  }
+
+  #Message-model-customer-service-root .u9-cs-panel-header {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #Message-model-customer-service-root * {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
