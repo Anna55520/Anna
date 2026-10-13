@@ -412,24 +412,35 @@
         state.currentUserId = readCurrentUserId();
         setNotice("", "");
 
+        // Check the signed-in user's agent role first. Ordinary customers receive
+        // { is_agent: false } and never call the agent-only queue endpoint, avoiding
+        // an expected-but-noisy 403 in the browser console.
         try {
-          const agentResult = await callCustomerServiceAPI("list_agent_conversations", {
-            status: "active",
-            limit: 100
-          });
-          state.isAgent = true;
-          state.agentConversations = Array.isArray(agentResult.conversations) ? agentResult.conversations : [];
-          setAgentNotice("", "");
-        } catch (agentError) {
-          if (agentError.status === 403) {
-            // Expected for a regular user who is not a configured support agent.
-            state.isAgent = false;
-            state.agentConversations = [];
+          const agentStatus = await callCustomerServiceAPI("get_my_agent_status", {});
+          state.isAgent = agentStatus.is_agent === true;
+
+          if (state.isAgent) {
+            try {
+              const agentResult = await callCustomerServiceAPI("list_agent_conversations", {
+                status: "active",
+                limit: 100
+              });
+              state.agentConversations = Array.isArray(agentResult.conversations) ? agentResult.conversations : [];
+              setAgentNotice("", "");
+            } catch (agentError) {
+              console.warn("U9 Customer Service: Agent queue unavailable.", agentError);
+              state.agentConversations = [];
+              if (agentError.status === 403) state.isAgent = false;
+            }
           } else {
-            console.warn("U9 Customer Service: Agent queue unavailable.", agentError);
-            state.isAgent = false;
             state.agentConversations = [];
+            setAgentNotice("", "");
           }
+        } catch (agentStatusError) {
+          // A failed status check must not block a customer's own support history.
+          console.warn("U9 Customer Service: Could not check agent status; agent workspace hidden.", agentStatusError);
+          state.isAgent = false;
+          state.agentConversations = [];
         }
 
         updateAllViews();
