@@ -1278,6 +1278,54 @@
   line-height: 1.35;
 }
 
+/* Group chat button: uses the requested existing SVG resource. */
+#Message-model-groups-list .Message-model-home-group-chat {
+  display: inline-flex;
+  flex: 0 0 38px;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #e5e9f2;
+  border-radius: 10px;
+  background: #f5f7fc;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+
+#Message-model-groups-list .Message-model-home-group-chat-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+#Message-model-groups-list .Message-model-home-group-chat:hover {
+  border-color: #cbdcf5;
+  background: #eaf2ff;
+  box-shadow: 0 2px 7px rgb(45 92 160 / 9%);
+}
+
+#Message-model-groups-list .Message-model-home-group-chat:active {
+  transform: scale(0.94);
+  box-shadow: none;
+}
+
+#Message-model-groups-list .Message-model-home-group-chat:focus-visible {
+  outline: 2px solid #78ace9;
+  outline-offset: 3px;
+}
+
 #Message-model-groups-list .Message-model-home-groups-state {
   margin: 0;
   padding: 16px 14px;
@@ -1323,10 +1371,28 @@
   #Message-model-groups-list .Message-model-home-group-id {
     font-size: 9px;
   }
+
+  #Message-model-groups-list .Message-model-home-group-chat {
+    flex-basis: 35px;
+    width: 35px;
+    height: 35px;
+    min-width: 35px;
+    border-radius: 9px;
+  }
+
+  #Message-model-groups-list .Message-model-home-group-chat-icon {
+    width: 21px;
+    height: 21px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #Message-model-groups-list .Message-model-home-group-row {
+  #Message-model-groups-list .Message-model-home-group-row,
+  #Message-model-groups-list .Message-model-home-group-chat {
     transition: none;
+  }
+
+  #Message-model-groups-list .Message-model-home-group-chat:active {
+    transform: none;
   }
 }
