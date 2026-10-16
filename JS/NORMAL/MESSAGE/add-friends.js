@@ -1,73 +1,355 @@
+
 /* =========================================================
-   U9 MESSAGE — ADD FRIEND
+   U9 MESSAGE - ADD FRIEND PAGE
    File: JS/NORMAL/MESSAGE/add-friends.js
 
-   Uses existing Supabase Edge Function: message-api
+   Uses existing Supabase Edge Function:
+   message-api
 
-   Actions:
-   - search_users          (Account only; exact 6-character account)
+   Supported actions:
+   - search_users
    - send_friend_request
+   - list_friends
    - list_friend_requests
    - respond_friend_request
 
-   UI behavior:
-   - No standalone "Search Results" heading/panel
-   - No standalone "Received Requests" panel
-   - Search results appear directly below the account search form
-   - Sent Requests panel remains
-   - "观看" button is intentionally inert
-
-   Does not modify:
-   - normal-message.js
+   This file only manages Add Friend page content.
+   It does not manage:
+   - Message modal
+   - navigation
+   - header
    - friends.js
    - chat.js
-   - profile/avatar modules
    ========================================================= */
 
 (() => {
   "use strict";
 
-  if (window.U9AddFriendsModuleLoaded) return;
+  /*
+   * Prevent duplicate module initialization.
+   */
+  if (window.U9AddFriendsModuleLoaded) {
+    return;
+  }
+
   window.U9AddFriendsModuleLoaded = true;
 
   const MESSAGE_API_URL =
     "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/message-api";
 
-  const DEFAULT_AVATAR = "/SSVG/avatar/profile.svg";
-  const DEFAULT_FRAME = "/SSVG/avatar/ordinary.svg";
-  const ROOT_ID = "Message-model-add-friends-root";
+  const DEFAULT_AVATAR =
+    "/SSVG/avatar/profile.svg";
 
-  let initialized = false;
-  let requestBusy = false;
-  let searchResults = [];
-  let hasSearched = false;
+  const DEFAULT_AVATAR_FRAME =
+    "/SSVG/avatar/ordinary.svg";
 
-  let requestData = {
-    received: [],
-    sent: []
-  };
+  const ROOT_ID =
+    "Message-model-add-friends-root";
 
-  let searchSequence = 0;
-  let refreshSequence = 0;
+  const root = document.getElementById(ROOT_ID);
 
-  /* =========================================================
-     HELPERS
-  ========================================================= */
-
-  const escapeHTML = (value) =>
-    String(value ?? "").replace(/[&<>"']/g, (char) => ({
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#39;"
-    })[char]);
-
-  function getRoot() {
-    return document.getElementById(ROOT_ID);
+  if (!root) {
+    console.warn(
+      "U9 Add Friend: page root was not found."
+    );
+    return;
   }
 
-  function getSessionToken() {
+  /* =======================================================
+     STATE
+  ======================================================= */
+
+  const friendIds = new Set();
+
+  /*
+   * IDs of users that currently have an outgoing
+   * pending friend request.
+   */
+  const pendingRequestIds = new Set();
+
+  /*
+   * Received pending requests.
+   *
+   * Key:
+   *   sender user id
+   *
+   * Value:
+   *   complete request object
+   */
+  const receivedRequests = new Map();
+
+  let displayedUsers = [];
+
+  let isSearching = false;
+  let requestBusy = false;
+  let relationshipLoading = false;
+
+  /* =======================================================
+     PAGE CONTENT
+  ======================================================= */
+
+  root.innerHTML = `
+    <div class="u9-af-container">
+
+      <header class="u9-af-header">
+        <h2 class="u9-af-heading">
+          Add Friend
+        </h2>
+
+        <p class="u9-af-subtitle">
+          Find people on U9 and send them a friend request.
+        </p>
+      </header>
+
+
+      <!-- =================================================
+           SEARCH
+      ================================================== -->
+
+      <section class="u9-af-panel">
+
+        <form id="u9-af-search-form">
+
+          <label
+            class="u9-af-label"
+            for="u9-af-search-input"
+          >
+            Username or Account
+          </label>
+
+          <div class="u9-af-search-row">
+
+            <input
+              id="u9-af-search-input"
+              class="u9-af-input"
+              type="search"
+              name="search"
+              maxlength="100"
+              autocomplete="off"
+              placeholder="Enter a username or account"
+              aria-label="Search username or account"
+              required
+            >
+
+            <button
+              id="u9-af-search-button"
+              class="u9-af-button"
+              type="submit"
+            >
+              Search
+            </button>
+
+          </div>
+
+
+          <div style="height: 17px"></div>
+
+
+          <label
+            class="u9-af-label"
+            for="u9-af-initial-message"
+          >
+            Introduction (Optional)
+          </label>
+
+          <textarea
+            id="u9-af-initial-message"
+            class="u9-af-input u9-af-textarea"
+            maxlength="1000"
+            placeholder="Write a short message with your request..."
+          ></textarea>
+
+          <div
+            id="u9-af-message-counter"
+            class="u9-af-counter"
+          >
+            0 / 1000
+          </div>
+
+
+          <div
+            id="u9-af-feedback"
+            class="u9-af-feedback"
+            role="status"
+            aria-live="polite"
+          ></div>
+
+        </form>
+
+      </section>
+
+
+      <!-- =================================================
+           SEARCH RESULTS
+      ================================================== -->
+
+      <section class="u9-af-results-section">
+
+        <h3 class="u9-af-results-heading">
+          Search Results
+        </h3>
+
+        <p
+          id="u9-af-results-status"
+          class="u9-af-results-status"
+          aria-live="polite"
+        >
+          Search by username or account to find someone.
+        </p>
+
+        <div
+          id="u9-af-results"
+          class="u9-af-results"
+        ></div>
+
+      </section>
+
+
+      <!-- =================================================
+           RECEIVED REQUESTS
+      ================================================== -->
+
+      <section
+        class="u9-af-requests-section"
+        aria-labelledby="u9-af-received-heading"
+      >
+
+        <div class="u9-af-requests-header">
+
+          <h3
+            id="u9-af-received-heading"
+            class="u9-af-results-heading"
+          >
+            Received Requests
+          </h3>
+
+          <span
+            id="u9-af-received-count"
+            class="u9-af-count"
+          >
+            0
+          </span>
+
+        </div>
+
+
+        <p
+          id="u9-af-received-status"
+          class="u9-af-results-status"
+          aria-live="polite"
+        >
+          Loading friend requests...
+        </p>
+
+
+        <div
+          id="u9-af-received"
+          class="u9-af-request-list"
+        ></div>
+
+      </section>
+
+
+      <!-- =================================================
+           SENT REQUESTS
+      ================================================== -->
+
+      <section
+        class="u9-af-requests-section"
+        aria-labelledby="u9-af-sent-heading"
+      >
+
+        <div class="u9-af-requests-header">
+
+          <h3
+            id="u9-af-sent-heading"
+            class="u9-af-results-heading"
+          >
+            Sent Requests
+          </h3>
+
+          <span
+            id="u9-af-sent-count"
+            class="u9-af-count"
+          >
+            0
+          </span>
+
+        </div>
+
+
+        <p
+          id="u9-af-sent-status"
+          class="u9-af-results-status"
+          aria-live="polite"
+        >
+          Loading friend requests...
+        </p>
+
+
+        <div
+          id="u9-af-sent"
+          class="u9-af-request-list"
+        ></div>
+
+      </section>
+
+    </div>
+  `;
+
+
+  /* =======================================================
+     ELEMENTS
+  ======================================================= */
+
+  const searchForm =
+    root.querySelector("#u9-af-search-form");
+
+  const searchInput =
+    root.querySelector("#u9-af-search-input");
+
+  const searchButton =
+    root.querySelector("#u9-af-search-button");
+
+  const initialMessageInput =
+    root.querySelector("#u9-af-initial-message");
+
+  const messageCounter =
+    root.querySelector("#u9-af-message-counter");
+
+  const feedback =
+    root.querySelector("#u9-af-feedback");
+
+  const resultsStatus =
+    root.querySelector("#u9-af-results-status");
+
+  const resultsContainer =
+    root.querySelector("#u9-af-results");
+
+  const receivedContainer =
+    root.querySelector("#u9-af-received");
+
+  const receivedStatus =
+    root.querySelector("#u9-af-received-status");
+
+  const receivedCount =
+    root.querySelector("#u9-af-received-count");
+
+  const sentContainer =
+    root.querySelector("#u9-af-sent");
+
+  const sentStatus =
+    root.querySelector("#u9-af-sent-status");
+
+  const sentCount =
+    root.querySelector("#u9-af-sent-count");
+
+
+  /* =======================================================
+     AUTHENTICATION
+  ======================================================= */
+
+  function getAuthToken() {
     const possibleKeys = [
       "u9_token",
       "u9_session",
@@ -77,1013 +359,1801 @@
 
     for (const key of possibleKeys) {
       try {
-        const value = localStorage.getItem(key);
+        const value =
+          localStorage.getItem(key);
 
-        if (value && value.trim()) {
+        if (
+          typeof value === "string" &&
+          value.trim()
+        ) {
           return value.trim();
         }
       } catch (_) {
-        // Storage may be unavailable; try the cookie below.
+        // Continue.
       }
-    }
-
-    try {
-      const match = document.cookie.match(
-        /(?:^|;\s*)u9_session=([^;]+)/
-      );
-
-      if (match?.[1]) {
-        return decodeURIComponent(match[1]);
-      }
-    } catch (_) {
-      // The API will report an authentication error if necessary.
     }
 
     return "";
   }
 
-  async function callMessageAPI(action, payload = {}) {
-    const token = getSessionToken();
 
+  /* =======================================================
+     MESSAGE API
+  ======================================================= */
+
+  async function callMessageAPI(
+    action,
+    payload = {}
+  ) {
     const headers = {
       "Content-Type": "application/json"
     };
 
+    const token = getAuthToken();
+
     if (token) {
-      headers.Authorization = `Bearer ${token}`;
+      headers.Authorization =
+        `Bearer ${token}`;
     }
 
     let response;
 
     try {
-      response = await fetch(MESSAGE_API_URL, {
-        method: "POST",
-        headers,
-        credentials: "include",
-        cache: "no-store",
-        body: JSON.stringify({
-          action,
-          ...payload
-        })
-      });
+      response = await fetch(
+        MESSAGE_API_URL,
+        {
+          method: "POST",
+          headers,
+          credentials: "include",
+          cache: "no-store",
+          body: JSON.stringify({
+            action,
+            ...payload
+          })
+        }
+      );
     } catch (error) {
-      console.error("U9 Add Friend network error:", error);
-
-      throw new Error(
-        "Network error. Please check your connection and try again."
-      );
-    }
-
-    let result;
-
-    try {
-      result = await response.json();
-    } catch (_) {
-      throw new Error(
-        `The server returned an invalid response (${response.status}).`
-      );
-    }
-
-    if (!response.ok || result?.success === false) {
-      throw new Error(
-        result?.error || `Request failed (${response.status}).`
-      );
-    }
-
-    return result;
-  }
-
-  function setNotice(message = "", type = "") {
-    const notice = getRoot()?.querySelector("#u9-af-notice");
-
-    if (!notice) return;
-
-    notice.textContent = message;
-    notice.className = "u9-af-notice";
-
-    if (type === "success") {
-      notice.classList.add("is-success");
-    }
-
-    if (type === "error") {
-      notice.classList.add("is-error");
-    }
-  }
-
-  function setButtonBusy(
-    button,
-    busy,
-    busyText = "Please wait…"
-  ) {
-    if (!button) return;
-
-    if (busy) {
-      if (!button.hasAttribute("data-original-text")) {
-        button.dataset.originalText = button.textContent;
-      }
-
-      button.textContent = busyText;
-      button.disabled = true;
-      return;
-    }
-
-    if (button.dataset.originalText !== undefined) {
-      button.textContent = button.dataset.originalText;
-      delete button.dataset.originalText;
-    }
-
-    button.disabled = false;
-  }
-
-  function normalizeAccount(value) {
-    return String(value ?? "")
-      .trim()
-      .toUpperCase();
-  }
-
-  function isValidAccount(value) {
-    return /^[A-Z][A-Z0-9]{5}$/.test(value);
-  }
-
-  /* =========================================================
-     AVATAR / AVATAR FRAME
-
-     Uses CSS/NORMAL/MESSAGE/add-friends.css
-
-     SVG locations:
-     - Default avatar: /SSVG/avatar/profile.svg
-     - Default frame:  /SSVG/avatar/ordinary.svg
-
-     The avatar/frame dimensions and positioning are controlled
-     by CSS, matching the proportions in friends.css.
-  ========================================================= */
-
-  function getAvatar(profile) {
-    const url = profile?.avatar_url;
-
-    return typeof url === "string" && url.trim()
-      ? url.trim()
-      : DEFAULT_AVATAR;
-  }
-
-  function getFrame(profile) {
-    const url = profile?.avatar_frame_url;
-
-    return typeof url === "string" && url.trim()
-      ? url.trim()
-      : DEFAULT_FRAME;
-  }
-
-  function avatarMarkup(profile = {}) {
-    const username = escapeHTML(profile.username || "User");
-    const avatar = escapeHTML(getAvatar(profile));
-    const frame = escapeHTML(getFrame(profile));
-
-    const fallbackAvatar = escapeHTML(DEFAULT_AVATAR);
-    const fallbackFrame = escapeHTML(DEFAULT_FRAME);
-
-    return `
-      <div class="u9-af-avatar-stack" aria-hidden="true">
-        <img
-          class="u9-af-avatar"
-          src="${avatar}"
-          alt="${username}"
-          loading="lazy"
-          onerror="this.onerror=null;this.src='${fallbackAvatar}'"
-        >
-
-        <img
-          class="u9-af-avatar-frame"
-          src="${frame}"
-          alt=""
-          loading="lazy"
-          onerror="this.onerror=null;this.src='${fallbackFrame}'"
-        >
-      </div>
-    `;
-  }
-
-  /* =========================================================
-     REQUEST STATUS
-  ========================================================= */
-
-  function statusMarkup(status) {
-    const value = String(status || "pending").toLowerCase();
-
-    const labels = {
-      pending: "Pending",
-      accepted: "Accepted",
-      rejected: "Rejected",
-      cancelled: "Cancelled"
-    };
-
-    return `
-      <span class="u9-af-status u9-af-status-${escapeHTML(value)}">
-        ${escapeHTML(labels[value] || value)}
-      </span>
-    `;
-  }
-
-  function hasPendingRequest(items, fieldName, userId) {
-    return (Array.isArray(items) ? items : []).some((request) =>
-      String(request?.[fieldName] ?? "") ===
-        String(userId ?? "") &&
-      String(request?.status ?? "").toLowerCase() === "pending"
-    );
-  }
-
-  /* =========================================================
-     PAGE HTML
-
-     No standalone Search Results panel.
-     No standalone Received Requests panel.
-     Search cards appear directly below the search form.
-  ========================================================= */
-
-  function renderShell() {
-    const root = getRoot();
-
-    if (!root) return false;
-
-    root.innerHTML = `
-      <div class="u9-af-page">
-
-        <header class="u9-af-header">
-          <h2 class="u9-af-heading">Add Friend</h2>
-
-          <p class="u9-af-subtitle">
-            Find people on U9 and send them a friend request.
-          </p>
-        </header>
-
-        <div
-          id="u9-af-notice"
-          class="u9-af-notice"
-          role="status"
-          aria-live="polite"
-        ></div>
-
-        <section
-          class="u9-af-panel"
-          aria-labelledby="u9-af-search-title"
-        >
-          <div class="u9-af-panel-heading">
-            <h3
-              class="u9-af-panel-title"
-              id="u9-af-search-title"
-            >
-              Search Users
-            </h3>
-          </div>
-
-          <form
-            id="u9-af-search-form"
-            class="u9-af-search-form"
-          >
-            <div>
-              <label
-                class="u9-af-label"
-                for="u9-af-account"
-              >
-                Account
-              </label>
-
-              <div class="u9-af-search-row">
-                <input
-                  id="u9-af-account"
-                  class="u9-af-input"
-                  name="account"
-                  type="text"
-                  placeholder="Enter 6-character account"
-                  maxlength="6"
-                  minlength="6"
-                  pattern="[A-Za-z][A-Za-z0-9]{5}"
-                  autocomplete="off"
-                  autocapitalize="characters"
-                  spellcheck="false"
-                  required
-                >
-
-                <button
-                  class="u9-af-search-button"
-                  id="u9-af-search-button"
-                  type="submit"
-                >Search</button>
-              </div>
-
-              <p class="u9-af-subtitle">
-                Search by Account only. Username search is disabled.
-              </p>
-            </div>
-
-            <div>
-              <label
-                class="u9-af-label"
-                for="u9-af-introduction"
-              >
-                Introduction (Optional)
-              </label>
-
-              <textarea
-                id="u9-af-introduction"
-                class="u9-af-textarea"
-                maxlength="1000"
-                placeholder="Write a short message with your request…"
-              ></textarea>
-
-              <span
-                class="u9-af-counter"
-                id="u9-af-intro-counter"
-              >0 / 1000</span>
-            </div>
-          </form>
-
-          <!-- Search results are displayed inline below the form. -->
-          <div
-            class="u9-af-list"
-            id="u9-af-results"
-            aria-live="polite"
-          >
-            <div class="u9-af-empty">
-              Enter an Account to find a U9 user.
-            </div>
-          </div>
-        </section>
-
-        <section
-          class="u9-af-panel"
-          aria-labelledby="u9-af-sent-title"
-        >
-          <div class="u9-af-panel-heading">
-            <h3
-              class="u9-af-panel-title"
-              id="u9-af-sent-title"
-            >
-              Sent Requests
-            </h3>
-
-            <span
-              class="u9-af-count"
-              id="u9-af-sent-count"
-            >0</span>
-          </div>
-
-          <div
-            class="u9-af-list"
-            id="u9-af-sent"
-          >
-            <div class="u9-af-empty">
-              Loading sent requests…
-            </div>
-          </div>
-        </section>
-
-      </div>
-    `;
-
-    return true;
-  }
-
-  /* =========================================================
-     SEARCH RESULT CARDS
-  ========================================================= */
-
-  function renderSearchResults() {
-    const root = getRoot();
-    const list = root?.querySelector("#u9-af-results");
-
-    if (!list) return;
-
-    if (!searchResults.length) {
-      list.innerHTML = hasSearched
-        ? `
-          <div class="u9-af-empty">
-            No user found with that Account.
-          </div>
-        `
-        : `
-          <div class="u9-af-empty">
-            Enter an Account to find a U9 user.
-          </div>
-        `;
-
-      return;
-    }
-
-    list.innerHTML = searchResults.map((user) => {
-      const id = escapeHTML(user.id);
-      const username = escapeHTML(user.username || "User");
-      const account = escapeHTML(user.account || "—");
-
-      const outgoingPending = hasPendingRequest(
-        requestData.sent,
-        "receiver_id",
-        user.id
-      );
-
-      const incomingPending = hasPendingRequest(
-        requestData.received,
-        "sender_id",
-        user.id
-      );
-
-      let requestButton;
-
-      if (outgoingPending) {
-        requestButton = `
-          <button
-            type="button"
-            class="u9-af-button u9-af-button-sent"
-            disabled
-          >
-            Request Sent
-          </button>
-        `;
-      } else if (incomingPending) {
-        /*
-         * The Received Requests section has been removed.
-         * Show the incoming status here to avoid treating it
-         * as a new outgoing request.
-         */
-        requestButton = `
-          <button
-            type="button"
-            class="u9-af-button u9-af-button-secondary"
-            disabled
-          >
-            Request Received
-          </button>
-        `;
-      } else {
-        requestButton = `
-          <button
-            type="button"
-            class="u9-af-button u9-af-button-primary"
-            data-action="send-request"
-            data-user-id="${id}"
-          >
-            Add Friend
-          </button>
-        `;
-      }
-
-      return `
-        <article
-          class="u9-af-user-card"
-          data-user-id="${id}"
-        >
-          ${avatarMarkup(user)}
-
-          <div class="u9-af-user-info">
-            <p class="u9-af-username">
-              ${username}
-            </p>
-
-            <p class="u9-af-account">
-              Account: ${account}
-            </p>
-          </div>
-
-          <div class="u9-af-card-actions">
-            ${requestButton}
-
-            <button
-              type="button"
-              class="u9-af-button u9-af-button-secondary"
-              data-action="view-user"
-              data-user-id="${id}"
-            >
-              观看
-            </button>
-          </div>
-        </article>
-      `;
-    }).join("");
-  }
-
-  /* =========================================================
-     SENT REQUESTS
-  ========================================================= */
-
-  function renderSentRequests() {
-    const root = getRoot();
-
-    const list = root?.querySelector("#u9-af-sent");
-    const count = root?.querySelector("#u9-af-sent-count");
-
-    if (!list || !count) return;
-
-    const sent = Array.isArray(requestData.sent)
-      ? requestData.sent
-      : [];
-
-    const pendingCount = sent.filter((item) =>
-      String(item?.status ?? "").toLowerCase() === "pending"
-    ).length;
-
-    count.textContent = String(pendingCount);
-
-    if (!sent.length) {
-      list.innerHTML = `
-        <div class="u9-af-empty">
-          You haven't sent any friend requests yet.
-        </div>
-      `;
-
-      return;
-    }
-
-    list.innerHTML = sent.map((request) => {
-      const profile = request?.receiver || {};
-      const status = String(
-        request?.status || "pending"
-      ).toLowerCase();
-
-      return `
-        <article class="u9-af-user-card">
-          ${avatarMarkup(profile)}
-
-          <div class="u9-af-user-info">
-            <p class="u9-af-username">
-              ${escapeHTML(profile.username || "User")}
-            </p>
-
-            <p class="u9-af-account">
-              Account: ${escapeHTML(profile.account || "—")}
-            </p>
-
-            ${
-              request?.initial_message
-                ? `
-                  <p class="u9-af-intro">
-                    ${escapeHTML(request.initial_message)}
-                  </p>
-                `
-                : ""
-            }
-          </div>
-
-          <div class="u9-af-card-actions">
-            ${statusMarkup(status)}
-          </div>
-        </article>
-      `;
-    }).join("");
-  }
-
-  /* =========================================================
-     LOAD FRIEND REQUEST DATA
-
-     Requests are loaded from the existing message-api.
-     Only Sent Requests are rendered as a separate panel.
-  ========================================================= */
-
-  async function loadFriendRequests(options = {}) {
-    const currentSequence = ++refreshSequence;
-
-    const root = getRoot();
-    const sentList = root?.querySelector("#u9-af-sent");
-
-    if (
-      !options.silent &&
-      sentList &&
-      requestData.sent.length === 0
-    ) {
-      sentList.innerHTML = `
-        <div class="u9-af-empty">
-          Loading sent requests…
-        </div>
-      `;
-    }
-
-    try {
-      const result = await callMessageAPI(
-        "list_friend_requests"
-      );
-
-      if (currentSequence !== refreshSequence) return;
-
-      requestData = {
-        received: Array.isArray(result?.received)
-          ? result.received
-          : [],
-
-        sent: Array.isArray(result?.sent)
-          ? result.sent
-          : []
-      };
-
-      renderSentRequests();
-      renderSearchResults();
-    } catch (error) {
-      if (currentSequence !== refreshSequence) return;
 
       console.error(
-        "U9 Add Friend: request list failed:",
+        "U9 Add Friend: Message API connection failed.",
         error
       );
 
-      if (sentList) {
-        sentList.innerHTML = `
-          <div class="u9-af-empty">
-            Could not load sent requests:
-            ${escapeHTML(error.message)}
-          </div>
-        `;
-      }
-
-      setNotice(error.message, "error");
-    }
-  }
-
-  /* =========================================================
-     ACCOUNT-ONLY SEARCH
-
-     message-api search_users accepts q.
-     Exact account filtering is enforced on the client.
-  ========================================================= */
-
-  async function searchByAccount(account) {
-    const normalized = normalizeAccount(account);
-
-    if (!isValidAccount(normalized)) {
       throw new Error(
-        "Enter a valid 6-character Account (first character must be a letter)."
+        "Could not connect to the Message API. Please check your connection and try again."
       );
     }
 
-    const currentSequence = ++searchSequence;
-    hasSearched = true;
 
-    const root = getRoot();
-
-    const list = root?.querySelector("#u9-af-results");
-    const button = root?.querySelector("#u9-af-search-button");
-
-    searchResults = [];
-
-    if (list) {
-      list.innerHTML = `
-        <div class="u9-af-empty">
-          Searching Account…
-        </div>
-      `;
-    }
-
-    setButtonBusy(button, true, "Searching…");
+    let data;
 
     try {
-      const result = await callMessageAPI(
-        "search_users",
-        {
-          q: normalized
-        }
+      data = await response.json();
+    } catch (_) {
+
+      throw new Error(
+        `The Message API returned an invalid response (${response.status}).`
       );
-
-      // Ignore an older response if another search has started.
-      if (currentSequence !== searchSequence) return;
-
-      const users = Array.isArray(result?.users)
-        ? result.users
-        : [];
-
-      // Only exact Account matches are displayed.
-      searchResults = users.filter(
-        (user) => normalizeAccount(user?.account) === normalized
-      );
-
-      renderSearchResults();
-
-      if (searchResults.length) {
-        setNotice(
-          `Found ${searchResults.length} user(s).`,
-          "success"
-        );
-      } else {
-        setNotice(
-          "No user found with that Account."
-        );
-      }
-    } finally {
-      if (currentSequence === searchSequence) {
-        setButtonBusy(button, false);
-      }
     }
+
+
+    if (
+      !response.ok ||
+      data?.success === false
+    ) {
+
+      throw new Error(
+        data?.error ||
+        `Request failed (${response.status}).`
+      );
+    }
+
+
+    return data;
   }
 
-  /* =========================================================
-     SEND FRIEND REQUEST
-  ========================================================= */
 
-  async function sendRequestForUser(userId, button) {
-    const user = searchResults.find(
-      (item) => String(item?.id) === String(userId)
+  /* =======================================================
+     FEEDBACK
+  ======================================================= */
+
+  function showFeedback(
+    message,
+    type = "info"
+  ) {
+    feedback.textContent =
+      message;
+
+    feedback.className =
+      "u9-af-feedback is-visible is-" +
+      type;
+  }
+
+
+  function clearFeedback() {
+    feedback.textContent = "";
+
+    feedback.className =
+      "u9-af-feedback";
+  }
+
+
+  function showResultsStatus(
+    message
+  ) {
+    resultsStatus.textContent =
+      message;
+
+    resultsStatus.hidden =
+      false;
+  }
+
+
+  function hideResultsStatus() {
+    resultsStatus.textContent = "";
+
+    resultsStatus.hidden =
+      true;
+  }
+
+
+  /* =======================================================
+     HELPERS
+  ======================================================= */
+
+  function normalizeId(id) {
+    return String(
+      id || ""
+    ).toLowerCase();
+  }
+
+
+  function formatDate(value) {
+    if (!value) {
+      return "";
+    }
+
+    const date =
+      new Date(value);
+
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
+      return "";
+    }
+
+    return date.toLocaleString();
+  }
+
+
+  function getSafeImageUrl(
+    value,
+    fallback
+  ) {
+    if (
+      typeof value !== "string"
+    ) {
+      return fallback;
+    }
+
+    const url =
+      value.trim();
+
+    if (!url) {
+      return fallback;
+    }
+
+    if (
+      /^https?:\/\//i.test(url) ||
+      (
+        url.startsWith("/") &&
+        !url.startsWith("//")
+      ) ||
+      /^data:image\//i.test(url)
+    ) {
+      return url;
+    }
+
+    return fallback;
+  }
+
+
+  /* =======================================================
+     AVATAR
+  ======================================================= */
+
+  function createAvatar(profile = {}) {
+
+    const wrapper =
+      document.createElement("div");
+
+    wrapper.className =
+      "u9-af-avatar-wrap";
+
+
+    const avatar =
+      document.createElement("img");
+
+    avatar.className =
+      "u9-af-avatar";
+
+    avatar.alt = "";
+
+    avatar.loading =
+      "lazy";
+
+    avatar.src =
+      getSafeImageUrl(
+        profile.avatar_url,
+        DEFAULT_AVATAR
+      );
+
+
+    avatar.onerror = () => {
+
+      if (
+        !avatar.dataset.fallbackApplied
+      ) {
+
+        avatar.dataset.fallbackApplied =
+          "true";
+
+        avatar.src =
+          DEFAULT_AVATAR;
+      }
+    };
+
+
+    const frame =
+      document.createElement("img");
+
+    frame.className =
+      "u9-af-frame";
+
+    frame.alt = "";
+
+    frame.setAttribute(
+      "aria-hidden",
+      "true"
     );
 
-    if (!user) {
-      throw new Error(
-        "User not found in the current search results."
+    frame.loading =
+      "lazy";
+
+    frame.src =
+      getSafeImageUrl(
+        profile.avatar_frame_url,
+        DEFAULT_AVATAR_FRAME
+      );
+
+
+    frame.onerror = () => {
+
+      if (
+        !frame.dataset.fallbackApplied
+      ) {
+
+        frame.dataset.fallbackApplied =
+          "true";
+
+        frame.src =
+          DEFAULT_AVATAR_FRAME;
+      }
+    };
+
+
+    wrapper.append(
+      avatar,
+      frame
+    );
+
+    return wrapper;
+  }
+
+
+  /* =======================================================
+     REQUEST STATE
+  ======================================================= */
+
+  function getRequestButtonState(
+    profile
+  ) {
+
+    const id =
+      normalizeId(profile?.id);
+
+
+    if (
+      friendIds.has(id)
+    ) {
+
+      return {
+        label: "Already Friends",
+        disabled: true,
+        complete: true
+      };
+    }
+
+
+    if (
+      pendingRequestIds.has(id)
+    ) {
+
+      return {
+        label: "Request Sent",
+        disabled: true,
+        complete: true
+      };
+    }
+
+
+    /*
+     * If this person has already sent us a request,
+     * do not create another request.
+     */
+    if (
+      receivedRequests.has(id)
+    ) {
+
+      return {
+        label: "Request Received",
+        disabled: true,
+        complete: true
+      };
+    }
+
+
+    if (!profile?.account) {
+
+      return {
+        label: "Unavailable",
+        disabled: true,
+        complete: true
+      };
+    }
+
+
+    return {
+      label: "Add Friend",
+      disabled: false,
+      complete: false
+    };
+  }
+
+
+  /* =======================================================
+     SEARCH RESULT CARD
+  ======================================================= */
+
+  function createUserCard(
+    profile
+  ) {
+
+    const card =
+      document.createElement("article");
+
+    card.className =
+      "u9-af-user-card";
+
+
+    card.appendChild(
+      createAvatar(profile)
+    );
+
+
+    const details =
+      document.createElement("div");
+
+    details.className =
+      "u9-af-user-details";
+
+
+    const username =
+      document.createElement("p");
+
+    username.className =
+      "u9-af-username";
+
+    username.textContent =
+      profile.username ||
+      "User";
+
+
+    const account =
+      document.createElement("p");
+
+    account.className =
+      "u9-af-account";
+
+    account.textContent =
+      "Account: " +
+      (
+        profile.account ||
+        "Unavailable"
+      );
+
+
+    details.append(
+      username,
+      account
+    );
+
+
+    const actionWrapper =
+      document.createElement("div");
+
+    actionWrapper.className =
+      "u9-af-user-action";
+
+
+    const button =
+      document.createElement("button");
+
+    button.type =
+      "button";
+
+    button.className =
+      "u9-af-button u9-af-request-button";
+
+
+    const state =
+      getRequestButtonState(profile);
+
+
+    button.textContent =
+      state.label;
+
+    button.disabled =
+      state.disabled;
+
+
+    if (state.complete) {
+      button.classList.add(
+        "is-complete"
       );
     }
 
-    if (requestBusy) return;
 
-    requestBusy = true;
-    setButtonBusy(button, true, "Sending…");
+    if (!state.complete) {
 
-    const root = getRoot();
+      button.addEventListener(
+        "click",
+        () => {
+          sendFriendRequest(
+            profile,
+            button
+          );
+        }
+      );
+    }
 
-    const intro =
-      root?.querySelector("#u9-af-introduction")?.value || "";
+
+    actionWrapper.appendChild(
+      button
+    );
+
+    card.append(
+      details,
+      actionWrapper
+    );
+
+
+    return card;
+  }
+
+
+  function renderUsers(
+    users
+  ) {
+
+    displayedUsers =
+      Array.isArray(users)
+        ? users
+        : [];
+
+
+    resultsContainer.replaceChildren();
+
+
+    if (
+      displayedUsers.length === 0
+    ) {
+
+      showResultsStatus(
+        "No users found. Check the username or account and try again."
+      );
+
+      return;
+    }
+
+
+    hideResultsStatus();
+
+
+    const fragment =
+      document.createDocumentFragment();
+
+
+    displayedUsers.forEach(
+      (profile) => {
+
+        fragment.appendChild(
+          createUserCard(
+            profile
+          )
+        );
+      }
+    );
+
+
+    resultsContainer.appendChild(
+      fragment
+    );
+  }
+
+
+  /* =======================================================
+     SEARCH USERS
+  ======================================================= */
+
+  async function searchUsers() {
+
+    if (isSearching) {
+      return;
+    }
+
+
+    const q =
+      searchInput.value.trim();
+
+
+    if (q.length < 2) {
+
+      showFeedback(
+        "Enter at least 2 characters to search.",
+        "error"
+      );
+
+      searchInput.focus();
+
+      return;
+    }
+
+
+    isSearching =
+      true;
+
+    searchButton.disabled =
+      true;
+
+    searchButton.textContent =
+      "Searching...";
+
+
+    clearFeedback();
+
+    resultsContainer.replaceChildren();
+
+    showResultsStatus(
+      "Searching for users..."
+    );
+
 
     try {
+
+      const data =
+        await callMessageAPI(
+          "search_users",
+          { q }
+        );
+
+
+      const users =
+        Array.isArray(data?.users)
+          ? data.users
+          : [];
+
+
+      renderUsers(users);
+
+
+      if (
+        users.length > 0
+      ) {
+
+        showFeedback(
+          `Found ${users.length} user(s).`,
+          "success"
+        );
+      }
+
+    } catch (error) {
+
+      console.error(
+        "U9 Add Friend: search failed.",
+        error
+      );
+
+
+      showResultsStatus(
+        "Could not load search results."
+      );
+
+
+      showFeedback(
+        error.message ||
+        "Could not search for users.",
+        "error"
+      );
+
+    } finally {
+
+      isSearching =
+        false;
+
+      searchButton.disabled =
+        false;
+
+      searchButton.textContent =
+        "Search";
+    }
+  }
+
+
+  /* =======================================================
+     SEND FRIEND REQUEST
+  ======================================================= */
+
+  async function sendFriendRequest(
+    profile,
+    button
+  ) {
+
+    const id =
+      normalizeId(profile?.id);
+
+
+    if (
+      friendIds.has(id)
+    ) {
+
+      button.textContent =
+        "Already Friends";
+
+      button.disabled =
+        true;
+
+      return;
+    }
+
+
+    if (
+      pendingRequestIds.has(id)
+    ) {
+
+      button.textContent =
+        "Request Sent";
+
+      button.disabled =
+        true;
+
+      return;
+    }
+
+
+    if (
+      receivedRequests.has(id)
+    ) {
+
+      button.textContent =
+        "Request Received";
+
+      button.disabled =
+        true;
+
+      return;
+    }
+
+
+    if (!profile?.account) {
+
+      showFeedback(
+        "This user's account is unavailable.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    if (requestBusy) {
+      return;
+    }
+
+
+    requestBusy =
+      true;
+
+
+    const oldLabel =
+      button.textContent;
+
+
+    button.disabled =
+      true;
+
+    button.textContent =
+      "Sending...";
+
+
+    try {
+
+      const initialMessage =
+        initialMessageInput.value.trim();
+
+
       await callMessageAPI(
         "send_friend_request",
         {
-          receiver_account: user.account,
-          initial_message: intro.trim()
+          receiver_account:
+            profile.account,
+
+          initial_message:
+            initialMessage
         }
       );
 
-      setNotice(
-        `Friend request sent to ${user.username || user.account}.`,
+
+      /*
+       * Update local state immediately.
+       */
+      pendingRequestIds.add(
+        id
+      );
+
+
+      button.textContent =
+        "Request Sent";
+
+      button.classList.add(
+        "is-complete"
+      );
+
+
+      showFeedback(
+        `Friend request sent to ${
+          profile.username ||
+          profile.account
+        }.`,
         "success"
       );
 
-      await loadFriendRequests({
-        silent: true
-      });
 
-      renderSearchResults();
-    } finally {
-      requestBusy = false;
+      /*
+       * Refresh relationships so
+       * Sent Requests stays synchronized.
+       */
+      await loadRelationships();
 
-      if (button?.isConnected) {
-        setButtonBusy(button, false);
+    } catch (error) {
+
+      const message =
+        error.message ||
+        "Could not send friend request.";
+
+
+      const normalizedMessage =
+        message.toLowerCase();
+
+
+      if (
+        normalizedMessage.includes(
+          "already friends"
+        )
+      ) {
+
+        friendIds.add(id);
+
+        button.textContent =
+          "Already Friends";
+
+        button.classList.add(
+          "is-complete"
+        );
+
+      } else if (
+        normalizedMessage.includes(
+          "pending friend request already exists"
+        )
+      ) {
+
+        pendingRequestIds.add(id);
+
+        button.textContent =
+          "Request Sent";
+
+        button.classList.add(
+          "is-complete"
+        );
+
+      } else {
+
+        button.textContent =
+          oldLabel;
       }
+
+
+      showFeedback(
+        message,
+        "error"
+      );
+
+
+      console.error(
+        "U9 Add Friend: sending request failed.",
+        error
+      );
+
+    } finally {
+
+      requestBusy =
+        false;
+
+      button.disabled =
+        friendIds.has(id) ||
+        pendingRequestIds.has(id) ||
+        receivedRequests.has(id) ||
+        !profile?.account;
     }
   }
 
-  /* =========================================================
-     RESPOND TO REQUEST
 
-     Kept available for compatibility with the existing API.
-     There is currently no Received Requests panel or button.
-  ========================================================= */
+  /* =======================================================
+     RECEIVED REQUEST CARD
+  ======================================================= */
 
-  async function respondToRequest(
-    requestId,
-    decision,
-    button
+  function createReceivedRequestCard(
+    request
   ) {
-    if (requestBusy) return;
 
-    requestBusy = true;
+    const profile =
+      request?.sender || {};
 
-    setButtonBusy(
-      button,
-      true,
-      decision === "accept"
-        ? "Accepting…"
-        : "Rejecting…"
+
+    const card =
+      document.createElement("article");
+
+    card.className =
+      "u9-af-user-card u9-af-request-card";
+
+
+    card.appendChild(
+      createAvatar(profile)
     );
 
+
+    const details =
+      document.createElement("div");
+
+    details.className =
+      "u9-af-user-details";
+
+
+    const username =
+      document.createElement("p");
+
+    username.className =
+      "u9-af-username";
+
+    username.textContent =
+      profile.username ||
+      "User";
+
+
+    const account =
+      document.createElement("p");
+
+    account.className =
+      "u9-af-account";
+
+    account.textContent =
+      "Account: " +
+      (
+        profile.account ||
+        "Unavailable"
+      );
+
+
+    details.append(
+      username,
+      account
+    );
+
+
+    /*
+     * Initial message.
+     */
+    if (
+      request?.initial_message
+    ) {
+
+      const message =
+        document.createElement("p");
+
+      message.className =
+        "u9-af-intro";
+
+      message.textContent =
+        request.initial_message;
+
+      details.appendChild(
+        message
+      );
+    }
+
+
+    /*
+     * Optional request time.
+     */
+    const createdAt =
+      request?.created_at ||
+      request?.createdAt;
+
+
+    const formattedDate =
+      formatDate(createdAt);
+
+
+    if (formattedDate) {
+
+      const date =
+        document.createElement("p");
+
+      date.className =
+        "u9-af-request-date";
+
+      date.textContent =
+        formattedDate;
+
+      details.appendChild(
+        date
+      );
+    }
+
+
+    /*
+     * Actions.
+     */
+    const actions =
+      document.createElement("div");
+
+    actions.className =
+      "u9-af-user-action u9-af-request-actions";
+
+
+    const acceptButton =
+      document.createElement("button");
+
+    acceptButton.type =
+      "button";
+
+    acceptButton.className =
+      "u9-af-button u9-af-button-primary";
+
+    acceptButton.textContent =
+      "Accept";
+
+
+    const rejectButton =
+      document.createElement("button");
+
+    rejectButton.type =
+      "button";
+
+    rejectButton.className =
+      "u9-af-button u9-af-button-danger";
+
+    rejectButton.textContent =
+      "Reject";
+
+
+    acceptButton.addEventListener(
+      "click",
+      () => {
+
+        respondToFriendRequest(
+          request,
+          "accept",
+          acceptButton,
+          rejectButton
+        );
+      }
+    );
+
+
+    rejectButton.addEventListener(
+      "click",
+      () => {
+
+        respondToFriendRequest(
+          request,
+          "reject",
+          rejectButton,
+          acceptButton
+        );
+      }
+    );
+
+
+    actions.append(
+      acceptButton,
+      rejectButton
+    );
+
+
+    card.append(
+      details,
+      actions
+    );
+
+
+    return card;
+  }
+
+
+  /* =======================================================
+     RENDER RECEIVED REQUESTS
+  ======================================================= */
+
+  function renderReceivedRequests(
+    requests
+  ) {
+
+    const list =
+      Array.isArray(requests)
+        ? requests
+        : [];
+
+
+    receivedContainer.replaceChildren();
+
+
+    /*
+     * Keep only pending received requests
+     * in the active request count.
+     */
+    const pending =
+      list.filter(
+        (request) =>
+          String(
+            request?.status ||
+            "pending"
+          ).toLowerCase() ===
+          "pending"
+      );
+
+
+    receivedCount.textContent =
+      String(pending.length);
+
+
+    /*
+     * Refresh lookup map.
+     */
+    receivedRequests.clear();
+
+
+    for (
+      const request of pending
+    ) {
+
+      const sender =
+        request?.sender || {};
+
+      const senderId =
+        normalizeId(
+          sender.id ||
+          request?.sender_id
+        );
+
+
+      if (senderId) {
+
+        receivedRequests.set(
+          senderId,
+          request
+        );
+      }
+    }
+
+
+    if (
+      pending.length === 0
+    ) {
+
+      receivedStatus.textContent =
+        "You don't have any pending friend requests.";
+
+      receivedStatus.hidden =
+        false;
+
+      return;
+    }
+
+
+    receivedStatus.textContent =
+      "";
+
+
+    receivedStatus.hidden =
+      true;
+
+
+    const fragment =
+      document.createDocumentFragment();
+
+
+    pending.forEach(
+      (request) => {
+
+        fragment.appendChild(
+          createReceivedRequestCard(
+            request
+          )
+        );
+      }
+    );
+
+
+    receivedContainer.appendChild(
+      fragment
+    );
+
+
+    /*
+     * Search result buttons may need
+     * to change to "Request Received".
+     */
+    if (
+      displayedUsers.length > 0
+    ) {
+
+      renderUsers(
+        displayedUsers
+      );
+    }
+  }
+
+
+  /* =======================================================
+     SENT REQUEST CARD
+  ======================================================= */
+
+  function createSentRequestCard(
+    request
+  ) {
+
+    const profile =
+      request?.receiver || {};
+
+
+    const card =
+      document.createElement("article");
+
+    card.className =
+      "u9-af-user-card u9-af-request-card";
+
+
+    card.appendChild(
+      createAvatar(profile)
+    );
+
+
+    const details =
+      document.createElement("div");
+
+    details.className =
+      "u9-af-user-details";
+
+
+    const username =
+      document.createElement("p");
+
+    username.className =
+      "u9-af-username";
+
+    username.textContent =
+      profile.username ||
+      "User";
+
+
+    const account =
+      document.createElement("p");
+
+    account.className =
+      "u9-af-account";
+
+    account.textContent =
+      "Account: " +
+      (
+        profile.account ||
+        "Unavailable"
+      );
+
+
+    details.append(
+      username,
+      account
+    );
+
+
+    if (
+      request?.initial_message
+    ) {
+
+      const message =
+        document.createElement("p");
+
+      message.className =
+        "u9-af-intro";
+
+      message.textContent =
+        request.initial_message;
+
+      details.appendChild(
+        message
+      );
+    }
+
+
+    const status =
+      document.createElement("span");
+
+    status.className =
+      "u9-af-status";
+
+
+    const requestStatus =
+      String(
+        request?.status ||
+        "pending"
+      ).toLowerCase();
+
+
+    status.textContent =
+      requestStatus
+        .charAt(0)
+        .toUpperCase() +
+      requestStatus.slice(1);
+
+
+    if (
+      requestStatus ===
+      "pending"
+    ) {
+
+      status.classList.add(
+        "is-pending"
+      );
+
+    } else if (
+      requestStatus ===
+      "accepted"
+    ) {
+
+      status.classList.add(
+        "is-accepted"
+      );
+
+    } else if (
+      requestStatus ===
+      "rejected"
+    ) {
+
+      status.classList.add(
+        "is-rejected"
+      );
+
+    } else if (
+      requestStatus ===
+      "cancelled"
+    ) {
+
+      status.classList.add(
+        "is-cancelled"
+      );
+    }
+
+
+    const actionWrapper =
+      document.createElement("div");
+
+    actionWrapper.className =
+      "u9-af-user-action";
+
+
+    actionWrapper.appendChild(
+      status
+    );
+
+
+    card.append(
+      details,
+      actionWrapper
+    );
+
+
+    return card;
+  }
+
+
+  /* =======================================================
+     RENDER SENT REQUESTS
+  ======================================================= */
+
+  function renderSentRequests(
+    requests
+  ) {
+
+    const list =
+      Array.isArray(requests)
+        ? requests
+        : [];
+
+
+    sentContainer.replaceChildren();
+
+
+    const pending =
+      list.filter(
+        (request) =>
+          String(
+            request?.status ||
+            ""
+          ).toLowerCase() ===
+          "pending"
+      );
+
+
+    sentCount.textContent =
+      String(pending.length);
+
+
+    if (
+      list.length === 0
+    ) {
+
+      sentStatus.textContent =
+        "You haven't sent any friend requests yet.";
+
+      sentStatus.hidden =
+        false;
+
+      return;
+    }
+
+
+    sentStatus.textContent =
+      "";
+
+    sentStatus.hidden =
+      true;
+
+
+    const fragment =
+      document.createDocumentFragment();
+
+
+    list.forEach(
+      (request) => {
+
+        fragment.appendChild(
+          createSentRequestCard(
+            request
+          )
+        );
+      }
+    );
+
+
+    sentContainer.appendChild(
+      fragment
+    );
+  }
+
+
+  /* =======================================================
+     ACCEPT / REJECT REQUEST
+  ======================================================= */
+
+  async function respondToFriendRequest(
+    request,
+    decision,
+    activeButton,
+    otherButton
+  ) {
+
+    if (
+      requestBusy
+    ) {
+      return;
+    }
+
+
+    const requestId =
+      request?.id;
+
+
+    if (!requestId) {
+
+      showFeedback(
+        "This friend request is missing its request ID.",
+        "error"
+      );
+
+      return;
+    }
+
+
+    requestBusy =
+      true;
+
+
+    activeButton.disabled =
+      true;
+
+    otherButton.disabled =
+      true;
+
+
+    activeButton.textContent =
+      decision === "accept"
+        ? "Accepting..."
+        : "Rejecting...";
+
+
     try {
+
       await callMessageAPI(
         "respond_friend_request",
         {
-          request_id: requestId,
+          request_id:
+            requestId,
+
           decision
         }
       );
 
-      setNotice(
+
+      showFeedback(
         decision === "accept"
           ? "Friend request accepted."
           : "Friend request rejected.",
         "success"
       );
 
-      await loadFriendRequests({
-        silent: true
-      });
-    } finally {
-      requestBusy = false;
 
-      if (button?.isConnected) {
-        setButtonBusy(button, false);
-      }
+      /*
+       * Reload all relationship data.
+       */
+      await loadRelationships();
+
+
+    } catch (error) {
+
+      console.error(
+        "U9 Add Friend: responding to request failed.",
+        error
+      );
+
+
+      showFeedback(
+        error.message ||
+        "Could not update the friend request.",
+        "error"
+      );
+
+
+      activeButton.disabled =
+        false;
+
+      otherButton.disabled =
+        false;
+
+      activeButton.textContent =
+        decision === "accept"
+          ? "Accept"
+          : "Reject";
+
+
+    } finally {
+
+      requestBusy =
+        false;
     }
   }
 
-  /* =========================================================
-     EVENTS
-  ========================================================= */
 
-  function bindEvents() {
-    const root = getRoot();
+  /* =======================================================
+     LOAD FRIENDS + REQUESTS
+  ======================================================= */
 
-    if (!root || root.dataset.u9AfBound === "true") {
+  async function loadRelationships() {
+
+    if (
+      relationshipLoading
+    ) {
       return;
     }
 
-    root.dataset.u9AfBound = "true";
 
-    /* Search form */
+    relationshipLoading =
+      true;
 
-    root.addEventListener("submit", async (event) => {
-      if (event.target?.id !== "u9-af-search-form") {
-        return;
-      }
 
-      event.preventDefault();
-      setNotice();
+    receivedStatus.textContent =
+      "Loading friend requests...";
 
-      const account =
-        root.querySelector("#u9-af-account")?.value || "";
+    receivedStatus.hidden =
+      false;
 
-      hasSearched = true;
 
-      try {
-        await searchByAccount(account);
-      } catch (error) {
-        console.error(
-          "U9 Add Friend search failed:",
-          error
-        );
+    sentStatus.textContent =
+      "Loading friend requests...";
 
-        setNotice(error.message, "error");
+    sentStatus.hidden =
+      false;
 
-        const list = root.querySelector("#u9-af-results");
 
-        if (list) {
-          list.innerHTML = `
-            <div class="u9-af-empty">
-              ${escapeHTML(error.message)}
-            </div>
-          `;
+    try {
+
+      /*
+       * We deliberately request both endpoints.
+       */
+      const [
+        friendsData,
+        requestsData
+      ] = await Promise.all([
+
+        callMessageAPI(
+          "list_friends"
+        ),
+
+        callMessageAPI(
+          "list_friend_requests"
+        )
+
+      ]);
+
+
+      /* -----------------------------------------------
+         FRIENDS
+      ------------------------------------------------ */
+
+      friendIds.clear();
+
+
+      const friends =
+        Array.isArray(
+          friendsData?.friends
+        )
+          ? friendsData.friends
+          : [];
+
+
+      for (
+        const item of friends
+      ) {
+
+        const friend =
+          item?.friend ||
+          item;
+
+
+        const id =
+          normalizeId(
+            friend?.id
+          );
+
+
+        if (id) {
+          friendIds.add(id);
         }
       }
-    });
 
-    /* Input fields */
 
-    root.addEventListener("input", (event) => {
-      if (event.target?.id === "u9-af-account") {
-        const input = event.target;
-        const start = input.selectionStart;
+      /* -----------------------------------------------
+         SENT
+      ------------------------------------------------ */
 
-        input.value = normalizeAccount(input.value)
-          .replace(/[^A-Z0-9]/g, "")
-          .slice(0, 6);
+      pendingRequestIds.clear();
 
-        try {
-          input.setSelectionRange(start, start);
-        } catch (_) {
-          // Some input types do not support selection ranges.
+
+      const sent =
+        Array.isArray(
+          requestsData?.sent
+        )
+          ? requestsData.sent
+          : [];
+
+
+      for (
+        const request of sent
+      ) {
+
+        if (
+          String(
+            request?.status ||
+            ""
+          ).toLowerCase() !==
+          "pending"
+        ) {
+          continue;
+        }
+
+
+        const receiver =
+          request?.receiver ||
+          {};
+
+
+        const receiverId =
+          normalizeId(
+            receiver.id ||
+            request?.receiver_id
+          );
+
+
+        if (
+          receiverId
+        ) {
+
+          pendingRequestIds.add(
+            receiverId
+          );
         }
       }
 
-      if (event.target?.id === "u9-af-introduction") {
-        const counter =
-          root.querySelector("#u9-af-intro-counter");
 
-        if (counter) {
-          counter.textContent =
-            `${event.target.value.length} / 1000`;
-        }
-      }
-    });
+      /* -----------------------------------------------
+         RECEIVED
+      ------------------------------------------------ */
 
-    /* Card actions */
+      const received =
+        Array.isArray(
+          requestsData?.received
+        )
+          ? requestsData.received
+          : [];
 
-    root.addEventListener("click", async (event) => {
-      const button = event.target.closest(
-        "button[data-action]"
+
+      renderReceivedRequests(
+        received
       );
 
-      if (!button || !root.contains(button)) {
-        return;
-      }
 
-      const action = button.dataset.action;
+      /* -----------------------------------------------
+         SENT UI
+      ------------------------------------------------ */
 
-      // "观看" is intentionally a placeholder button.
-      if (action === "view-user") {
-        return;
-      }
+      renderSentRequests(
+        sent
+      );
+
+
+      /* -----------------------------------------------
+         SEARCH RESULT STATE
+      ------------------------------------------------ */
 
       if (
-        action !== "send-request" &&
-        action !== "accept-request" &&
-        action !== "reject-request"
+        displayedUsers.length > 0
       ) {
-        return;
-      }
 
-      setNotice();
-
-      try {
-        if (action === "send-request") {
-          await sendRequestForUser(
-            button.dataset.userId,
-            button
-          );
-        } else if (action === "accept-request") {
-          await respondToRequest(
-            button.dataset.requestId,
-            "accept",
-            button
-          );
-        } else if (action === "reject-request") {
-          await respondToRequest(
-            button.dataset.requestId,
-            "reject",
-            button
-          );
-        }
-      } catch (error) {
-        console.error(
-          "U9 Add Friend action failed:",
-          error
+        renderUsers(
+          displayedUsers
         );
-
-        setNotice(error.message, "error");
       }
-    });
-  }
 
-  /* =========================================================
-     INITIALIZATION
 
-     normal-message.js expects:
-     window.initializeAddFriendsPage
-  ========================================================= */
+    } catch (error) {
 
-  function initializeAddFriendsPage() {
-    const root = getRoot();
-
-    if (!root) {
       console.warn(
-        "U9 Add Friend: root element not found:",
-        ROOT_ID
+        "U9 Add Friend: relationship status could not be refreshed.",
+        error
       );
 
-      return false;
+
+      receivedContainer.replaceChildren();
+
+      receivedCount.textContent =
+        "0";
+
+      receivedStatus.textContent =
+        "Could not load received friend requests.";
+
+
+      receivedStatus.hidden =
+        false;
+
+
+      sentContainer.replaceChildren();
+
+      sentCount.textContent =
+        "0";
+
+      sentStatus.textContent =
+        "Could not load sent friend requests.";
+
+
+      sentStatus.hidden =
+        false;
+
+    } finally {
+
+      relationshipLoading =
+        false;
     }
-
-    renderShell();
-    bindEvents();
-
-    initialized = true;
-
-    const intro =
-      root.querySelector("#u9-af-introduction");
-
-    const counter =
-      root.querySelector("#u9-af-intro-counter");
-
-    if (intro && counter) {
-      counter.textContent =
-        `${intro.value.length} / 1000`;
-    }
-
-    loadFriendRequests();
-
-    console.info(
-      "U9 Add Friend page initialized."
-    );
-
-    return true;
   }
 
-  // Required by normal-message.js page manager.
-  window.initializeAddFriendsPage =
-    initializeAddFriendsPage;
 
-  // Optional manual refresh hook for debugging.
-  window.refreshAddFriendsPage = () => {
-    if (!initialized) {
-      return initializeAddFriendsPage();
+  /* =======================================================
+     FORM EVENTS
+  ======================================================= */
+
+  searchForm.addEventListener(
+    "submit",
+    (event) => {
+
+      event.preventDefault();
+
+      searchUsers();
     }
+  );
 
-    return loadFriendRequests();
-  };
 
-  // Initialize immediately only if the page is already active.
-  if (document.readyState === "loading") {
-    document.addEventListener(
-      "DOMContentLoaded",
-      () => {
-        if (getRoot()?.closest(".active")) {
-          initializeAddFriendsPage();
-        }
-      },
-      { once: true }
-    );
-  } else if (getRoot()?.closest(".active")) {
-    initializeAddFriendsPage();
-  }
+  /* =======================================================
+     MESSAGE COUNTER
+  ======================================================= */
 
-  console.info("U9 Add Friend module ready.");
+  initialMessageInput.addEventListener(
+    "input",
+    () => {
+
+      messageCounter.textContent =
+        `${initialMessageInput.value.length} / 1000`;
+    }
+  );
+
+
+  /* =======================================================
+     INITIALIZE
+  ======================================================= */
+
+  showResultsStatus(
+    "Search by username or account to find someone."
+  );
+
+
+  /*
+   * Load:
+   * - friends
+   * - sent requests
+   * - received requests
+   */
+  loadRelationships();
+
+
+  /*
+   * Optional global refresh hook.
+   */
+  window.refreshAddFriendsPage =
+    loadRelationships;
+
+
+  console.log(
+    "U9 Add Friend page initialized."
+  );
+
 })();
