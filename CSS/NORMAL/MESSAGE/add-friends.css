@@ -1060,3 +1060,250 @@
     transition: none !important;
   }
 }
+
+
+/* =========================================================
+   GROUP PAGE VISUAL ALIGNMENT — ADD FRIEND
+   Keep Add Friend's own class names and functionality.
+========================================================= */
+#Message-model-add-friends-root {
+  --u9-af-text: #202431;
+  --u9-af-muted: #777f91;
+  --u9-af-border: #e5e8f0;
+  --u9-af-surface: #ffffff;
+  --u9-af-soft: #f6f7fb;
+  --u9-af-accent: #5968c8;
+  --u9-af-accent-hover: #4654ad;
+  --u9-af-accent-soft: #eef0ff;
+  --u9-af-danger: #b53b49;
+  color: var(--u9-af-text);
+}
+
+#Message-model-add-friends-root .u9-af-container {
+  width: 100%;
+  max-width: 920px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+#Message-model-add-friends-root .u9-af-header {
+  margin: 0;
+  color: var(--u9-af-text);
+  font-size: 24px;
+  font-weight: 760;
+  line-height: 1.25;
+  letter-spacing: -.4px;
+}
+
+#Message-model-add-friends-root .u9-af-heading {
+  margin: 0;
+  color: inherit;
+  font: inherit;
+}
+
+#Message-model-add-friends-root .u9-af-subtitle {
+  margin: 6px 0 0;
+  color: var(--u9-af-muted);
+  font-size: 13px;
+  line-height: 1.55;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+#Message-model-add-friends-root .u9-af-panel,
+#Message-model-add-friends-root .u9-af-results-section,
+#Message-model-add-friends-root .u9-af-requests-section {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 19px;
+  border: 1px solid var(--u9-af-border);
+  border-radius: 16px;
+  background: var(--u9-af-surface);
+  box-shadow: 0 3px 14px rgb(28 37 74 / 4%);
+}
+
+#Message-model-add-friends-root .u9-af-label,
+#Message-model-add-friends-root .u9-af-panel label {
+  display: block;
+  margin: 0 0 7px;
+  color: #454b5c;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+#Message-model-add-friends-root #u9-af-search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+#Message-model-add-friends-root .u9-af-search-row {
+  gap: 10px;
+}
+
+#Message-model-add-friends-root .u9-af-input {
+  min-height: 44px;
+  padding: 0 13px;
+  border: 1px solid #dce1ec;
+  border-radius: 10px;
+  background: #fff;
+  color: var(--u9-af-text);
+  font-size: 13px;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+#Message-model-add-friends-root .u9-af-input::placeholder { color: #a0a7b6; }
+#Message-model-add-friends-root .u9-af-input:focus {
+  border-color: var(--u9-af-accent);
+  box-shadow: 0 0 0 3px rgb(89 104 200 / 11%);
+}
+
+#Message-model-add-friends-root .u9-af-textarea {
+  width: 100%;
+  min-height: 94px;
+  padding: 11px 13px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+#Message-model-add-friends-root .u9-af-button,
+#Message-model-add-friends-root .u9-af-request-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 750;
+  text-align: center;
+  white-space: nowrap;
+  transition: background-color .16s ease, border-color .16s ease, color .16s ease;
+}
+
+#Message-model-add-friends-root #u9-af-search-button {
+  flex: 0 0 auto;
+  min-width: 100px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-color: var(--u9-af-accent);
+  border-radius: 10px;
+  background: var(--u9-af-accent);
+  color: #fff;
+  font-size: 13px;
+}
+#Message-model-add-friends-root #u9-af-search-button:hover {
+  border-color: var(--u9-af-accent-hover);
+  background: var(--u9-af-accent-hover);
+}
+#Message-model-add-friends-root button:disabled {
+  cursor: not-allowed;
+  opacity: .6;
+}
+
+#Message-model-add-friends-root .u9-af-counter {
+  margin-top: 6px;
+  color: var(--u9-af-muted);
+  font-size: 12px;
+  text-align: right;
+}
+
+#Message-model-add-friends-root .u9-af-results-heading {
+  margin: 0 0 10px;
+  color: var(--u9-af-text);
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+#Message-model-add-friends-root .u9-af-requests-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+#Message-model-add-friends-root .u9-af-requests-header .u9-af-results-heading { margin: 0; }
+
+#Message-model-add-friends-root .u9-af-results-status {
+  margin: 0 0 12px;
+  color: var(--u9-af-muted);
+  font-size: 13px;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+#Message-model-add-friends-root .u9-af-results-status:empty { display: none; }
+
+#Message-model-add-friends-root .u9-af-count {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: 27px;
+  height: 27px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: var(--u9-af-soft);
+  color: var(--u9-af-muted);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+#Message-model-add-friends-root .u9-af-user-card {
+  margin: 0 0 10px;
+  padding: 13px 15px;
+  border-color: #e5e8f0;
+  border-radius: 13px;
+  background: #fff;
+  box-shadow: none;
+}
+#Message-model-add-friends-root .u9-af-user-card:last-child { margin-bottom: 0; }
+#Message-model-add-friends-root .u9-af-user-card:hover {
+  border-color: #d9deea;
+  background: #fcfcfe;
+  box-shadow: 0 3px 12px rgb(24 39 75 / 5%);
+}
+
+#Message-model-add-friends-root .u9-af-empty,
+#Message-model-add-friends-root .u9-af-state {
+  padding: 16px;
+  border: 1px dashed #dce1ec;
+  border-radius: 12px;
+  background: var(--u9-af-soft);
+  color: var(--u9-af-muted);
+  font-size: 13px;
+  line-height: 1.55;
+  text-align: center;
+}
+
+#Message-model-add-friends-root .u9-af-feedback {
+  margin-top: 10px;
+}
+#Message-model-add-friends-root .u9-af-feedback:empty { display: none; }
+
+@media (max-width: 760px) {
+  #Message-model-add-friends-root .u9-af-container {
+    padding: 13px;
+    gap: 14px;
+  }
+  #Message-model-add-friends-root .u9-af-header { font-size: 21px; }
+  #Message-model-add-friends-root .u9-af-panel,
+  #Message-model-add-friends-root .u9-af-results-section,
+  #Message-model-add-friends-root .u9-af-requests-section {
+    padding: 14px;
+    border-radius: 13px;
+  }
+}
+
+@media (max-width: 380px) {
+  #Message-model-add-friends-root .u9-af-container { padding: 8px; gap: 12px; }
+  #Message-model-add-friends-root .u9-af-panel,
+  #Message-model-add-friends-root .u9-af-results-section,
+  #Message-model-add-friends-root .u9-af-requests-section { padding: 12px; }
+}
