@@ -1,49 +1,44 @@
 
 /* =========================================================
    U9 MESSAGE — ADD FRIEND
-   File: CSS/NORMAL/MESSAGE/add-friends.css
+   File:
+   CSS/NORMAL/MESSAGE/add-friends.css
 
-   Design reference:
-   - normal-message.css
-   - friends.css
-   - group.css
+   Layout reference:
+   CSS/NORMAL/MESSAGE/friends.css
+   CSS/NORMAL/MESSAGE/group.css
 
-   Important:
-   - Fully scoped to #Message-model-add-friends-root
-   - Does NOT modify normal-message.css
-   - Does NOT modify friends.css
-   - Does NOT modify group.css
-   - Uses the same avatar proportions as Friends page
-   - Prevents avatar/frame from affecting card layout
+   IMPORTANT:
+   - Avatar + frame stay on the LEFT.
+   - User information stays beside the avatar.
+   - Actions stay on the RIGHT.
+   - Avatar dimensions match friends.css exactly.
+   - Fully scoped to #Message-model-add-friends-root.
+   - Does not modify normal-message.css.
    ========================================================= */
 
 
 /* =========================================================
    ROOT
-========================================================= */
+   ========================================================= */
 
 #Message-model-add-friends-root {
   --u9-af-text: #202124;
   --u9-af-muted: #747b87;
 
   --u9-af-border: #e5e8ef;
-  --u9-af-border-hover: #d9deea;
-
   --u9-af-surface: #ffffff;
   --u9-af-subtle: #f6f7fa;
 
-  --u9-af-accent: #5968c8;
-  --u9-af-accent-hover: #4654ad;
-  --u9-af-accent-soft: #eef0ff;
+  --u9-af-accent: #4e63bd;
+  --u9-af-accent-hover: #3d50a5;
+  --u9-af-accent-soft: #eef1ff;
 
-  --u9-af-danger: #b53b49;
+  --u9-af-danger: #c43d42;
 
   width: 100%;
   min-width: 0;
   min-height: 100%;
-
-  margin: 0;
-  padding: 0;
 
   color: var(--u9-af-text);
 
@@ -59,7 +54,7 @@
 
 /* =========================================================
    GLOBAL RESET — SCOPED
-========================================================= */
+   ========================================================= */
 
 #Message-model-add-friends-root *,
 #Message-model-add-friends-root *::before,
@@ -88,73 +83,55 @@
 
 
 /* =========================================================
-   MAIN CONTAINER
+   PAGE
+   ========================================================= */
 
-   IMPORTANT:
-   JS currently creates:
-   <div class="u9-af-container">
-
-   Therefore this is the main page wrapper.
-
-   Do not depend on .u9-af-page.
-========================================================= */
-
-#Message-model-add-friends-root .u9-af-container {
+#Message-model-add-friends-root .u9-af-page {
   display: flex;
   flex-direction: column;
 
   width: 100%;
+  max-width: 920px;
+
   min-width: 0;
   min-height: 100%;
 
-  margin: 0;
-  padding: 20px 18px 24px;
+  margin: 0 auto;
 
-  gap: 16px;
+  padding: 22px;
 
-  background: #ffffff;
-
-  box-sizing: border-box;
+  gap: 18px;
 }
 
 
 /* =========================================================
    HEADER
-========================================================= */
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-header {
-  display: block;
-
   width: 100%;
   min-width: 0;
-
-  margin: 0;
-  padding: 0;
 }
 
 #Message-model-add-friends-root .u9-af-heading {
-  display: block;
-
   margin: 0;
 
-  color: #252a34;
+  color: #202124;
 
-  font-size: 22px;
-  font-weight: 700;
-  line-height: 1.3;
+  font-size: 24px;
+  font-weight: 750;
+  line-height: 1.25;
 
-  letter-spacing: -0.25px;
+  letter-spacing: -0.45px;
 }
 
 #Message-model-add-friends-root .u9-af-subtitle {
-  display: block;
-
-  margin: 5px 0 0;
+  margin: 7px 0 0;
 
   color: var(--u9-af-muted);
 
   font-size: 13px;
-  line-height: 1.5;
+  line-height: 1.55;
 
   overflow-wrap: anywhere;
 }
@@ -162,83 +139,74 @@
 
 /* =========================================================
    PANEL
-========================================================= */
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-panel {
-  display: block;
+  width: 100%;
+  min-width: 0;
+
+  padding: 19px;
+
+  border: 1px solid var(--u9-af-border);
+  border-radius: 16px;
+
+  background: var(--u9-af-surface);
+
+  box-shadow: 0 3px 14px rgb(28 37 74 / 4%);
+}
+
+#Message-model-add-friends-root .u9-af-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
   width: 100%;
   min-width: 0;
 
-  margin: 0;
-  padding: 17px;
+  gap: 12px;
 
-  border: 1px solid var(--u9-af-border);
-  border-radius: 14px;
-
-  background: #ffffff;
-
-  box-shadow: 0 2px 8px rgb(24 39 75 / 3%);
-
-  overflow: visible;
-}
-
-
-/* =========================================================
-   PANEL HEADING
-========================================================= */
-
-#Message-model-add-friends-root .u9-af-panel-heading {
-  display: flex;
-
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 10px;
-
-  width: 100%;
-
-  margin: 0 0 14px;
+  margin: 0 0 15px;
 }
 
 #Message-model-add-friends-root .u9-af-panel-title {
+  min-width: 0;
+
   margin: 0;
 
-  color: #252a34;
+  color: #202431;
 
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.4;
+  font-size: 16px;
+  font-weight: 750;
+  line-height: 1.35;
 }
 
 #Message-model-add-friends-root .u9-af-count {
   display: inline-flex;
 
+  flex: 0 0 auto;
+
   align-items: center;
   justify-content: center;
 
-  flex: 0 0 auto;
+  min-width: 27px;
+  height: 27px;
 
-  min-width: 25px;
-  height: 25px;
-
-  padding: 0 7px;
+  padding: 0 8px;
 
   border-radius: 999px;
 
   background: var(--u9-af-subtle);
   color: var(--u9-af-muted);
 
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 750;
 }
 
 
 /* =========================================================
    SEARCH FORM
-========================================================= */
+   ========================================================= */
 
-#Message-model-add-friends-root #u9-af-search-form,
 #Message-model-add-friends-root .u9-af-search-form {
   display: flex;
   flex-direction: column;
@@ -246,285 +214,184 @@
   width: 100%;
   min-width: 0;
 
-  margin: 0;
-  padding: 0;
-
-  gap: 0;
+  gap: 10px;
 }
-
-
-/* =========================================================
-   LABEL
-========================================================= */
 
 #Message-model-add-friends-root .u9-af-label {
   display: block;
 
-  width: 100%;
-
-  margin: 0 0 6px;
+  margin: 0 0 7px;
 
   color: #454b5c;
 
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  line-height: 1.4;
 }
-
-
-/* =========================================================
-   SEARCH ROW
-========================================================= */
 
 #Message-model-add-friends-root .u9-af-search-row {
   display: flex;
-
   align-items: stretch;
 
   width: 100%;
   min-width: 0;
 
-  gap: 9px;
-
-  margin: 0;
-  padding: 0;
+  gap: 10px;
 }
 
 
 /* =========================================================
    INPUT
-========================================================= */
+   ========================================================= */
 
-#Message-model-add-friends-root .u9-af-input {
-  display: block;
-
+#Message-model-add-friends-root .u9-af-input,
+#Message-model-add-friends-root .u9-af-textarea {
   width: 100%;
   min-width: 0;
-  min-height: 42px;
 
-  margin: 0;
-  padding: 0 12px;
-
-  border: 1px solid #dce1ea;
-  border-radius: 9px;
+  border: 1px solid #dce1ec;
+  border-radius: 10px;
 
   outline: none;
 
   background: #ffffff;
   color: var(--u9-af-text);
 
-  font-size: 13px;
-  line-height: 1.4;
-
   transition:
     border-color 160ms ease,
-    box-shadow 160ms ease,
-    background-color 160ms ease;
-
-  box-sizing: border-box;
+    box-shadow 160ms ease;
 }
 
-#Message-model-add-friends-root .u9-af-input::placeholder {
-  color: #9aa1ad;
-}
-
-#Message-model-add-friends-root .u9-af-input:focus {
-  border-color: var(--u9-af-accent);
-
-  box-shadow:
-    0 0 0 3px rgb(89 104 200 / 10%);
-}
-
-
-/* =========================================================
-   SEARCH INPUT
-
-   Account is the only search method.
-========================================================= */
-
-#Message-model-add-friends-root #u9-af-search-input {
+#Message-model-add-friends-root .u9-af-input {
   flex: 1 1 auto;
+
+  min-height: 44px;
+
+  padding: 0 13px;
 
   text-transform: uppercase;
 }
 
-
-/* =========================================================
-   TEXTAREA
-========================================================= */
-
 #Message-model-add-friends-root .u9-af-textarea {
-  min-height: 76px;
+  min-height: 82px;
 
-  padding: 10px 12px;
+  padding: 11px 13px;
 
   resize: vertical;
 
   text-transform: none;
+}
 
-  line-height: 1.5;
+#Message-model-add-friends-root .u9-af-input::placeholder,
+#Message-model-add-friends-root .u9-af-textarea::placeholder {
+  color: #9aa1ad;
+}
+
+#Message-model-add-friends-root .u9-af-input:focus,
+#Message-model-add-friends-root .u9-af-textarea:focus {
+  border-color: var(--u9-af-accent);
+
+  box-shadow:
+    0 0 0 3px rgb(78 99 189 / 12%);
 }
 
 
 /* =========================================================
    SEARCH BUTTON
-========================================================= */
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-search-button {
   display: inline-flex;
-
   align-items: center;
   justify-content: center;
 
   flex: 0 0 auto;
 
-  width: auto;
-  min-width: 92px;
-  min-height: 42px;
+  min-width: 104px;
+  min-height: 44px;
 
-  margin: 0;
-  padding: 0 15px;
+  padding: 0 18px;
 
   border: 1px solid var(--u9-af-accent);
-  border-radius: 9px;
+  border-radius: 10px;
 
   background: var(--u9-af-accent);
   color: #ffffff;
 
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  line-height: 1;
 
   white-space: nowrap;
 
   transition:
     background-color 160ms ease,
-    border-color 160ms ease,
-    transform 120ms ease;
+    border-color 160ms ease;
 }
 
-#Message-model-add-friends-root .u9-af-search-button:hover:not(:disabled) {
+#Message-model-add-friends-root
+.u9-af-search-button:hover:not(:disabled) {
   border-color: var(--u9-af-accent-hover);
   background: var(--u9-af-accent-hover);
 }
 
-#Message-model-add-friends-root .u9-af-search-button:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
 
 /* =========================================================
-   MESSAGE COUNTER
-========================================================= */
+   COUNTER
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-counter {
   display: block;
 
-  width: 100%;
+  margin-top: 6px;
 
-  margin: 5px 0 0;
+  color: var(--u9-af-muted);
 
-  color: #858c98;
-
-  font-size: 11px;
-  line-height: 1.4;
+  font-size: 12px;
 
   text-align: right;
 }
 
 
 /* =========================================================
-   FEEDBACK / NOTICE
-========================================================= */
+   NOTICE
+   ========================================================= */
 
-#Message-model-add-friends-root .u9-af-feedback,
 #Message-model-add-friends-root .u9-af-notice {
   width: 100%;
 
-  margin-top: 10px;
-  padding: 9px 11px;
+  padding: 10px 13px;
 
   border: 1px solid var(--u9-af-border);
-  border-radius: 9px;
+  border-radius: 10px;
 
   background: #f7f8fb;
+
   color: #535b68;
 
-  font-size: 12px;
-  line-height: 1.5;
+  font-size: 13px;
 
   overflow-wrap: anywhere;
 }
 
-#Message-model-add-friends-root .u9-af-feedback:empty,
 #Message-model-add-friends-root .u9-af-notice:empty {
   display: none;
 }
 
-#Message-model-add-friends-root .u9-af-feedback.is-success,
 #Message-model-add-friends-root .u9-af-notice.is-success {
-  border-color: #d4dcf4;
-  background: #f3f5ff;
-  color: #4555ad;
+  border-color: #cbd7fb;
+  background: #f2f5ff;
+  color: #334a9a;
 }
 
-#Message-model-add-friends-root .u9-af-feedback.is-error,
 #Message-model-add-friends-root .u9-af-notice.is-error {
-  border-color: #efd3d6;
-  background: #fff5f6;
-  color: var(--u9-af-danger);
-}
-
-
-/* =========================================================
-   RESULTS SECTION
-========================================================= */
-
-#Message-model-add-friends-root .u9-af-results-section {
-  display: flex;
-  flex-direction: column;
-
-  width: 100%;
-  min-width: 0;
-
-  margin: 0;
-  padding: 0;
-}
-
-
-/* =========================================================
-   RESULTS HEADING
-========================================================= */
-
-#Message-model-add-friends-root .u9-af-results-heading {
-  display: block;
-
-  margin: 2px 0 5px;
-
-  color: #252a34;
-
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.45;
-}
-
-#Message-model-add-friends-root .u9-af-results-status {
-  display: block;
-
-  margin: 0 0 10px;
-
-  color: var(--u9-af-muted);
-
-  font-size: 12px;
-  line-height: 1.5;
-
-  overflow-wrap: anywhere;
+  border-color: #f0d2d2;
+  background: #fff5f5;
+  color: #a72e35;
 }
 
 
 /* =========================================================
    RESULT LIST
-========================================================= */
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-list {
   display: flex;
@@ -533,32 +400,20 @@
   width: 100%;
   min-width: 0;
 
-  gap: 8px;
-
-  margin: 0;
-  padding: 0;
-
-  list-style: none;
+  gap: 9px;
 }
 
 
 /* =========================================================
    USER CARD
+   =========================================================
 
-   IMPORTANT:
-   Card is deliberately similar to friends.css.
+   STRUCTURE:
 
-   Friends:
-   - gap: 13px
-   - padding: 13px 15px
-   - radius: 13px
+   [ AVATAR ] [ USER INFO ................ ] [ ACTIONS ]
 
-   Add Friend:
-   - gap: 11px
-   - padding: 11px 13px
-
-   This keeps Add Friend visually lighter.
-========================================================= */
+   Avatar is ALWAYS the first flex item.
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-user-card {
   position: relative;
@@ -571,14 +426,15 @@
   width: 100%;
   min-width: 0;
 
+  min-height: 82px;
+
   flex: 0 0 auto;
 
-  gap: 11px;
+  gap: 13px;
 
-  margin: 0;
-  padding: 11px 13px;
+  padding: 11px 14px;
 
-  border: 1px solid var(--u9-af-border);
+  border: 1px solid #e8eaf0;
   border-radius: 13px;
 
   background: #ffffff;
@@ -592,37 +448,42 @@
 }
 
 #Message-model-add-friends-root .u9-af-user-card:hover {
-  border-color: var(--u9-af-border-hover);
+  border-color: #d9deea;
 
   background: #fcfcfe;
 
-  box-shadow: 0 3px 12px rgb(24 39 75 / 5%);
+  box-shadow:
+    0 3px 12px rgb(24 39 75 / 5%);
 }
 
 
 /* =========================================================
    AVATAR STACK
+   =========================================================
 
-   EXACT SAME DIMENSIONS AS FRIENDS PAGE
+   SAME AS FRIENDS PAGE:
 
-   Desktop:
-   slot 58px
-   avatar 37px
-   frame 71px
+   Desktop
+   slot   = 58px
+   avatar = 37px
+   frame  = 71px
 
-   Tablet:
-   slot 52px
-   avatar 34px
-   frame 65px
+   Tablet
+   slot   = 52px
+   avatar = 34px
+   frame  = 65px
 
-   Small:
-   slot 44px
-   avatar 29px
-   frame 55.4px
+   Small
+   slot   = 44px
+   avatar = 29px
+   frame  = 55.4px
 
-   The frame is visually larger than the slot,
-   but does NOT change the flex layout width.
-========================================================= */
+   IMPORTANT:
+   The 71px frame is visual only.
+   The actual flex layout slot remains 58px.
+
+   This keeps the frame from pushing the text.
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-avatar-stack {
   --u9-af-slot-size: 58px;
@@ -644,12 +505,12 @@
   margin: 0;
   padding: 0;
 
+  overflow: visible;
+
   border: 0;
   border-radius: 0;
 
   background: transparent;
-
-  overflow: visible;
 
   isolation: isolate;
 
@@ -659,9 +520,7 @@
 
 /* =========================================================
    BASE AVATAR
-
-   Same positioning logic as friends.css.
-========================================================= */
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-avatar {
   position: absolute !important;
@@ -676,6 +535,8 @@
 
   display: block;
 
+  flex: none !important;
+
   width: var(--u9-af-image-size) !important;
   height: var(--u9-af-image-size) !important;
 
@@ -688,15 +549,16 @@
   margin: 0 !important;
   padding: 0 !important;
 
-  border: 0;
-  border-radius: 50%;
-
-  background: #edf0f5;
+  transform:
+    translate(-50%, -50%) !important;
 
   object-fit: cover;
   object-position: center;
 
-  transform: translate(-50%, -50%) !important;
+  border: 0;
+  border-radius: 50%;
+
+  background: #f0f2f7;
 
   box-sizing: border-box;
 }
@@ -704,9 +566,7 @@
 
 /* =========================================================
    AVATAR FRAME
-
-   Same positioning logic as friends.css.
-========================================================= */
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-avatar-frame {
   position: absolute !important;
@@ -721,6 +581,8 @@
 
   display: block;
 
+  flex: none !important;
+
   width: var(--u9-af-frame-size) !important;
   height: var(--u9-af-frame-size) !important;
 
@@ -733,80 +595,30 @@
   margin: 0 !important;
   padding: 0 !important;
 
+  transform:
+    translate(-50%, -50%) !important;
+
+  object-fit: contain;
+  object-position: center;
+
   border: 0;
   border-radius: 0;
 
   background: transparent;
 
-  object-fit: contain;
-  object-position: center;
-
   pointer-events: none;
 
-  transform: translate(-50%, -50%) !important;
-
   box-sizing: border-box;
 }
 
 
 /* =========================================================
-   FALLBACK AVATAR
-
-   If JS creates a fallback element.
-========================================================= */
-
-#Message-model-add-friends-root .u9-af-avatar-fallback {
-  position: absolute !important;
-
-  top: 50% !important;
-  left: 50% !important;
-
-  right: auto !important;
-  bottom: auto !important;
-
-  z-index: 1;
-
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  width: var(--u9-af-image-size) !important;
-  height: var(--u9-af-image-size) !important;
-
-  min-width: 0 !important;
-  min-height: 0 !important;
-
-  max-width: none !important;
-  max-height: none !important;
-
-  margin: 0 !important;
-  padding: 0 !important;
-
-  overflow: hidden;
-
-  transform: translate(-50%, -50%) !important;
-
-  border: 0;
-  border-radius: 50%;
-
-  background: #e8edff;
-  color: #4058a8;
-
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1;
-
-  box-sizing: border-box;
-}
-
-
-/* =========================================================
-   USER INFORMATION
-========================================================= */
+   USER INFO
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-user-info {
-  display: block;
+  display: flex;
+  flex-direction: column;
 
   flex: 1 1 auto;
 
@@ -824,15 +636,14 @@
   min-width: 0;
 
   margin: 0;
-  padding: 0;
-
-  overflow: hidden;
 
   color: #242933;
 
   font-size: 14px;
   font-weight: 650;
-  line-height: 1.45;
+  line-height: 1.5;
+
+  overflow: hidden;
 
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -845,14 +656,13 @@
   min-width: 0;
 
   margin: 3px 0 0;
-  padding: 0;
-
-  overflow: hidden;
 
   color: #777d87;
 
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.4;
+
+  overflow: hidden;
 
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -863,32 +673,40 @@
 
   width: 100%;
 
-  margin: 5px 0 0;
-  padding: 0;
+  margin-top: 6px;
 
-  color: #687084;
+  color: #525b68;
 
   font-size: 12px;
   line-height: 1.5;
 
   overflow-wrap: anywhere;
+
   white-space: pre-wrap;
 }
 
 
 /* =========================================================
    CARD ACTIONS
-========================================================= */
+   =========================================================
+
+   Desktop:
+   actions stay on RIGHT.
+
+   Avatar never participates in action alignment.
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-card-actions {
   display: flex;
-
   align-items: center;
   justify-content: flex-end;
 
   flex: 0 0 auto;
 
-  gap: 6px;
+  width: auto;
+  min-width: 0;
+
+  gap: 7px;
 
   margin: 0;
   padding: 0;
@@ -896,8 +714,8 @@
 
 
 /* =========================================================
-   BUTTON
-========================================================= */
+   ACTION BUTTON
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-button {
   display: inline-flex;
@@ -908,63 +726,61 @@
   flex: 0 0 auto;
 
   min-width: 0;
-  min-height: 34px;
+  min-height: 35px;
 
-  margin: 0;
-  padding: 0 11px;
+  padding: 0 12px;
 
   border: 1px solid transparent;
   border-radius: 9px;
 
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
+
   line-height: 1.2;
 
-  text-align: center;
   white-space: nowrap;
 
   transition:
     background-color 160ms ease,
     border-color 160ms ease,
-    color 160ms ease,
-    transform 120ms ease;
+    color 160ms ease;
 }
 
 
 /* =========================================================
    PRIMARY
-========================================================= */
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-button-primary {
   border-color: var(--u9-af-accent);
 
   background: var(--u9-af-accent);
+
   color: #ffffff;
 }
 
-#Message-model-add-friends-root .u9-af-button-primary:hover:not(:disabled) {
+#Message-model-add-friends-root
+.u9-af-button-primary:hover:not(:disabled) {
   border-color: var(--u9-af-accent-hover);
 
   background: var(--u9-af-accent-hover);
 }
 
-#Message-model-add-friends-root .u9-af-button-primary:active:not(:disabled) {
-  transform: scale(0.97);
-}
-
 
 /* =========================================================
    SECONDARY
-========================================================= */
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-button-secondary {
   border-color: #dfe3ec;
 
   background: #ffffff;
+
   color: #424957;
 }
 
-#Message-model-add-friends-root .u9-af-button-secondary:hover:not(:disabled) {
+#Message-model-add-friends-root
+.u9-af-button-secondary:hover:not(:disabled) {
   border-color: #cdd4e8;
 
   background: #f5f6fb;
@@ -973,35 +789,38 @@
 
 /* =========================================================
    DANGER
-========================================================= */
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-button-danger {
-  border-color: #efd4d8;
+  border-color: #f0d1d1;
 
   background: #ffffff;
+
   color: var(--u9-af-danger);
 }
 
-#Message-model-add-friends-root .u9-af-button-danger:hover:not(:disabled) {
-  background: #fff4f5;
+#Message-model-add-friends-root
+.u9-af-button-danger:hover:not(:disabled) {
+  background: #fff3f3;
 }
 
 
 /* =========================================================
-   SENT
-========================================================= */
+   SENT / PENDING
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-button-sent {
-  border-color: #d7dcf2;
+  border-color: #d4d9ee;
 
   background: var(--u9-af-accent-soft);
-  color: #4d5cb9;
+
+  color: #3f519f;
 }
 
 
 /* =========================================================
    REQUEST STATUS
-========================================================= */
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-status {
   display: inline-flex;
@@ -1011,58 +830,58 @@
 
   flex: 0 0 auto;
 
-  min-height: 23px;
+  min-height: 24px;
 
   padding: 3px 8px;
 
   border-radius: 999px;
 
   background: #f0f2f7;
+
   color: #687084;
 
   font-size: 10px;
-  font-weight: 700;
-  line-height: 1.25;
+  font-weight: 750;
+
+  line-height: 1.3;
 
   white-space: nowrap;
 }
 
 #Message-model-add-friends-root .u9-af-status-pending {
-  background: #fff5e2;
-  color: #8d6419;
+  background: #fff5df;
+  color: #8a6213;
 }
 
 #Message-model-add-friends-root .u9-af-status-accepted {
-  background: #eef0ff;
-  color: #4d5cb9;
+  background: #eef1ff;
+  color: #3f519f;
 }
 
 #Message-model-add-friends-root .u9-af-status-rejected,
 #Message-model-add-friends-root .u9-af-status-cancelled {
-  background: #f2f3f6;
-  color: #737989;
+  background: #f2f3f5;
+  color: #747a85;
 }
 
 
 /* =========================================================
-   EMPTY / LOADING
-========================================================= */
+   EMPTY STATE
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-empty {
-  display: block;
-
   width: 100%;
 
-  margin: 0;
-  padding: 18px 13px;
+  padding: 20px 14px;
 
-  border: 1px dashed #dfe3ed;
+  border: 1px dashed #dfe3ec;
   border-radius: 12px;
 
   background: #fafbfe;
+
   color: var(--u9-af-muted);
 
-  font-size: 12px;
+  font-size: 13px;
   line-height: 1.6;
 
   text-align: center;
@@ -1072,8 +891,8 @@
 
 
 /* =========================================================
-   SECTION DIVIDER
-========================================================= */
+   DIVIDER
+   ========================================================= */
 
 #Message-model-add-friends-root .u9-af-section-divider {
   width: 100%;
@@ -1087,12 +906,12 @@
 
 /* =========================================================
    TABLET
-========================================================= */
+   ========================================================= */
 
 @media (max-width: 760px) {
 
-  #Message-model-add-friends-root .u9-af-container {
-    padding: 16px 13px 20px;
+  #Message-model-add-friends-root .u9-af-page {
+    padding: 10px 12px 14px;
 
     gap: 14px;
   }
@@ -1102,13 +921,13 @@
   }
 
   #Message-model-add-friends-root .u9-af-panel {
-    padding: 15px;
+    padding: 14px;
+
     border-radius: 13px;
   }
 
-  /*
-     Same proportions as friends.css
-  */
+
+  /* Same as friends.css */
 
   #Message-model-add-friends-root .u9-af-avatar-stack {
     --u9-af-slot-size: 52px;
@@ -1116,9 +935,13 @@
     --u9-af-frame-size: 65px;
   }
 
+
   #Message-model-add-friends-root .u9-af-user-card {
+    min-height: 74px;
+
     gap: 10px;
-    padding: 10px 11px;
+
+    padding: 11px;
   }
 
   #Message-model-add-friends-root .u9-af-card-actions {
@@ -1127,119 +950,78 @@
 
   #Message-model-add-friends-root .u9-af-button {
     min-height: 33px;
-    padding: 0 10px;
+
+    padding-right: 10px;
+    padding-left: 10px;
+
+    font-size: 11px;
   }
 }
 
 
 /* =========================================================
-   SMALL MOBILE
-========================================================= */
+   MOBILE
+   ========================================================= */
 
 @media (max-width: 600px) {
 
-  #Message-model-add-friends-root .u9-af-container {
-    padding: 13px 10px 18px;
-
-    gap: 13px;
-  }
-
-  #Message-model-add-friends-root .u9-af-heading {
-    font-size: 20px;
-  }
-
-  #Message-model-add-friends-root .u9-af-subtitle {
-    font-size: 12px;
-  }
-
-  #Message-model-add-friends-root .u9-af-panel {
+  #Message-model-add-friends-root .u9-af-page {
     padding: 13px;
 
-    border-radius: 12px;
+    gap: 14px;
   }
 
-  /*
-     Search becomes vertical.
-  */
 
   #Message-model-add-friends-root .u9-af-search-row {
     flex-direction: column;
-
-    gap: 8px;
   }
 
   #Message-model-add-friends-root .u9-af-search-button {
     width: 100%;
   }
 
+
   /*
-     Result card stays compact.
-  */
+   * IMPORTANT:
+   *
+   * Do NOT move the avatar to a separate row.
+   * Keep:
+   *
+   * [avatar] [info] [actions]
+   *
+   * together whenever there is enough width.
+   */
 
   #Message-model-add-friends-root .u9-af-user-card {
-    align-items: flex-start;
+    align-items: center;
 
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
 
     gap: 9px;
 
     padding: 10px;
   }
 
-  #Message-model-add-friends-root .u9-af-user-info {
-    flex: 1 1 calc(100% - 62px);
-  }
-
-  #Message-model-add-friends-root .u9-af-card-actions {
-    width: 100%;
-
-    justify-content: flex-start;
-
-    padding-left: 62px;
-
-    gap: 6px;
-  }
-
-  #Message-model-add-friends-root .u9-af-button {
-    min-height: 34px;
-  }
-}
-
-
-/* =========================================================
-   VERY SMALL MOBILE
-
-   Same proportions as friends.css.
-========================================================= */
-
-@media (max-width: 380px) {
-
-  #Message-model-add-friends-root .u9-af-container {
-    padding-right: 8px;
-    padding-left: 8px;
-  }
-
-  #Message-model-add-friends-root .u9-af-avatar-stack {
-    --u9-af-slot-size: 44px;
-    --u9-af-image-size: 29px;
-    --u9-af-frame-size: 55.4px;
-  }
-
-  #Message-model-add-friends-root .u9-af-user-card {
-    gap: 7px;
-
-    padding: 9px;
-  }
 
   #Message-model-add-friends-root .u9-af-user-info {
-    flex-basis: calc(100% - 51px);
+    flex: 1 1 auto;
+
+    min-width: 0;
   }
 
+
   #Message-model-add-friends-root .u9-af-card-actions {
-    padding-left: 51px;
+    flex: 0 0 auto;
+
+    width: auto;
+
+    padding: 0;
+
+    justify-content: flex-end;
 
     gap: 5px;
   }
+
 
   #Message-model-add-friends-root .u9-af-button {
     min-height: 32px;
@@ -1247,30 +1029,102 @@
     padding-right: 9px;
     padding-left: 9px;
 
-    font-size: 10px;
+    font-size: 11px;
+  }
+
+
+  #Message-model-add-friends-root .u9-af-intro {
+    font-size: 11px;
   }
 }
 
 
 /* =========================================================
-   FOCUS
-========================================================= */
+   SMALL MOBILE
+   ========================================================= */
 
-#Message-model-add-friends-root .u9-af-button:focus-visible {
-  outline: 2px solid var(--u9-af-accent);
+@media (max-width: 380px) {
 
-  outline-offset: 2px;
+  #Message-model-add-friends-root .u9-af-page {
+    padding-right: 8px;
+    padding-left: 8px;
+  }
+
+
+  /* EXACT FRIENDS PAGE SMALL SIZE */
+
+  #Message-model-add-friends-root .u9-af-avatar-stack {
+    --u9-af-slot-size: 44px;
+    --u9-af-image-size: 29px;
+    --u9-af-frame-size: 55.4px;
+  }
+
+
+  #Message-model-add-friends-root .u9-af-user-card {
+    gap: 7px;
+
+    padding: 9px 10px;
+  }
+
+
+  #Message-model-add-friends-root .u9-af-card-actions {
+    gap: 3px;
+  }
+
+
+  #Message-model-add-friends-root .u9-af-button {
+    min-height: 30px;
+
+    padding-right: 7px;
+    padding-left: 7px;
+
+    font-size: 10px;
+  }
+
+
+  #Message-model-add-friends-root .u9-af-status {
+    min-height: 22px;
+
+    padding-right: 7px;
+    padding-left: 7px;
+
+    font-size: 9px;
+  }
 }
 
-#Message-model-add-friends-root .u9-af-input:focus-visible,
-#Message-model-add-friends-root .u9-af-textarea:focus-visible {
-  outline: none;
+
+/* =========================================================
+   VERY NARROW SCREEN
+   =========================================================
+
+   Only when the screen genuinely cannot fit all three
+   areas do we allow the action area to go below.
+
+   The avatar remains LEFT.
+   ========================================================= */
+
+@media (max-width: 330px) {
+
+  #Message-model-add-friends-root .u9-af-user-card {
+    align-items: flex-start;
+
+    flex-wrap: wrap;
+  }
+
+
+  #Message-model-add-friends-root .u9-af-card-actions {
+    width: 100%;
+
+    margin-left: 51px;
+
+    justify-content: flex-start;
+  }
 }
 
 
 /* =========================================================
    REDUCED MOTION
-========================================================= */
+   ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
 
