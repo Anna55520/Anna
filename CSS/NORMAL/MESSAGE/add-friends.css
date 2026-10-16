@@ -2,15 +2,12 @@
    U9 MESSAGE — ADD FRIEND PAGE
    File: CSS/NORMAL/MESSAGE/add-friends.css
 
-   Design reference:
-   - Matches friends.css
-   - Small avatar
-   - Small avatar frame
-   - Avatar/frame stay together on LEFT
-   - Username immediately follows avatar area
-   - Actions stay on RIGHT
-   - Fully scoped to Add Friend root
-   - Protected against normal-message.css conflicts
+   IMPORTANT
+   - Keep avatar + avatar frame exactly like Friends page
+   - Avatar/frame stay on the LEFT
+   - Avatar/frame do NOT affect flex layout
+   - Everything else uses the original Add Friend layout
+   - Fully scoped to #Message-model-add-friends-root
 ========================================================= */
 
 
@@ -46,8 +43,7 @@
 
 
 /* =========================================================
-   BUTTON / INPUT RESET
-   Prevent normal-message.css from changing Add Friend UI
+   FORM ELEMENT RESET
 ========================================================= */
 
 #Message-model-add-friends-root button,
@@ -152,14 +148,49 @@
 
 
 /* =========================================================
-   SEARCH AREA
+   SEARCH FORM
 ========================================================= */
 
-#Message-model-add-friends-root .u9-af-panel input {
+#Message-model-add-friends-root .u9-af-search-form {
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 8px;
+}
+
+
+/* =========================================================
+   SEARCH ROW
+========================================================= */
+
+#Message-model-add-friends-root .u9-af-search-row {
+  display: flex;
+
+  align-items: stretch;
+
+  width: 100%;
+  min-width: 0;
+
+  gap: 10px;
+}
+
+
+/* =========================================================
+   SEARCH INPUT
+========================================================= */
+
+#Message-model-add-friends-root .u9-af-panel input,
+#Message-model-add-friends-root .u9-af-input {
+  flex: 1 1 auto;
+
   display: block;
 
   width: 100%;
   min-width: 0;
+
   min-height: 44px;
 
   padding: 0 13px;
@@ -179,11 +210,13 @@
     box-shadow 160ms ease;
 }
 
-#Message-model-add-friends-root .u9-af-panel input::placeholder {
+#Message-model-add-friends-root .u9-af-panel input::placeholder,
+#Message-model-add-friends-root .u9-af-input::placeholder {
   color: #a0a7b6;
 }
 
-#Message-model-add-friends-root .u9-af-panel input:focus {
+#Message-model-add-friends-root .u9-af-panel input:focus,
+#Message-model-add-friends-root .u9-af-input:focus {
   border-color: #5968c8;
 
   box-shadow:
@@ -195,23 +228,26 @@
    SEARCH BUTTON
 ========================================================= */
 
-#Message-model-add-friends-root .u9-af-panel button {
+#Message-model-add-friends-root .u9-af-search-button {
   display: inline-flex;
 
   align-items: center;
   justify-content: center;
 
-  min-height: 36px;
+  flex: 0 0 auto;
 
-  padding: 0 13px;
+  min-width: 100px;
+  min-height: 44px;
 
-  border: 1px solid transparent;
-  border-radius: 9px;
+  padding: 0 18px;
+
+  border: 1px solid #5968c8;
+  border-radius: 10px;
 
   background: #5968c8;
   color: #ffffff;
 
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 750;
 
   text-align: center;
@@ -223,15 +259,68 @@
     opacity 160ms ease;
 }
 
-#Message-model-add-friends-root .u9-af-panel button:hover {
+#Message-model-add-friends-root .u9-af-search-button:hover {
+  border-color: #4654ad;
   background: #4654ad;
 }
 
-#Message-model-add-friends-root .u9-af-panel button:active {
+#Message-model-add-friends-root .u9-af-search-button:active {
+  border-color: #3f4ca0;
   background: #3f4ca0;
 }
 
-#Message-model-add-friends-root .u9-af-panel button:disabled {
+#Message-model-add-friends-root .u9-af-search-button:disabled {
+  opacity: 0.55;
+}
+
+
+/* =========================================================
+   FALLBACK
+   If JS does not use .u9-af-search-button and directly
+   places the search button inside the panel.
+========================================================= */
+
+#Message-model-add-friends-root .u9-af-panel > button {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  min-width: 100px;
+  min-height: 44px;
+
+  margin-top: 10px;
+
+  padding: 0 18px;
+
+  border: 1px solid #5968c8;
+  border-radius: 10px;
+
+  background: #5968c8;
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 750;
+
+  white-space: nowrap;
+
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    opacity 160ms ease;
+}
+
+#Message-model-add-friends-root .u9-af-panel > button:hover {
+  border-color: #4654ad;
+  background: #4654ad;
+}
+
+#Message-model-add-friends-root .u9-af-panel > button:active {
+  border-color: #3f4ca0;
+  background: #3f4ca0;
+}
+
+#Message-model-add-friends-root .u9-af-panel > button:disabled {
   opacity: 0.55;
 }
 
@@ -266,21 +355,32 @@
 
 
 /* =========================================================
+   RESULT SLOT / REQUEST LIST
+========================================================= */
+
+#Message-model-add-friends-root .u9-af-results,
+#Message-model-add-friends-root .u9-af-result-slot,
+#Message-model-add-friends-root .u9-af-requests,
+#Message-model-add-friends-root .u9-af-request-list {
+  width: 100%;
+  min-width: 0;
+}
+
+
+/* =========================================================
    USER CARD
 
-   IMPORTANT:
-   Avatar is FIRST.
-   Details are SECOND.
-   Action is LAST.
+   Layout:
 
-   This reproduces Friends page structure.
+   [ avatar + frame ] [ user info ] [ action ]
+
+   Avatar is ALWAYS the first flex item.
 ========================================================= */
 
 #Message-model-add-friends-root .u9-af-user-card {
   position: relative;
 
   display: flex;
-
   align-items: center;
 
   width: 100%;
@@ -320,16 +420,16 @@
 /* =========================================================
    AVATAR WRAPPER
 
-   SAME LOGIC AS FRIENDS PAGE
+   KEEP THIS PART.
 
-   Layout slot: 58px
-   Avatar:      37px
-   Frame:       71px
+   Same proportions as Friends page:
 
-   The frame may visually extend outside the slot,
-   but the SLOT itself remains only 58px.
+   Layout slot : 58px
+   Avatar      : 37px
+   Frame       : 71px
 
-   This prevents the frame from pushing the username.
+   The frame is visual only and does NOT participate
+   in the flex layout.
 ========================================================= */
 
 #Message-model-add-friends-root .u9-af-avatar-wrap {
@@ -366,7 +466,7 @@
 /* =========================================================
    BASE AVATAR
 
-   Actual avatar stays SMALL.
+   KEEP THIS PART.
 ========================================================= */
 
 #Message-model-add-friends-root .u9-af-avatar {
@@ -411,10 +511,10 @@
 /* =========================================================
    AVATAR FRAME
 
-   Frame is only a VISUAL OVERLAY.
-   It does NOT participate in layout.
+   KEEP THIS PART.
 
-   This is the important fix.
+   Frame is an overlay.
+   It does NOT create additional flex width.
 ========================================================= */
 
 #Message-model-add-friends-root .u9-af-frame {
@@ -460,6 +560,8 @@
 
 /* =========================================================
    USER DETAILS
+
+   KEEP ORIGINAL INFORMATION AREA.
 ========================================================= */
 
 #Message-model-add-friends-root .u9-af-user-details {
@@ -535,7 +637,7 @@
 
 
 /* =========================================================
-   USER ACTION AREA
+   USER ACTION
 ========================================================= */
 
 #Message-model-add-friends-root .u9-af-user-action {
@@ -547,6 +649,8 @@
   flex: 0 0 auto;
 
   min-width: 0;
+
+  margin-left: auto;
 }
 
 
@@ -563,6 +667,8 @@
   flex: 0 0 auto;
 
   gap: 7px;
+
+  min-width: 0;
 }
 
 
@@ -620,6 +726,8 @@
 }
 
 #Message-model-add-friends-root .u9-af-button-primary:active {
+  border-color: #3f4ca0;
+
   background: #3f4ca0;
 }
 
@@ -671,7 +779,7 @@
 
 
 /* =========================================================
-   PENDING
+   PENDING STATUS
 ========================================================= */
 
 #Message-model-add-friends-root .u9-af-status.pending,
@@ -682,7 +790,7 @@
 
 
 /* =========================================================
-   SUCCESS
+   SUCCESS STATUS
 ========================================================= */
 
 #Message-model-add-friends-root .u9-af-status.success,
@@ -693,7 +801,7 @@
 
 
 /* =========================================================
-   ERROR
+   ERROR STATUS
 ========================================================= */
 
 #Message-model-add-friends-root .u9-af-status.error,
@@ -730,11 +838,57 @@
 
 
 /* =========================================================
-   REQUEST SECTION SEPARATOR
+   REQUEST SECTION
 ========================================================= */
 
 #Message-model-add-friends-root .u9-af-requests-section {
   padding-top: 2px;
+}
+
+
+/* =========================================================
+   IMAGE PROTECTION
+
+   IMPORTANT:
+   normal-message.css may contain rules such as:
+
+     img {
+       width: 100%;
+       max-width: 100%;
+     }
+
+   These rules must NOT affect avatar/frame.
+========================================================= */
+
+#Message-model-add-friends-root .u9-af-avatar-wrap img {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+#Message-model-add-friends-root .u9-af-avatar {
+  width: var(--af-avatar-size) !important;
+  height: var(--af-avatar-size) !important;
+
+  max-width: none !important;
+  max-height: none !important;
+}
+
+#Message-model-add-friends-root .u9-af-frame {
+  width: var(--af-frame-size) !important;
+  height: var(--af-frame-size) !important;
+
+  max-width: none !important;
+  max-height: none !important;
+}
+
+
+/* =========================================================
+   PREVENT AVATAR FLEX GROW / SHRINK
+========================================================= */
+
+#Message-model-add-friends-root .u9-af-avatar-wrap {
+  flex-grow: 0 !important;
+  flex-shrink: 0 !important;
 }
 
 
@@ -748,17 +902,32 @@
     padding: 13px;
   }
 
+
   #Message-model-add-friends-root .u9-af-header {
     margin-bottom: 14px;
 
     font-size: 21px;
   }
 
+
   #Message-model-add-friends-root .u9-af-panel {
     padding: 14px;
 
     border-radius: 13px;
   }
+
+
+  #Message-model-add-friends-root .u9-af-search-row {
+    gap: 8px;
+  }
+
+
+  #Message-model-add-friends-root .u9-af-search-button {
+    min-width: 88px;
+
+    padding: 0 14px;
+  }
+
 
   #Message-model-add-friends-root .u9-af-user-card {
     gap: 10px;
@@ -770,7 +939,8 @@
 
 
   /* -----------------------------------------------
-     SMALLER AVATAR — SAME SCALE AS FRIENDS PAGE
+     AVATAR / FRAME
+     SAME SCALE AS FRIENDS PAGE
   ------------------------------------------------ */
 
   #Message-model-add-friends-root .u9-af-avatar-wrap {
@@ -784,6 +954,7 @@
     gap: 5px;
   }
 
+
   #Message-model-add-friends-root .u9-af-request-button {
     min-width: 72px;
 
@@ -793,6 +964,7 @@
 
     font-size: 11px;
   }
+
 
   #Message-model-add-friends-root .u9-af-user-details .u9-af-name,
   #Message-model-add-friends-root .u9-af-user-details .u9-af-username {
@@ -811,9 +983,23 @@
     padding: 8px;
   }
 
+
   #Message-model-add-friends-root .u9-af-panel {
     padding: 12px;
   }
+
+
+  #Message-model-add-friends-root .u9-af-search-row {
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+
+  #Message-model-add-friends-root .u9-af-search-button {
+    width: 100%;
+  }
+
 
   #Message-model-add-friends-root .u9-af-user-card {
     gap: 7px;
@@ -825,7 +1011,8 @@
 
 
   /* -----------------------------------------------
-     SAME PROPORTION AS FRIENDS PAGE
+     AVATAR / FRAME
+     SAME SCALE AS FRIENDS PAGE
   ------------------------------------------------ */
 
   #Message-model-add-friends-root .u9-af-avatar-wrap {
@@ -839,6 +1026,7 @@
     gap: 3px;
   }
 
+
   #Message-model-add-friends-root .u9-af-request-button {
     min-width: 0;
 
@@ -849,6 +1037,7 @@
     font-size: 10px;
   }
 
+
   #Message-model-add-friends-root .u9-af-status {
     min-height: 22px;
 
@@ -856,38 +1045,6 @@
 
     font-size: 9px;
   }
-}
-
-
-/* =========================================================
-   IMPORTANT IMAGE PROTECTION
-
-   Prevent normal-message.css from making avatar/frame
-   width: 100%, max-width, etc.
-========================================================= */
-
-#Message-model-add-friends-root .u9-af-avatar-wrap img {
-  max-width: none !important;
-}
-
-#Message-model-add-friends-root .u9-af-avatar {
-  width: var(--af-avatar-size) !important;
-  height: var(--af-avatar-size) !important;
-}
-
-#Message-model-add-friends-root .u9-af-frame {
-  width: var(--af-frame-size) !important;
-  height: var(--af-frame-size) !important;
-}
-
-
-/* =========================================================
-   PREVENT FLEX GROWING OF AVATAR
-========================================================= */
-
-#Message-model-add-friends-root .u9-af-avatar-wrap {
-  flex-grow: 0 !important;
-  flex-shrink: 0 !important;
 }
 
 
