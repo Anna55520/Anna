@@ -2146,10 +2146,17 @@
 
 
   /*
-   * Optional global refresh hook.
+   * Global page initializer expected by normal-message.js.
+   * The page shell and event handlers are created once when this
+   * module loads; navigating back to Add Friend refreshes the
+   * relationship lists without rebuilding the form or losing state.
    */
-  window.refreshAddFriendsPage =
-    loadRelationships;
+  window.initializeAddFriendsPage = function initializeAddFriendsPage() {
+    return loadRelationships();
+  };
+
+  /* Optional global refresh hook used by other Message components. */
+  window.refreshAddFriendsPage = loadRelationships;
 
 
   console.log(
