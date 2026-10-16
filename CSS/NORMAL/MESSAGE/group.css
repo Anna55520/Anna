@@ -30,7 +30,8 @@
 
 #Message-model-group-root [hidden] { display: none !important; }
 #Message-model-group-root button,
-#Message-model-group-root input { font: inherit; }
+#Message-model-group-root input,
+#Message-model-group-root textarea { font: inherit; }
 #Message-model-group-root button { cursor: pointer; }
 #Message-model-group-root button:disabled { cursor: not-allowed; opacity: .6; }
 
@@ -124,10 +125,59 @@
   font-weight: 750;
 }
 
-#Message-model-group-root .u9-group-search-form {
+#Message-model-group-root .u9-group-search-form,
+#Message-model-group-root .u9-group-create-form {
   display: flex;
   flex-direction: column;
+  gap: 16px;
+}
+
+#Message-model-group-root .u9-group-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+#Message-model-group-root .u9-group-label-optional {
+  color: var(--u9-group-muted);
+  font-weight: 500;
+}
+
+#Message-model-group-root .u9-group-field-hint {
+  margin: 0;
+  color: var(--u9-group-muted);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+#Message-model-group-root .u9-group-field-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
   gap: 8px;
+}
+
+#Message-model-group-root .u9-group-char-count {
+  color: var(--u9-group-muted);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+#Message-model-group-root .u9-group-textarea {
+  min-height: 108px;
+  padding: 11px 13px;
+  resize: vertical;
+  line-height: 1.55;
+}
+
+#Message-model-group-root .u9-group-search-form { gap: 8px; }
+
+#Message-model-group-root .u9-group-create-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 2px;
 }
 
 #Message-model-group-root .u9-group-label {
@@ -422,6 +472,7 @@
   #Message-model-group-root .u9-group-panel { padding: 14px; border-radius: 13px; }
   #Message-model-group-root .u9-group-search-row { flex-direction: column; }
   #Message-model-group-root .u9-group-primary-button { width: 100%; }
+  #Message-model-group-root .u9-group-create-actions { justify-content: stretch; }
   #Message-model-group-root .u9-group-card { gap: 10px; padding: 11px; }
   #Message-model-group-root .u9-group-avatar,
   #Message-model-group-root .u9-group-avatar-fallback { flex-basis: 42px; width: 42px; height: 42px; border-radius: 11px; }
