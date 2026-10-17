@@ -307,7 +307,7 @@ try{
 const response =
 await fetch(
 
-"/api/register",
+"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/register",
 
 {
 
