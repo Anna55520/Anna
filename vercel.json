@@ -1,0 +1,21 @@
+
+{
+  "rewrites": [
+    {
+      "source": "/api/login",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/login"
+    },
+    {
+      "source": "/api/register",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/register"
+    },
+    {
+      "source": "/api/logout",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/logout"
+    },
+    {
+      "source": "/api/me",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me"
+    }
+  ]
+}
