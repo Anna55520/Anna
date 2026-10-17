@@ -15,19 +15,23 @@
 ========================================================= */
 
 const U9_PROFILE_PAGE3_FREE_AVATAR_API =
-  "/api/avatar-free";
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-free";
 
 const U9_PROFILE_PAGE3_SET_AVATAR_API =
-  "/api/avatar-set";
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-set";
 
 const U9_PROFILE_PAGE3_FREE_FRAME_API =
-  "/api/avatar-frame-free";
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free";
 
 const U9_PROFILE_PAGE3_PAID_FRAME_API =
-  "/api/avatar-frame-paid";
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid";
+
+const U9_PROFILE_PAGE3_EQUIP_FRAME_API =
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-equip";
 
 const U9_PROFILE_PAGE3_PURCHASE_FRAME_API =
-  "/api/avatar-frame-paid-purchase";
+  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid-purchase";
+
 
 /* =========================================================
    ELEMENTS
