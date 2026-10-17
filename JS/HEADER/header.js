@@ -422,15 +422,13 @@ function setUserState(
       break;
 
 
+    case "CHECKING":
+    if (!currentUser) {
+        showHeaderLoading();
+  }
 
+  break;
 
-    case "ERROR":
-
-
-      showHeaderLoading();
-
-
-      break;
 
 
 
