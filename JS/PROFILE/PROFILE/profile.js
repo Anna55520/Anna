@@ -207,6 +207,48 @@ const u9ProfileDefaultFrame =
 
 
 /* =========================
+   SUPABASE STORAGE IMAGE PROXY
+========================= */
+
+const U9_PROFILE_STORAGE_ORIGIN =
+  "https://tvtakmswbzawaweytimx.supabase.co";
+
+function u9ProfileGetImageUrl(source) {
+  if (typeof source !== "string") {
+    return source;
+  }
+
+  const value = source.trim();
+
+  if (!value) {
+    return value;
+  }
+
+  try {
+    const url = new URL(value, window.location.origin);
+
+    if (
+      url.origin === U9_PROFILE_STORAGE_ORIGIN &&
+      url.pathname.startsWith(
+        "/storage/v1/object/public/"
+      )
+    ) {
+      const storagePath = url.pathname.replace(
+        "/storage/v1/object/public/",
+        ""
+      );
+
+      return "/storage/" + storagePath + url.search;
+    }
+
+    return value;
+  } catch (error) {
+    return value;
+  }
+}
+
+
+/* =========================
    PROFILE INTERNAL PAGE STATE
 ========================= */
 
@@ -1090,7 +1132,8 @@ async function u9ProfileLoadFrame(frameType, frameId) {
 
     if (u9ProfileAvatarFrame) {
       u9ProfileAvatarFrame.dataset.u9Fallback = "false";
-      u9ProfileAvatarFrame.src = currentFrame.svg;
+      u9ProfileAvatarFrame.src =
+      u9ProfileGetImageUrl(currentFrame.svg);
     }
 
     return true;
@@ -1154,7 +1197,10 @@ async function u9ProfileLoadAvatarFromUser(user) {
 
   try {
     const avatar = user.avatar || null;
-    const avatarUrl = avatar?.url || "";
+
+    const avatarUrl = u9ProfileGetImageUrl(
+    avatar?.url || ""
+    );
 
     if (avatarUrl && u9ProfileAvatarImage) {
       u9ProfileAvatarImage.dataset.u9Fallback = "false";
