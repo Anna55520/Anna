@@ -154,7 +154,7 @@
   "use strict";
 
   const API_URL = "/api/u9-settings";
-  const REFRESH_INTERVAL_MS = 30000;
+  const REFRESH_INTERVAL_MS = 2000;
 
   async function loadPlatformSettings() {
     try {
