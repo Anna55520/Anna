@@ -9,7 +9,7 @@
 ========================================================= */
 
 const U9_PROFILE_PICTURE_UPLOAD_API =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-upload";
+  "/api/functions/avatar-upload";
 
 
 /* =========================================================
