@@ -1,3 +1,4 @@
+
 {
   "rewrites": [
     {
@@ -19,6 +20,10 @@
     {
       "source": "/api/u9-exchange",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/u9-exchange"
+    },
+    {
+      "source": "/api/avatar-frame-free",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free"
     }
   ]
 }
