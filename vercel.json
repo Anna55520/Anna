@@ -52,6 +52,10 @@
     {
       "source": "/api/avatar-frame-paid-purchase",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid-purchase"
+    },
+    {
+      "source": "/storage/:path*",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/storage/v1/object/public/:path*"
     }
   ]
 }
