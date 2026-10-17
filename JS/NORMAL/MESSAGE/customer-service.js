@@ -23,8 +23,9 @@
   if (window.__U9CustomerServicePageLoaded) return;
   window.__U9CustomerServicePageLoaded = true;
 
+  const SUPABASE_URL = "https://tvtakmswbzawaweytimx.supabase.co";
   const CUSTOMER_SERVICE_API_URL =
-    "/api/functions/customer-service-api";
+    SUPABASE_URL + "/functions/v1/customer-service-api";
   const ROOT_ID = "Message-model-customer-service-root";
   const PAGE_ID = "Message-model-customer-service-page";
   const REFRESH_INTERVAL_MS = 15000;
