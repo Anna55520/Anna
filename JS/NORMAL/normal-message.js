@@ -22,12 +22,12 @@
   ================================================= */
 
   const MESSAGE_API_URL =
-    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/message-api";
+    "/api/functions/message-api";
 
   // Group listing uses the separate group-api Edge Function.
   // Do not route group requests through message-api.
   const GROUP_API_URL =
-    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/group-api";
+    "/api/functions/group-api";
 
   const BACK_ICON_URL =
     "/SSVG/account/back.svg";
