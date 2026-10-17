@@ -1,4 +1,3 @@
-
 {
   "rewrites": [
     {
@@ -24,6 +23,22 @@
     {
       "source": "/api/avatar-frame-free",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free"
+    },
+    {
+      "source": "/api/avatar-frame-paid",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid"
+    },
+    {
+      "source": "/api/message-api",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/message-api"
+    },
+    {
+      "source": "/api/group-api",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/group-api"
+    },
+    {
+      "source": "/api/avatar-free",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-free"
     }
   ]
 }
