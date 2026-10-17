@@ -22,6 +22,10 @@
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/u9-exchange"
     },
     {
+      "source": "/api/u9-settings",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/u9-settings"
+    },
+    {
       "source": "/api/avatar-frame-free",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free"
     },
