@@ -424,7 +424,7 @@ if(
         const response =
           await fetch(
 
-            "/api/functions/logout",
+            "/api/logout",
 
             {
 
