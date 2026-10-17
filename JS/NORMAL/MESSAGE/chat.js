@@ -33,11 +33,20 @@
      CONFIGURATION
   ================================================= */
 
-  // All browser API calls use the site's Vercel same-origin proxy.
-  const MESSAGE_API_URL = "/api/functions/message-api";
-  const GROUP_API_URL = "/api/functions/group-api";
-  const CUSTOMER_SERVICE_API_URL = "/api/functions/customer-service-api";
-  const ME_API_URL = "/api/me";
+  const SUPABASE_URL =
+    "https://tvtakmswbzawaweytimx.supabase.co";
+
+  const MESSAGE_API_URL =
+    SUPABASE_URL + "/functions/v1/message-api";
+
+  const GROUP_API_URL =
+    SUPABASE_URL + "/functions/v1/group-api";
+
+  const CUSTOMER_SERVICE_API_URL =
+    SUPABASE_URL + "/functions/v1/customer-service-api";
+
+  const ME_API_URL =
+    SUPABASE_URL + "/functions/v1/me";
 
   const DEFAULT_AVATAR =
     "/SSVG/account/account-edit-button.svg";
