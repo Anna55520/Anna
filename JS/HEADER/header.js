@@ -46,7 +46,7 @@ const headerToolToggle =
 
 
 const U9_ME_API =
-"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/me";
+"/api/me";
 
 
 
