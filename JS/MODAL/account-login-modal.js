@@ -292,7 +292,7 @@ try{
 const response =
 await fetch(
 
-"https://tvtakmswbzawaweytimx.supabase.co/functions/v1/login",
+"/api/login",
 
 {
 
