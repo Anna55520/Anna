@@ -424,7 +424,7 @@ if(
         const response =
           await fetch(
 
-            "/api/logout",
+            "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/logout",
 
             {
 
