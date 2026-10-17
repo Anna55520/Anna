@@ -325,12 +325,11 @@ async function u9ProfileRefreshBalanceCoins() {
 
   if (
     !window.U9User ||
-    typeof window.U9User.refresh !== "function" ||
     typeof window.U9User.isLoggedIn !== "function" ||
     !window.U9User.isLoggedIn()
   ) {
     console.warn(
-      "Cannot refresh Balance / Coins: U9User.refresh is unavailable or user is logged out."
+      "Cannot refresh Balance / Coins: user is logged out."
     );
 
     return false;
@@ -338,16 +337,42 @@ async function u9ProfileRefreshBalanceCoins() {
 
   u9ProfileBalanceRefreshPromise = (async function() {
     try {
-      const user = await window.U9User.refresh();
+      const response = await fetch("/api/me", {
+        method: "GET",
+        headers: u9ProfileAuthHeaders(),
+        credentials: "omit",
+        cache: "no-store"
+      });
 
-      if (!user) {
+      if (!response.ok) {
         console.warn(
-          "Balance / Coins refresh returned no user."
+          "Balance / Coins request failed:",
+          response.status
         );
-
         return false;
       }
 
+      const result = await response.json();
+
+      // Support common API response shapes.
+      const user =
+        result.user ||
+        result.data?.user ||
+        result.data ||
+        result;
+
+      if (
+        !user ||
+        user.balance === undefined ||
+        user.coins === undefined
+      ) {
+        console.warn(
+          "Balance / Coins response is missing values."
+        );
+        return false;
+      }
+
+      // Update only Profile's Balance and Coins.
       u9ProfileUpdateBalanceCoins(user);
 
       return true;
@@ -365,6 +390,7 @@ async function u9ProfileRefreshBalanceCoins() {
 
   return u9ProfileBalanceRefreshPromise;
 }
+
 
 
 /* =========================
