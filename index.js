@@ -144,3 +144,81 @@
     true
   );
 })();
+
+
+/* =================================================
+   U9 PLATFORM MAINTENANCE API
+================================================= */
+
+(() => {
+  "use strict";
+
+  const API_URL = "/api/u9-settings";
+  const REFRESH_INTERVAL_MS = 30000;
+
+  async function loadPlatformSettings() {
+    try {
+      const response = await fetch(API_URL, {
+        method: "GET",
+        cache: "no-store",
+        credentials: "same-origin",
+        headers: {
+          Accept: "application/json"
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`Platform settings request failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+
+      // Accept a single row, an array containing one row,
+      // or a response wrapped in a "data" property.
+      const settings = Array.isArray(result)
+        ? result[0]
+        : result?.data
+          ? Array.isArray(result.data)
+            ? result.data[0]
+            : result.data
+          : result;
+
+      if (
+        !settings ||
+        typeof settings.maintenance_enabled !== "boolean"
+      ) {
+        throw new Error("Invalid platform settings response.");
+      }
+
+      if (window.U9PlatformMaintenance) {
+        window.U9PlatformMaintenance.update({
+          maintenance_enabled: settings.maintenance_enabled,
+          maintenance_duration_hours:
+            settings.maintenance_duration_hours,
+          maintenance_message:
+            typeof settings.maintenance_message === "string" &&
+            settings.maintenance_message.trim()
+              ? settings.maintenance_message.trim()
+              : "We are currently performing maintenance. Please try again later."
+        });
+      }
+    } catch (error) {
+      // Do not incorrectly dismiss an already-active maintenance modal
+      // if the API temporarily becomes unavailable.
+      console.error("Unable to load platform maintenance settings:", error);
+    }
+  }
+
+  // Read the current status as soon as the page is ready.
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadPlatformSettings, {
+      once: true
+    });
+  } else {
+    loadPlatformSettings();
+  }
+
+  // Refresh periodically so Admin changes reach the user interface.
+  window.setInterval(loadPlatformSettings, REFRESH_INTERVAL_MS);
+})();
+
