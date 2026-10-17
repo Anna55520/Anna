@@ -29,10 +29,10 @@
   ================================================= */
 
   const MESSAGE_API_URL =
-    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/message-api";
+    "/api/functions/message-api";
 
   const FREE_AVATAR_API_URL =
-    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-free";
+    "/api/functions/avatar-free";
 
   const FRIENDS_ROOT_ID =
     "Message-model-friends-root";
