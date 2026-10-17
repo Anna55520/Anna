@@ -24,7 +24,7 @@
   window.U9GroupModuleLoaded = true;
 
   const GROUP_API_URL =
-    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/group-api";
+    "/api/functions/group-api";
   const ROOT_ID = "Message-model-group-root";
 
   let initialized = false;
