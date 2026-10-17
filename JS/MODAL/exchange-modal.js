@@ -7,7 +7,7 @@
   "use strict";
 
   const API_URL =
-    "/api/functions/u9-exchange";
+    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/u9-exchange";
 
   const modal = document.getElementById("U9-exchange-modal");
   const closeButton = document.getElementById("U9-exchange-modal-close");
