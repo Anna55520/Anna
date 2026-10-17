@@ -183,8 +183,7 @@ const u9ProfileAvatarFrame =
 
 const u9ProfileFreeFrameUrl = "/api/avatar-frame-free";
 
-const u9ProfilePaidFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid";
+const u9ProfilePaidFrameUrl = "/api/avatar-frame-paid";
 
 
 /* =========================
