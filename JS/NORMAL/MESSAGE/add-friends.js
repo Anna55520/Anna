@@ -35,7 +35,7 @@
   window.U9AddFriendsModuleLoaded = true;
 
   const MESSAGE_API_URL =
-    "/api/functions/message-api";
+    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/message-api";
 
   const DEFAULT_AVATAR =
     "/SSVG/avatar/profile.svg";
