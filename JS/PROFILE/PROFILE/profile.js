@@ -173,9 +173,6 @@ const u9ProfileAvatarFrame =
    API
 ========================= */
 
-const u9ProfileDefaultFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-default";
-
 const u9ProfileFreeFrameUrl = "/api/avatar-frame-free";
 
 const u9ProfilePaidFrameUrl =
