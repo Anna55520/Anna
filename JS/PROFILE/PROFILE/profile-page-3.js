@@ -15,22 +15,22 @@
 ========================================================= */
 
 const U9_PROFILE_PAGE3_FREE_AVATAR_API =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-free";
+  "/api/functions/avatar-free";
 
 const U9_PROFILE_PAGE3_SET_AVATAR_API =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-set";
+  "/api/functions/avatar-set";
 
 const U9_PROFILE_PAGE3_FREE_FRAME_API =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free";
+  "/api/functions/avatar-frame-free";
 
 const U9_PROFILE_PAGE3_PAID_FRAME_API =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid";
+  "/api/functions/avatar-frame-paid";
 
 const U9_PROFILE_PAGE3_EQUIP_FRAME_API =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-equip";
+  "/api/functions/avatar-frame-equip";
 
 const U9_PROFILE_PAGE3_PURCHASE_FRAME_API =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid-purchase";
+  "/api/functions/avatar-frame-paid-purchase";
 
 
 /* =========================================================
