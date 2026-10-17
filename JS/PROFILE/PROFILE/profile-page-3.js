@@ -98,6 +98,51 @@ function page3IsLoggedIn() {
    IMAGE / SVG
 ========================================================= */
 
+
+/* =========================================================
+   IMAGE / SVG
+   Route public Supabase Storage images through Vercel
+========================================================= */
+
+const U9_PAGE3_SUPABASE_STORAGE_ORIGIN =
+  "https://tvtakmswbzawaweytimx.supabase.co";
+
+function getPage3ImageUrl(source) {
+  if (typeof source !== "string") {
+    return source;
+  }
+
+  const value = source.trim();
+
+  if (!value) {
+    return value;
+  }
+
+  try {
+    const url = new URL(value, window.location.origin);
+
+    if (
+      url.origin === U9_PAGE3_SUPABASE_STORAGE_ORIGIN &&
+      url.pathname.startsWith("/storage/v1/object/public/")
+    ) {
+      const storagePath = url.pathname.replace(
+        "/storage/v1/object/public/",
+        ""
+      );
+
+      return (
+        "/storage/" +
+        storagePath +
+        url.search
+      );
+    }
+
+    return value;
+  } catch (error) {
+    return value;
+  }
+}
+
 function setPage3ImageSource(image, source) {
   if (!image || !source) return;
 
@@ -116,8 +161,9 @@ function setPage3ImageSource(image, source) {
     return;
   }
 
-  image.src = value;
+  image.src = getPage3ImageUrl(value);
 }
+
 
 
 /* =========================================================
