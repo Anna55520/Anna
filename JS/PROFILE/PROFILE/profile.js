@@ -174,13 +174,13 @@ const u9ProfileAvatarFrame =
 ========================= */
 
 const u9ProfileDefaultFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-default";
+  "/api/functions/avatar-frame-default";
 
 const u9ProfileFreeFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-free";
+  "/api/functions/avatar-frame-free";
 
 const u9ProfilePaidFrameUrl =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid";
+  "/api/functions/avatar-frame-paid";
 
 
 /* =========================
