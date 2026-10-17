@@ -6,7 +6,6 @@
    Does not modify message-api or existing 1:1 chat modules.
 
    Actions used:
-   - create_group
    - search_group
    - list_my_groups
    - request_join_group
@@ -24,7 +23,7 @@
   window.U9GroupModuleLoaded = true;
 
   const GROUP_API_URL =
-    "/api/functions/group-api";
+    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/group-api";
   const ROOT_ID = "Message-model-group-root";
 
   let initialized = false;
@@ -192,64 +191,6 @@
         </header>
 
         <div id="u9-group-notice" class="u9-group-notice" role="status" aria-live="polite"></div>
-
-        <section class="u9-group-panel" aria-labelledby="u9-group-create-title">
-          <div class="u9-group-panel-heading">
-            <div>
-              <h3 class="u9-group-panel-title" id="u9-group-create-title">Create a Group</h3>
-              <p class="u9-group-panel-description">Start a new group. You will automatically become its owner.</p>
-            </div>
-          </div>
-
-          <form id="u9-group-create-form" class="u9-group-create-form">
-            <div class="u9-group-field">
-              <label class="u9-group-label" for="u9-group-create-name">Group Name <span aria-hidden="true">*</span></label>
-              <input
-                id="u9-group-create-name"
-                class="u9-group-input"
-                name="name"
-                type="text"
-                placeholder="Enter a group name"
-                minlength="1"
-                maxlength="80"
-                autocomplete="off"
-                required
-              >
-              <p class="u9-group-field-hint">Use 1–80 characters.</p>
-            </div>
-
-            <div class="u9-group-field">
-              <label class="u9-group-label" for="u9-group-create-description">Description</label>
-              <textarea
-                id="u9-group-create-description"
-                class="u9-group-input u9-group-textarea"
-                name="description"
-                placeholder="What is this group about? (optional)"
-                maxlength="1000"
-                rows="4"
-              ></textarea>
-              <div class="u9-group-field-footer"><span class="u9-group-field-hint">Optional · up to 1000 characters.</span><span id="u9-group-description-count" class="u9-group-char-count">0 / 1000</span></div>
-            </div>
-
-            <div class="u9-group-field">
-              <label class="u9-group-label" for="u9-group-create-avatar">Group Avatar URL <span class="u9-group-label-optional">(optional)</span></label>
-              <input
-                id="u9-group-create-avatar"
-                class="u9-group-input"
-                name="avatar_url"
-                type="url"
-                placeholder="https://example.com/group-avatar.png"
-                maxlength="2048"
-                autocomplete="url"
-              >
-              <p class="u9-group-field-hint">Use a public image URL, or leave this blank for the default avatar.</p>
-            </div>
-
-            <div class="u9-group-create-actions">
-              <button id="u9-group-create-button" class="u9-group-primary-button" type="submit">Create Group</button>
-            </div>
-          </form>
-        </section>
 
         <section class="u9-group-panel" aria-labelledby="u9-group-search-title">
           <div class="u9-group-panel-heading">
@@ -499,64 +440,6 @@
     }).join("");
   }
 
-  async function createGroup(form, button) {
-    if (busy) return;
-
-    const nameInput = form.querySelector("#u9-group-create-name");
-    const descriptionInput = form.querySelector("#u9-group-create-description");
-    const avatarInput = form.querySelector("#u9-group-create-avatar");
-    const name = String(nameInput?.value || "").trim();
-    const description = String(descriptionInput?.value || "").trim();
-    const avatarUrl = String(avatarInput?.value || "").trim();
-
-    if (!name || name.length > 80) {
-      throw new Error("Group name must contain between 1 and 80 characters.");
-    }
-    if (description.length > 1000) {
-      throw new Error("Group description must be 1000 characters or fewer.");
-    }
-    if (avatarUrl) {
-      let parsedUrl;
-      try { parsedUrl = new URL(avatarUrl); } catch (_) {
-        throw new Error("Enter a valid avatar URL, or leave the field blank.");
-      }
-      if (!["https:", "http:"].includes(parsedUrl.protocol)) {
-        throw new Error("Avatar URL must use HTTP or HTTPS.");
-      }
-    }
-
-    busy = true;
-    setBusy(button, true, "Creating…");
-    try {
-      const result = await callGroupAPI("create_group", {
-        name,
-        description,
-        avatar_url: avatarUrl || null
-      });
-      if (!result?.group?.id) throw new Error("The group was created, but the server did not return its details.");
-
-      form.reset();
-      const descriptionCount = getRoot()?.querySelector("#u9-group-description-count");
-      if (descriptionCount) descriptionCount.textContent = "0 / 1000";
-
-      lastSearchGroup = {
-        group: result.group,
-        membership: { status: "active", role: "owner" },
-        request: null
-      };
-      const searchInput = getRoot()?.querySelector("#u9-group-id-input");
-      if (searchInput) searchInput.value = result.group.id;
-
-      await loadMyGroups({ silent: true });
-      renderSearchResult();
-      setNotice(`Group “${groupTitle(result.group)}” created successfully. You are the owner.`, "success");
-      emitMembershipChanged();
-    } finally {
-      busy = false;
-      if (button?.isConnected) setBusy(button, false);
-    }
-  }
-
   async function searchGroup(groupId) {
     const normalized = String(groupId || "").trim().toLowerCase();
     if (!UUID_PATTERN.test(normalized)) {
@@ -736,20 +619,6 @@
     root.dataset.u9GroupBound = "true";
 
     root.addEventListener("submit", async (event) => {
-      if (event.target?.id === "u9-group-create-form") {
-        event.preventDefault();
-        setNotice();
-        const form = event.target;
-        const button = form.querySelector("#u9-group-create-button");
-        try {
-          await createGroup(form, button);
-        } catch (error) {
-          console.error("U9 Group create failed:", error);
-          setNotice(error.message || "Could not create the group.", "error");
-        }
-        return;
-      }
-
       if (event.target?.id !== "u9-group-search-form") return;
       event.preventDefault();
       setNotice();
@@ -765,11 +634,6 @@
     });
 
     root.addEventListener("input", (event) => {
-      if (event.target?.id === "u9-group-create-description") {
-        const count = root.querySelector("#u9-group-description-count");
-        if (count) count.textContent = `${event.target.value.length} / 1000`;
-      }
-
       if (event.target?.id === "u9-group-id-input") {
         const input = event.target;
         const position = input.selectionStart;
