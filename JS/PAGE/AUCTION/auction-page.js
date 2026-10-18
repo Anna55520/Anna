@@ -283,20 +283,18 @@
      Do not call Supabase RPC/table APIs from this page.
      All auction requests go through Vercel rewrites.
   ========================================================= */
-
+  
   async function apiPost(path, body = {}) {
-    const token = getSessionToken();
+    const token = localStorage.getItem("u9_token");
 
     if (!token) {
-      throw new Error(
-        "Your session could not be found. Please log in again."
-      );
+      throw new Error("Your session could not be found. Please log in again.");
     }
 
     const response = await fetch(path, {
       method: "POST",
-      credentials: "same-origin",
       cache: "no-store",
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`
@@ -308,28 +306,21 @@
 
     try {
       payload = await response.json();
-    } catch (_) {
-      throw new Error(
-        `The server returned an invalid response (HTTP ${response.status}).`
-      );
+    } catch {
+      throw new Error(`Auction API returned an invalid response (${response.status}).`);
     }
 
     if (!response.ok || payload?.success === false) {
-      const message =
+      throw new Error(
         payload?.message ||
         payload?.error ||
-        `Request failed (HTTP ${response.status}).`;
-
-      if (response.status === 401) {
-        throw new Error(
-          "Your session has expired. Please log in again."
-        );
-      }
-
-      throw new Error(message);
+        `Auction API request failed (${response.status}).`
+      );
     }
 
-    return payload;
+    return payload && Object.prototype.hasOwnProperty.call(payload, "result")
+      ? payload.result
+      : payload;
   }
 
   function unwrapResult(payload) {
