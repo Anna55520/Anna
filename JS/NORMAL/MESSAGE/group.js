@@ -23,8 +23,8 @@
   if (window.U9GroupModuleLoaded) return;
   window.U9GroupModuleLoaded = true;
 
-  const GROUP_API_URL =
-    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/group-api";
+  const GROUP_API_URL = "/api/group-api";
+   
   const ROOT_ID = "Message-model-group-root";
 
   let initialized = false;
