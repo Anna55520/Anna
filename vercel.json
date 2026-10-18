@@ -74,6 +74,10 @@
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/Auction-round-status"
     },
     {
+      "source": "/api/Auction-active-matching",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/Auction-active-matching"
+    },
+    {
       "source": "/storage/:path*",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/storage/v1/object/public/:path*"
     }
