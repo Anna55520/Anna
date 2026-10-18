@@ -1,11 +1,42 @@
+
 /* =========================================================
    U9 AUCTION PAGE
    Task Matching / Order / Round / Cooldown
+
+   API migration:
+   /api/Auction-auto-order
+   /api/Auction-round-status
+   /api/Auction-order-matching
+   /api/Auction-complete-order
+   /api/Auction-active-matching
+
+   Business logic and existing UI IDs preserved.
 ========================================================= */
 
 (function () {
   "use strict";
 
+  /* =========================================================
+     CONFIGURATION
+  ========================================================= */
+
+  const API = {
+    autoOrder: "/api/Auction-auto-order",
+    roundStatus: "/api/Auction-round-status",
+    orderMatching: "/api/Auction-order-matching",
+    completeOrder: "/api/Auction-complete-order",
+    activeMatching: "/api/Auction-active-matching"
+  };
+
+  const SESSION_STORAGE_KEYS = [
+    "u9_session",
+    "u9_session_token",
+    "sessionToken",
+    "session_token",
+    "authToken",
+    "access_token",
+    "token"
+  ];
 
   /* =========================================================
      ELEMENTS
@@ -26,7 +57,6 @@
   const test2Page =
     document.getElementById("U9-page-test2");
 
-
   /* =========================================================
      STATE
   ========================================================= */
@@ -42,221 +72,513 @@
   let currentMatching = null;
 
   let currentCoins = 0;
-
-  /*
-   * Latest round status returned by u9_round_status.
-   * This now also contains pending order information.
-   */
   let currentRoundStatus = null;
 
+  let refreshSequence = 0;
 
   /* =========================================================
      USER
   ========================================================= */
 
   function getUserId() {
-
     try {
-
       if (
         window.U9User &&
         typeof window.U9User.get === "function"
       ) {
+        const user = window.U9User.get();
 
-        const user =
-          window.U9User.get();
-
-        if (
-          user &&
-          user.id
-        ) {
-
+        if (user && user.id) {
           return user.id;
         }
       }
-
     } catch (error) {
-
       console.error(
         "U9: Failed to read U9User:",
         error
       );
     }
 
-
     if (window.currentUserUUID) {
-
-      console.log(
-        "U9: User ID from window.currentUserUUID:",
-        window.currentUserUUID
-      );
-
       return window.currentUserUUID;
     }
 
-
     if (window.currentUserId) {
-
-      console.log(
-        "U9: User ID from window.currentUserId:",
-        window.currentUserId
-      );
-
       return window.currentUserId;
     }
 
-
-    const storedUUID =
-      localStorage.getItem(
-        "currentUserUUID"
-      );
-
-    if (storedUUID) {
-
-      console.log(
-        "U9: User ID from localStorage currentUserUUID:",
-        storedUUID
-      );
-
-      return storedUUID;
-    }
-
-
-    const storedId =
-      localStorage.getItem(
-        "currentUserId"
-      );
-
-    if (storedId) {
-
-      console.log(
-        "U9: User ID from localStorage currentUserId:",
-        storedId
-      );
-
-      return storedId;
-    }
-
-
-    console.error(
-      "U9: User UUID is missing."
-    );
-
-    return null;
-  }
-
-
-  /* =========================================================
-     SUPABASE
-  ========================================================= */
-
-  function getSupabase() {
-
     try {
+      const storedUUID =
+        localStorage.getItem("currentUserUUID");
 
-      if (
-        typeof supabaseClient !== "undefined" &&
-        supabaseClient
-      ) {
-
-        return supabaseClient;
+      if (storedUUID) {
+        return storedUUID;
       }
 
+      const storedId =
+        localStorage.getItem("currentUserId");
+
+      if (storedId) {
+        return storedId;
+      }
     } catch (error) {
-      // Ignore ReferenceError
+      console.warn(
+        "U9: Unable to read stored user ID:",
+        error
+      );
     }
 
-
-    if (
-      window.supabaseClient
-    ) {
-
-      return window.supabaseClient;
-    }
-
-
-    if (
-      window.supabase
-    ) {
-
-      return window.supabase;
-    }
-
-
-    if (
-      window.SupabaseClient
-    ) {
-
-      return window.SupabaseClient;
-    }
-
-
-    if (
-      window.U9Supabase
-    ) {
-
-      return window.U9Supabase;
-    }
-
-
-    console.error(
-      "U9: Supabase client not found."
-    );
-
-    console.error(
-      "U9: window.supabaseClient =",
-      window.supabaseClient
-    );
-
-    console.error(
-      "U9: window.supabase =",
-      window.supabase
-    );
+    console.error("U9: User UUID is missing.");
 
     return null;
   }
 
+  /* =========================================================
+     SESSION TOKEN
+
+     IMPORTANT:
+     The token must be the raw U9 session token.
+     The Edge Function hashes it and checks session.token_hash.
+
+     If your login code uses a different storage key, add that
+     exact key to SESSION_STORAGE_KEYS below.
+  ========================================================= */
+
+  function readStoredToken() {
+    try {
+      for (const key of SESSION_STORAGE_KEYS) {
+        const value = localStorage.getItem(key);
+
+        if (
+          typeof value === "string" &&
+          value.trim()
+        ) {
+          const token = value.trim();
+
+          // Support JSON-stringified token values.
+          if (
+            token.startsWith('"') &&
+            token.endsWith('"')
+          ) {
+            try {
+              const decoded = JSON.parse(token);
+
+              if (typeof decoded === "string") {
+                return decoded;
+              }
+            } catch (_) {
+              // Use the original value below.
+            }
+          }
+
+          // Support JSON objects used by some auth clients.
+          if (
+            token.startsWith("{") &&
+            token.endsWith("}")
+          ) {
+            try {
+              const parsed = JSON.parse(token);
+
+              const candidate =
+                parsed.sessionToken ||
+                parsed.session_token ||
+                parsed.access_token ||
+                parsed.token;
+
+              if (
+                typeof candidate === "string" &&
+                candidate.trim()
+              ) {
+                return candidate.trim();
+              }
+            } catch (_) {
+              // Not a JSON object; use the raw value.
+            }
+          }
+
+          return token;
+        }
+      }
+    } catch (error) {
+      console.warn(
+        "U9: Could not read session token from localStorage:",
+        error
+      );
+    }
+
+    return null;
+  }
+
+  function readCookieToken() {
+    try {
+      const cookie = document.cookie || "";
+
+      const match = cookie.match(
+        /(?:^|;\s*)u9_session=([^;]*)/
+      );
+
+      if (match && match[1]) {
+        return decodeURIComponent(match[1]);
+      }
+    } catch (error) {
+      console.warn(
+        "U9: Could not read U9 session cookie:",
+        error
+      );
+    }
+
+    return null;
+  }
+
+  function getSessionToken() {
+    // Prefer an explicit token supplied by the existing auth module.
+    try {
+      if (
+        window.U9Auth &&
+        typeof window.U9Auth.getSessionToken === "function"
+      ) {
+        const token = window.U9Auth.getSessionToken();
+
+        if (
+          typeof token === "string" &&
+          token.trim()
+        ) {
+          return token.trim();
+        }
+      }
+    } catch (error) {
+      console.warn(
+        "U9: U9Auth token lookup failed:",
+        error
+      );
+    }
+
+    try {
+      if (
+        window.U9Session &&
+        typeof window.U9Session.getToken === "function"
+      ) {
+        const token = window.U9Session.getToken();
+
+        if (
+          typeof token === "string" &&
+          token.trim()
+        ) {
+          return token.trim();
+        }
+      }
+    } catch (error) {
+      console.warn(
+        "U9: U9Session token lookup failed:",
+        error
+      );
+    }
+
+    return readStoredToken() || readCookieToken();
+  }
+
+  /* =========================================================
+     SAME-ORIGIN API
+
+     Do not call Supabase RPC/table APIs from this page.
+     All auction requests go through Vercel rewrites.
+  ========================================================= */
+
+  async function apiPost(path, body = {}) {
+    const token = getSessionToken();
+
+    if (!token) {
+      throw new Error(
+        "Your session could not be found. Please log in again."
+      );
+    }
+
+    const response = await fetch(path, {
+      method: "POST",
+      credentials: "same-origin",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify(body)
+    });
+
+    let payload;
+
+    try {
+      payload = await response.json();
+    } catch (_) {
+      throw new Error(
+        `The server returned an invalid response (HTTP ${response.status}).`
+      );
+    }
+
+    if (!response.ok || payload?.success === false) {
+      const message =
+        payload?.message ||
+        payload?.error ||
+        `Request failed (HTTP ${response.status}).`;
+
+      if (response.status === 401) {
+        throw new Error(
+          "Your session has expired. Please log in again."
+        );
+      }
+
+      throw new Error(message);
+    }
+
+    return payload;
+  }
+
+  function unwrapResult(payload) {
+    if (!payload) {
+      return null;
+    }
+
+    if (
+      Object.prototype.hasOwnProperty.call(
+        payload,
+        "result"
+      )
+    ) {
+      return payload.result;
+    }
+
+    return payload;
+  }
+
+  function unwrapRow(payload) {
+    const result = unwrapResult(payload);
+
+    if (Array.isArray(result)) {
+      return result[0] || null;
+    }
+
+    return result || null;
+  }
+
+  function pickValue(object, keys, fallback = undefined) {
+    if (!object) {
+      return fallback;
+    }
+
+    for (const key of keys) {
+      if (
+        Object.prototype.hasOwnProperty.call(object, key) &&
+        object[key] !== undefined
+      ) {
+        return object[key];
+      }
+    }
+
+    return fallback;
+  }
+
+  /* =========================================================
+     API: ROUND STATUS
+  ========================================================= */
+
+  async function requestRoundStatus() {
+    const payload = await apiPost(
+      API.roundStatus,
+      {}
+    );
+
+    const row = unwrapRow(payload);
+
+    if (!row) {
+      return null;
+    }
+
+    // Accept common column names from RETURNS TABLE.
+    return {
+      ...row,
+
+      current_round_id: pickValue(
+        row,
+        ["current_round_id", "round_id"]
+      ),
+
+      completed_count: pickValue(
+        row,
+        ["completed_count", "v_completed_count"],
+        0
+      ),
+
+      orders_per_round: pickValue(
+        row,
+        ["orders_per_round", "configured_orders_per_round"],
+        3
+      ),
+
+      cooldown_start_time: pickValue(
+        row,
+        ["cooldown_start_time", "cooldown_start"]
+      ),
+
+      cooldown_end_time: pickValue(
+        row,
+        ["cooldown_end_time", "cooldown_end"]
+      ),
+
+      coins: pickValue(
+        row,
+        ["coins", "current_coins", "final_coins"],
+        0
+      ),
+
+      pending_order_id: pickValue(
+        row,
+        ["pending_order_id", "id"]
+      ),
+
+      pending_product_id: pickValue(
+        row,
+        ["pending_product_id", "product_id"]
+      ),
+
+      pending_product_name: pickValue(
+        row,
+        ["pending_product_name", "product_name"]
+      ),
+
+      pending_product_image_url: pickValue(
+        row,
+        ["pending_product_image_url", "product_image_url"]
+      ),
+
+      pending_total_price: pickValue(
+        row,
+        ["pending_total_price", "total_price"]
+      ),
+
+      pending_profit: pickValue(
+        row,
+        ["pending_profit", "profit"]
+      ),
+
+      pending_status: pickValue(
+        row,
+        ["pending_status", "status"]
+      ),
+
+      pending_round_id: pickValue(
+        row,
+        ["pending_round_id", "round_id"]
+      )
+    };
+  }
+
+  /* =========================================================
+     API: AUTO ORDER
+  ========================================================= */
+
+  async function requestAutoOrder() {
+    const payload = await apiPost(
+      API.autoOrder,
+      {}
+    );
+
+    return unwrapRow(payload);
+  }
+
+  /* =========================================================
+     API: ORDER MATCHING
+  ========================================================= */
+
+  async function requestOrderMatching(matchingId) {
+    const payload = await apiPost(
+      API.orderMatching,
+      {
+        matching_id: matchingId
+      }
+    );
+
+    return unwrapRow(payload);
+  }
+
+  /* =========================================================
+     API: COMPLETE ORDER
+  ========================================================= */
+
+  async function requestCompleteOrder(orderId) {
+    const payload = await apiPost(
+      API.completeOrder,
+      {
+        order_id: orderId
+      }
+    );
+
+    return unwrapRow(payload);
+  }
+
+  /* =========================================================
+     API: ACTIVE MATCHING
+
+     The Edge Function should return the user's active matching
+     row, or null when there is no active matching.
+  ========================================================= */
+
+  async function requestActiveMatching() {
+    const payload = await apiPost(
+      API.activeMatching,
+      {}
+    );
+
+    const result = unwrapResult(payload);
+
+    if (!result) {
+      return null;
+    }
+
+    if (Array.isArray(result)) {
+      return result[0] || null;
+    }
+
+    if (result.matching) {
+      return result.matching;
+    }
+
+    if (result.data) {
+      if (Array.isArray(result.data)) {
+        return result.data[0] || null;
+      }
+
+      return result.data;
+    }
+
+    // A single row may be returned directly.
+    if (result.id || result.matching_id) {
+      return result;
+    }
+
+    return null;
+  }
 
   /* =========================================================
      FORMAT
   ========================================================= */
 
   function formatCoins(value) {
+    const number = Number(value);
 
-    const number =
-      Number(value);
-
-    if (
-      Number.isNaN(number)
-    ) {
-
+    if (!Number.isFinite(number)) {
       return "0.00";
     }
 
     return number.toFixed(2);
   }
 
-
   function formatSeconds(seconds) {
+    seconds = Math.max(
+      0,
+      Math.ceil(Number(seconds) || 0)
+    );
 
-    seconds =
-      Math.max(
-        0,
-        Math.ceil(
-          Number(seconds) || 0
-        )
-      );
-
-
-    const minutes =
-      Math.floor(
-        seconds / 60
-      );
-
-
-    const secs =
-      seconds % 60;
-
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
 
     return (
       String(minutes).padStart(2, "0") +
@@ -265,571 +587,303 @@
     );
   }
 
-
   /* =========================================================
      MESSAGE
   ========================================================= */
 
   function showMessage(message) {
+    const el = document.getElementById(
+      "U9-auction-message"
+    );
 
-    const el =
-      document.getElementById(
-        "U9-auction-message"
-      );
+    if (el) {
+      el.textContent = message || "";
+    }
+  }
 
+  /* =========================================================
+     UI - BUTTONS
+  ========================================================= */
 
-    if (!el) {
+  function setStartButton(disabled, text) {
+    const button = document.getElementById(
+      "U9-auction-start"
+    );
+
+    if (!button) {
       return;
     }
 
-
-    el.textContent =
-      message || "";
+    button.disabled = !!disabled;
+    button.textContent = text || "Start Task";
   }
 
+  function setCompleteButton(disabled, text) {
+    const button = document.getElementById(
+      "U9-auction-complete"
+    );
 
-  /* =========================================================
-     UI - COMPLETE BUTTON BY BALANCE
-  ========================================================= */
+    if (!button) {
+      return;
+    }
+
+    button.disabled = !!disabled;
+    button.textContent = text || "Complete Task";
+  }
 
   function updateCompleteButtonByBalance() {
-
     if (
       !currentOrder ||
       currentOrder.status !== "pending"
     ) {
-
       return;
     }
 
-
-    if (
-      currentCoins < 0
-    ) {
-
-      setCompleteButton(
-        true,
-        "Recharge to Complete"
-      );
-
+    if (currentCoins < 0) {
+      setCompleteButton(true, "Recharge to Complete");
     } else {
-
-      setCompleteButton(
-        false,
-        "Complete Task"
-      );
+      setCompleteButton(false, "Complete Task");
     }
   }
-
 
   /* =========================================================
      UI - COINS
   ========================================================= */
 
   function updateCoins(coins) {
+    currentCoins = Number(coins) || 0;
 
-    currentCoins =
-      Number(coins) || 0;
-
-
-    const el =
-      document.getElementById(
-        "U9-auction-coins"
-      );
-
+    const el = document.getElementById(
+      "U9-auction-coins"
+    );
 
     if (el) {
-
-      el.textContent =
-        formatCoins(
-          currentCoins
-        );
+      el.textContent = formatCoins(currentCoins);
     }
-
 
     updateCompleteButtonByBalance();
   }
-
 
   /* =========================================================
      BALANCE AUTO REFRESH
   ========================================================= */
 
   function stopBalanceRefresh() {
-
     if (balanceTimer) {
-
-      clearInterval(
-        balanceTimer
-      );
-
-      balanceTimer =
-        null;
+      clearInterval(balanceTimer);
+      balanceTimer = null;
     }
   }
 
-
   function startBalanceRefresh() {
-
     stopBalanceRefresh();
-
 
     if (
       !currentOrder ||
       currentOrder.status !== "pending"
     ) {
-
       return;
     }
 
-
     async function refreshBalance() {
-
       if (
         !currentOrder ||
         currentOrder.status !== "pending"
       ) {
-
         stopBalanceRefresh();
-
         return;
       }
-
-
-      const client =
-        getSupabase();
-
-
-      const userId =
-        getUserId();
-
-
-      if (
-        !client ||
-        !userId
-      ) {
-
-        return;
-      }
-
 
       try {
-
-        const {
-          data,
-          error
-        } =
-          await client.rpc(
-            "u9_round_status",
-            {
-              p_user_id: userId
-            }
-          );
-
-
-        if (error) {
-
-          console.error(
-            "U9 balance refresh error:",
-            error
-          );
-
-          return;
-        }
-
-
-        if (!data) {
-          return;
-        }
-
-
-        const status =
-          Array.isArray(data)
-            ? data[0]
-            : data;
-
+        const status = await requestRoundStatus();
 
         if (!status) {
           return;
         }
 
-
-        updateCoins(
-          status.coins
-        );
-
-      }
-
-      catch (error) {
-
+        currentRoundStatus = status;
+        updateCoins(status.coins);
+      } catch (error) {
         console.error(
-          "U9 balance refresh exception:",
+          "U9 balance refresh error:",
           error
         );
       }
     }
 
-
     refreshBalance();
 
-
-    balanceTimer =
-      setInterval(
-        refreshBalance,
-        2000
-      );
+    balanceTimer = setInterval(
+      refreshBalance,
+      2000
+    );
   }
-
 
   /* =========================================================
      UI - ROUND
   ========================================================= */
 
-  function updateRound(
-    completed,
-    total
-  ) {
-
-    const el =
-      document.getElementById(
-        "U9-auction-round"
-      );
-
+  function updateRound(completed, total) {
+    const el = document.getElementById(
+      "U9-auction-round"
+    );
 
     if (!el) {
-
       console.warn(
         "U9: #U9-auction-round not found."
       );
-
       return;
     }
 
-
-    const completedNumber =
-      Number(completed) || 0;
-
-    const totalNumber =
-      Number(total) || 0;
-
+    const completedNumber = Number(completed) || 0;
+    const totalNumber = Number(total) || 0;
 
     el.textContent =
       `${completedNumber} / ${totalNumber}`;
   }
-
-
-  /* =========================================================
-     UI - START BUTTON
-  ========================================================= */
-
-  function setStartButton(
-    disabled,
-    text
-  ) {
-
-    const button =
-      document.getElementById(
-        "U9-auction-start"
-      );
-
-
-    if (!button) {
-      return;
-    }
-
-
-    button.disabled =
-      !!disabled;
-
-
-    button.textContent =
-      text || "Start Task";
-  }
-
-
-  /* =========================================================
-     UI - COMPLETE BUTTON
-  ========================================================= */
-
-  function setCompleteButton(
-    disabled,
-    text
-  ) {
-
-    const button =
-      document.getElementById(
-        "U9-auction-complete"
-      );
-
-
-    if (!button) {
-      return;
-    }
-
-
-    button.disabled =
-      !!disabled;
-
-
-    button.textContent =
-      text || "Complete Task";
-  }
-
 
   /* =========================================================
      MATCHING UI
   ========================================================= */
 
   function showMatching(message) {
+    const el = document.getElementById(
+      "U9-auction-matching"
+    );
 
-    const el =
-      document.getElementById(
-        "U9-auction-matching"
-      );
-
-
-    const text =
-      document.getElementById(
-        "U9-auction-matching-text"
-      );
-
+    const text = document.getElementById(
+      "U9-auction-matching-text"
+    );
 
     if (el) {
-
-      el.style.display =
-        "block";
+      el.style.display = "block";
     }
-
 
     if (text) {
-
-      text.textContent =
-        message || "Matching...";
+      text.textContent = message || "Matching...";
     }
   }
-
 
   function hideMatching() {
-
-    const el =
-      document.getElementById(
-        "U9-auction-matching"
-      );
-
+    const el = document.getElementById(
+      "U9-auction-matching"
+    );
 
     if (el) {
-
-      el.style.display =
-        "none";
+      el.style.display = "none";
     }
   }
-
 
   /* =========================================================
      ORDER UI
   ========================================================= */
 
   function showOrder() {
-
-    const el =
-      document.getElementById(
-        "U9-auction-order"
-      );
-
+    const el = document.getElementById(
+      "U9-auction-order"
+    );
 
     if (el) {
-
-      el.style.display =
-        "block";
+      el.style.display = "block";
     }
   }
-
 
   function hideOrder() {
-
-    const el =
-      document.getElementById(
-        "U9-auction-order"
-      );
-
+    const el = document.getElementById(
+      "U9-auction-order"
+    );
 
     if (el) {
-
-      el.style.display =
-        "none";
+      el.style.display = "none";
     }
   }
-
 
   /* =========================================================
      RENDER ORDER
   ========================================================= */
 
   function renderOrder(order) {
-
     if (!order) {
       return;
     }
 
     currentOrder = order;
 
-    const name =
-      document.getElementById(
-        "U9-auction-product-name"
-      );
+    const name = document.getElementById(
+      "U9-auction-product-name"
+    );
 
-    const image =
-      document.getElementById(
-        "U9-auction-product-image"
-      );
+    const image = document.getElementById(
+      "U9-auction-product-image"
+    );
 
-    const description =
-      document.getElementById(
-        "U9-auction-product-description"
-      );
+    const description = document.getElementById(
+      "U9-auction-product-description"
+    );
 
-    const price =
-      document.getElementById(
-        "U9-auction-product-price"
-      );
+    const price = document.getElementById(
+      "U9-auction-product-price"
+    );
 
-    const profit =
-      document.getElementById(
-        "U9-auction-product-profit"
-      );
+    const profit = document.getElementById(
+      "U9-auction-product-profit"
+    );
 
-    const url =
-      document.getElementById(
-        "U9-auction-product-url"
-      );
+    const url = document.getElementById(
+      "U9-auction-product-url"
+    );
 
-    const status =
-      document.getElementById(
-        "U9-auction-order-status"
-      );
-
-
-    /* =====================================================
-      PRODUCT NAME
-    ===================================================== */
+    const status = document.getElementById(
+      "U9-auction-order-status"
+    );
 
     if (name) {
-
-      name.textContent =
-        order.product_name ||
-        "Task";
+      name.textContent = order.product_name || "Task";
     }
 
-
-    /* =====================================================
-      PRODUCT IMAGE
-    ===================================================== */
-
     if (image) {
-
       if (order.product_image_url) {
-
-        image.src =
-          order.product_image_url;
-
-        image.alt =
-          order.product_name ||
-          "Product";
-
-        image.style.display =
-          "block";
-
+        image.src = order.product_image_url;
+        image.alt = order.product_name || "Product";
+        image.style.display = "block";
       } else {
-
         image.removeAttribute("src");
-
-        image.alt =
-          "";
-
-        image.style.display =
-          "none";
+        image.alt = "";
+        image.style.display = "none";
       }
     }
 
-
-    /* =====================================================
-      PRODUCT DESCRIPTION
-    ===================================================== */
-
     if (description) {
-
       description.textContent =
         order.product_description ||
         "Complete this task to receive your Coins and profit.";
     }
 
-
-    /* =====================================================
-      PRICE
-    ===================================================== */
-
     if (price) {
-
-      price.textContent =
-        formatCoins(
-          order.total_price
-        );
+      price.textContent = formatCoins(order.total_price);
     }
-
-
-    /* =====================================================
-      PROFIT
-    ===================================================== */
 
     if (profit) {
-
       profit.textContent =
-        "+" +
-        formatCoins(
-          order.profit
-        );
+        "+" + formatCoins(order.profit);
     }
 
-
-    /* =====================================================
-      STATUS
-    ===================================================== */
-
     if (status) {
-
       status.textContent =
         order.status === "completed"
           ? "Completed"
           : "Pending";
     }
 
-
-    /* =====================================================
-      PRODUCT URL
-    ===================================================== */
-
-    if (
-      url &&
-      order.product_url
-    ) {
-
-      url.href =
-        order.product_url;
-
-      url.style.display =
-        "block";
-
+    if (url && order.product_url) {
+      url.href = order.product_url;
+      url.style.display = "block";
     } else if (url) {
-
       url.removeAttribute("href");
-
-      url.style.display =
-        "none";
+      url.style.display = "none";
     }
 
-
     showOrder();
-
     updateCompleteButtonByBalance();
   }
 
@@ -838,303 +892,123 @@
   ========================================================= */
 
   function buildPendingOrderFromStatus(status) {
-
     if (!status) {
       return null;
     }
-
 
     if (
       !status.pending_order_id ||
       status.pending_status !== "pending"
     ) {
-
       return null;
     }
 
-
     return {
-
-      order_id:
-        status.pending_order_id,
-
-      user_id:
-        getUserId(),
-
-      product_id:
-        status.pending_product_id,
-
-      product_name:
-        status.pending_product_name ||
-        "Task",
-
-      product_description:
-        "",
-
-      product_url:
-        "",
-
+      order_id: status.pending_order_id,
+      user_id: getUserId(),
+      product_id: status.pending_product_id,
+      product_name: status.pending_product_name || "Task",
+      product_description: "",
+      product_url: "",
       product_image_url:
-        status.pending_product_image_url ||
-        "",
-
-      total_price:
-        status.pending_total_price,
-
-      profit:
-        status.pending_profit,
-
-      status:
-        status.pending_status,
-
-      round_id:
-        status.pending_round_id
+        status.pending_product_image_url || "",
+      total_price: status.pending_total_price,
+      profit: status.pending_profit,
+      status: status.pending_status,
+      round_id: status.pending_round_id
     };
   }
-
 
   /* =========================================================
      ROUND STATUS
   ========================================================= */
 
   async function loadRoundStatus() {
+    console.log("U9: Loading round status...");
 
-    const client =
-      getSupabase();
-
-
-    const userId =
-      getUserId();
-
-
-    if (!client) {
-
-      console.error(
-        "U9: Cannot load round status because Supabase client is missing."
-      );
-
-      return null;
-    }
-
-
-    if (!userId) {
-
-      console.error(
-        "U9: Cannot load round status because user UUID is missing."
-      );
-
-      return null;
-    }
-
-
-    console.log(
-      "U9: Loading round status...",
-      {
-        userId: userId
-      }
-    );
-
-
-    const {
-      data,
-      error
-    } =
-      await client.rpc(
-        "u9_round_status",
-        {
-          p_user_id: userId
-        }
-      );
-
-
-    if (error) {
-
-      console.error(
-        "U9 u9_round_status ERROR:",
-        error
-      );
-
-      throw error;
-    }
-
-
-    console.log(
-      "U9 round status:",
-      data
-    );
-
-
-    if (!data) {
-
-      console.warn(
-        "U9: u9_round_status returned no data."
-      );
-
-      return null;
-    }
-
-
-    const status =
-      Array.isArray(data)
-        ? data[0]
-        : data;
-
+    const status = await requestRoundStatus();
 
     if (!status) {
-
       console.warn(
-        "U9: Round status row is empty."
+        "U9: Auction round status returned no data."
       );
-
       return null;
     }
 
+    currentRoundStatus = status;
 
-    /*
-     * Save the complete status object.
-     */
-    currentRoundStatus =
-      status;
-
-
-    updateCoins(
-      status.coins
-    );
-
+    updateCoins(status.coins);
 
     updateRound(
       status.completed_count,
       status.orders_per_round
     );
 
+    handleCooldown(status.cooldown_end_time);
 
-    handleCooldown(
-      status.cooldown_end_time
-    );
-
+    console.log("U9 round status:", status);
 
     return status;
   }
-
 
   /* =========================================================
      COOLDOWN
   ========================================================= */
 
-  function handleCooldown(
-    cooldownEnd
-  ) {
-
+  function handleCooldown(cooldownEnd) {
     if (cooldownTimer) {
-
-      clearInterval(
-        cooldownTimer
-      );
-
-      cooldownTimer =
-        null;
+      clearInterval(cooldownTimer);
+      cooldownTimer = null;
     }
 
-
-    const cooldownEl =
-      document.getElementById(
-        "U9-auction-cooldown"
-      );
-
+    const cooldownEl = document.getElementById(
+      "U9-auction-cooldown"
+    );
 
     if (!cooldownEnd) {
-
       if (cooldownEl) {
-
-        cooldownEl.textContent =
-          "";
+        cooldownEl.textContent = "";
       }
 
-
-      if (
-        currentMatching
-      ) {
-
-        setStartButton(
-          true,
-          "Matching..."
-        );
-
+      if (currentMatching) {
+        setStartButton(true, "Matching...");
         return;
       }
-
 
       if (
         currentOrder &&
         currentOrder.status === "pending"
       ) {
-
         setStartButton(
           true,
           "Complete current task first"
         );
-
       } else {
-
-        setStartButton(
-          false,
-          "Start Task"
-        );
+        setStartButton(false, "Start Task");
       }
-
 
       return;
     }
 
-
     function tick() {
+      const remaining = Math.ceil(
+        (
+          new Date(cooldownEnd).getTime() -
+          Date.now()
+        ) / 1000
+      );
 
-      const remaining =
-        Math.ceil(
-          (
-            new Date(
-              cooldownEnd
-            ).getTime() -
-            Date.now()
-          ) / 1000
-        );
-
-
-      if (
-        remaining <= 0
-      ) {
-
+      if (remaining <= 0) {
         if (cooldownTimer) {
-
-          clearInterval(
-            cooldownTimer
-          );
-
-          cooldownTimer =
-            null;
+          clearInterval(cooldownTimer);
+          cooldownTimer = null;
         }
-
 
         if (cooldownEl) {
-
-          cooldownEl.textContent =
-            "";
+          cooldownEl.textContent = "";
         }
 
-
-        /*
-         * Cooldown has ended.
-         *
-         * The previous round is finished.
-         * Show the new round as 0 / total immediately.
-         *
-         * The actual new round_id will be created
-         * by u9_auto_order when the next task starts.
-         */
-        if (
-          currentRoundStatus
-        ) {
-
+        if (currentRoundStatus) {
           updateRound(
             0,
             currentRoundStatus.orders_per_round
@@ -1148,969 +1022,502 @@
           };
         }
 
-
-        if (
-          !currentMatching &&
-          !currentOrder
-        ) {
-
-          setStartButton(
-            false,
-            "Start Task"
-          );
+        if (!currentMatching && !currentOrder) {
+          setStartButton(false, "Start Task");
         }
-
 
         return;
       }
 
-
       if (cooldownEl) {
-
         cooldownEl.textContent =
-          "Cooldown " +
-          formatSeconds(
-            remaining
-          );
+          "Cooldown " + formatSeconds(remaining);
       }
 
-
-      setStartButton(
-        true,
-        "Cooldown"
-      );
+      setStartButton(true, "Cooldown");
     }
-
 
     tick();
 
-
-    cooldownTimer =
-      setInterval(
-        tick,
-        1000
-      );
+    cooldownTimer = setInterval(tick, 1000);
   }
-
 
   /* =========================================================
      MATCHING COUNTDOWN
   ========================================================= */
 
-  function startMatchingCountdown(
-    matchEndTime
-  ) {
-
+  function startMatchingCountdown(matchEndTime) {
     if (matchingTimer) {
-
-      clearInterval(
-        matchingTimer
-      );
-
-      matchingTimer =
-        null;
+      clearInterval(matchingTimer);
+      matchingTimer = null;
     }
 
-
     function tick() {
+      const remaining = Math.ceil(
+        (
+          new Date(matchEndTime).getTime() -
+          Date.now()
+        ) / 1000
+      );
 
-      const remaining =
-        Math.ceil(
-          (
-            new Date(
-              matchEndTime
-            ).getTime() -
-            Date.now()
-          ) / 1000
-        );
-
-
-      if (
-        remaining <= 0
-      ) {
-
+      if (remaining <= 0) {
         if (matchingTimer) {
-
-          clearInterval(
-            matchingTimer
-          );
-
-          matchingTimer =
-            null;
+          clearInterval(matchingTimer);
+          matchingTimer = null;
         }
 
-
         finishMatching();
-
         return;
       }
 
-
       showMatching(
-        "Matching... " +
-        remaining +
-        "s"
+        "Matching... " + remaining + "s"
       );
     }
 
-
     tick();
 
-
-    matchingTimer =
-      setInterval(
-        tick,
-        500
-      );
+    matchingTimer = setInterval(tick, 500);
   }
-
 
   /* =========================================================
      FINISH MATCHING
   ========================================================= */
 
   async function finishMatching() {
-
     if (!currentMatching) {
-
-      console.warn(
-        "U9: No active matching found."
-      );
-
+      console.warn("U9: No active matching found.");
       hideMatching();
-
       return;
     }
 
-
-    const client =
-      getSupabase();
-
-
-    const userId =
-      getUserId();
-
-
-    if (!client || !userId) {
-
-      showMessage(
-        "Unable to complete matching."
-      );
-
-      return;
-    }
-
-
-    const matchingId =
-      currentMatching.matching_id;
-
+    const matchingId = currentMatching.matching_id;
 
     if (!matchingId) {
-
-      console.error(
-        "U9: matching_id is missing."
-      );
-
-      showMessage(
-        "Matching ID is missing."
-      );
-
+      showMessage("Matching ID is missing.");
       return;
     }
 
-
-    setStartButton(
-      true,
-      "Creating order..."
-    );
-
+    setStartButton(true, "Creating order...");
 
     showMatching(
       "Matching completed. Creating order..."
     );
 
-
     try {
-
       console.log(
-        "U9: Calling u9_order_matching...",
-        {
-          userId: userId,
-          matchingId: matchingId
-        }
+        "U9: Calling Auction-order-matching...",
+        { matchingId }
       );
 
-
-      const {
-        data,
-        error
-      } =
-        await client.rpc(
-          "u9_order_matching",
-          {
-            p_user_id: userId,
-            p_matching_id: matchingId
-          }
-        );
-
-
-      if (error) {
-
-        console.error(
-          "U9 u9_order_matching RPC ERROR:",
-          error
-        );
-
-        throw error;
-      }
-
+      const result =
+        await requestOrderMatching(matchingId);
 
       console.log(
         "U9 order matching result:",
-        data
+        result
       );
 
-
-      const result =
-        Array.isArray(data)
-          ? data[0]
-          : data;
-
-
       if (!result) {
-
         throw new Error(
           "Order matching result is empty."
         );
       }
 
+      const orderId = pickValue(
+        result,
+        ["order_id", "id"]
+      );
 
-      if (!result.order_id) {
-
+      if (!orderId) {
         throw new Error(
-          "Order was not created."
+          "Order ID was not returned by the API."
         );
       }
 
-
       currentOrder = {
-
-        order_id:
-          result.order_id,
-
-        user_id:
-          result.user_id,
-
-        product_id:
-          result.product_id,
-
+        order_id: orderId,
+        user_id: result.user_id || getUserId(),
+        product_id: result.product_id,
         product_name:
-          result.product_name,
-
+          result.product_name ||
+          result.name ||
+          "Task",
         product_image_url:
-          result.product_image_url || "",
-
-        product_description:
+          result.product_image_url ||
+          result.image_url ||
           "",
-
-        product_url:
-          "",
-
-        total_price:
-          result.total_price,
-
-        profit:
-          result.profit,
-
-        coins_after:
-          result.coins_after,
-
-        status:
-          result.status || "pending",
-
-        round_id:
-          result.round_id,
-
-        order_number:
-          result.order_number
+        product_description: "",
+        product_url: "",
+        total_price: pickValue(
+          result,
+          ["total_price", "price"],
+          0
+        ),
+        profit: result.profit ?? 0,
+        coins_after: pickValue(
+          result,
+          ["coins_after", "final_coins"],
+          currentCoins
+        ),
+        status: result.status || "pending",
+        round_id: result.round_id,
+        order_number: result.order_number
       };
 
-
-      currentMatching =
-        null;
-
+      currentMatching = null;
 
       hideMatching();
 
+      updateCoins(currentOrder.coins_after);
 
-      /*
-       * Coins are deducted here,
-       * after matching is finished.
-       */
-      updateCoins(
-        result.coins_after
-      );
-
-
-      renderOrder(
-        currentOrder
-      );
-
+      renderOrder(currentOrder);
 
       updateCompleteButtonByBalance();
-
 
       setStartButton(
         true,
         "Complete current task first"
       );
 
-
       startBalanceRefresh();
 
-
-      showMessage(
-        "Task matched successfully."
-      );
-    }
-
-    catch (error) {
-
+      showMessage("Task matched successfully.");
+    } catch (error) {
       console.error(
         "U9 ORDER MATCHING ERROR:",
         error
       );
 
-
-      currentMatching =
-        null;
-
-
-      hideMatching();
-
-
-      setCompleteButton(
-        true,
-        "Complete Task"
-      );
-
-
-      setStartButton(
-        false,
-        "Start Task"
-      );
-
-
+      // Keep the active matching state available for recovery.
       showMessage(
         error?.message ||
         "Failed to create order."
       );
+
+      setStartButton(
+        false,
+        "Retry Matching"
+      );
     }
   }
-
 
   /* =========================================================
      START TASK
   ========================================================= */
 
   async function startTask() {
-
     if (ordering) {
       return;
     }
 
-
     if (currentMatching) {
-
       console.warn(
         "U9: Matching is already running."
       );
-
       return;
     }
-
 
     if (
       currentOrder &&
       currentOrder.status === "pending"
     ) {
-
       showMessage(
         "Please complete the current task first."
       );
-
       return;
     }
 
-
-    if (
-      currentCoins < 0
-    ) {
-
+    if (currentCoins < 0) {
       showMessage(
         "Please recharge your Coins before starting another task."
       );
-
       return;
     }
 
-
-    const client =
-      getSupabase();
-
-
-    const userId =
-      getUserId();
-
-
-    if (!client) {
-
-      alert(
-        "Supabase client is not initialized."
-      );
-
-      console.error(
-        "U9: startTask() aborted - Supabase client missing."
-      );
-
+    if (!getUserId()) {
+      showMessage("Please log in first.");
       return;
     }
 
-
-    if (!userId) {
-
-      alert(
-        "Please log in first."
+    if (!getSessionToken()) {
+      showMessage(
+        "Your session could not be found. Please log in again."
       );
-
-      console.error(
-        "U9: startTask() aborted - user UUID missing."
-      );
-
       return;
     }
 
+    ordering = true;
 
-    ordering =
-      true;
-
-
-    setStartButton(
-      true,
-      "Matching..."
-    );
-
+    setStartButton(true, "Matching...");
 
     hideOrder();
 
-
-    setCompleteButton(
-      true,
-      "Complete Task"
-    );
-
+    setCompleteButton(true, "Complete Task");
 
     try {
-
-      showMatching(
-        "Starting Matching..."
-      );
-
-
+      showMatching("Starting Matching...");
       showMessage("");
 
-
       console.log(
-        "U9: Calling u9_auto_order...",
-        {
-          userId: userId
-        }
+        "U9: Calling Auction-auto-order..."
       );
 
-
-      const {
-        data,
-        error
-      } =
-        await client.rpc(
-          "u9_auto_order",
-          {
-            p_user_id: userId
-          }
-        );
-
-
-      if (error) {
-
-        console.error(
-          "U9 u9_auto_order RPC ERROR:",
-          error
-        );
-
-        throw error;
-      }
-
+      const result = await requestAutoOrder();
 
       console.log(
         "U9 auto order result:",
-        data
+        result
       );
 
-
-      const result =
-        Array.isArray(data)
-          ? data[0]
-          : data;
-
-
       if (!result) {
-
         throw new Error(
           "No matching result was returned."
         );
       }
 
-
-      /* =====================================================
-         COOLDOWN
-      ===================================================== */
-
-      if (
-        result.cooldown === true
-      ) {
-
-        currentMatching =
-          null;
+      if (result.cooldown === true) {
+        currentMatching = null;
 
         hideMatching();
 
-
         await loadRoundStatus();
-
 
         showMessage(
           "The current round is cooling down."
         );
 
-
         return;
       }
 
+      const matchingId = pickValue(
+        result,
+        ["matching_id", "id"]
+      );
 
-      /* =====================================================
-         SAVE MATCHING STATE
-      ===================================================== */
-
-      if (!result.matching_id) {
-
+      if (!matchingId) {
         throw new Error(
           "Matching ID was not returned."
         );
       }
 
-
       currentMatching = {
-
-        matching_id:
-          result.matching_id,
-
-        user_id:
-          result.user_id,
-
-        product_id:
-          result.product_id,
-
-        product_name:
-          result.product_name,
-
-        total_price:
-          result.total_price,
-
-        profit:
-          result.profit,
-
-        coins_after:
-          result.coins_after,
-
-        match_start_time:
-          result.match_start_time,
-
-        match_end_time:
-          result.match_end_time,
-
-        round_id:
-          result.round_id,
-
-        order_number:
-          result.order_number
+        matching_id: matchingId,
+        user_id: result.user_id || getUserId(),
+        product_id: result.product_id,
+        product_name: result.product_name,
+        total_price: result.total_price,
+        profit: result.profit,
+        coins_after: result.coins_after,
+        match_start_time: result.match_start_time,
+        match_end_time: result.match_end_time,
+        round_id: result.round_id,
+        order_number: result.order_number
       };
 
+      // Coins should not change during matching.
+      if (result.coins != null) {
+        updateCoins(result.coins);
+      } else if (result.coins_after != null) {
+        updateCoins(result.coins_after);
+      }
 
-      /*
-       * Coins do NOT change during Matching.
-       */
-      updateCoins(
-        result.coins_after
-      );
-
-
-      currentOrder =
-        null;
-
+      currentOrder = null;
 
       hideOrder();
 
+      setCompleteButton(true, "Complete Task");
 
-      setCompleteButton(
-        true,
-        "Complete Task"
-      );
+      setStartButton(true, "Matching...");
 
-
-      setStartButton(
-        true,
-        "Matching..."
-      );
-
-
-      /* =====================================================
-         START MATCHING COUNTDOWN
-      ===================================================== */
-
-      const matchEnd =
-        result.match_end_time;
-
-
-      if (matchEnd) {
-
+      if (result.match_end_time) {
         startMatchingCountdown(
-          matchEnd
+          result.match_end_time
         );
-
       } else {
-
         await finishMatching();
       }
-    }
-
-    catch (error) {
-
+    } catch (error) {
       console.error(
         "U9 AUTO ORDER ERROR:",
         error
       );
 
-
-      currentMatching =
-        null;
-
-
-      currentOrder =
-        null;
-
+      currentMatching = null;
 
       hideMatching();
 
+      setCompleteButton(true, "Complete Task");
 
-      setCompleteButton(
-        true,
-        "Complete Task"
-      );
-
-
-      setStartButton(
-        false,
-        "Start Task"
-      );
-
+      setStartButton(false, "Start Task");
 
       showMessage(
         error?.message ||
         "Failed to start task."
       );
-    }
-
-    finally {
-
-      ordering =
-        false;
+    } finally {
+      ordering = false;
     }
   }
-
 
   /* =========================================================
      COMPLETE TASK
   ========================================================= */
 
   async function completeTask() {
-
     if (completing) {
       return;
     }
-
 
     if (
       !currentOrder ||
       currentOrder.status !== "pending"
     ) {
-
       showMessage(
         "There is no pending task to complete."
       );
-
       return;
     }
 
-
-    if (
-      currentCoins < 0
-    ) {
-
+    if (currentCoins < 0) {
       showMessage(
         "Please recharge your Coins before completing this order."
       );
-
 
       setCompleteButton(
         true,
         "Recharge to Complete"
       );
 
-
       return;
     }
 
-
-    const client =
-      getSupabase();
-
-
-    const userId =
-      getUserId();
-
-
-    if (!client) {
-
+    if (!getSessionToken()) {
       showMessage(
-        "Supabase client is not initialized."
+        "Your session could not be found. Please log in again."
       );
-
       return;
     }
 
+    completing = true;
 
-    if (!userId) {
-
-      showMessage(
-        "Please log in first."
-      );
-
-      return;
-    }
-
-
-    completing =
-      true;
-
-
-    setCompleteButton(
-      true,
-      "Completing..."
-    );
-
+    setCompleteButton(true, "Completing...");
 
     try {
-
       console.log(
-        "U9: Completing order...",
-        {
-          userId: userId,
-          orderId: currentOrder.order_id
-        }
+        "U9: Calling Auction-complete-order...",
+        { orderId: currentOrder.order_id }
       );
 
-
-      const {
-        data,
-        error
-      } =
-        await client.rpc(
-          "u9_complete_order",
-          {
-            p_user_id: userId,
-            p_order_id:
-              currentOrder.order_id
-          }
-        );
-
-
-      if (error) {
-
-        console.error(
-          "U9 u9_complete_order RPC ERROR:",
-          error
-        );
-
-        throw error;
-      }
-
+      const result = await requestCompleteOrder(
+        currentOrder.order_id
+      );
 
       console.log(
         "U9 complete order result:",
-        data
+        result
       );
 
-
-      const result =
-        Array.isArray(data)
-          ? data[0]
-          : data;
-
-
       if (!result) {
-
         throw new Error(
           "Completion result is empty."
         );
       }
 
-
-      currentOrder.status =
-        "completed";
-
+      currentOrder.status = "completed";
 
       updateCoins(
-        result.coins_after
+        pickValue(
+          result,
+          ["coins_after", "final_coins"],
+          currentCoins
+        )
       );
 
-
-      const statusEl =
-        document.getElementById(
-          "U9-auction-order-status"
-        );
-
+      const statusEl = document.getElementById(
+        "U9-auction-order-status"
+      );
 
       if (statusEl) {
-
-        statusEl.textContent =
-          "Completed";
+        statusEl.textContent = "Completed";
       }
 
-
       updateRound(
-        result.completed_count,
-        result.orders_per_round
+        pickValue(
+          result,
+          ["completed_count"],
+          0
+        ),
+        pickValue(
+          result,
+          ["orders_per_round"],
+          currentRoundStatus?.orders_per_round ?? 0
+        )
       );
-
 
       stopBalanceRefresh();
 
+      const cooldownEnd = pickValue(
+        result,
+        ["cooldown_end_time", "cooldown_end"]
+      );
 
-      if (
-        result.cooldown_end_time
-      ) {
-
-        handleCooldown(
-          result.cooldown_end_time
-        );
-
+      if (cooldownEnd) {
+        handleCooldown(cooldownEnd);
 
         showMessage(
           "Round completed. Cooldown started."
         );
-
       } else {
-
-        setStartButton(
-          false,
-          "Start Task"
-        );
-
+        setStartButton(false, "Start Task");
 
         showMessage(
           "Task completed successfully."
         );
       }
 
+      setCompleteButton(true, "Completed");
 
-      setCompleteButton(
-        true,
-        "Completed"
-      );
-
-
-      currentOrder =
-        null;
-
+      currentOrder = null;
 
       await loadRoundStatus();
-    }
-
-    catch (error) {
-
+    } catch (error) {
       console.error(
         "U9 COMPLETE ORDER ERROR:",
         error
       );
 
-
-      if (
-        currentCoins < 0
-      ) {
-
+      if (currentCoins < 0) {
         setCompleteButton(
           true,
           "Recharge to Complete"
         );
-
       } else {
-
         setCompleteButton(
           false,
           "Complete Task"
         );
       }
 
-
       showMessage(
         error?.message ||
         "Failed to complete task."
       );
-    }
-
-    finally {
-
-      completing =
-        false;
+    } finally {
+      completing = false;
     }
   }
-
 
   /* =========================================================
      LOAD PENDING ORDER
   ========================================================= */
 
-  async function loadPendingOrder(
-    status
-  ) {
-
-    /*
-     * Pending order information now comes from
-     * u9_round_status.
-     *
-     * Do not query u9-orders directly from the browser.
-     */
-
+  async function loadPendingOrder(status) {
     const pendingOrder =
-      buildPendingOrderFromStatus(
-        status
-      );
-
+      buildPendingOrderFromStatus(status);
 
     if (!pendingOrder) {
-
-      currentOrder =
-        null;
+      currentOrder = null;
 
       stopBalanceRefresh();
 
@@ -2119,239 +1526,135 @@
       return null;
     }
 
+    currentOrder = pendingOrder;
 
-    currentOrder =
-      pendingOrder;
-
-
-    renderOrder(
-      currentOrder
-    );
-
+    renderOrder(currentOrder);
 
     updateCompleteButtonByBalance();
-
 
     setStartButton(
       true,
       "Complete current task first"
     );
 
-
     startBalanceRefresh();
-
 
     console.log(
       "U9 pending order restored:",
       currentOrder
     );
 
-
     return currentOrder;
   }
-
 
   /* =========================================================
      LOAD ACTIVE MATCHING
   ========================================================= */
 
   async function loadActiveMatching() {
+    const data = await requestActiveMatching();
 
-    const client =
-      getSupabase();
-
-
-    const userId =
-      getUserId();
-
-
-    if (
-      !client ||
-      !userId
-    ) {
-
+    if (!data) {
+      currentMatching = null;
       return null;
     }
 
-
-    const {
+    const matchingId = pickValue(
       data,
-      error
-    } =
-      await client
-        .from("u9-matchings")
-        .select("*")
-        .eq(
-          "user_id",
-          userId
-        )
-        .eq(
-          "status",
-          "matching"
-        )
-        .order(
-          "created_at",
-          {
-            ascending: false
-          }
-        )
-        .limit(1)
-        .maybeSingle();
+      ["matching_id", "id"]
+    );
 
+    const matchEndTime = data.match_end_time;
 
-    if (error) {
-
+    if (!matchingId || !matchEndTime) {
       console.error(
-        "U9 load active matching error:",
-        error
+        "U9: Active matching response is missing required fields.",
+        data
       );
 
       return null;
     }
 
-
-    if (!data) {
-
-      return null;
-    }
-
-
     currentMatching = {
-
-      matching_id:
-        data.id,
-
-      user_id:
-        data.user_id,
-
-      product_id:
-        data.product_id,
-
-      match_start_time:
-        data.match_start_time,
-
-      match_end_time:
-        data.match_end_time,
-
-      round_id:
-        data.round_id,
-
-      order_number:
-        data.order_number
+      matching_id: matchingId,
+      user_id: data.user_id || getUserId(),
+      product_id: data.product_id,
+      match_start_time: data.match_start_time,
+      match_end_time: matchEndTime,
+      round_id: data.round_id,
+      order_number: data.order_number
     };
 
-
-    currentOrder =
-      null;
-
+    currentOrder = null;
 
     stopBalanceRefresh();
 
-
     hideOrder();
 
+    setCompleteButton(true, "Complete Task");
 
-    setCompleteButton(
-      true,
-      "Complete Task"
+    setStartButton(true, "Matching...");
+
+    const remaining = Math.ceil(
+      (
+        new Date(matchEndTime).getTime() -
+        Date.now()
+      ) / 1000
     );
 
-
-    setStartButton(
-      true,
-      "Matching..."
-    );
-
-
-    const remaining =
-      Math.ceil(
-        (
-          new Date(
-            data.match_end_time
-          ).getTime() -
-          Date.now()
-        ) / 1000
-      );
-
-
-    if (
-      remaining <= 0
-    ) {
-
+    if (remaining <= 0) {
       await finishMatching();
-
     } else {
-
-      startMatchingCountdown(
-        data.match_end_time
-      );
+      startMatchingCountdown(matchEndTime);
     }
-
 
     console.log(
       "U9 active matching restored:",
       currentMatching
     );
 
-
     return currentMatching;
   }
-
 
   /* =========================================================
      REFRESH AUCTION PAGE
   ========================================================= */
 
   async function refreshAuctionPage() {
+    const sequence = ++refreshSequence;
 
     console.log(
       "U9: Refreshing auction page..."
     );
 
-
     try {
+      const status = await loadRoundStatus();
 
-      /*
-       * u9_round_status now returns:
-       *
-       * Coins
-       * Round information
-       * Pending order information
-       *
-       * in one RPC call.
-       */
-      const status =
-        await loadRoundStatus();
-
-
-      if (!status) {
-
+      if (sequence !== refreshSequence || !status) {
         return null;
       }
 
-
-      /*
-       * A pending order has priority.
-       */
       const pendingOrder =
-        await loadPendingOrder(
-          status
-        );
+        await loadPendingOrder(status);
 
+      if (sequence !== refreshSequence) {
+        return null;
+      }
 
-      if (
-        pendingOrder
-      ) {
+      if (pendingOrder) {
+        currentMatching = null;
 
-        currentMatching =
-          null;
+        if (matchingTimer) {
+          clearInterval(matchingTimer);
+          matchingTimer = null;
+        }
 
+        hideMatching();
 
         console.log(
-          "U9: Pending order restored from round status.",
+          "U9: Pending order restored.",
           pendingOrder
         );
-
 
         return {
           status,
@@ -2360,218 +1663,164 @@
         };
       }
 
-
-      /*
-       * If there is no pending order,
-       * stop balance polling.
-       */
       stopBalanceRefresh();
 
-
-      /*
-       * If there is no pending order,
-       * check whether Matching is still active.
-       */
       const activeMatching =
         await loadActiveMatching();
 
+      if (sequence !== refreshSequence) {
+        return null;
+      }
 
-      console.log(
-        "U9: Auction status:",
-        status
-      );
-
+      console.log("U9: Auction status:", status);
 
       console.log(
         "U9: Pending order:",
         pendingOrder
       );
 
-
       console.log(
         "U9: Active matching:",
         activeMatching
       );
 
-
       return {
         status,
-        pendingOrder,
+        pendingOrder: null,
         activeMatching
       };
-
-    }
-
-    catch (error) {
-
+    } catch (error) {
       console.error(
         "U9 AUCTION REFRESH ERROR:",
         error
       );
-
 
       showMessage(
         error?.message ||
         "Failed to load auction status."
       );
 
-
       return null;
     }
   }
-
 
   /* =========================================================
      OPEN AUCTION PAGE
   ========================================================= */
 
   function openAuctionPage() {
-
     if (!auctionPage) {
-
       console.warn(
         "U9: Auction page element not found."
       );
-
       return;
     }
 
-
     if (homePage) {
-
-      homePage.style.display =
-        "none";
+      homePage.style.display = "none";
     }
-
 
     if (shopPage) {
-
-      shopPage.style.display =
-        "none";
+      shopPage.style.display = "none";
     }
-
 
     if (test1Page) {
-
-      test1Page.style.display =
-        "none";
+      test1Page.style.display = "none";
     }
-
 
     if (test2Page) {
-
-      test2Page.style.display =
-        "none";
+      test2Page.style.display = "none";
     }
 
-
-    auctionPage.style.display =
-      "block";
-
+    auctionPage.style.display = "block";
 
     refreshAuctionPage();
   }
-
 
   /* =========================================================
      EVENTS
   ========================================================= */
 
   function bindAuctionEvents() {
+    const startButton = document.getElementById(
+      "U9-auction-start"
+    );
 
-    const startButton =
-      document.getElementById(
-        "U9-auction-start"
-      );
-
-
-    const completeButton =
-      document.getElementById(
-        "U9-auction-complete"
-      );
-
+    const completeButton = document.getElementById(
+      "U9-auction-complete"
+    );
 
     if (startButton) {
-
-      startButton.onclick =
-        startTask;
+      startButton.onclick = startTask;
     }
 
-
     if (completeButton) {
-
-      completeButton.onclick =
-        completeTask;
+      completeButton.onclick = completeTask;
     }
   }
 
+  /* =========================================================
+     CLEANUP
+  ========================================================= */
+
+  function stopAllTimers() {
+    if (matchingTimer) {
+      clearInterval(matchingTimer);
+      matchingTimer = null;
+    }
+
+    if (cooldownTimer) {
+      clearInterval(cooldownTimer);
+      cooldownTimer = null;
+    }
+
+    stopBalanceRefresh();
+  }
 
   /* =========================================================
      PUBLIC API
   ========================================================= */
 
-  window.openAuctionPage =
-    openAuctionPage;
+  window.openAuctionPage = openAuctionPage;
 
   window.U9Auction = {
-
-    refresh:
-      refreshAuctionPage,
-
-    startTask:
-      startTask,
-
-    completeTask:
-      completeTask,
-
-    getUserId:
-      getUserId,
-
-    getSupabase:
-      getSupabase,
-
-    updateCoins:
-      updateCoins
+    refresh: refreshAuctionPage,
+    startTask,
+    completeTask,
+    getUserId,
+    getSessionToken,
+    updateCoins,
+    stopAllTimers
   };
-
 
   /* =========================================================
      INITIALIZE
   ========================================================= */
 
   function initializeAuctionPage() {
-
     if (!auctionPage) {
-
       console.warn(
         "U9: Auction page does not exist."
       );
-
       return;
     }
 
-
-    auctionPage.style.display =
-      "none";
-
+    auctionPage.style.display = "none";
 
     bindAuctionEvents();
-
 
     console.log(
       "U9 Auction Page initialized."
     );
   }
 
-
   initializeAuctionPage();
 
 })();
 
-
-/* =========================
+/* =========================================================
    AUCTION TOOL BUTTONS
-========================= */
+========================================================= */
 
 (function () {
   "use strict";
@@ -2601,7 +1850,6 @@
           console.error(
             "U9 Auction: U9History is not available."
           );
-
           return;
         }
 
