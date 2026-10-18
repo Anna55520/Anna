@@ -8,7 +8,8 @@
  * Refresh ID:    U9-history-order-refresh
  * Pagination ID: U9-history-order-pagination
  * Token:         localStorage["u9_token"]
- * Edge Function: u9-order-history
+ * API Proxy:     /api/u9-order-history
+ * Image Proxy:   /storage-2/
  * ========================================================= */
 
 (function () {
@@ -16,7 +17,7 @@
 
   const PAGE_ID = "History-model-Order-Page";
   const BUTTON_ID = "History-model-Order-button";
-  const FUNCTION_NAME = "u9-order-history";
+  const API_URL = "/api/u9-order-history";
 
   const PAGE_SIZE = 10;
   const VISIBLE_PAGE_BUTTONS = 3;
@@ -34,10 +35,6 @@
 
   function getPage() {
     return document.getElementById(PAGE_ID);
-  }
-
-  function getSupabaseClient() {
-    return window.supabaseClient || window.supabase || null;
   }
 
   function getSessionToken() {
@@ -58,6 +55,10 @@
     });
   }
 
+  /* =======================================================
+     IMAGE URL PROXY
+  ======================================================= */
+
   function getSafeImageURL(value) {
     if (typeof value !== "string" || !value.trim()) {
       return "";
@@ -66,12 +67,11 @@
     try {
       const url = new URL(value.trim(), window.location.origin);
 
-      // 只允许 HTTP / HTTPS 图片
       if (url.protocol !== "https:" && url.protocol !== "http:") {
         return "";
       }
 
-      // 项目 B：商品图片走 Vercel /storage-2/ 代理
+      // Project B: public product images use the Vercel proxy.
       if (
         url.hostname === "vjlpowhxmflpkjlukkfy.supabase.co" &&
         url.pathname.startsWith("/storage/v1/object/public/")
@@ -84,7 +84,7 @@
         return "/storage-2/" + storagePath + url.search + url.hash;
       }
 
-      // 项目 A：头像等公开图片走 Vercel /storage/ 代理
+      // Project A: keep the existing same-origin storage proxy.
       if (
         url.hostname === "tvtakmswbzawaweytimx.supabase.co" &&
         url.pathname.startsWith("/storage/v1/object/public/")
@@ -97,14 +97,17 @@
         return "/storage/" + storagePath + url.search + url.hash;
       }
 
-      // 其他图片 URL 暂时保持原样，避免影响现有外部图片
+      // Preserve other valid HTTP(S) image URLs.
       return url.href;
     } catch (error) {
-      console.warn("[U9 Order History] Invalid image URL:", error);
+      console.warn(
+        "[U9 Order History] Invalid image URL:",
+        error
+      );
+
       return "";
     }
   }
-
 
   function formatMoney(value) {
     const number = Number(value);
@@ -382,22 +385,19 @@
 
     page.dataset.orderHistoryRendered = "true";
 
-    /* Refresh button */
-
+    // Refresh button
     page.querySelector("#U9-history-order-refresh")
       ?.addEventListener("click", function () {
         loadOrderHistory(true);
       });
 
-    /* Retry button */
-
+    // Retry button
     page.querySelector("#U9-history-order-retry")
       ?.addEventListener("click", function () {
         loadOrderHistory(true);
       });
 
-    /* Pagination buttons */
-
+    // Pagination buttons
     page.querySelector("#U9-history-order-pagination")
       ?.addEventListener("click", function (event) {
         const target = event.target;
@@ -706,8 +706,7 @@
       `;
     }).join("");
 
-    /* Replace failed images with a placeholder. */
-
+    // Replace failed images with a placeholder.
     list.querySelectorAll(
       ".U9-history-order-image"
     ).forEach(function (image) {
@@ -725,7 +724,7 @@
   }
 
   /* =======================================================
-     LOAD ORDER HISTORY
+     LOAD ORDER HISTORY THROUGH VERCEL PROXY
   ======================================================= */
 
   async function loadOrderHistory(forceRefresh) {
@@ -762,17 +761,6 @@
       return;
     }
 
-    const client = getSupabaseClient();
-
-    if (!client || !client.functions) {
-      showOrderHistoryState(
-        "error",
-        "Supabase client is not initialized. Check supabase-client.js."
-      );
-
-      return;
-    }
-
     loading = true;
 
     setLoading(true);
@@ -783,7 +771,7 @@
     );
 
     try {
-      const response = await fetch("/api/u9-order-history", {
+      const response = await fetch(API_URL, {
         method: "GET",
         credentials: "same-origin",
         cache: "no-store",
@@ -798,40 +786,17 @@
       try {
         data = await response.json();
       } catch (_) {
-        throw new Error("订单历史 API 返回了无效响应。");
+        throw new Error(
+          "Order history API returned an invalid response."
+        );
       }
 
       if (!response.ok) {
         throw new Error(
           data?.error ||
           data?.message ||
-          `订单历史请求失败（HTTP ${response.status}）。`
+          `Order history request failed (HTTP ${response.status}).`
         );
-      }
-
-
-      if (error) {
-        let details =
-          error.message || "Unknown function error";
-
-        if (
-          error.context &&
-          typeof error.context.json === "function"
-        ) {
-          try {
-            const body = await error.context.json();
-
-            if (body?.error) {
-              details = body.error;
-            } else if (body?.message) {
-              details = body.message;
-            }
-          } catch (_) {
-            // Keep the original error message.
-          }
-        }
-
-        throw new Error(details);
       }
 
       if (
@@ -840,7 +805,9 @@
         !Array.isArray(data.orders)
       ) {
         throw new Error(
-          data?.error || "Invalid order history response."
+          data?.error ||
+          data?.message ||
+          "Invalid order history response."
         );
       }
 
@@ -903,28 +870,27 @@
     const navButton = document.getElementById(BUTTON_ID);
 
     if (navButton) {
-    navButton.addEventListener("click", function () {
-    loadOrderHistory(false);
-    });
+      navButton.addEventListener("click", function () {
+        loadOrderHistory(false);
+      });
     } else {
-    console.warn(
-    "[U9 Order History] Navigation button not found:",
-    BUTTON_ID
-    );
+      console.warn(
+        "[U9 Order History] Navigation button not found:",
+        BUTTON_ID
+      );
     }
 
     document.addEventListener("click", function (event) {
-    const target = event.target;
+      const target = event.target;
 
-    if (!(target instanceof Element)) {
-    return;
-    }
+      if (!(target instanceof Element)) {
+        return;
+      }
 
-    if (target.closest("#U9-auction-tool-3")) {
-    loadOrderHistory(false);
-    }
+      if (target.closest("#U9-auction-tool-3")) {
+        loadOrderHistory(false);
+      }
     });
-
 
     console.log("[U9 Order History] Page initialized.");
   }
