@@ -108,7 +108,9 @@
     const token = getSessionToken();
 
     if (!token) {
-      throw new Error("Your login session has expired. Please log in again.");
+      throw new Error(
+        "Your login session has expired. Please log in again."
+      );
     }
 
     const response = await fetch(path, {
@@ -121,25 +123,44 @@
       body: JSON.stringify(payload)
     });
 
-    let data;
+    const rawText = await response.text();
+
+    let data = null;
 
     try {
-      data = await response.json();
+      data = rawText ? JSON.parse(rawText) : null;
     } catch {
+      console.error("U9 Auction: Non-JSON API response:", {
+        path,
+        status: response.status,
+        body: rawText
+      });
+
       throw new Error(
-        `Auction API returned an invalid response (${response.status}).`
+        `Auction API returned invalid JSON (${response.status}).`
       );
     }
 
     if (!response.ok || data?.success !== true) {
-      throw new Error(
+      console.error("U9 Auction API error:", {
+        path,
+        status: response.status,
+        response: data
+      });
+
+      const message =
         data?.message ||
-        `Auction API request failed (${response.status}).`
-      );
+        data?.error ||
+        data?.details ||
+        data?.hint ||
+        `Auction API request failed (${response.status}).`;
+
+      throw new Error(message);
     }
 
     return data.result ?? null;
   }
+
 
   /* =========================================================
      FORMAT
