@@ -87,6 +87,10 @@
     {
       "source": "/storage/:path*",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/storage/v1/object/public/:path*"
+    },
+    {
+      "source": "/storage-2/:path*",
+      "destination": "https://vjlpowhxmflpkjlukkfy.supabase.co/storage/v1/object/public/:path*"
     }
   ]
 }
