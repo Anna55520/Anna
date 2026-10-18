@@ -64,17 +64,47 @@
     }
 
     try {
-      const url = new URL(value.trim(), window.location.href);
+      const url = new URL(value.trim(), window.location.origin);
 
+      // 只允许 HTTP / HTTPS 图片
       if (url.protocol !== "https:" && url.protocol !== "http:") {
         return "";
       }
 
+      // 项目 B：商品图片走 Vercel /storage-2/ 代理
+      if (
+        url.hostname === "vjlpowhxmflpkjlukkfy.supabase.co" &&
+        url.pathname.startsWith("/storage/v1/object/public/")
+      ) {
+        const storagePath = url.pathname.replace(
+          "/storage/v1/object/public/",
+          ""
+        );
+
+        return "/storage-2/" + storagePath + url.search + url.hash;
+      }
+
+      // 项目 A：头像等公开图片走 Vercel /storage/ 代理
+      if (
+        url.hostname === "tvtakmswbzawaweytimx.supabase.co" &&
+        url.pathname.startsWith("/storage/v1/object/public/")
+      ) {
+        const storagePath = url.pathname.replace(
+          "/storage/v1/object/public/",
+          ""
+        );
+
+        return "/storage/" + storagePath + url.search + url.hash;
+      }
+
+      // 其他图片 URL 暂时保持原样，避免影响现有外部图片
       return url.href;
-    } catch (_) {
+    } catch (error) {
+      console.warn("[U9 Order History] Invalid image URL:", error);
       return "";
     }
   }
+
 
   function formatMoney(value) {
     const number = Number(value);
@@ -753,15 +783,32 @@
     );
 
     try {
-      const { data, error } = await client.functions.invoke(
-        FUNCTION_NAME,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+      const response = await fetch("/api/u9-order-history", {
+        method: "GET",
+        credentials: "same-origin",
+        cache: "no-store",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`
         }
-      );
+      });
+
+      let data = null;
+
+      try {
+        data = await response.json();
+      } catch (_) {
+        throw new Error("订单历史 API 返回了无效响应。");
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          data?.error ||
+          data?.message ||
+          `订单历史请求失败（HTTP ${response.status}）。`
+        );
+      }
+
 
       if (error) {
         let details =
