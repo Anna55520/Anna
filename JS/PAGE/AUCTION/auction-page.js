@@ -419,6 +419,44 @@
     }
   }
 
+  function u9AuctionGetProductImageUrl(source) {
+    if (typeof source !== "string") {
+      return "";
+    }
+
+    const value = source.trim();
+
+    if (!value) {
+      return "";
+    }
+
+    try {
+      const url = new URL(value, window.location.origin);
+
+      if (
+        url.hostname === "vjlpowhxmflpkjlukkfy.supabase.co" &&
+        url.pathname.startsWith("/storage/v1/object/public/")
+      ) {
+        const storagePath = url.pathname.replace(
+          "/storage/v1/object/public/",
+          ""
+        );
+
+        return (
+          "/storage-2/" +
+          storagePath +
+          url.search +
+          url.hash
+        );
+      }
+
+      return value;
+    } catch (error) {
+      console.warn("U9: Invalid product image URL:", error);
+      return value;
+    }
+  }
+
   /* =========================================================
      RENDER ORDER
   ========================================================= */
@@ -443,8 +481,12 @@
     }
 
     if (image) {
-      if (order.product_image_url) {
-        image.src = order.product_image_url;
+      const productImageUrl = u9AuctionGetProductImageUrl(
+        order.product_image_url
+      );
+
+      if (productImageUrl) {
+        image.src = productImageUrl;
         image.alt = order.product_name || "Product";
         image.style.display = "block";
       } else {
