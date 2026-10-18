@@ -78,16 +78,12 @@
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/Auction-active-matching"
     },
     {
-      "source": "/storage/:path*",
-      "destination": "https://tvtakmswbzawaweytimx.supabase.co/storage/v1/object/public/:path*"
-    },
-    {
       "source": "/api/avatar-upload",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-upload"
     },
     {
-      "source": "/api/message-api",
-      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/message-api"
+      "source": "/storage/:path*",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/storage/v1/object/public/:path*"
     }
   ]
 }
