@@ -1,4 +1,3 @@
-
 {
   "rewrites": [
     {
@@ -82,8 +81,8 @@
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-upload"
     },
     {
-    "source": "/api/customer-service-api",
-    "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/customer-service-api"
+      "source": "/api/customer-service-api",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/customer-service-api"
     },
     {
       "source": "/storage/:path*",
