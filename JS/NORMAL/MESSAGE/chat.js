@@ -33,20 +33,14 @@
      CONFIGURATION
   ================================================= */
 
-  const SUPABASE_URL =
-    "https://tvtakmswbzawaweytimx.supabase.co";
+  const MESSAGE_API_URL = "/api/message-api";
+   
+  const GROUP_API_URL = "/api/group-api";
+   
+  const CUSTOMER_SERVICE_API_URL = "/api/customer-service-api";
+   
+  const ME_API_URL = "/api/me";
 
-  const MESSAGE_API_URL =
-    SUPABASE_URL + "/functions/v1/message-api";
-
-  const GROUP_API_URL =
-    SUPABASE_URL + "/functions/v1/group-api";
-
-  const CUSTOMER_SERVICE_API_URL =
-    SUPABASE_URL + "/functions/v1/customer-service-api";
-
-  const ME_API_URL =
-    SUPABASE_URL + "/functions/v1/me";
 
   const DEFAULT_AVATAR =
     "/SSVG/account/account-edit-button.svg";
