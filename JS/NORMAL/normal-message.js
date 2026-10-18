@@ -21,13 +21,9 @@
      CONFIGURATION
   ================================================= */
 
-  const MESSAGE_API_URL =
-    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/message-api";
+  const MESSAGE_API_URL = "/api/message-api";
 
-  // Group listing uses the separate group-api Edge Function.
-  // Do not route group requests through message-api.
-  const GROUP_API_URL =
-    "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/group-api";
+  const GROUP_API_URL = "/api/group-api";
 
   const BACK_ICON_URL =
     "/SSVG/account/back.svg";
