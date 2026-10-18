@@ -283,12 +283,14 @@
      Do not call Supabase RPC/table APIs from this page.
      All auction requests go through Vercel rewrites.
   ========================================================= */
-  
+
   async function apiPost(path, body = {}) {
-    const token = localStorage.getItem("u9_token");
+    const token = getSessionToken();
 
     if (!token) {
-      throw new Error("Your session could not be found. Please log in again.");
+      throw new Error(
+        "Your session could not be found. Please log in again."
+      );
     }
 
     const response = await fetch(path, {
@@ -307,7 +309,9 @@
     try {
       payload = await response.json();
     } catch {
-      throw new Error(`Auction API returned an invalid response (${response.status}).`);
+      throw new Error(
+        `Auction API returned an invalid response (${response.status}).`
+      );
     }
 
     if (!response.ok || payload?.success === false) {
@@ -318,7 +322,7 @@
       );
     }
 
-    return payload && Object.prototype.hasOwnProperty.call(payload, "result")
+    return Object.prototype.hasOwnProperty.call(payload, "result")
       ? payload.result
       : payload;
   }
