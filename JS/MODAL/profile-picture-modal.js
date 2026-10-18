@@ -8,8 +8,7 @@
    API
 ========================================================= */
 
-const U9_PROFILE_PICTURE_UPLOAD_API =
-  "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-upload";
+const U9_PROFILE_PICTURE_UPLOAD_API = "/api/avatar-upload";
 
 
 /* =========================================================
