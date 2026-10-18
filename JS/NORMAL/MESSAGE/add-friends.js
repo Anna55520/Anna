@@ -34,7 +34,7 @@
 
   window.U9AddFriendsModuleLoaded = true;
 
-  const MESSAGE_API_URL = "/api/add-friends-api";
+  const MESSAGE_API_URL = "/api/message-api";
 
   const DEFAULT_AVATAR =
     "/SSVG/avatar/profile.svg";
