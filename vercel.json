@@ -58,6 +58,22 @@
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-frame-paid-purchase"
     },
     {
+      "source": "/api/Auction-auto-order",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/Auction-auto-order"
+    },
+    {
+      "source": "/api/Auction-complete-order",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/Auction-complete-order"
+    },
+    {
+      "source": "/api/Auction-order-matching",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/Auction-order-matching"
+    },
+    {
+      "source": "/api/Auction-round-status",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/Auction-round-status"
+    },
+    {
       "source": "/storage/:path*",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/storage/v1/object/public/:path*"
     }
