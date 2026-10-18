@@ -80,6 +80,10 @@
     {
       "source": "/storage/:path*",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/storage/v1/object/public/:path*"
+    },
+    {
+      "source": "/api/avatar-upload",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/avatar-upload"
     }
   ]
 }
