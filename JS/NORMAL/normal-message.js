@@ -1048,7 +1048,7 @@
         >
           <img
             class="Message-model-home-group-chat-icon"
-            src="/SSVG/account/account-edit-button.svg"
+            src="/SSVG/avatar/profile.svg"
             alt=""
             aria-hidden="true"
             draggable="false"
