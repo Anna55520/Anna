@@ -26,7 +26,12 @@
   const MESSAGE_API_URL = "/api/message-api";
   const FREE_AVATAR_API_URL = "/api/avatar-free";
   const FRIENDS_ROOT_ID = "Message-model-friends-root";
-  const ACTION_ICON_URL = "/SSVG/account/account-edit-button.svg";
+  const ACTION_ICON_URLS = {
+    chat: "/SSVG/normal/chat.svg",
+    observe: "/SSVG/normal/test1.svg",
+    mute: "/SSVG/normal/test2.svg",
+    delete: "/SSVG/normal/test3.svg"
+  };
   const DEFAULT_AVATAR = "/SSVG/account/account-edit-button.svg";
   const DEFAULT_AVATAR_FRAME = "/SSVG/avatar/ordinary.svg";
 
@@ -315,13 +320,14 @@
   /* ================= ACTION BUTTON ================= */
 
   function renderActionButton(friend, action, label, enabled) {
+    const iconURL = ACTION_ICON_URLS[action] || ACTION_ICON_URLS.chat;
     return `
       <button class="U9-friend-action U9-friend-action-${escapeHTML(action)}"
         type="button" data-friend-action="${escapeHTML(action)}"
         data-friend-id="${escapeHTML(friend.id)}"
         aria-label="${escapeHTML(label)}" title="${escapeHTML(label)}"
         ${enabled ? "" : "disabled"}>
-        <img src="${escapeHTML(ACTION_ICON_URL)}" alt="" aria-hidden="true" draggable="false">
+        <img src="${escapeHTML(iconURL)}" alt="" aria-hidden="true" draggable="false">
       </button>`;
   }
 
@@ -371,10 +377,10 @@
                   <div class="U9-friend-account">${account ? "@" + escapeHTML(account) : "Friend"}</div>
                 </div>
                 <div class="U9-friend-actions">
-                  ${renderActionButton(friend, "observe", "Observe", false)}
-                  ${renderActionButton(friend, "mute", "Mute", false)}
+                  ${renderActionButton(friend, "observe", "Observe", true)}
+                  ${renderActionButton(friend, "mute", "Mute", true)}
                   ${renderActionButton(friend, "chat", "Chat", true)}
-                  ${renderActionButton(friend, "delete", "Delete friend", false)}
+                  ${renderActionButton(friend, "delete", "Delete friend", true)}
                 </div>
               </article>`;
           }).join("")}
