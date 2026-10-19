@@ -43,7 +43,7 @@
 
 
   const DEFAULT_AVATAR =
-    "/SSVG/account/account-edit-button.svg";
+    "/SSVG/avatar/profile.svg";
 
   const POLL_INTERVAL_MS = 4000;
 
