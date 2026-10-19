@@ -152,30 +152,67 @@
       return fallback;
     }
 
-    const url = value.trim();
+    const source = value.trim();
 
-    if (!url) {
+    if (!source) {
       return fallback;
     }
 
-    if (/^https?:\/\//i.test(url)) {
-      return url;
-    }
-
+    // Support inline SVG supplied by the trusted avatar-frame system.
     if (
-      url.startsWith("/") &&
-      !url.startsWith("//")
+      /^<svg[\s>]/i.test(source) ||
+      /^<\?xml[\s\S]*?<svg[\s>]/i.test(source)
     ) {
-      return url;
+      return "data:image/svg+xml;charset=UTF-8," +
+        encodeURIComponent(source);
     }
 
+    // Keep valid image data URLs unchanged.
     if (
-      /^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(url)
+      /^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(source)
     ) {
-      return url;
+      return source;
     }
 
-    return fallback;
+    try {
+      const url = new URL(source, window.location.origin);
+
+      if (url.protocol !== "https:" && url.protocol !== "http:") {
+        return fallback;
+      }
+
+      // Supabase project A public Storage -> same-origin Vercel proxy.
+      if (
+        url.hostname === "tvtakmswbzawaweytimx.supabase.co" &&
+        url.pathname.startsWith("/storage/v1/object/public/")
+      ) {
+        const storagePath = url.pathname.replace(
+          "/storage/v1/object/public/",
+          ""
+        );
+
+        return "/storage/" + storagePath + url.search + url.hash;
+      }
+
+      // Supabase project B public Storage -> same-origin Vercel proxy.
+      if (
+        url.hostname === "vjlpowhxmflpkjlukkfy.supabase.co" &&
+        url.pathname.startsWith("/storage/v1/object/public/")
+      ) {
+        const storagePath = url.pathname.replace(
+          "/storage/v1/object/public/",
+          ""
+        );
+
+        return "/storage-2/" + storagePath + url.search + url.hash;
+      }
+
+      // Preserve other valid HTTP(S) image URLs.
+      return url.href;
+    } catch (error) {
+      console.warn("U9 Message: Invalid image URL.", error);
+      return fallback;
+    }
   }
 
   function getUserAvatarURL(user) {
@@ -190,7 +227,8 @@
         typeof user.avatar === "string"
           ? user.avatar
           : user.avatar?.url ||
-            user.avatar?.custom_url
+            user.avatar?.custom_url ||
+            user.avatar?.image
       ) ||
       user.profile_image ||
       user.photo_url ||
@@ -210,13 +248,28 @@
     const frameValue =
       user.avatar_frame_url ||
       user.avatarFrameUrl ||
+      user.avatar_frame?.url ||
+      user.avatar_frame?.svg ||
+      user.avatar_frame?.image ||
+      user.avatarFrame?.url ||
+      user.avatarFrame?.svg ||
+      user.avatarFrame?.image ||
       user.avatarFrame ||
       "";
 
-    return normalizeImageURL(
-      frameValue,
-      DEFAULT_CHAT_FRAME
-    );
+    const source = typeof frameValue === "string"
+      ? frameValue
+      : frameValue && typeof frameValue === "object"
+        ? (
+            frameValue.url ||
+            frameValue.svg ||
+            frameValue.image ||
+            frameValue.avatar_frame_url ||
+            ""
+          )
+        : "";
+
+    return normalizeImageURL(source, DEFAULT_CHAT_FRAME);
   }
 
   /* =================================================
