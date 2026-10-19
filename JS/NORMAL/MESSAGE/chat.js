@@ -4,27 +4,20 @@
    File: JS/NORMAL/MESSAGE/chat.js
 
    Features:
-   - One-to-one chat through message-api
-   - Group chat through group-api
-   - Customer-service chat through customer-service-api
-   - Load and send text messages
+   - Connect one-to-one chat to message-api
+   - Connect group chat to group-api
+   - Connect customer-service chat to customer-service-api
+   - Load and send text messages in all modes
    - Refresh messages every 4 seconds
-   - Sender / receiver message bubbles
-   - Preserve existing chat HTML IDs
+   - Show sender / receiver message bubbles
+   - Keep existing chat HTML IDs
    - Stop refreshing after leaving Chat
-   - Prevent stale requests from affecting a new chat
-   - Support U9 custom session and u9_session cookie
    - Show useful API and authentication errors
 
    APIs:
    - message-api: list_messages, send_message
    - group-api: list_group_messages, send_group_message
-   - customer-service-api:
-       list_messages
-       send_message
-       mark_read
-       close_conversation
-   - me: GET current user
+   - customer-service-api: list_messages, send_message, mark_read, close_conversation
 ================================================= */
 
 (function () {
@@ -38,23 +31,23 @@
 
   /* =================================================
      CONFIGURATION
-
-     These are same-origin Vercel API routes.
-     Do not replace them with direct Supabase URLs
-     unless you intentionally change the proxy design.
   ================================================= */
 
   const MESSAGE_API_URL = "/api/message-api";
+   
   const GROUP_API_URL = "/api/group-api";
-  const CUSTOMER_SERVICE_API_URL =
-    "/api/customer-service-api";
+   
+  const CUSTOMER_SERVICE_API_URL = "/api/customer-service-api";
+   
   const ME_API_URL = "/api/me";
 
-  const DEFAULT_AVATAR = "/SSVG/avatar/profile.svg";
+
+  const DEFAULT_AVATAR =
+    "/SSVG/avatar/profile.svg";
 
   const POLL_INTERVAL_MS = 4000;
+
   const MAX_MESSAGE_LENGTH = 5000;
-  const MESSAGE_LIMIT = 100;
 
   /* =================================================
      DOM ELEMENTS
@@ -105,18 +98,23 @@
   ================================================= */
 
   let currentChatUser = null;
+
   let currentUserId = null;
 
   let currentUserLookupAttempted = false;
+
   let currentUserLookupPromise = null;
 
   let isChatActive = false;
+
+  let isLoadingMessages = false;
+
   let isSendingMessage = false;
 
-  let activeLoadCount = 0;
   let pollTimer = null;
 
   let lastRenderedSignature = null;
+
   let currentRequestVersion = 0;
 
   let chatEventsBound = false;
@@ -148,9 +146,7 @@
     }
 
     if (
-      /^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(
-        url
-      )
+      /^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(url)
     ) {
       return url;
     }
@@ -160,71 +156,34 @@
 
   /* =================================================
      SESSION TOKEN
-
-     Keep compatibility with the U9 custom session.
-     The backend remains responsible for validating
-     and authorizing every request.
   ================================================= */
-
-  function readStorageValue(key) {
-    try {
-      const value = localStorage.getItem(key);
-
-      if (
-        typeof value === "string" &&
-        value.trim()
-      ) {
-        return value.trim();
-      }
-    } catch (error) {
-      console.warn(
-        "U9 Chat: Cannot read localStorage.",
-        error
-      );
-    }
-
-    return "";
-  }
-
-  function readSessionCookie() {
-    try {
-      const match = document.cookie.match(
-        /(?:^|;\s*)u9_session=([^;]+)/
-      );
-
-      if (match && match[1]) {
-        return decodeURIComponent(match[1]);
-      }
-    } catch (error) {
-      console.warn(
-        "U9 Chat: Cannot read u9_session cookie.",
-        error
-      );
-    }
-
-    return "";
-  }
 
   function getSessionToken() {
     const keys = [
       "u9_token",
       "u9_access_token",
-      "u9_session",
-      "session_token",
       "access_token",
       "authToken",
       "token"
     ];
 
     for (const key of keys) {
-      const value = readStorageValue(key);
+      try {
+        const value = localStorage.getItem(key);
 
-      if (value) {
-        return value;
+        if (value && value.trim()) {
+          return value.trim();
+        }
+      } catch (error) {
+        console.warn(
+          "U9 Chat: Cannot read session storage."
+        );
+
+        return "";
       }
     }
 
-    return readSessionCookie();
+    return "";
   }
 
   /* =================================================
@@ -246,38 +205,34 @@
   }
 
   /* =================================================
-     SHARED API REQUEST
+     CALL MESSAGE API
   ================================================= */
 
-  async function postAPI(
-    apiURL,
-    action,
-    payload = {},
-    serviceName = "messaging"
-  ) {
+  async function callMessageAPI(action, payload = {}) {
     let response;
 
     try {
-      response = await fetch(apiURL, {
-        method: "POST",
-        headers: getRequestHeaders(),
-        credentials: "include",
-        cache: "no-store",
-        body: JSON.stringify({
-          action,
-          ...payload
-        })
-      });
+      response = await fetch(
+        MESSAGE_API_URL,
+        {
+          method: "POST",
+          headers: getRequestHeaders(),
+          credentials: "include",
+          cache: "no-store",
+          body: JSON.stringify({
+            action,
+            ...payload
+          })
+        }
+      );
     } catch (error) {
       console.error(
-        "U9 Chat: Cannot reach " + serviceName + ".",
+        "U9 Chat: Cannot reach message-api.",
         error
       );
 
       const networkError = new Error(
-        "Could not connect to " +
-          serviceName +
-          ". Check the same-origin API route and Vercel deployment."
+        "Could not connect to the messaging server. Check the message-api deployment and CORS settings."
       );
 
       networkError.cause = error;
@@ -290,16 +245,9 @@
     try {
       result = await response.json();
     } catch (error) {
-      const invalidResponse = new Error(
-        serviceName +
-          " returned an invalid response (HTTP " +
-          response.status +
-          ")."
+      throw new Error(
+        "The messaging server returned an invalid response."
       );
-
-      invalidResponse.status = response.status;
-
-      throw invalidResponse;
     }
 
     if (
@@ -309,12 +257,10 @@
     ) {
       const apiError = new Error(
         result?.error ||
-          result?.message ||
-          serviceName + " request failed."
+        "The messaging request failed."
       );
 
       apiError.status = response.status;
-      apiError.code = result?.code || null;
 
       throw apiError;
     }
@@ -323,156 +269,193 @@
   }
 
   /* =================================================
-     CALL MESSAGE API
+     CALL GROUP API
+
+     Group messages use the separate group-api function.
+     Never pass a group UUID to message-api as receiver_id.
   ================================================= */
 
-  function callMessageAPI(action, payload = {}) {
-    return postAPI(
-      MESSAGE_API_URL,
-      action,
-      payload,
-      "message-api"
-    );
+  function getGroupSessionToken() {
+    for (const key of [
+      "u9_token",
+      "u9_session",
+      "session_token",
+      "access_token"
+    ]) {
+      try {
+        const value = localStorage.getItem(key);
+        if (value && value.trim()) return value.trim();
+      } catch (_) {
+        // Try the U9 session cookie below.
+      }
+    }
+
+    try {
+      const match = document.cookie.match(/(?:^|;\s*)u9_session=([^;]+)/);
+      if (match?.[1]) return decodeURIComponent(match[1]);
+    } catch (_) {
+      // group-api will report an authentication error if needed.
+    }
+
+    return "";
   }
 
-  /* =================================================
-     CALL GROUP API
-  ================================================= */
+  async function callGroupAPI(action, payload = {}) {
+    const headers = { "Content-Type": "application/json" };
+    const token = getGroupSessionToken();
+    if (token) headers.Authorization = "Bearer " + token;
 
-  function callGroupAPI(action, payload = {}) {
-    return postAPI(
-      GROUP_API_URL,
-      action,
-      payload,
-      "group-api"
-    );
+    let response;
+    try {
+      response = await fetch(GROUP_API_URL, {
+        method: "POST",
+        headers,
+        credentials: "include",
+        cache: "no-store",
+        body: JSON.stringify({ action, ...payload })
+      });
+    } catch (error) {
+      const networkError = new Error(
+        "Could not connect to the group messaging server. Check the group-api deployment and CORS settings."
+      );
+      networkError.cause = error;
+      throw networkError;
+    }
+
+    let result;
+    try {
+      result = await response.json();
+    } catch (_) {
+      const invalidResponse = new Error(
+        `The group server returned an invalid response (${response.status}).`
+      );
+      invalidResponse.status = response.status;
+      throw invalidResponse;
+    }
+
+    if (!response.ok || !result || result.success !== true) {
+      const apiError = new Error(
+        result?.error || "The group messaging request failed."
+      );
+      apiError.status = response.status;
+      throw apiError;
+    }
+
+    return result;
   }
 
   /* =================================================
      CALL CUSTOMER SERVICE API
+
+     Customer-service conversations have their own API and
+     use conversation_id, never a friend receiver_id.
   ================================================= */
 
-  function callCustomerServiceAPI(
-    action,
-    payload = {}
-  ) {
-    return postAPI(
-      CUSTOMER_SERVICE_API_URL,
-      action,
-      payload,
-      "customer-service-api"
-    );
+  async function callCustomerServiceAPI(action, payload = {}) {
+    const headers = { "Content-Type": "application/json" };
+    const token = getGroupSessionToken();
+    if (token) headers.Authorization = "Bearer " + token;
+
+    let response;
+    try {
+      response = await fetch(CUSTOMER_SERVICE_API_URL, {
+        method: "POST",
+        headers,
+        credentials: "include",
+        cache: "no-store",
+        body: JSON.stringify({ action, ...payload })
+      });
+    } catch (error) {
+      const networkError = new Error(
+        "Could not connect to customer service. Check the customer-service-api deployment and CORS settings."
+      );
+      networkError.cause = error;
+      throw networkError;
+    }
+
+    let result;
+    try {
+      result = await response.json();
+    } catch (_) {
+      const invalidResponse = new Error(
+        `The customer service server returned an invalid response (${response.status}).`
+      );
+      invalidResponse.status = response.status;
+      throw invalidResponse;
+    }
+
+    if (!response.ok || !result || result.success !== true) {
+      const apiError = new Error(
+        result?.error || "The customer service request failed."
+      );
+      apiError.status = response.status;
+      throw apiError;
+    }
+
+    return result;
   }
-
-  /* =================================================
-     CUSTOMER SERVICE CONVERSATION
-  ================================================= */
 
   function getCustomerServiceConversationId() {
     return String(
       currentChatUser?.conversationId ||
-        currentChatUser?.conversation_id ||
-        currentChatUser?.id ||
-        ""
+      currentChatUser?.conversation_id ||
+      currentChatUser?.id ||
+      ""
     );
   }
 
-  function updateCustomerServiceComposer(
-    statusOverride
-  ) {
-    if (
-      currentChatUser?.type !== "customer_service"
-    ) {
+  function updateCustomerServiceComposer(statusOverride) {
+    if (currentChatUser?.type !== "customer_service") {
       if (chatInput) {
         chatInput.disabled = false;
-
-        if (
-          /^(This conversation is closed|Message customer service\.\.\.|Reply to customer\.\.\.)$/.test(
-            chatInput.placeholder || ""
-          )
-        ) {
+        if (/^(This conversation is closed|Message customer service\.\.\.|Reply to customer\.\.\.)$/.test(chatInput.placeholder || "")) {
           chatInput.placeholder = "Type a message...";
         }
       }
-
       if (chatMoreButton) {
         chatMoreButton.disabled = false;
-
-        chatMoreButton.setAttribute(
-          "aria-label",
-          "More chat options"
-        );
-
+        chatMoreButton.setAttribute("aria-label", "More chat options");
         chatMoreButton.removeAttribute("title");
       }
-
-      if (chatSendButton && !isSendingMessage) {
-        chatSendButton.disabled = false;
-      }
-
+      if (chatSendButton && !isSendingMessage) chatSendButton.disabled = false;
       return;
     }
 
-    if (
-      !currentChatUser.metadata ||
-      typeof currentChatUser.metadata !== "object"
-    ) {
+    if (!currentChatUser.metadata || typeof currentChatUser.metadata !== "object") {
       currentChatUser.metadata = {};
     }
 
     const status = String(
-      statusOverride ||
-        currentChatUser.metadata.conversation_status ||
-        "open"
+      statusOverride || currentChatUser.metadata.conversation_status || "open"
     ).toLowerCase();
-
-    currentChatUser.metadata.conversation_status =
-      status;
+    currentChatUser.metadata.conversation_status = status;
 
     const closed = status === "closed";
-
     if (chatInput) {
       chatInput.disabled = closed;
-
       chatInput.placeholder = closed
         ? "This conversation is closed"
-        : currentChatUser.metadata.service_side ===
-            "agent"
+        : (currentChatUser.metadata.service_side === "agent"
           ? "Reply to customer..."
-          : "Message customer service...";
+          : "Message customer service...");
     }
-
     if (chatSendButton) {
-      chatSendButton.disabled =
-        closed || isSendingMessage;
+      chatSendButton.disabled = closed || isSendingMessage;
     }
-
     if (chatMoreButton) {
-      chatMoreButton.setAttribute(
-        "aria-label",
-        closed
-          ? "Conversation closed"
-          : "Close customer service conversation"
-      );
-
-      chatMoreButton.title = closed
-        ? "Conversation closed"
-        : "Close conversation";
-
+      chatMoreButton.setAttribute("aria-label", closed ? "Conversation closed" : "Close customer service conversation");
+      chatMoreButton.title = closed ? "Conversation closed" : "Close conversation";
       chatMoreButton.disabled = closed;
     }
-
     if (chatStatus) {
       chatStatus.textContent = closed
         ? "Closed · view only"
-        : status === "assigned"
-          ? "Support agent connected"
-          : "Waiting for support agent";
+        : (status === "assigned" ? "Support agent connected" : "Waiting for support agent");
     }
   }
 
   /* =================================================
-     CURRENT USER ID
+     USER ID: READ EXISTING USER STATE
   ================================================= */
 
   function readCurrentUserId() {
@@ -524,10 +507,10 @@
       ];
 
       for (const key of keys) {
-        const value = readStorageValue(key);
+        const value = localStorage.getItem(key);
 
-        if (value) {
-          return value;
+        if (value && value.trim()) {
+          return value.trim();
         }
       }
 
@@ -537,7 +520,7 @@
       ];
 
       for (const key of jsonKeys) {
-        const value = readStorageValue(key);
+        const value = localStorage.getItem(key);
 
         if (!value) {
           continue;
@@ -548,14 +531,12 @@
 
           const id =
             parsed?.id ||
-            parsed?.user?.id ||
-            parsed?.user_id ||
-            null;
+            parsed?.user?.id;
 
           if (id) {
             return String(id);
           }
-        } catch (error) {
+        } catch {
           // Ignore non-JSON storage values.
         }
       }
@@ -570,7 +551,7 @@
   }
 
   /* =================================================
-     CURRENT USER ID: FALL BACK TO /ME
+     USER ID: FALL BACK TO /ME
   ================================================= */
 
   async function resolveCurrentUserId() {
@@ -585,36 +566,38 @@
       return currentUserId;
     }
 
-    if (currentUserLookupPromise) {
-      return currentUserLookupPromise;
-    }
-
     if (currentUserLookupAttempted) {
       return null;
+    }
+
+    if (currentUserLookupPromise) {
+      return currentUserLookupPromise;
     }
 
     currentUserLookupAttempted = true;
 
     currentUserLookupPromise = (async function () {
       try {
-        const response = await fetch(ME_API_URL, {
-          method: "GET",
-          headers: getRequestHeaders(),
-          credentials: "include",
-          cache: "no-store"
-        });
+        const response = await fetch(
+          ME_API_URL,
+          {
+            method: "GET",
+            headers: getRequestHeaders(),
+            credentials: "include",
+            cache: "no-store"
+          }
+        );
 
-        const result = await response
-          .json()
+        const result = await response.json()
           .catch(function () {
             return {};
           });
 
         if (!response.ok) {
           console.warn(
-            "U9 Chat: /me lookup failed.",
+            "U9 Chat: /me user lookup failed.",
             response.status,
-            result?.message || result?.error
+            result?.message
           );
 
           return null;
@@ -623,7 +606,6 @@
         const id =
           result?.user?.id ||
           result?.id ||
-          result?.user_id ||
           null;
 
         if (id) {
@@ -655,24 +637,24 @@
       chatName.textContent =
         user?.name ||
         user?.username ||
-        user?.group_name ||
         "Chat";
     }
 
     if (chatStatus) {
       chatStatus.textContent =
         user?.status ||
-        (user?.type === "group" ? "Group chat" : "Friend");
+        "Friend";
     }
 
     if (chatAvatar) {
       chatAvatar.onerror = null;
+
       chatAvatar.dataset.fallbackStage = "0";
 
       chatAvatar.src = normalizeImageURL(
         user?.avatar_url ||
-          user?.avatar ||
-          user?.avatarUrl,
+        user?.avatar ||
+        user?.avatarUrl,
         DEFAULT_AVATAR
       );
 
@@ -682,9 +664,7 @@
         ) {
           chatAvatar.dataset.fallbackStage = "1";
 
-          if (
-            chatAvatar.src.endsWith(DEFAULT_AVATAR)
-          ) {
+          if (chatAvatar.src.endsWith(DEFAULT_AVATAR)) {
             chatAvatar.onerror = null;
             return;
           }
@@ -709,7 +689,7 @@
       "U9-chat-system-message U9-chat-system-message-" +
       type;
 
-    notice.textContent = String(message || "");
+    notice.textContent = message;
 
     notice.setAttribute("role", "status");
 
@@ -719,7 +699,6 @@
     notice.style.fontSize = "13px";
     notice.style.lineHeight = "1.5";
     notice.style.overflowWrap = "anywhere";
-    notice.style.boxSizing = "border-box";
 
     if (type === "error") {
       notice.style.background = "#fff1f1";
@@ -732,25 +711,19 @@
     return notice;
   }
 
-  function showChatNotice(
-    message,
-    type = "info"
-  ) {
+  function showChatNotice(message, type = "info") {
     if (!chatMessages) {
       return;
     }
 
-    chatMessages.replaceChildren(
+    chatMessages.innerHTML = "";
+
+    chatMessages.appendChild(
       createNotice(message, type)
     );
-
-    lastRenderedSignature = null;
   }
 
-  function appendChatNotice(
-    message,
-    type = "error"
-  ) {
+  function appendChatNotice(message, type = "error") {
     if (!chatMessages) {
       return;
     }
@@ -770,11 +743,6 @@
     );
 
     chatMessages.appendChild(notice);
-
-    if (chatMessages.scrollHeight) {
-      chatMessages.scrollTop =
-        chatMessages.scrollHeight;
-    }
   }
 
   /* =================================================
@@ -803,66 +771,61 @@
   ================================================= */
 
   function createMessageElement(message) {
-    const isOwnMessage = Boolean(
-      currentUserId &&
+    const isOwnMessage =
+      Boolean(
+        currentUserId &&
         String(message.sender_id) ===
           String(currentUserId)
-    );
-
-    const isGroup =
-      currentChatUser?.type === "group";
+      );
 
     const row = document.createElement("div");
 
     row.className =
       "U9-chat-message-row " +
-      (isOwnMessage
-        ? "U9-chat-message-own"
-        : "U9-chat-message-other");
+      (
+        isOwnMessage
+          ? "U9-chat-message-own"
+          : "U9-chat-message-other"
+      );
 
     row.style.display = "flex";
     row.style.width = "100%";
     row.style.margin = "5px 0";
-    row.style.justifyContent = isOwnMessage
-      ? "flex-end"
-      : "flex-start";
+    row.style.justifyContent =
+      isOwnMessage ? "flex-end" : "flex-start";
 
     const bubble = document.createElement("div");
 
     bubble.className =
       "U9-chat-message-bubble " +
-      (isOwnMessage
-        ? "U9-chat-bubble-own"
-        : "U9-chat-bubble-other");
+      (
+        isOwnMessage
+          ? "U9-chat-bubble-own"
+          : "U9-chat-bubble-other"
+      );
 
-    bubble.style.maxWidth = isGroup
+    bubble.style.maxWidth = currentChatUser?.type === "group"
       ? "100%"
       : "min(78%, 520px)";
-
     bubble.style.padding = "10px 13px";
     bubble.style.borderRadius = "15px";
     bubble.style.overflowWrap = "anywhere";
     bubble.style.boxSizing = "border-box";
 
-    bubble.style.background = isOwnMessage
-      ? "#dcecff"
-      : "#f0f2f5";
+    bubble.style.background =
+      isOwnMessage ? "#dcecff" : "#f0f2f5";
 
     bubble.style.color = "#222222";
 
     if (message.deleted_at) {
       const deleted = document.createElement("div");
 
-      deleted.textContent =
-        "This message was deleted.";
-
+      deleted.textContent = "This message was deleted.";
       deleted.style.fontStyle = "italic";
       deleted.style.opacity = "0.65";
 
       bubble.appendChild(deleted);
-    } else if (
-      message.message_type === "image"
-    ) {
+    } else if (message.message_type === "image") {
       const mediaURL = normalizeImageURL(
         message.media_path,
         ""
@@ -874,7 +837,6 @@
         image.src = mediaURL;
         image.alt = "Image message";
         image.loading = "lazy";
-        image.decoding = "async";
 
         image.style.display = "block";
         image.style.maxWidth = "100%";
@@ -882,34 +844,19 @@
         image.style.borderRadius = "8px";
         image.style.objectFit = "contain";
 
-        image.onerror = function () {
-          image.onerror = null;
-
-          const label = document.createElement("div");
-          label.textContent = "Image unavailable";
-
-          image.replaceWith(label);
-        };
-
         bubble.appendChild(image);
       } else {
-        const imageLabel =
-          document.createElement("div");
+        const imageLabel = document.createElement("div");
 
         imageLabel.textContent = "Image message";
-
         bubble.appendChild(imageLabel);
       }
 
-      if (
-        message.content &&
-        message.content !== "[image]"
-      ) {
+      if (message.content && message.content !== "[image]") {
         const caption = document.createElement("div");
 
         caption.textContent = message.content;
         caption.style.marginTop = "6px";
-        caption.style.whiteSpace = "pre-wrap";
 
         bubble.appendChild(caption);
       }
@@ -931,9 +878,8 @@
 
     time.className = "U9-chat-message-time";
 
-    time.textContent = formatMessageTime(
-      message.created_at
-    );
+    time.textContent =
+      formatMessageTime(message.created_at);
 
     time.style.marginTop = "5px";
     time.style.fontSize = "10px";
@@ -943,12 +889,12 @@
 
     bubble.appendChild(time);
 
-    if (isGroup && !isOwnMessage) {
+    if (
+      currentChatUser?.type === "group" &&
+      !isOwnMessage
+    ) {
       const content = document.createElement("div");
-
-      content.className =
-        "U9-chat-message-content";
-
+      content.className = "U9-chat-message-content";
       content.style.display = "flex";
       content.style.flexDirection = "column";
       content.style.alignItems = "flex-start";
@@ -958,15 +904,12 @@
       content.style.maxWidth = "min(78%, 520px)";
 
       const sender = document.createElement("div");
-
       sender.className = "U9-chat-message-sender";
-
       sender.textContent = String(
         message.sender_username ||
-          message.sender_name ||
-          "Group member"
+        message.sender_name ||
+        "Group member"
       );
-
       sender.style.maxWidth = "100%";
       sender.style.color = "#7e899a";
       sender.style.fontSize = "11px";
@@ -975,7 +918,6 @@
 
       content.appendChild(sender);
       content.appendChild(bubble);
-
       row.appendChild(content);
     } else {
       row.appendChild(bubble);
@@ -985,32 +927,22 @@
   }
 
   /* =================================================
-     MESSAGE SIGNATURE
+     RENDER MESSAGES
   ================================================= */
 
   function getMessagesSignature(messages) {
     return messages
       .map(function (message) {
         return [
-          message.id || "",
+          message.id,
           message.edited_at || "",
-          message.deleted_at || "",
-          message.content || "",
-          message.read_at || "",
-          message.media_path || ""
+          message.deleted_at || ""
         ].join(":");
       })
       .join("|");
   }
 
-  /* =================================================
-     RENDER MESSAGES
-  ================================================= */
-
-  function renderMessages(
-    messages,
-    force = false
-  ) {
+  function renderMessages(messages, force = false) {
     if (!chatMessages) {
       return;
     }
@@ -1031,11 +963,12 @@
 
     const wasNearBottom =
       chatMessages.scrollHeight -
-        chatMessages.scrollTop -
-        chatMessages.clientHeight <
-      100;
+      chatMessages.scrollTop -
+      chatMessages.clientHeight < 100;
 
     const oldScrollTop = chatMessages.scrollTop;
+
+    chatMessages.innerHTML = "";
 
     const list = document.createElement("div");
 
@@ -1072,7 +1005,7 @@
       });
     }
 
-    chatMessages.replaceChildren(list);
+    chatMessages.appendChild(list);
 
     lastRenderedSignature = signature;
 
@@ -1114,68 +1047,24 @@
       /origin/i.test(message)
     ) {
       if (currentChatUser?.type === "group") {
-        return "This website is not authorized by group-api. Check the API origin configuration.";
+        return "This website is not authorized by group-api. Check the group-api CORS origin list.";
       }
-
-      if (
-        currentChatUser?.type ===
-        "customer_service"
-      ) {
-        return "This website is not authorized by customer-service-api. Check its origin configuration.";
+      if (currentChatUser?.type === "customer_service") {
+        return "This website is not authorized by customer-service-api. Check its ALLOWED_ORIGINS setting.";
       }
-
-      return "This website is not authorized by message-api. Check its origin configuration.";
+      return "This website is not authorized by message-api. Check the message-api CORS origin list.";
     }
 
-    if (
-      error?.status === 404 &&
-      /conversation/i.test(message)
-    ) {
-      return "This customer-service conversation could not be found.";
-    }
-
-    if (
-      /this conversation is closed/i.test(message)
-    ) {
-      return "This conversation is closed. You cannot send more messages.";
-    }
-
-    return (
-      message ||
-      "Could not load messages. Please try again."
-    );
-  }
-
-  /* =================================================
-     REQUEST IDENTITY CHECK
-  ================================================= */
-
-  function isCurrentConversation(
-    requestVersion,
-    targetId,
-    targetType
-  ) {
-    return (
-      isChatActive &&
-      requestVersion === currentRequestVersion &&
-      String(currentChatUser?.id || "") ===
-        String(targetId) &&
-      String(currentChatUser?.type || "friend") ===
-        String(targetType)
-    );
+    return message ||
+      "Could not load messages. Please try again.";
   }
 
   /* =================================================
      LOAD CHAT MESSAGES
-
-     Concurrent calls are allowed. Each response is
-     checked against the conversation version before
-     it updates the UI.
   ================================================= */
 
   async function loadChatMessages(options = {}) {
     const silent = options.silent === true;
-    const force = options.force === true;
 
     if (
       !isChatActive ||
@@ -1185,48 +1074,35 @@
       return [];
     }
 
-    const requestVersion = currentRequestVersion;
-    const targetId = String(currentChatUser.id);
-    const targetType = String(
-      currentChatUser.type || "friend"
-    );
+    if (isLoadingMessages) {
+      return [];
+    }
 
-    activeLoadCount++;
+    isLoadingMessages = true;
+
+    const requestVersion = currentRequestVersion;
+
+    const targetId = String(currentChatUser.id);
+    const targetType = String(currentChatUser.type || "friend");
 
     try {
       await resolveCurrentUserId();
 
-      if (
-        !isCurrentConversation(
-          requestVersion,
-          targetId,
-          targetType
-        )
-      ) {
-        return [];
-      }
-
       let result;
-
       if (targetType === "group") {
         result = await callGroupAPI(
           "list_group_messages",
           {
-            group_id: String(
-              currentChatUser.group_id || targetId
-            ),
-            limit: MESSAGE_LIMIT
+            group_id: String(currentChatUser.group_id || targetId),
+            limit: 100
           }
         );
-      } else if (
-        targetType === "customer_service"
-      ) {
+      } else if (targetType === "customer_service") {
         result = await callCustomerServiceAPI(
           "list_messages",
           {
-            conversation_id:
-              getCustomerServiceConversationId(),
-            limit: MESSAGE_LIMIT
+            conversation_id: getCustomerServiceConversationId(),
+            limit: 100
           }
         );
       } else {
@@ -1234,17 +1110,16 @@
           "list_messages",
           {
             other_user_id: targetId,
-            limit: MESSAGE_LIMIT
+            limit: 100
           }
         );
       }
 
       if (
-        !isCurrentConversation(
-          requestVersion,
-          targetId,
-          targetType
-        )
+        !isChatActive ||
+        requestVersion !== currentRequestVersion ||
+        String(currentChatUser?.id) !== targetId ||
+        String(currentChatUser?.type || "friend") !== targetType
       ) {
         return [];
       }
@@ -1253,62 +1128,29 @@
         ? result.messages
         : [];
 
-      renderMessages(messages, force);
+      renderMessages(messages);
 
-      if (
-        targetType === "customer_service"
-      ) {
-        const conversationStatus =
-          result?.conversation?.status ||
-          currentChatUser.metadata
-            ?.conversation_status ||
-          "open";
+      if (targetType === "customer_service") {
+        const conversationStatus = result?.conversation?.status ||
+          currentChatUser.metadata?.conversation_status || "open";
+        updateCustomerServiceComposer(conversationStatus);
 
-        updateCustomerServiceComposer(
-          conversationStatus
+        const side = currentChatUser.metadata?.service_side === "agent" ? "agent" : "customer";
+        const incomingType = side === "agent" ? "customer" : "agent";
+        const hasUnreadIncoming = messages.some((message) =>
+          message.sender_type === incomingType && !message.read_at && !message.deleted_at
         );
-
-        const side =
-          currentChatUser.metadata?.service_side ===
-          "agent"
-            ? "agent"
-            : "customer";
-
-        const incomingType =
-          side === "agent" ? "customer" : "agent";
-
-        const hasUnreadIncoming = messages.some(
-          function (message) {
-            return (
-              message.sender_type === incomingType &&
-              !message.read_at &&
-              !message.deleted_at
-            );
-          }
-        );
-
         if (hasUnreadIncoming) {
           try {
-            await callCustomerServiceAPI(
-              "mark_read",
-              {
-                conversation_id:
-                  getCustomerServiceConversationId()
-              }
-            );
+            await callCustomerServiceAPI("mark_read", {
+              conversation_id: getCustomerServiceConversationId()
+            });
           } catch (readError) {
-            console.warn(
-              "U9 Chat: Could not update customer-service read status.",
-              readError
-            );
+            console.warn("U9 Chat: Could not update customer-service read status.", readError);
           }
         }
       } else if (chatStatus) {
-        chatStatus.textContent =
-          currentChatUser.status ||
-          (targetType === "group"
-            ? "Group chat"
-            : "Friend");
+        chatStatus.textContent = currentChatUser.status || "Friend";
       }
 
       return messages;
@@ -1319,11 +1161,8 @@
       );
 
       if (
-        !isCurrentConversation(
-          requestVersion,
-          targetId,
-          targetType
-        )
+        !isChatActive ||
+        requestVersion !== currentRequestVersion
       ) {
         return [];
       }
@@ -1331,10 +1170,7 @@
       const errorMessage =
         getReadableError(error);
 
-      if (
-        silent &&
-        lastRenderedSignature !== null
-      ) {
+      if (silent && lastRenderedSignature !== null) {
         appendChatNotice(errorMessage, "error");
       } else {
         showChatNotice(errorMessage, "error");
@@ -1342,10 +1178,7 @@
 
       return [];
     } finally {
-      activeLoadCount = Math.max(
-        0,
-        activeLoadCount - 1
-      );
+      isLoadingMessages = false;
     }
   }
 
@@ -1379,58 +1212,35 @@
 
     if (content.length > MAX_MESSAGE_LENGTH) {
       appendChatNotice(
-        "Messages cannot exceed " +
-          MAX_MESSAGE_LENGTH +
-          " characters.",
+        `Messages cannot exceed ${MAX_MESSAGE_LENGTH} characters.`,
         "error"
       );
 
       return;
     }
 
-    const requestVersion = currentRequestVersion;
     const targetId = String(currentChatUser.id);
-    const targetType = String(
-      currentChatUser.type || "friend"
-    );
-
-    if (
-      targetType === "customer_service" &&
-      String(
-        currentChatUser.metadata
-          ?.conversation_status || "open"
-      ).toLowerCase() === "closed"
-    ) {
-      appendChatNotice(
-        "This conversation is closed. You cannot send more messages.",
-        "error"
-      );
-
-      return;
-    }
+    const targetType = String(currentChatUser.type || "friend");
 
     isSendingMessage = true;
 
     if (chatSendButton) {
       chatSendButton.disabled = true;
-
       chatSendButton.setAttribute(
         "aria-busy",
         "true"
       );
     }
 
-    if (chatInput) {
-      chatInput.disabled = true;
-    }
-
     try {
       if (targetType === "customer_service") {
+        if (String(currentChatUser.metadata?.conversation_status || "open").toLowerCase() === "closed") {
+          throw new Error("This conversation is closed.");
+        }
         await callCustomerServiceAPI(
           "send_message",
           {
-            conversation_id:
-              getCustomerServiceConversationId(),
+            conversation_id: getCustomerServiceConversationId(),
             message_type: "text",
             content
           }
@@ -1439,9 +1249,7 @@
         await callGroupAPI(
           "send_group_message",
           {
-            group_id: String(
-              currentChatUser.group_id || targetId
-            ),
+            group_id: String(currentChatUser.group_id || targetId),
             message_type: "text",
             content
           }
@@ -1458,88 +1266,38 @@
       }
 
       /*
-       * Only clear the composer if the send succeeded
-       * and the user is still in the same conversation.
+       * Clear the input only after the server confirms
+       * the message was accepted.
        */
-      if (
-        isCurrentConversation(
-          requestVersion,
-          targetId,
-          targetType
-        )
-      ) {
-        chatInput.value = "";
+      chatInput.value = "";
 
-        await loadChatMessages({
-          force: true
-        });
+      await loadChatMessages();
 
-        if (
-          targetType === "customer_service"
-        ) {
-          window.dispatchEvent(
-            new CustomEvent(
-              "u9:customer-service:conversation-updated",
-              {
-                detail: {
-                  conversation_id:
-                    getCustomerServiceConversationId()
-                }
-              }
-            )
-          );
-        }
-
-        if (
-          chatInput &&
-          !chatInput.disabled
-        ) {
-          chatInput.focus();
-        }
+      if (targetType === "customer_service") {
+        window.dispatchEvent(new CustomEvent("u9:customer-service:conversation-updated", {
+          detail: { conversation_id: getCustomerServiceConversationId() }
+        }));
       }
+
+      if (chatInput && !chatInput.disabled) chatInput.focus();
     } catch (error) {
       console.error(
         "U9 Chat: Failed to send message.",
         error
       );
 
-      if (
-        isCurrentConversation(
-          requestVersion,
-          targetId,
-          targetType
-        )
-      ) {
-        appendChatNotice(
-          getReadableError(error),
-          "error"
-        );
-      }
+      appendChatNotice(
+        getReadableError(error),
+        "error"
+      );
     } finally {
       isSendingMessage = false;
 
-      if (
-        isCurrentConversation(
-          requestVersion,
-          targetId,
-          targetType
-        )
-      ) {
-        if (chatInput) {
-          chatInput.disabled = false;
-        }
-
-        if (chatSendButton) {
-          chatSendButton.removeAttribute(
-            "aria-busy"
-          );
-        }
-
-        if (
-          targetType === "customer_service"
-        ) {
+      if (chatSendButton) {
+        chatSendButton.removeAttribute("aria-busy");
+        if (currentChatUser?.type === "customer_service") {
           updateCustomerServiceComposer();
-        } else if (chatSendButton) {
+        } else {
           chatSendButton.disabled = false;
         }
       }
@@ -1567,16 +1325,11 @@
       return;
     }
 
-    const scheduledVersion = currentRequestVersion;
-
     pollTimer = setTimeout(
       async function () {
         pollTimer = null;
 
-        if (
-          !isChatActive ||
-          scheduledVersion !== currentRequestVersion
-        ) {
+        if (!isChatActive) {
           return;
         }
 
@@ -1584,12 +1337,7 @@
           silent: true
         });
 
-        if (
-          isChatActive &&
-          scheduledVersion === currentRequestVersion
-        ) {
-          scheduleMessagePolling();
-        }
+        scheduleMessagePolling();
       },
       POLL_INTERVAL_MS
     );
@@ -1607,128 +1355,12 @@
       return;
     }
 
-    closeChatPage();
+    window.closeChatPage();
 
     if (
       typeof window.showMessageHome === "function"
     ) {
       window.showMessageHome();
-    }
-  }
-
-  /* =================================================
-     CLOSE CUSTOMER SERVICE CONVERSATION
-  ================================================= */
-
-  async function handleCustomerServiceClose() {
-    if (
-      currentChatUser?.type !== "customer_service"
-    ) {
-      console.info(
-        "U9 Chat: More options are not implemented yet."
-      );
-
-      return;
-    }
-
-    const status = String(
-      currentChatUser.metadata
-        ?.conversation_status || "open"
-    ).toLowerCase();
-
-    if (status === "closed") {
-      return;
-    }
-
-    const confirmText =
-      currentChatUser.metadata?.service_side ===
-      "agent"
-        ? "Close this customer support conversation? The customer will no longer be able to reply in this conversation."
-        : "Close this customer support conversation? You can start a new one later.";
-
-    if (!window.confirm(confirmText)) {
-      return;
-    }
-
-    const requestVersion = currentRequestVersion;
-    const targetId = String(currentChatUser.id);
-
-    if (chatMoreButton) {
-      chatMoreButton.disabled = true;
-    }
-
-    try {
-      const result = await callCustomerServiceAPI(
-        "close_conversation",
-        {
-          conversation_id:
-            getCustomerServiceConversationId()
-        }
-      );
-
-      if (
-        !isCurrentConversation(
-          requestVersion,
-          targetId,
-          "customer_service"
-        )
-      ) {
-        return;
-      }
-
-      const nextStatus =
-        result?.conversation?.status || "closed";
-
-      if (
-        !currentChatUser.metadata ||
-        typeof currentChatUser.metadata !== "object"
-      ) {
-        currentChatUser.metadata = {};
-      }
-
-      currentChatUser.metadata.conversation_status =
-        nextStatus;
-
-      updateCustomerServiceComposer(nextStatus);
-
-      appendChatNotice(
-        "This customer service conversation is now closed.",
-        "info"
-      );
-
-      window.dispatchEvent(
-        new CustomEvent(
-          "u9:customer-service:conversation-updated",
-          {
-            detail: {
-              conversation_id:
-                getCustomerServiceConversationId()
-            }
-          }
-        )
-      );
-    } catch (error) {
-      console.error(
-        "U9 Chat: Could not close customer-service conversation.",
-        error
-      );
-
-      if (
-        isCurrentConversation(
-          requestVersion,
-          targetId,
-          "customer_service"
-        )
-      ) {
-        appendChatNotice(
-          getReadableError(error),
-          "error"
-        );
-
-        if (chatMoreButton) {
-          chatMoreButton.disabled = false;
-        }
-      }
     }
   }
 
@@ -1761,10 +1393,7 @@
       chatInput.addEventListener(
         "input",
         function () {
-          if (
-            chatInput.value.length >
-            MAX_MESSAGE_LENGTH
-          ) {
+          if (chatInput.value.length > MAX_MESSAGE_LENGTH) {
             chatInput.value =
               chatInput.value.slice(
                 0,
@@ -1789,35 +1418,48 @@
     }
 
     if (chatMoreButton) {
-      chatMoreButton.addEventListener(
-        "click",
-        handleCustomerServiceClose
-      );
+      chatMoreButton.addEventListener("click", async function () {
+        if (currentChatUser?.type !== "customer_service") {
+          console.info("U9 Chat: More options are not implemented yet.");
+          return;
+        }
+
+        const status = String(currentChatUser.metadata?.conversation_status || "open").toLowerCase();
+        if (status === "closed") return;
+
+        const confirmText = currentChatUser.metadata?.service_side === "agent"
+          ? "Close this customer support conversation? The customer will no longer be able to reply in this conversation."
+          : "Close this customer support conversation? You can start a new one later.";
+        if (!window.confirm(confirmText)) return;
+
+        chatMoreButton.disabled = true;
+        try {
+          const result = await callCustomerServiceAPI("close_conversation", {
+            conversation_id: getCustomerServiceConversationId()
+          });
+          const nextStatus = result?.conversation?.status || "closed";
+          if (!currentChatUser.metadata || typeof currentChatUser.metadata !== "object") {
+            currentChatUser.metadata = {};
+          }
+          currentChatUser.metadata.conversation_status = nextStatus;
+          updateCustomerServiceComposer(nextStatus);
+          appendChatNotice("This customer service conversation is now closed.", "info");
+          window.dispatchEvent(new CustomEvent("u9:customer-service:conversation-updated", {
+            detail: { conversation_id: getCustomerServiceConversationId() }
+          }));
+        } catch (error) {
+          console.error("U9 Chat: Could not close customer service conversation.", error);
+          appendChatNotice(getReadableError(error), "error");
+          chatMoreButton.disabled = false;
+        }
+      });
     }
   }
 
   /* =================================================
      INITIALIZE CHAT PAGE
-
      Called by normal-message.js:
        initializeChatPage(user)
-
-     Accepted examples:
-       { id: "USER_UUID", name: "Username" }
-
-       {
-         id: "GROUP_UUID",
-         group_id: "GROUP_UUID",
-         type: "group",
-         name: "Group name"
-       }
-
-       {
-         id: "CONVERSATION_UUID",
-         type: "customer_service",
-         conversation_id: "CONVERSATION_UUID",
-         metadata: { service_side: "customer" }
-       }
   ================================================= */
 
   async function initializeChatPage(user) {
@@ -1838,15 +1480,11 @@
       !user ||
       !(
         user.id ||
-        user.user_id ||
-        user.group_id ||
-        user.groupId ||
-        user.conversation_id ||
-        user.conversationId
+        user.user_id
       )
     ) {
       console.error(
-        "U9 Chat: A valid conversation identifier is required.",
+        "U9 Chat: A valid chat user ID is required.",
         user
       );
 
@@ -1856,35 +1494,24 @@
     bindChatEvents();
 
     const nextUserId = String(
-      user.id ||
-        user.user_id ||
-        user.group_id ||
-        user.groupId ||
-        user.conversation_id ||
-        user.conversationId
+      user.id || user.user_id || user.group_id || user.groupId
     );
-
     const nextChatType = String(
       user.type ||
-        (user.group_id || user.groupId
-          ? "group"
-          : user.conversation_id ||
-              user.conversationId
-            ? "customer_service"
-            : "friend")
+      (user.group_id || user.groupId ? "group" : "friend")
     );
 
     const changedConversation =
       !currentChatUser ||
       String(currentChatUser.id) !== nextUserId ||
-      String(
-        currentChatUser.type || "friend"
-      ) !== nextChatType;
+      String(currentChatUser.type || "friend") !== nextChatType;
 
     if (changedConversation) {
       currentRequestVersion++;
 
       stopMessagePolling();
+
+      isLoadingMessages = false;
 
       lastRenderedSignature = null;
     }
@@ -1893,30 +1520,9 @@
       ...user,
       id: nextUserId,
       type: nextChatType,
-
-      group_id:
-        nextChatType === "group"
-          ? String(
-              user.group_id ||
-                user.groupId ||
-                nextUserId
-            )
-          : user.group_id || null,
-
-      conversation_id:
-        nextChatType === "customer_service"
-          ? String(
-              user.conversation_id ||
-                user.conversationId ||
-                nextUserId
-            )
-          : user.conversation_id || null,
-
-      metadata:
-        user.metadata &&
-        typeof user.metadata === "object"
-          ? { ...user.metadata }
-          : {}
+      group_id: nextChatType === "group"
+        ? String(user.group_id || user.groupId || nextUserId)
+        : (user.group_id || null)
     };
 
     isChatActive = true;
@@ -1949,16 +1555,13 @@
       isChatActive &&
       currentChatUser &&
       String(currentChatUser.id) === nextUserId &&
-      String(
-        currentChatUser.type || "friend"
-      ) === nextChatType
+      String(currentChatUser.type || "friend") === nextChatType
     ) {
       scheduleMessagePolling();
 
       if (
         document.activeElement !== chatInput &&
-        !chatInput.value &&
-        !chatInput.disabled
+        !chatInput.value
       ) {
         chatInput.focus({
           preventScroll: true
@@ -1971,8 +1574,7 @@
       {
         chatType: nextChatType,
         targetId: nextUserId,
-        targetName:
-          currentChatUser.name || "User"
+        targetName: currentChatUser.name || "User"
       }
     );
 
@@ -1981,7 +1583,6 @@
 
   /* =================================================
      CLOSE CHAT PAGE
-
      Called by normal-message.js when leaving Chat.
   ================================================= */
 
@@ -1994,8 +1595,9 @@
 
     currentChatUser = null;
 
+    isLoadingMessages = false;
+
     isSendingMessage = false;
-    activeLoadCount = 0;
 
     lastRenderedSignature = null;
 
@@ -2015,26 +1617,15 @@
 
     if (chatSendButton) {
       chatSendButton.disabled = false;
-
-      chatSendButton.removeAttribute(
-        "aria-busy"
-      );
+      chatSendButton.removeAttribute("aria-busy");
     }
-
     if (chatInput) {
       chatInput.disabled = false;
-      chatInput.value = "";
       chatInput.placeholder = "Type a message...";
     }
-
     if (chatMoreButton) {
       chatMoreButton.disabled = false;
-
-      chatMoreButton.setAttribute(
-        "aria-label",
-        "More chat options"
-      );
-
+      chatMoreButton.setAttribute("aria-label", "More chat options");
       chatMoreButton.removeAttribute("title");
     }
 
@@ -2058,7 +1649,7 @@
     sendChatMessage;
 
   /* =================================================
-     INITIALIZE MODULE
+     INITIALIZE
   ================================================= */
 
   function initializeChatModule() {
@@ -2078,4 +1669,5 @@
   } else {
     initializeChatModule();
   }
+
 })();
