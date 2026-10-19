@@ -21,7 +21,6 @@
 ================================================= */
 
 #U9-message-normal-modal {
-  /* Full-screen Message modal: covers the page header and toolbar. */
   position: fixed;
   inset: 0;
 
@@ -46,9 +45,13 @@
   transition: visibility 0s linear 0.45s;
 }
 
-/* Keep the modal at the viewport top even when the page toolbar collapses. */
+/* Keep the modal at the viewport top when the toolbar collapses. */
 #U9-message-normal-modal.message-toolbar-collapsed {
   top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+
   height: 100vh;
   height: 100dvh;
 }
@@ -56,14 +59,17 @@
 #U9-message-normal-modal.modal-open {
   visibility: visible;
   pointer-events: auto;
+
   transition: visibility 0s;
 }
 
 #U9-message-normal-modal.modal-closing {
   visibility: visible;
   pointer-events: none;
+
   transition: visibility 0s;
 }
+
 
 /* =================================================
    MODAL CONTENT
@@ -103,6 +109,7 @@
 
 /* =================================================
    MESSAGE HEADER
+   Vertically align title and close/back button.
 ================================================= */
 
 #U9-message-normal-modal-title {
@@ -128,6 +135,7 @@
   color: #ffffff;
   font-size: 20px;
   font-weight: 600;
+  line-height: 1;
   text-align: center;
 
   z-index: 2;
@@ -136,10 +144,14 @@
 #U9-message-normal-modal-title-text {
   position: absolute;
 
+  top: 50%;
   left: 55px;
   right: 55px;
 
   display: block;
+
+  margin: 0;
+  padding: 0;
 
   overflow: hidden;
   white-space: nowrap;
@@ -148,7 +160,10 @@
   color: #ffffff;
   font-size: inherit;
   font-weight: inherit;
+  line-height: 1.2;
   text-align: center;
+
+  transform: translateY(-50%);
 
   pointer-events: none;
 }
@@ -161,7 +176,7 @@
 #U9-message-normal-modal-close {
   position: absolute;
 
-  top: 50%;
+  top: calc(50% + 1px);
   left: 12px;
 
   display: flex;
@@ -1134,8 +1149,7 @@
   #Message-model-navigation .Message-model-nav-button,
   #Message-model-navigation .Message-model-nav-icon,
   #Message-model-friends-list .Message-model-home-friend-row,
-  #Message-model-friends-list .Message-model-contact-chat,
-  .Message-model-contact-chat {
+  #Message-model-friends-list .Message-model-contact-chat {
     transition: none;
   }
 
@@ -1149,8 +1163,6 @@
 
 /* =================================================
    HOME GROUPS: GROUP LIST ROWS
-   Added for the Message home Groups section.
-   Does not change any existing SVG/image icon source.
 ================================================= */
 
 #Message-model-groups-list {
@@ -1276,7 +1288,9 @@
 }
 
 
-/* Group chat button: uses the same chat SVG as Friend chat. */
+/* =================================================
+   GROUP CHAT BUTTON
+================================================= */
 
 #Message-model-groups-list .Message-model-home-group-chat {
   display: inline-flex;
