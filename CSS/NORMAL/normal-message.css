@@ -1,4 +1,3 @@
-
 /* =================================================
    U9 MESSAGE NORMAL MODAL
    File: CSS/NORMAL/normal-message.css
@@ -751,11 +750,7 @@
 
 /* =================================================
    HOME CHAT BUTTON
-   Current SVG:
-   /SSVG/account/account-edit-button.svg
-
-   Change background-image here when the new
-   message icon SVG is ready.
+   Uses /SSVG/normal/chat.svg from the HTML img.
 ================================================= */
 
 #Message-model-friends-list .Message-model-home-friend-row
@@ -778,10 +773,7 @@
   border-radius: 10px;
 
   background-color: #f5f7fc;
-  background-image: url("/SSVG/account/account-edit-button.svg");
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: var(--home-chat-icon-size) var(--home-chat-icon-size);
+  background-image: none;
 
   color: #477fbd;
 
@@ -799,11 +791,25 @@
 }
 
 
-/* The temporary icon is supplied by CSS. */
+/* Display the actual chat SVG supplied by JavaScript. */
 
 #Message-model-friends-list .Message-model-home-friend-row
 .Message-model-contact-chat .Message-model-contact-chat-icon {
-  display: none !important;
+  display: block !important;
+
+  flex: 0 0 var(--home-chat-icon-size);
+
+  width: var(--home-chat-icon-size);
+  height: var(--home-chat-icon-size);
+
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: contain;
+  object-position: center;
+
+  pointer-events: none;
+  user-select: none;
 }
 
 #Message-model-friends-list .Message-model-contact-chat:hover {
@@ -1151,6 +1157,7 @@
   }
 }
 
+
 /* =================================================
    HOME GROUPS: GROUP LIST ROWS
    Added for the Message home Groups section.
@@ -1279,7 +1286,9 @@
   line-height: 1.35;
 }
 
-/* Group chat button: uses the requested existing SVG resource. */
+
+/* Group chat button: uses the same chat SVG as Friend chat. */
+
 #Message-model-groups-list .Message-model-home-group-chat {
   display: inline-flex;
   flex: 0 0 38px;
