@@ -1676,21 +1676,15 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           hidden
         >
 
-          <!-- CHAT HEADER
-              Back button is handled by the main Message Header.
-          -->
+          <!-- CHAT HEADER -->
 
           <div id="Message-model-chat-header">
-
-            <!-- CHAT AVATAR -->
 
             <img
               id="Message-model-chat-avatar"
               src="/SSVG/avatar/profile.svg"
               alt=""
             >
-
-            <!-- CHAT USER INFO -->
 
             <div id="Message-model-chat-user-info">
 
@@ -1703,8 +1697,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
               </div>
 
             </div>
-
-            <!-- MORE OPTIONS -->
 
             <button
               id="Message-model-chat-more"
@@ -1724,40 +1716,66 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
             aria-live="polite"
             aria-relevant="additions"
           >
-
-            <!-- Messages will be rendered here -->
-
+            <!-- Messages rendered by chat.js -->
           </div>
 
 
-          <!-- CHAT INPUT -->
+          <!-- TELEGRAM-STYLE COMPOSER -->
 
           <form id="Message-model-chat-form">
 
-            <input
-              id="Message-model-chat-input"
-              type="text"
-              placeholder="Type a message..."
-              autocomplete="off"
-              aria-label="Type a message"
+            <!-- ADD BUTTON: NO FUNCTION YET -->
+
+            <button
+              id="U9-message-chat-add-button"
+              type="button"
+              aria-label="Add"
+              title="Add"
             >
+              <img
+                src="/SSVG/normal/add.svg"
+                alt=""
+                aria-hidden="true"
+              >
+            </button>
+
+
+            <!-- MULTILINE MESSAGE INPUT -->
+
+            <div id="U9-message-chat-input-wrap">
+
+              <textarea
+                id="Message-model-chat-input"
+                rows="1"
+                maxlength="5000"
+                placeholder="Message"
+                autocomplete="off"
+                aria-label="Type a message"
+                enterkeyhint="enter"
+                wrap="soft"
+              ></textarea>
+
+            </div>
+
+
+            <!-- SEND BUTTON: SVG ONLY -->
 
             <button
               id="Message-model-chat-send"
               type="submit"
               aria-label="Send message"
             >
-
               <img
                 src="/SSVG/normal/send.svg"
                 alt=""
+                aria-hidden="true"
               >
-
             </button>
 
           </form>
 
         </section>
+
 
       </div>
 
