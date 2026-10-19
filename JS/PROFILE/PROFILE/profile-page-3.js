@@ -3,17 +3,20 @@
    U9 PROFILE PAGE 3
    Avatar / Free Avatar Frame / Paid Avatar Frame
 
-   Loading improvements:
+   Improvements:
    - Reuse loaded tab data
    - Keep existing panel content during loading
-   - Display a compact loading status
-   - Prevent stale requests from replacing the selected tab
+   - Display compact loading status
+   - Prevent stale requests replacing the selected tab
+   - Prevent initialization from overriding a user's tab choice
+   - Route public Supabase Storage images through /storage/
+   - Preserve existing avatar/frame APIs and behaviors
 ========================================================= */
+
 
 /* =========================================================
    API
 ========================================================= */
-
 
 const U9_PROFILE_PAGE3_FREE_AVATAR_API =
   "/api/avatar-free";
@@ -32,7 +35,6 @@ const U9_PROFILE_PAGE3_EQUIP_FRAME_API =
 
 const U9_PROFILE_PAGE3_PURCHASE_FRAME_API =
   "/api/avatar-frame-paid-purchase";
-
 
 
 /* =========================================================
@@ -61,6 +63,8 @@ let paidFrames = [];
 let activePage3Tab = "avatar";
 let page3Initialized = false;
 let page3RequestVersion = 0;
+let page3UserHasSelectedTab = false;
+let page3InitializationPromise = null;
 
 const page3Loaded = {
   avatar: false,
@@ -74,7 +78,12 @@ const page3Loaded = {
 ========================================================= */
 
 function getPage3Token() {
-  return localStorage.getItem("u9_token");
+  try {
+    return localStorage.getItem("u9_token");
+  } catch (error) {
+    console.warn("Unable to read U9 token:", error);
+    return null;
+  }
 }
 
 
@@ -95,12 +104,7 @@ function page3IsLoggedIn() {
 
 
 /* =========================================================
-   IMAGE / SVG
-========================================================= */
-
-
-/* =========================================================
-   IMAGE / SVG
+   IMAGE URL / SVG
    Route public Supabase Storage images through Vercel
 ========================================================= */
 
@@ -119,11 +123,16 @@ function getPage3ImageUrl(source) {
   }
 
   try {
-    const url = new URL(value, window.location.origin);
+    const url = new URL(
+      value,
+      window.location.origin
+    );
 
     if (
       url.origin === U9_PAGE3_SUPABASE_STORAGE_ORIGIN &&
-      url.pathname.startsWith("/storage/v1/object/public/")
+      url.pathname.startsWith(
+        "/storage/v1/object/public/"
+      )
     ) {
       const storagePath = url.pathname.replace(
         "/storage/v1/object/public/",
@@ -143,12 +152,17 @@ function getPage3ImageUrl(source) {
   }
 }
 
+
 function setPage3ImageSource(image, source) {
-  if (!image || !source) return;
+  if (!image || source === undefined || source === null) {
+    return;
+  }
 
   const value = String(source).trim();
 
-  if (!value) return;
+  if (!value) {
+    return;
+  }
 
   if (
     value.startsWith("<svg") ||
@@ -165,12 +179,14 @@ function setPage3ImageSource(image, source) {
 }
 
 
-
 /* =========================================================
    GET FIRST AVAILABLE VALUE
 ========================================================= */
 
-function getPage3FirstValue(values, fallback = null) {
+function getPage3FirstValue(
+  values,
+  fallback = null
+) {
   for (const value of values) {
     if (
       value !== undefined &&
@@ -198,44 +214,74 @@ function loadCurrentEquipment(user = null) {
         : null;
   }
 
-  currentAvatarId =
-    getPage3FirstValue([
-      user?.avatar?.id,
-      user?.avatar?.avatar_id,
-      user?.avatar_id
-    ]);
+  if (!user || typeof user !== "object") {
+    return;
+  }
 
-  currentAvatarType =
-    getPage3FirstValue([
-      user?.avatar_type,
-      user?.avatarType,
-      user?.avatar?.type,
-      user?.avatar?.avatar_type,
-      user?.user_avatar?.avatar_type,
-      user?.userAvatar?.avatar_type
-    ], "default");
+  currentAvatarId = getPage3FirstValue([
+    user?.avatar?.id,
+    user?.avatar?.avatar_id,
+    user?.avatar_id
+  ]);
+
+  currentAvatarType = getPage3FirstValue([
+    user?.avatar_type,
+    user?.avatarType,
+    user?.avatar?.type,
+    user?.avatar?.avatar_type,
+    user?.user_avatar?.avatar_type,
+    user?.userAvatar?.avatar_type
+  ], "default");
 
   /*
-   * IMPORTANT:
+   * Prefer dedicated custom-avatar URL fields.
    *
-   * avatar.url may represent the currently equipped avatar.
-   * It must not be treated as the saved custom avatar URL.
-   *
-   * Prefer the dedicated custom avatar URL fields.
+   * Some user objects expose avatar.url as the currently
+   * equipped avatar, which may be a free/default avatar.
+   * Do not blindly save that URL as the custom avatar.
    */
 
-  const customAvatarUrl =
-    getPage3FirstValue([
-      user?.avatar_url,
-      user?.avatarUrl,
-      user?.avatar?.custom_url,
-      user?.user_avatar?.avatar_url,
-      user?.userAvatar?.avatar_url
-    ]);
+  let customAvatarUrl = getPage3FirstValue([
+    user?.avatar_url,
+    user?.avatarUrl,
+    user?.avatar?.custom_url,
+    user?.user_avatar?.avatar_url,
+    user?.userAvatar?.avatar_url
+  ]);
 
   /*
-   * Preserve the previous custom URL if the returned user
-   * object temporarily does not include the custom URL.
+   * Use avatar.url only when the user data explicitly
+   * identifies the current avatar as a custom avatar.
+   */
+
+  const avatarTypeIndicatesCustom = [
+    user?.avatar_type,
+    user?.avatarType,
+    user?.avatar?.type,
+    user?.avatar?.avatar_type,
+    user?.user_avatar?.avatar_type,
+    user?.userAvatar?.avatar_type
+  ].some(function (value) {
+    return (
+      typeof value === "string" &&
+      value.trim().toLowerCase() === "custom"
+    );
+  });
+
+  if (
+    customAvatarUrl === null &&
+    avatarTypeIndicatesCustom
+  ) {
+    customAvatarUrl = getPage3FirstValue([
+      user?.avatar?.url,
+      user?.user_avatar?.url,
+      user?.userAvatar?.url
+    ]);
+  }
+
+  /*
+   * Keep the previously saved custom URL if the refreshed
+   * user object temporarily omits the custom URL field.
    */
 
   if (customAvatarUrl !== null) {
@@ -243,19 +289,17 @@ function loadCurrentEquipment(user = null) {
       String(customAvatarUrl).trim() || null;
   }
 
-  currentFrameType =
-    getPage3FirstValue([
-      user?.avatar_frame_type,
-      user?.avatarFrameType,
-      user?.frame_type
-    ], "default");
+  currentFrameType = getPage3FirstValue([
+    user?.avatar_frame_type,
+    user?.avatarFrameType,
+    user?.frame_type
+  ], "default");
 
-  currentFrameId =
-    getPage3FirstValue([
-      user?.avatar_frame_id,
-      user?.avatarFrameId,
-      user?.frame_id
-    ]);
+  currentFrameId = getPage3FirstValue([
+    user?.avatar_frame_id,
+    user?.avatarFrameId,
+    user?.frame_id
+  ]);
 
   console.log("PAGE3 CURRENT USER DATA:", {
     avatarId: currentAvatarId,
@@ -326,14 +370,11 @@ function createPage3UI() {
     return;
   }
 
-  /*
-   * Build the tabs and panel only once.
-   * Do not recreate the whole page when switching tabs.
-   */
-
   if (
     page3Initialized &&
-    document.getElementById("U9-profile-page3-panel") &&
+    document.getElementById(
+      "U9-profile-page3-panel"
+    ) &&
     profilePage3Content.querySelector(
       ".U9-profile-page3-tabs"
     )
@@ -348,8 +389,14 @@ function createPage3UI() {
 
   tabs.append(
     createPage3Tab("avatar", "Avatar"),
-    createPage3Tab("free-frame", "Free Avatar Frame"),
-    createPage3Tab("paid-frame", "Paid Avatar Frame")
+    createPage3Tab(
+      "free-frame",
+      "Free Avatar Frame"
+    ),
+    createPage3Tab(
+      "paid-frame",
+      "Paid Avatar Frame"
+    )
   );
 
   const status = document.createElement("div");
@@ -386,6 +433,13 @@ function createPage3Tab(tabName, label) {
   button.setAttribute("aria-selected", "false");
 
   button.addEventListener("click", function () {
+    /*
+     * Remember that the user has made an explicit choice.
+     * Initialization must not override it later.
+     */
+
+    page3UserHasSelectedTab = true;
+
     switchPage3Tab(tabName);
   });
 
@@ -399,12 +453,15 @@ function createPage3Tab(tabName, label) {
 
 function updatePage3Tabs() {
   document
-    .querySelectorAll(".U9-profile-page3-tab")
+    .querySelectorAll(
+      ".U9-profile-page3-tab"
+    )
     .forEach(function (tab) {
       const active =
         tab.dataset.tab === activePage3Tab;
 
       tab.classList.toggle("active", active);
+
       tab.setAttribute(
         "aria-selected",
         String(active)
@@ -430,7 +487,9 @@ function setPage3Status(
   if (!message) {
     status.hidden = true;
     status.textContent = "";
-    status.className = "U9-profile-page3-status";
+    status.className =
+      "U9-profile-page3-status";
+
     return;
   }
 
@@ -543,6 +602,11 @@ async function switchPage3Tab(
 
   activePage3Tab = tabName;
 
+  /*
+   * Each tab selection gets a new version number.
+   * Only the latest request may update the panel.
+   */
+
   const requestVersion =
     ++page3RequestVersion;
 
@@ -555,8 +619,7 @@ async function switchPage3Tab(
   if (!panel) return;
 
   /*
-   * Already loaded:
-   * render immediately without another request.
+   * Use cached data immediately when available.
    */
 
   if (
@@ -568,16 +631,15 @@ async function switchPage3Tab(
     return;
   }
 
-  /*
-   * Keep existing content visible while loading.
-   * Only the small status row changes.
-   */
-
   const loadingText = {
     avatar: "Loading avatars…",
     "free-frame": "Loading free frames…",
     "paid-frame": "Loading paid frames…"
   };
+
+  /*
+   * Keep the old panel content visible during loading.
+   */
 
   setPage3Status(
     loadingText[tabName],
@@ -591,7 +653,13 @@ async function switchPage3Tab(
       await loadFreeFrames();
     } else {
       if (!requirePage3Login(panel)) {
-        setPage3Status("");
+        if (
+          requestVersion === page3RequestVersion &&
+          activePage3Tab === tabName
+        ) {
+          setPage3Status("");
+        }
+
         return;
       }
 
@@ -599,8 +667,7 @@ async function switchPage3Tab(
     }
 
     /*
-     * If another tab was selected while the request
-     * was running, do not let this old request render.
+     * Ignore results from a tab that is no longer active.
      */
 
     if (
@@ -624,7 +691,8 @@ async function switchPage3Tab(
     }
 
     console.error(
-      "PAGE3 " + tabName.toUpperCase() + " LOAD ERROR:",
+      "PAGE3 " + tabName.toUpperCase() +
+      " LOAD ERROR:",
       error
     );
 
@@ -663,30 +731,45 @@ function renderPage3Tab(tabName, panel) {
 
 function createSelectAvatarCard() {
   const card = document.createElement("div");
-  card.className = "U9-profile-page3-avatar-card";
+  card.className =
+    "U9-profile-page3-avatar-card";
 
   const image = document.createElement("img");
-  image.className = "U9-profile-page3-avatar-image";
+  image.className =
+    "U9-profile-page3-avatar-image";
 
   image.alt = currentCustomAvatarUrl
     ? "Custom Avatar"
     : "Select Avatar";
 
-  image.src =
+  /*
+   * Important fix:
+   * Use the shared image loader so Supabase Storage URLs
+   * are routed through the same-origin /storage/ proxy.
+   */
+
+  setPage3ImageSource(
+    image,
     currentCustomAvatarUrl ||
-    "SSVG/avatar/profile.svg";
+    "SSVG/avatar/profile.svg"
+  );
 
   image.onerror = function () {
     if (!image.dataset.fallbackUsed) {
       image.dataset.fallbackUsed = "1";
-      image.src = "SSVG/avatar/profile.svg";
+
+      setPage3ImageSource(
+        image,
+        "SSVG/avatar/profile.svg"
+      );
     }
   };
 
   card.appendChild(image);
 
   const name = document.createElement("div");
-  name.className = "U9-profile-page3-avatar-name";
+  name.className =
+    "U9-profile-page3-avatar-name";
 
   name.textContent = currentCustomAvatarUrl
     ? "Custom Avatar"
@@ -695,8 +778,10 @@ function createSelectAvatarCard() {
   card.appendChild(name);
 
   const button = document.createElement("button");
+
   button.type = "button";
-  button.className = "U9-profile-page3-avatar-button";
+  button.className =
+    "U9-profile-page3-avatar-button";
 
   if (!currentCustomAvatarUrl) {
     button.textContent = "Select Avatar";
@@ -704,7 +789,8 @@ function createSelectAvatarCard() {
     button.addEventListener("click", function () {
       if (
         window.U9ProfilePictureModal &&
-        typeof window.U9ProfilePictureModal.open === "function"
+        typeof window.U9ProfilePictureModal.open ===
+          "function"
       ) {
         window.U9ProfilePictureModal.open();
         return;
@@ -714,7 +800,9 @@ function createSelectAvatarCard() {
         "U9ProfilePictureModal.open() is not available."
       );
 
-      alert("Profile picture is not available yet.");
+      alert(
+        "Profile picture is not available yet."
+      );
     });
   } else {
     button.dataset.avatarType = "custom";
@@ -722,7 +810,8 @@ function createSelectAvatarCard() {
     const active =
       currentAvatarType === "custom";
 
-    button.textContent = active ? "Using" : "Use";
+    button.textContent =
+      active ? "Using" : "Use";
 
     if (active) {
       button.classList.add("active");
@@ -779,16 +868,22 @@ function renderFreeAvatarsIntoPanel(panel) {
   panel.innerHTML = "";
 
   const list = document.createElement("div");
-  list.className = "U9-profile-page3-avatar-list";
+  list.className =
+    "U9-profile-page3-avatar-list";
 
-  list.appendChild(createSelectAvatarCard());
+  list.appendChild(
+    createSelectAvatarCard()
+  );
 
   freeAvatars.forEach(function (avatar) {
     const card = document.createElement("div");
-    card.className = "U9-profile-page3-avatar-card";
+    card.className =
+      "U9-profile-page3-avatar-card";
 
     const image = document.createElement("img");
-    image.className = "U9-profile-page3-avatar-image";
+    image.className =
+      "U9-profile-page3-avatar-image";
+
     image.alt = avatar?.name || "Avatar";
 
     setPage3ImageSource(
@@ -801,21 +896,30 @@ function renderFreeAvatarsIntoPanel(panel) {
     card.appendChild(image);
 
     const name = document.createElement("div");
-    name.className = "U9-profile-page3-avatar-name";
-    name.textContent = avatar?.name || "Avatar";
+    name.className =
+      "U9-profile-page3-avatar-name";
+
+    name.textContent =
+      avatar?.name || "Avatar";
 
     card.appendChild(name);
 
     const button = document.createElement("button");
+
     button.type = "button";
-    button.className = "U9-profile-page3-avatar-button";
-    button.dataset.avatarId = avatar?.id || "";
+    button.className =
+      "U9-profile-page3-avatar-button";
+
+    button.dataset.avatarId =
+      avatar?.id || "";
 
     const active =
-      String(currentAvatarId) === String(avatar?.id) &&
+      String(currentAvatarId) ===
+        String(avatar?.id) &&
       currentAvatarType === "free";
 
-    button.textContent = active ? "Using" : "Use";
+    button.textContent =
+      active ? "Using" : "Use";
 
     if (active) {
       button.classList.add("active");
@@ -851,7 +955,10 @@ async function setFreeAvatar(
     return;
   }
 
-  setPage3ButtonBusy(button, "Processing...");
+  setPage3ButtonBusy(
+    button,
+    "Processing..."
+  );
 
   try {
     const result = await fetchPage3Json(
@@ -879,8 +986,8 @@ async function setFreeAvatar(
 
     /*
      * Do not clear currentCustomAvatarUrl.
-     * The uploaded avatar should remain saved even when
-     * the user switches to a free avatar.
+     * The uploaded avatar remains saved when the user
+     * switches to a free avatar.
      */
 
     await refreshProfileAfterChange();
@@ -903,7 +1010,10 @@ async function setFreeAvatar(
       customAvatarUrl: currentCustomAvatarUrl
     });
   } catch (error) {
-    console.error("SET AVATAR ERROR:", error);
+    console.error(
+      "SET AVATAR ERROR:",
+      error
+    );
 
     alert(
       error?.message ||
@@ -939,7 +1049,10 @@ async function setCustomAvatar(
     return;
   }
 
-  setPage3ButtonBusy(button, "Processing...");
+  setPage3ButtonBusy(
+    button,
+    "Processing..."
+  );
 
   try {
     const result = await fetchPage3Json(
@@ -960,7 +1073,9 @@ async function setCustomAvatar(
 
     currentAvatarType = "custom";
     currentAvatarId = null;
-    currentCustomAvatarUrl = String(avatarUrl).trim();
+
+    currentCustomAvatarUrl =
+      String(avatarUrl).trim();
 
     const returnedUrl = getPage3FirstValue([
       result?.avatar?.custom_url,
@@ -988,13 +1103,19 @@ async function setCustomAvatar(
       );
     }
 
-    console.log("CUSTOM AVATAR SET SUCCESS:", {
-      avatarType: currentAvatarType,
-      avatarId: currentAvatarId,
-      avatarUrl: currentCustomAvatarUrl
-    });
+    console.log(
+      "CUSTOM AVATAR SET SUCCESS:",
+      {
+        avatarType: currentAvatarType,
+        avatarId: currentAvatarId,
+        avatarUrl: currentCustomAvatarUrl
+      }
+    );
   } catch (error) {
-    console.error("SET CUSTOM AVATAR ERROR:", error);
+    console.error(
+      "SET CUSTOM AVATAR ERROR:",
+      error
+    );
 
     alert(
       error?.message ||
@@ -1019,13 +1140,20 @@ async function setCustomAvatar(
 
 function updateAvatarButtons() {
   document
-    .querySelectorAll(".U9-profile-page3-avatar-button")
+    .querySelectorAll(
+      ".U9-profile-page3-avatar-button"
+    )
     .forEach(function (button) {
-      if (button.dataset.avatarType === "custom") {
+      if (
+        button.dataset.avatarType === "custom"
+      ) {
         const active =
           currentAvatarType === "custom";
 
-        button.classList.toggle("active", active);
+        button.classList.toggle(
+          "active",
+          active
+        );
 
         if (active) {
           button.textContent = "Using";
@@ -1045,7 +1173,11 @@ function updateAvatarButtons() {
         String(button.dataset.avatarId) ===
           String(currentAvatarId);
 
-      button.classList.toggle("active", active);
+      button.classList.toggle(
+        "active",
+        active
+      );
+
       button.disabled = active;
 
       if (active) {
@@ -1138,7 +1270,8 @@ function renderFreeFramesIntoPanel(panel) {
   }
 
   const list = document.createElement("div");
-  list.className = "U9-profile-page3-frame-list";
+  list.className =
+    "U9-profile-page3-frame-list";
 
   freeFrames.forEach(function (frame) {
     list.appendChild(
@@ -1170,7 +1303,8 @@ function renderPaidFramesIntoPanel(panel) {
   }
 
   const list = document.createElement("div");
-  list.className = "U9-profile-page3-frame-list";
+  list.className =
+    "U9-profile-page3-frame-list";
 
   paidFrames.forEach(function (frame) {
     list.appendChild(
@@ -1191,12 +1325,20 @@ function createFrameCard(
   frameType
 ) {
   const card = document.createElement("div");
-  card.className = "U9-profile-page3-frame-card";
-  card.dataset.frameId = frame?.id || "";
+
+  card.className =
+    "U9-profile-page3-frame-card";
+
+  card.dataset.frameId =
+    frame?.id || "";
 
   const image = document.createElement("img");
-  image.className = "U9-profile-page3-frame-image";
-  image.alt = frame?.name || "Avatar Frame";
+
+  image.className =
+    "U9-profile-page3-frame-image";
+
+  image.alt =
+    frame?.name || "Avatar Frame";
 
   setPage3ImageSource(
     image,
@@ -1208,14 +1350,20 @@ function createFrameCard(
   card.appendChild(image);
 
   const name = document.createElement("div");
-  name.className = "U9-profile-page3-frame-name";
-  name.textContent = frame?.name || "Avatar Frame";
+
+  name.className =
+    "U9-profile-page3-frame-name";
+
+  name.textContent =
+    frame?.name || "Avatar Frame";
 
   card.appendChild(name);
 
   if (frameType === "paid") {
     const price = document.createElement("div");
-    price.className = "U9-profile-page3-frame-price";
+
+    price.className =
+      "U9-profile-page3-frame-price";
 
     const coins = Number(frame?.coins_price);
 
@@ -1229,13 +1377,20 @@ function createFrameCard(
   const button = document.createElement("button");
 
   button.type = "button";
-  button.className = "U9-profile-page3-frame-button";
-  button.dataset.frameId = frame?.id || "";
-  button.dataset.frameType = frameType;
+
+  button.className =
+    "U9-profile-page3-frame-button";
+
+  button.dataset.frameId =
+    frame?.id || "";
+
+  button.dataset.frameType =
+    frameType;
 
   const equipped =
     currentFrameType === frameType &&
-    String(currentFrameId) === String(frame?.id);
+    String(currentFrameId) ===
+      String(frame?.id);
 
   if (equipped) {
     button.textContent = "Using";
@@ -1245,7 +1400,11 @@ function createFrameCard(
     button.textContent = "Use";
 
     button.addEventListener("click", function () {
-      equipFrame("free", frame?.id, button);
+      equipFrame(
+        "free",
+        frame?.id,
+        button
+      );
     });
   } else {
     const owned =
@@ -1258,19 +1417,27 @@ function createFrameCard(
       button.classList.add("use");
 
       button.addEventListener("click", function () {
-        equipFrame("paid", frame?.id, button);
+        equipFrame(
+          "paid",
+          frame?.id,
+          button
+        );
       });
     } else {
       const coins = Number(frame?.coins_price);
 
-      button.textContent = Number.isFinite(coins)
-        ? "Buy " + coins
-        : "Buy";
+      button.textContent =
+        Number.isFinite(coins)
+          ? "Buy " + coins
+          : "Buy";
 
       button.classList.add("buy");
 
       button.addEventListener("click", function () {
-        purchasePaidFrame(frame?.id, button);
+        purchasePaidFrame(
+          frame?.id,
+          button
+        );
       });
     }
   }
@@ -1303,14 +1470,20 @@ function setPage3ButtonBusy(
 
 function updateFrameButtons() {
   document
-    .querySelectorAll(".U9-profile-page3-frame-button")
+    .querySelectorAll(
+      ".U9-profile-page3-frame-button"
+    )
     .forEach(function (button) {
       const active =
-        currentFrameType === button.dataset.frameType &&
+        currentFrameType ===
+          button.dataset.frameType &&
         String(currentFrameId) ===
           String(button.dataset.frameId);
 
-      button.classList.toggle("active", active);
+      button.classList.toggle(
+        "active",
+        active
+      );
 
       if (active) {
         button.textContent = "Using";
@@ -1338,7 +1511,10 @@ async function equipFrame(
     return;
   }
 
-  setPage3ButtonBusy(button, "Processing...");
+  setPage3ButtonBusy(
+    button,
+    "Processing..."
+  );
 
   try {
     const result = await fetchPage3Json(
@@ -1374,12 +1550,9 @@ async function equipFrame(
           "U9-profile-page3-panel"
         )
       );
-    } else if (activePage3Tab === "paid-frame") {
-      /*
-       * Refresh the paid-frame list so the equipped state
-       * and ownership state can be checked again.
-       */
-
+    } else if (
+      activePage3Tab === "paid-frame"
+    ) {
       page3Loaded["paid-frame"] = false;
 
       await switchPage3Tab(
@@ -1393,7 +1566,10 @@ async function equipFrame(
       frameId: currentFrameId
     });
   } catch (error) {
-    console.error("EQUIP FRAME ERROR:", error);
+    console.error(
+      "EQUIP FRAME ERROR:",
+      error
+    );
 
     alert(
       error?.message ||
@@ -1452,7 +1628,10 @@ async function purchasePaidFrame(
     return;
   }
 
-  setPage3ButtonBusy(button, "Purchasing...");
+  setPage3ButtonBusy(
+    button,
+    "Purchasing..."
+  );
 
   try {
     await fetchPage3Json(
@@ -1470,12 +1649,6 @@ async function purchasePaidFrame(
       "Failed to purchase avatar frame."
     );
 
-    /*
-     * Refresh profile data after the purchase.
-     * The server remains the source of truth for ownership
-     * and the user's coin balance.
-     */
-
     await refreshProfileAfterChange();
 
     console.log(
@@ -1484,8 +1657,8 @@ async function purchasePaidFrame(
     );
 
     /*
-     * Preserve the original behavior:
-     * purchase -> automatically equip.
+     * Preserve existing behavior:
+     * successful purchase automatically equips the frame.
      */
 
     await equipFrame(
@@ -1495,8 +1668,8 @@ async function purchasePaidFrame(
     );
 
     /*
-     * Reload the paid-frame list from the server so the
-     * ownership state is not based only on local changes.
+     * Reload server-owned state instead of assuming
+     * the local purchase succeeded in every detail.
      */
 
     page3Loaded["paid-frame"] = false;
@@ -1529,9 +1702,10 @@ async function purchasePaidFrame(
     if (button) {
       button.disabled = false;
 
-      button.textContent = Number.isFinite(price)
-        ? "Buy " + price
-        : "Buy";
+      button.textContent =
+        Number.isFinite(price)
+          ? "Buy " + price
+          : "Buy";
     }
   } finally {
     if (button) {
@@ -1554,57 +1728,82 @@ async function loadProfilePage3() {
     return;
   }
 
-  try {
-    createPage3UI();
+  /*
+   * Avoid duplicate initialization if this function is
+   * called more than once while the first call is pending.
+   */
 
-    setPage3Status(
-      "Loading your profile settings…",
-      "loading"
-    );
+  if (page3InitializationPromise) {
+    return page3InitializationPromise;
+  }
 
-    /*
-     * Refresh the current user first, if this method exists.
-     */
+  page3InitializationPromise = (async function () {
+    try {
+      createPage3UI();
 
-    if (
-      window.U9User &&
-      typeof window.U9User.refresh === "function"
-    ) {
-      const user = await window.U9User.refresh();
+      setPage3Status(
+        "Loading your profile settings…",
+        "loading"
+      );
 
-      if (user) {
-        loadCurrentEquipment(user);
+      /*
+       * Capture the current selection before awaiting the
+       * user refresh. A user may click another tab while
+       * the refresh is in progress.
+       */
+
+      const selectedTabBeforeRefresh =
+        activePage3Tab;
+
+      if (
+        window.U9User &&
+        typeof window.U9User.refresh === "function"
+      ) {
+        const user = await window.U9User.refresh();
+
+        if (user) {
+          loadCurrentEquipment(user);
+        } else {
+          loadCurrentEquipment();
+        }
       } else {
         loadCurrentEquipment();
       }
-    } else {
-      loadCurrentEquipment();
+
+      /*
+       * Do not force Avatar if the user has already selected
+       * a tab while the refresh was pending.
+       */
+
+      const targetTab = page3UserHasSelectedTab
+        ? activePage3Tab
+        : selectedTabBeforeRefresh;
+
+      await switchPage3Tab(targetTab);
+
+      console.log("PROFILE PAGE 3 LOADED");
+    } catch (error) {
+      console.error(
+        "PROFILE PAGE 3 LOAD ERROR:",
+        error
+      );
+
+      setPage3Status("");
+
+      showPage3Message(
+        document.getElementById(
+          "U9-profile-page3-panel"
+        ),
+        error?.message ||
+        "Unable to load profile settings. Please refresh and try again.",
+        "error"
+      );
+    } finally {
+      page3InitializationPromise = null;
     }
+  })();
 
-    /*
-     * Display the default Avatar tab.
-     */
-
-    await switchPage3Tab("avatar");
-
-    console.log("PROFILE PAGE 3 LOADED");
-  } catch (error) {
-    console.error(
-      "PROFILE PAGE 3 LOAD ERROR:",
-      error
-    );
-
-    setPage3Status("");
-
-    showPage3Message(
-      document.getElementById(
-        "U9-profile-page3-panel"
-      ),
-      error?.message ||
-      "Unable to load profile settings. Please refresh and try again.",
-      "error"
-    );
-  }
+  return page3InitializationPromise;
 }
 
 
@@ -1639,6 +1838,11 @@ window.U9ProfilePage3.refresh = async function () {
     } else {
       loadCurrentEquipment();
     }
+
+    /*
+     * Reload the currently selected tab, not a hard-coded
+     * default tab.
+     */
 
     await switchPage3Tab(
       activePage3Tab,
