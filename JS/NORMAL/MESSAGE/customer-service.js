@@ -219,7 +219,7 @@
       <div class="u9-cs-page">
         <header class="u9-cs-hero">
           <div class="u9-cs-hero-icon" aria-hidden="true">
-            <img src="/SSVG/account/account-edit-button.svg" alt="">
+            <img src="/SSVG/normal/customer-service.svg" alt="">
           </div>
           <div class="u9-cs-hero-copy">
             <p class="u9-cs-eyebrow">U9 SUPPORT</p>
