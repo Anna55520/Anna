@@ -21,19 +21,17 @@
 ================================================= */
 
 #U9-message-normal-modal {
-  --message-modal-top: 115px;
-
+  /* Full-screen Message modal: covers the page header and toolbar. */
   position: fixed;
-  top: var(--message-modal-top);
-  left: 0;
+  inset: 0;
 
   display: flex;
   justify-content: center;
   align-items: stretch;
 
   width: 100%;
-  height: calc(100vh - var(--message-modal-top));
-  height: calc(100dvh - var(--message-modal-top));
+  height: 100vh;
+  height: 100dvh;
 
   box-sizing: border-box;
   overflow: hidden;
@@ -45,36 +43,27 @@
   visibility: hidden;
   pointer-events: none;
 
-  transition:
-    top 0.35s ease,
-    height 0.35s ease,
-    visibility 0s linear 0.45s;
+  transition: visibility 0s linear 0.45s;
 }
 
+/* Keep the modal at the viewport top even when the page toolbar collapses. */
 #U9-message-normal-modal.message-toolbar-collapsed {
-  --message-modal-top: 60px;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
 }
 
 #U9-message-normal-modal.modal-open {
   visibility: visible;
   pointer-events: auto;
-
-  transition:
-    top 0.35s ease,
-    height 0.35s ease,
-    visibility 0s;
+  transition: visibility 0s;
 }
 
 #U9-message-normal-modal.modal-closing {
   visibility: visible;
   pointer-events: none;
-
-  transition:
-    top 0.35s ease,
-    height 0.35s ease,
-    visibility 0s;
+  transition: visibility 0s;
 }
-
 
 /* =================================================
    MODAL CONTENT
