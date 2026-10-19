@@ -4,14 +4,15 @@
    File: CSS/NORMAL/normal-message.css
 
    Responsibilities:
-   - Message modal and animations
-   - Unified 55px header
-   - Header title centered / close button left
+   - Message modal and slide animations
+   - Unified 55px blue header
+   - Centered title and left close button
    - Message home layout
    - Home friends and groups
    - Home friend avatar and frame
    - SVG chat button
    - Shared inner-page layout
+   - Stable parent layout for mobile keyboard support
 
    Chat-specific styles:
    CSS/NORMAL/MESSAGE/chat.css
@@ -19,20 +20,28 @@
 
 
 /* =================================================
-   MODAL
+   GLOBAL MODAL VARIABLES
 ================================================= */
 
 #U9-message-normal-modal {
+  --u9-message-header-bg: #78ace9;
+  --u9-message-header-height: 55px;
+
+  --u9-message-modal-bg: #ffffff;
+  --u9-message-border: #e8eaf0;
+
   position: fixed;
   inset: 0;
 
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: stretch;
+  justify-content: flex-start;
 
   width: 100%;
-  height: 100vh;
-  height: 100dvh;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
 
   box-sizing: border-box;
   overflow: hidden;
@@ -45,7 +54,18 @@
   pointer-events: none;
 
   transition: visibility 0s linear 0.45s;
+
+  /*
+    JS may update this variable when the mobile
+    visual viewport changes because of the keyboard.
+  */
+  --u9-message-viewport-height: 100vh;
 }
+
+
+/* =================================================
+   MODAL OPEN / CLOSE STATES
+================================================= */
 
 #U9-message-normal-modal.modal-open {
   visibility: visible;
@@ -70,18 +90,18 @@
   position: relative;
 
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
 
   width: 100%;
   height: 100%;
-
   min-width: 0;
   min-height: 0;
 
   box-sizing: border-box;
   overflow: hidden;
 
-  background: #ffffff;
+  background: var(--u9-message-modal-bg);
 
   transform: translateY(100%);
   transition: transform 0.45s ease;
@@ -99,44 +119,50 @@
 
 
 /* =================================================
-   MESSAGE HEADER
-   Unified with History / Inbox / Gift
-   - Fixed height: 55px
-   - Centered title
-   - Close button on the left
+   OUTER MESSAGE HEADER
+   Fixed 55px flex item.
+   It must not scroll with the content below it.
 ================================================= */
 
 #U9-message-normal-modal-title {
   position: relative;
+  z-index: 20;
 
   display: flex;
+  flex: 0 0 var(--u9-message-header-height);
   align-items: center;
   justify-content: center;
 
-  flex: 0 0 55px;
-
   width: 100%;
-  height: 55px;
-  min-height: 55px;
+  height: var(--u9-message-header-height);
+  min-height: var(--u9-message-header-height);
+  max-height: var(--u9-message-header-height);
 
+  margin: 0;
   padding: 0 60px;
 
   box-sizing: border-box;
 
-  border: none;
+  border: 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
 
-  background: #78ace9;
+  background: var(--u9-message-header-bg);
   color: #ffffff;
 
+  font-family: inherit;
   font-size: 20px;
   font-weight: 600;
   line-height: 1.3;
 
   text-align: center;
 
-  z-index: 2;
+  overflow: hidden;
 }
+
+
+/* =================================================
+   OUTER HEADER TITLE TEXT
+================================================= */
 
 #U9-message-normal-modal-title-text {
   position: absolute;
@@ -147,20 +173,22 @@
 
   display: block;
 
+  min-width: 0;
   margin: 0;
   padding: 0;
 
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 
   color: #ffffff;
 
+  font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
   line-height: 1.2;
 
   text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 
   transform: translateY(-50%);
 
@@ -169,15 +197,13 @@
 
 
 /* =================================================
-   HEADER CLOSE / BACK BUTTON
-   Unified dimensions and position
-   No hover or active effects
+   OUTER HEADER CLOSE / BACK BUTTON
 ================================================= */
 
 #U9-message-normal-modal-close {
   position: absolute;
 
-  top: calc(45% + 2px);
+  top: 50%;
   left: 15px;
   right: auto;
 
@@ -187,13 +213,15 @@
 
   width: 36px;
   height: 36px;
+  min-width: 36px;
+  min-height: 36px;
 
   margin: 0;
   padding: 0;
 
   box-sizing: border-box;
 
-  border: none;
+  border: 0;
   border-radius: 50%;
   outline: none;
 
@@ -211,9 +239,11 @@
 
   -webkit-appearance: none;
   appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #U9-message-normal-modal-close.message-home-close {
+  background: transparent;
   color: #ffffff;
   font-size: 20px;
 }
@@ -254,12 +284,18 @@
   box-sizing: border-box;
 }
 
+
+/* =================================================
+   MESSAGE HOME
+================================================= */
+
 #Message-model-home {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
 
   width: 100%;
+  min-width: 0;
   min-height: 0;
 
   overflow-x: hidden;
@@ -289,6 +325,7 @@
 #U9-message-normal-modal-content.message-inner-page
 #Message-model-pages {
   display: flex;
+  flex: 1 1 0;
   flex-direction: column;
 }
 
@@ -492,6 +529,11 @@
   box-sizing: border-box;
 }
 
+
+/* =================================================
+   HOME FRIEND LIST CONFIGURATION
+================================================= */
+
 #Message-model-friends-list {
   --home-avatar-slot-size: 58px;
   --home-avatar-image-size: 37px;
@@ -521,6 +563,7 @@
   position: relative;
 
   display: flex;
+  flex: 0 0 auto;
   flex-direction: row;
   align-items: center;
 
@@ -529,8 +572,6 @@
   width: 100%;
   min-width: 0;
   min-height: var(--home-row-min-height);
-
-  flex: 0 0 auto;
 
   padding:
     var(--home-row-padding-y)
@@ -721,7 +762,6 @@
 
 /* =================================================
    HOME FRIEND NAME
-   The account is intentionally omitted.
 ================================================= */
 
 #Message-model-friends-list .Message-model-home-friend-row
@@ -754,14 +794,13 @@
 #Message-model-friends-list .Message-model-home-friend-row
 .Message-model-contact-chat {
   display: inline-flex;
+  flex: 0 0 var(--home-chat-button-size);
+
   align-items: center;
   justify-content: center;
 
-  flex: 0 0 var(--home-chat-button-size);
-
   width: var(--home-chat-button-size);
   height: var(--home-chat-button-size);
-
   min-width: var(--home-chat-button-size);
 
   margin: 0;
@@ -874,7 +913,7 @@
   position: relative;
 
   display: none;
-  flex: 1 1 auto;
+  flex: 1 1 0;
 
   width: 100%;
   height: 0;
@@ -888,8 +927,15 @@
   overflow: hidden;
 }
 
+
+/* =================================================
+   SHARED INNER PAGES
+================================================= */
+
 #Message-model-pages .Message-model-page {
   position: relative;
+
+  flex: 1 1 auto;
 
   width: 100%;
   height: 100%;
@@ -974,6 +1020,7 @@
   #U9-message-normal-modal-title {
     padding-right: 55px;
     padding-left: 55px;
+
     font-size: 18px;
   }
 
@@ -1000,13 +1047,17 @@
   #Message-model-navigation .Message-model-nav-button {
     min-height: 70px;
     gap: 5px;
+
     padding: 7px 2px;
+
     border-radius: 9px;
+
     font-size: 10px;
   }
 
   #Message-model-navigation .Message-model-nav-icon {
     flex-basis: 20px;
+
     width: 20px;
     height: 20px;
   }
@@ -1059,6 +1110,7 @@
 
   .Message-model-contact-avatar {
     flex-basis: 40px;
+
     width: 40px;
     height: 40px;
   }
@@ -1069,6 +1121,7 @@
 
   .Message-model-contact-chat {
     flex-basis: 36px;
+
     width: 36px;
     height: 36px;
   }
@@ -1093,12 +1146,15 @@
   #Message-model-navigation .Message-model-nav-button {
     min-height: 64px;
     gap: 4px;
+
     padding: 6px 1px;
+
     font-size: 9px;
   }
 
   #Message-model-navigation .Message-model-nav-icon {
     flex-basis: 18px;
+
     width: 18px;
     height: 18px;
   }
@@ -1136,20 +1192,22 @@
 
 #Message-model-groups-list {
   gap: 8px;
+
   padding: 2px 1px 8px;
+
   overflow: visible;
 }
 
 #Message-model-groups-list .Message-model-home-group-row {
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
+
   gap: 12px;
 
   width: 100%;
   min-width: 0;
   min-height: 68px;
-
-  flex: 0 0 auto;
 
   padding: 11px 13px;
 
@@ -1171,15 +1229,21 @@
 #Message-model-groups-list .Message-model-home-group-row:hover {
   border-color: #d9deea;
   background: #fcfcfe;
+
   box-shadow: 0 3px 12px rgb(24 39 75 / 5%);
 }
 
+
+/* =================================================
+   GROUP AVATAR
+================================================= */
+
 #Message-model-groups-list .Message-model-home-group-avatar {
   display: flex;
+  flex: 0 0 42px;
+
   align-items: center;
   justify-content: center;
-
-  flex: 0 0 42px;
 
   width: 42px;
   height: 42px;
@@ -1218,6 +1282,11 @@
   font-weight: 750;
   line-height: 1;
 }
+
+
+/* =================================================
+   GROUP NAME / DESCRIPTION / ROLE
+================================================= */
 
 #Message-model-groups-list .Message-model-home-group-main {
   flex: 1 1 auto;
@@ -1341,6 +1410,7 @@
 #Message-model-groups-list .Message-model-home-group-chat:hover {
   border-color: #cbdcf5;
   background: #eaf2ff;
+
   box-shadow: 0 2px 7px rgb(45 92 160 / 9%);
 }
 
@@ -1353,6 +1423,11 @@
   outline: 2px solid #78ace9;
   outline-offset: 3px;
 }
+
+
+/* =================================================
+   GROUP LIST STATUS / ERROR
+================================================= */
 
 #Message-model-groups-list .Message-model-home-groups-state {
   margin: 0;
@@ -1385,15 +1460,20 @@
 @media (max-width: 480px) {
   #Message-model-groups-list .Message-model-home-group-row {
     gap: 10px;
+
     min-height: 62px;
+
     padding: 9px 10px;
+
     border-radius: 11px;
   }
 
   #Message-model-groups-list .Message-model-home-group-avatar {
     flex-basis: 38px;
+
     width: 38px;
     height: 38px;
+
     border-radius: 10px;
   }
 
@@ -1411,9 +1491,11 @@
 
   #Message-model-groups-list .Message-model-home-group-chat {
     flex-basis: 35px;
+
     width: 35px;
     height: 35px;
     min-width: 35px;
+
     border-radius: 9px;
   }
 
@@ -1425,8 +1507,36 @@
 
 
 /* =================================================
+   MOBILE HEADER
+================================================= */
+
+@media (max-width: 480px) {
+  #U9-message-normal-modal-title {
+    padding-right: 55px;
+    padding-left: 55px;
+
+    font-size: 18px;
+  }
+
+  #U9-message-normal-modal-title-text {
+    left: 55px;
+    right: 55px;
+  }
+
+  #U9-message-normal-modal-close {
+    left: 10px;
+    right: auto;
+  }
+
+  #U9-message-normal-modal-close img {
+    width: 22px;
+    height: 22px;
+  }
+}
+
+
+/* =================================================
    REDUCED MOTION
-   Single consolidated rule
 ================================================= */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1451,29 +1561,36 @@
 
 
 /* =================================================
-   MOBILE HEADER
-   Same size and position as History / Inbox / Gift
+   VIEWPORT / KEYBOARD FOUNDATION
+
+   The JS keyboard handler can update
+   --u9-message-viewport-height.
+
+   The actual chat composer adjustment will be
+   completed together with chat.css and chat.js.
 ================================================= */
 
+@supports (height: 100dvh) {
+  #U9-message-normal-modal {
+    height: 100dvh;
+  }
+}
+
 @media (max-width: 480px) {
-  #U9-message-normal-modal-title {
-    padding-right: 55px;
-    padding-left: 55px;
-    font-size: 18px;
+  #U9-message-normal-modal {
+    /*
+      Keep the modal bounded by the available viewport.
+      JS can provide a more accurate height when the
+      mobile keyboard changes the visual viewport.
+    */
+    min-height: 0;
   }
 
-  #U9-message-normal-modal-title-text {
-    left: 55px;
-    right: 55px;
+  #U9-message-normal-modal-content {
+    min-height: 0;
   }
 
-  #U9-message-normal-modal-close {
-    left: 10px;
-    right: auto;
-  }
-
-  #U9-message-normal-modal-close img {
-    width: 22px;
-    height: 22px;
+  #Message-model-pages {
+    min-height: 0;
   }
 }
