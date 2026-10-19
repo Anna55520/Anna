@@ -1101,7 +1101,7 @@
         >
           <img
             class="Message-model-home-group-chat-icon"
-            src="/SSVG/avatar/profile.svg"
+            src="/SSVG/normal/chat.svg"
             alt=""
             aria-hidden="true"
             draggable="false"
