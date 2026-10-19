@@ -1676,9 +1676,9 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           hidden
         >
 
-          <!-- =========================
-              CHAT HEADER
-          ========================= -->
+          <!-- CHAT HEADER
+              Back button is handled by the main Message Header.
+          -->
 
           <div id="Message-model-chat-header">
 
@@ -1717,9 +1717,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           </div>
 
 
-          <!-- =========================
-              CHAT MESSAGES
-          ========================= -->
+          <!-- CHAT MESSAGES -->
 
           <div
             id="Message-model-chat-messages"
@@ -1732,44 +1730,17 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           </div>
 
 
-          <!-- =========================
-              CHAT INPUT
-          ========================= -->
+          <!-- CHAT INPUT -->
 
           <form id="Message-model-chat-form">
 
-            <!-- ADD BUTTON -->
-
-            <button
-              id="U9-message-chat-add-button"
-              type="button"
-              aria-label="Add attachment"
-              title="More options"
-            >
-
-              <img
-                src="/SSVG/normal/add.svg"
-                alt=""
-                aria-hidden="true"
-              >
-
-            </button>
-
-
-            <!-- MESSAGE INPUT -->
-
-            <textarea
+            <input
               id="Message-model-chat-input"
-              rows="1"
+              type="text"
               placeholder="Type a message..."
               autocomplete="off"
               aria-label="Type a message"
-              enterkeyhint="enter"
-              wrap="soft"
-            ></textarea>
-
-
-            <!-- SEND BUTTON -->
+            >
 
             <button
               id="Message-model-chat-send"
@@ -1780,7 +1751,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
               <img
                 src="/SSVG/normal/send.svg"
                 alt=""
-                aria-hidden="true"
               >
 
             </button>
@@ -1788,7 +1758,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
           </form>
 
         </section>
-
 
       </div>
 
