@@ -1,69 +1,41 @@
-
 /* =========================================================
-   U9 MESSAGE CHAT PAGE
-   Shared by Friends / Groups / Customer Service
+   U9 MESSAGE - CHAT PAGE
    File: CSS/NORMAL/MESSAGE/chat.css
 
    Features:
-   - Full-height flexible chat layout
-   - Header / message list / composer
-   - Compatible with U9-chat-* JavaScript classes
-   - Compatible with legacy chat-message-* classes
-   - Group sender names
-   - Image messages
-   - Empty state and system notices
-   - Responsive desktop and mobile layout
+   1. Chat page fills the available modal height
+   2. Modal title and chat header stay fixed
+   3. Only the message list scrolls
+   4. Telegram-style multiline input
+   5. Placeholder is vertically centered when input is empty
+   6. Textarea grows with multiple lines
+   7. Add / Send buttons use replaceable SVG files
+   8. Mobile keyboard-friendly layout
+   9. Support actual U9 chat.js message classes
 ========================================================= */
 
+
 /* =========================================================
-   CHAT PAGE
+   1. CHAT PAGE BASE
 ========================================================= */
 
 #Message-model-chat-page {
-  --chat-bg: #f5f7fb;
-  --chat-primary: #78ace9;
-  --chat-primary-hover: #639de2;
-  --chat-text: #202938;
-  --chat-muted: #8993a3;
-  --chat-border: #e7ebf2;
-  --chat-input-bg: #ffffff;
-  --chat-bubble-own: #dcecff;
-  --chat-bubble-other: #ffffff;
+  display: none;
+  flex-direction: column;
 
   position: relative;
 
-  display: none;
-  flex: 1 1 0;
-  flex-direction: column;
-
   width: 100%;
-  height: auto;
-
-  min-width: 0;
+  height: 100%;
   min-height: 0;
 
   overflow: hidden;
 
-  background: var(--chat-bg);
-  color: var(--chat-text);
+  background: #ffffff;
+  color: #202124;
 
   box-sizing: border-box;
 }
-
-/* Hidden state */
-
-#Message-model-chat-page[hidden] {
-  display: none !important;
-}
-
-/* Active chat page */
-
-#Message-model-chat-page.is-active:not([hidden]),
-#Message-model-chat-page.active:not([hidden]) {
-  display: flex;
-}
-
-/* All descendants use predictable sizing */
 
 #Message-model-chat-page *,
 #Message-model-chat-page *::before,
@@ -71,939 +43,914 @@
   box-sizing: border-box;
 }
 
+#Message-model-chat-page.is-active:not([hidden]) {
+  display: flex;
+}
+
+#Message-model-chat-page[hidden] {
+  display: none !important;
+}
+
+
 /* =========================================================
-   PAGE LAYOUT
+   2. MODAL LAYOUT
+   Keep the modal title outside the scrolling message area.
 ========================================================= */
+
+#U9-message-normal-modal-content.message-inner-page {
+  display: flex;
+  flex-direction: column;
+
+  min-height: 0;
+  overflow: hidden;
+}
 
 #U9-message-normal-modal-content.message-inner-page
 #Message-model-pages {
   display: flex;
-  flex: 1 1 0;
   flex-direction: column;
 
-  width: 100%;
-  height: auto;
+  flex: 1 1 auto;
 
   min-width: 0;
   min-height: 0;
 
   overflow: hidden;
-
-  box-sizing: border-box;
 }
-
-/* Keep the chat page inside the available modal height */
 
 #U9-message-normal-modal-content.message-inner-page
 #Message-model-chat-page {
-  flex: 1 1 0;
-
-  width: 100%;
-  height: 100%;
+  flex: 1 1 auto;
 
   min-width: 0;
   min-height: 0;
+
+  overflow: hidden;
 }
 
+
 /* =========================================================
-   CHAT HEADER
+   3. NORMAL MODAL TITLE
+   Keep the top title fixed while the messages scroll.
+========================================================= */
+
+#U9-message-normal-modal-title {
+  position: relative;
+  z-index: 20;
+
+  flex: 0 0 auto;
+
+  background: #ffffff;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   4. CHAT HEADER
+   Avatar, username, status and more button stay at the top.
 ========================================================= */
 
 #Message-model-chat-header {
   position: relative;
-  z-index: 2;
+  z-index: 10;
 
   display: flex;
-  flex: 0 0 auto;
   align-items: center;
 
-  gap: 12px;
+  flex: 0 0 auto;
 
   width: 100%;
-  min-width: 0;
-  min-height: 66px;
+  min-height: 64px;
 
   padding: 10px 16px;
+  gap: 12px;
 
   background: #ffffff;
 
-  border-bottom: 1px solid var(--chat-border);
-
-  box-sizing: border-box;
-}
-
-/* Back button compatibility */
-
-#Message-model-chat-back {
-  display: flex;
-  flex: 0 0 36px;
-  align-items: center;
-  justify-content: center;
-
-  width: 36px;
-  height: 36px;
-
-  padding: 0;
-
-  color: #586579;
-  font: inherit;
-
-  background: transparent;
-  border: none;
-  border-radius: 50%;
-
-  cursor: pointer;
-
-  transition:
-    background 0.18s ease,
-    color 0.18s ease;
-}
-
-#Message-model-chat-back:hover {
-  color: var(--chat-text);
-  background: #f0f3f8;
-}
-
-#Message-model-chat-back:focus-visible {
-  outline: 2px solid var(--chat-primary);
-  outline-offset: 2px;
-}
-
-/* Header avatar */
-
-#Message-model-chat-avatar {
-  display: block;
-  flex: 0 0 44px;
-
-  width: 44px;
-  height: 44px;
-
-  object-fit: cover;
-  object-position: center;
-
-  background: #edf1f7;
-
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 50%;
-}
-
-/* Header user information */
-
-#Message-model-chat-user-info {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  justify-content: center;
-
-  gap: 4px;
-
-  min-width: 0;
+  border-bottom: 1px solid #eeeeee;
 
   overflow: hidden;
 }
+
+
+/* Chat avatar */
+
+#Message-model-chat-avatar {
+  display: block;
+
+  flex: 0 0 42px;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  object-fit: cover;
+
+  background: #f0f2f5;
+}
+
+
+/* User information */
+
+#Message-model-chat-user-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  flex: 1 1 auto;
+
+  min-width: 0;
+  min-height: 40px;
+
+  gap: 3px;
+
+  overflow: hidden;
+}
+
 
 /* Chat name */
 
 #Message-model-chat-name {
-  overflow: hidden;
+  display: block;
 
-  color: var(--chat-text);
+  width: 100%;
 
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 650;
   line-height: 1.35;
 
-  white-space: nowrap;
+  color: #202124;
+
+  overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
 
 /* Chat status */
 
 #Message-model-chat-status {
-  overflow: hidden;
+  display: block;
 
-  color: var(--chat-muted);
+  width: 100%;
 
   font-size: 12px;
   font-weight: 400;
-  line-height: 1.3;
+  line-height: 1.35;
 
-  white-space: nowrap;
+  color: #777777;
+
+  overflow: hidden;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-/* More options */
+
+/* More options button */
 
 #Message-model-chat-more {
   display: flex;
-  flex: 0 0 36px;
   align-items: center;
   justify-content: center;
 
-  width: 36px;
-  height: 36px;
+  flex: 0 0 38px;
 
+  width: 38px;
+  height: 38px;
+
+  margin: 0;
   padding: 0;
 
-  color: #586579;
-
-  font-family: inherit;
-  font-size: 27px;
-  font-weight: 500;
-  line-height: 1;
-
-  background: transparent;
   border: none;
   border-radius: 50%;
 
+  background: transparent;
+
+  color: #555555;
+
+  font-family: inherit;
+  font-size: 27px;
+  line-height: 1;
+
   cursor: pointer;
 
-  transition:
-    background 0.18s ease,
-    color 0.18s ease,
-    opacity 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-#Message-model-chat-more:hover:not(:disabled) {
-  color: var(--chat-text);
-  background: #f0f3f8;
+#Message-model-chat-more:hover {
+  background: #f3f4f6;
+}
+
+#Message-model-chat-more:active {
+  background: #e9eaec;
 }
 
 #Message-model-chat-more:focus-visible {
-  outline: 2px solid var(--chat-primary);
+  outline: 2px solid #7aa7ff;
   outline-offset: 2px;
 }
 
-#Message-model-chat-more:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
 
 /* =========================================================
-   CHAT MESSAGES AREA
+   5. MESSAGES AREA
+   Only this region scrolls vertically.
 ========================================================= */
 
 #Message-model-chat-messages {
-  position: relative;
-
   display: flex;
-  flex: 1 1 0;
   flex-direction: column;
-  align-items: stretch;
+
+  flex: 1 1 0;
 
   width: 100%;
-  height: auto;
-
   min-width: 0;
   min-height: 0;
 
-  padding: 18px 16px;
+  padding: 16px 14px;
+  gap: 10px;
 
   overflow-x: hidden;
   overflow-y: auto;
 
-  overscroll-behavior: contain;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 
-  background: var(--chat-bg);
-
-  box-sizing: border-box;
+  background: #f7f8fa;
 
   scrollbar-width: thin;
-  scrollbar-color: #cbd3df transparent;
-}
+  scrollbar-color: #d0d3d8 transparent;
 
-/* Scrollbar */
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
 
 #Message-model-chat-messages::-webkit-scrollbar {
   width: 5px;
-}
-
-#Message-model-chat-messages::-webkit-scrollbar-thumb {
-  background: #cbd3df;
-  border-radius: 10px;
 }
 
 #Message-model-chat-messages::-webkit-scrollbar-track {
   background: transparent;
 }
 
+#Message-model-chat-messages::-webkit-scrollbar-thumb {
+  background: #d0d3d8;
+  border-radius: 10px;
+}
+
+#Message-model-chat-messages::-webkit-scrollbar-thumb:hover {
+  background: #b8bdc5;
+}
+
+
 /* =========================================================
-   MESSAGE LIST
-   Generated by chat.js
+   6. EMPTY STATE
 ========================================================= */
 
-#Message-model-chat-messages .U9-chat-message-list {
+#Message-model-chat-empty,
+.U9-chat-empty {
   display: flex;
-  flex: 1 0 auto;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  width: 100%;
+
+  margin: auto;
+  padding: 28px 18px;
+
+  color: #888888;
+
+  font-size: 13px;
+  line-height: 1.6;
+
+  text-align: center;
+}
+
+
+/* =========================================================
+   7. MESSAGE ROWS
+   Actual class names generated by U9 chat.js
+========================================================= */
+
+.U9-chat-message-row,
+.chat-message-row {
+  display: flex;
+  align-items: flex-end;
 
   width: 100%;
   min-width: 0;
-  min-height: 100%;
-
-  padding: 12px 14px;
-
-  box-sizing: border-box;
-}
-
-/* =========================================================
-   MESSAGE ROWS
-   Support both current U9 classes and legacy classes.
-========================================================= */
-
-#Message-model-chat-messages .U9-chat-message-row,
-#Message-model-chat-messages .chat-message-row {
-  display: flex;
-  align-items: flex-end;
 
   gap: 8px;
 
-  width: 100%;
-  min-width: 0;
-
-  margin: 0 0 10px;
-
-  box-sizing: border-box;
+  margin: 0;
 }
 
-/* Own message */
 
-#Message-model-chat-messages .U9-chat-message-own,
-#Message-model-chat-messages .chat-message-row.is-own {
+/* Own messages */
+
+.U9-chat-message-own,
+.chat-message-row.is-own {
   justify-content: flex-end;
 }
 
-/* Other person's message */
 
-#Message-model-chat-messages .U9-chat-message-other,
-#Message-model-chat-messages .chat-message-row.is-other {
+/* Other user's messages */
+
+.U9-chat-message-other,
+.chat-message-row.is-other {
   justify-content: flex-start;
 }
 
-/* =========================================================
-   MESSAGE CONTENT
-========================================================= */
 
-#Message-model-chat-messages .U9-chat-message-content,
-#Message-model-chat-messages .chat-message-content {
+/* Message bubble */
+
+.U9-chat-message-bubble,
+.chat-message-bubble {
   display: flex;
-  flex: 0 1 auto;
   flex-direction: column;
-
-  align-items: flex-start;
-
-  gap: 4px;
-
-  min-width: 0;
-  max-width: min(78%, 520px);
-}
-
-#Message-model-chat-messages
-.U9-chat-message-own
-.U9-chat-message-content,
-#Message-model-chat-messages
-.chat-message-row.is-own
-.chat-message-content {
-  align-items: flex-end;
-}
-
-#Message-model-chat-messages
-.U9-chat-message-other
-.U9-chat-message-content,
-#Message-model-chat-messages
-.chat-message-row.is-other
-.chat-message-content {
-  align-items: flex-start;
-}
-
-/* =========================================================
-   MESSAGE AVATAR
-   Used by legacy renderers if present.
-========================================================= */
-
-#Message-model-chat-messages .chat-message-avatar {
-  display: block;
-  flex: 0 0 30px;
-
-  width: 30px;
-  height: 30px;
-
-  object-fit: cover;
-
-  background: #e9eef6;
-  border-radius: 50%;
-}
-
-/* =========================================================
-   GROUP MESSAGE SENDER
-========================================================= */
-
-#Message-model-chat-messages .U9-chat-message-sender,
-#Message-model-chat-messages .chat-message-sender {
-  max-width: 100%;
-
-  color: #7e899a;
-
-  font-size: 11px;
-  font-weight: 400;
-  line-height: 1.35;
-
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-/* =========================================================
-   MESSAGE BUBBLES
-========================================================= */
-
-#Message-model-chat-messages .U9-chat-message-bubble,
-#Message-model-chat-messages .chat-message-bubble {
-  display: block;
 
   flex: 0 1 auto;
 
   width: fit-content;
-  max-width: 100%;
+  max-width: min(78%, 520px);
   min-width: 0;
 
-  padding: 10px 13px;
+  padding: 9px 12px;
 
-  color: #303b4d;
+  border-radius: 16px;
 
-  font-size: 14px;
-  line-height: 1.55;
-
-  white-space: pre-wrap;
   overflow-wrap: anywhere;
   word-break: break-word;
 
-  background: var(--chat-bubble-other);
-
-  border: 1px solid #edf0f5;
-  border-radius: 14px 14px 14px 4px;
-
-  box-sizing: border-box;
+  box-shadow: 0 1px 1px rgb(0 0 0 / 4%);
 }
 
-/* Own message bubble */
 
-#Message-model-chat-messages .U9-chat-bubble-own,
-#Message-model-chat-messages
-.chat-message-row.is-own
-.chat-message-bubble {
-  color: #263b55;
+/* Own bubble */
 
-  background: var(--chat-bubble-own);
+.U9-chat-bubble-own,
+.U9-chat-message-own .U9-chat-message-bubble,
+.chat-message-row.is-own .chat-message-bubble {
+  background: #d9fdd3;
 
-  border-color: #d2e5fb;
-  border-radius: 14px 14px 4px 14px;
+  color: #172b16;
+
+  border-bottom-right-radius: 5px;
 }
 
-/* Other message bubble */
 
-#Message-model-chat-messages .U9-chat-bubble-other {
-  color: #303b4d;
+/* Other user's bubble */
 
-  background: var(--chat-bubble-other);
+.U9-chat-bubble-other,
+.U9-chat-message-other .U9-chat-message-bubble,
+.chat-message-row.is-other .chat-message-bubble {
+  background: #ffffff;
 
-  border-color: #edf0f5;
-  border-radius: 14px 14px 14px 4px;
+  color: #202124;
+
+  border-bottom-left-radius: 5px;
 }
+
+
+/* Message content wrapper */
+
+.U9-chat-message-content,
+.chat-message-content {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+  max-width: 100%;
+
+  gap: 3px;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+
+/* Sender name */
+
+.U9-chat-message-sender,
+.chat-message-sender {
+  margin: 0;
+
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.35;
+
+  color: #6485a5;
+
+  overflow-wrap: anywhere;
+}
+
 
 /* Message text */
 
-#Message-model-chat-messages .U9-chat-message-text {
-  max-width: 100%;
+.U9-chat-message-text {
+  margin: 0;
+
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
 
   white-space: pre-wrap;
+
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
-/* =========================================================
-   MESSAGE TIME
-========================================================= */
 
-#Message-model-chat-messages .U9-chat-message-time,
-#Message-model-chat-messages .chat-message-time {
-  margin-top: 5px;
+/* Message timestamp */
 
-  color: #929baa;
+.U9-chat-message-time,
+.chat-message-time {
+  align-self: flex-end;
+
+  margin-top: 2px;
 
   font-size: 10px;
   font-weight: 400;
   line-height: 1.3;
 
-  overflow-wrap: anywhere;
+  color: #849087;
+
+  white-space: nowrap;
 }
 
-/* =========================================================
-   IMAGE MESSAGES
-========================================================= */
 
-#Message-model-chat-messages
-.U9-chat-message-bubble img,
-#Message-model-chat-messages
-.chat-message-bubble img {
+/* Legacy message avatar, if used */
+
+.chat-message-avatar {
   display: block;
 
-  width: auto;
-  max-width: 100%;
-  max-height: 280px;
+  flex: 0 0 30px;
 
-  object-fit: contain;
-  object-position: center;
+  width: 30px;
+  height: 30px;
 
-  border-radius: 8px;
-}
-
-/* =========================================================
-   EMPTY STATE
-========================================================= */
-
-#Message-model-chat-empty {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-
-  align-items: center;
-  justify-content: center;
-
-  width: 100%;
-  min-width: 0;
-  min-height: 180px;
-
-  margin: auto;
-  padding: 24px 12px;
-
-  text-align: center;
-
-  box-sizing: border-box;
-}
-
-#Message-model-chat-empty[hidden] {
-  display: none !important;
-}
-
-#Message-model-chat-empty-avatar {
-  display: block;
-  flex: 0 0 auto;
-
-  width: 82px;
-  height: 82px;
-
-  margin-bottom: 14px;
-
-  object-fit: cover;
-  object-position: center;
-
-  background: #e9eef6;
-
-  border: 3px solid #ffffff;
   border-radius: 50%;
 
-  box-shadow: 0 3px 14px rgba(34, 55, 85, 0.10);
+  object-fit: cover;
 }
 
-#Message-model-chat-empty-name {
+
+/* System messages */
+
+.U9-chat-system-message {
+  align-self: center;
+
   max-width: 90%;
 
-  margin: 0;
+  margin: 8px auto;
+  padding: 6px 12px;
 
-  color: #303b4d;
+  border-radius: 12px;
 
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.45;
+  background: #e9edf2;
+  color: #727982;
 
-  overflow-wrap: anywhere;
-}
-
-#Message-model-chat-empty-description {
-  max-width: 90%;
-
-  margin: 7px 0 0;
-
-  color: #929bad;
-
-  font-size: 12px;
-  line-height: 1.6;
-
-  overflow-wrap: anywhere;
-}
-
-/* =========================================================
-   EMPTY MESSAGE LIST
-   Generated by chat.js when the conversation has no messages.
-========================================================= */
-
-#Message-model-chat-messages .U9-chat-empty {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-
-  align-items: center;
-  justify-content: center;
-
-  width: 100%;
-  min-width: 0;
-  min-height: 180px;
-
-  margin: auto;
-  padding: 24px 12px;
-
-  color: #858b96;
-
-  font-size: 13px;
-  line-height: 1.6;
+  font-size: 11px;
+  line-height: 1.5;
 
   text-align: center;
+
   overflow-wrap: anywhere;
 }
 
-/* =========================================================
-   SYSTEM NOTICES
-========================================================= */
 
-#Message-model-chat-messages .U9-chat-system-message {
-  display: block;
+/* Temporary notice */
 
-  width: 100%;
-  max-width: 100%;
+.U9-chat-temporary-notice {
+  align-self: center;
 
-  margin: 10px 0;
-  padding: 12px 14px;
+  max-width: 90%;
 
-  font-size: 13px;
-  line-height: 1.5;
+  margin: 6px auto;
+  padding: 7px 12px;
 
   border-radius: 10px;
 
+  background: #fff4d6;
+  color: #765d20;
+
+  font-size: 12px;
+  line-height: 1.5;
+
+  text-align: center;
+
   overflow-wrap: anywhere;
-  word-break: break-word;
-
-  box-sizing: border-box;
 }
 
-#Message-model-chat-messages
-.U9-chat-system-message-info {
-  color: #687080;
-  background: #f3f6fb;
-}
-
-#Message-model-chat-messages
-.U9-chat-system-message-error {
-  color: #b42318;
-  background: #fff1f1;
-}
-
-/* Temporary notices should not overflow the chat */
-
-#Message-model-chat-messages
-.U9-chat-temporary-notice {
-  flex: 0 0 auto;
-}
 
 /* =========================================================
-   CHAT INPUT FORM
+   8. CHAT INPUT FORM
+   Stays below the messages and does not scroll with them.
 ========================================================= */
 
 #Message-model-chat-form {
   position: relative;
-  z-index: 2;
+  z-index: 15;
 
   display: flex;
-  flex: 0 0 auto;
-  align-items: center;
+  align-items: flex-end;
 
-  gap: 10px;
+  flex: 0 0 auto;
 
   width: 100%;
   min-width: 0;
-  min-height: 68px;
 
   margin: 0;
-  padding: 11px 14px;
+  padding: 10px 12px;
 
-  background: var(--chat-input-bg);
+  gap: 8px;
 
-  border-top: 1px solid var(--chat-border);
-
-  box-sizing: border-box;
-}
-
-/* =========================================================
-   CHAT INPUT
-========================================================= */
-
-#Message-model-chat-input {
-  display: block;
-  flex: 1 1 auto;
-
-  width: 0;
-  min-width: 0;
-  height: 44px;
-
-  margin: 0;
-  padding: 0 15px;
-
-  color: #263246;
-
-  font-family: inherit;
-  font-size: 14px;
-  line-height: normal;
-
-  background: #f3f5f9;
-
-  border: 1px solid transparent;
-  border-radius: 23px;
-
-  outline: none;
-
-  box-sizing: border-box;
-
-  transition:
-    background 0.18s ease,
-    border-color 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-#Message-model-chat-input::placeholder {
-  color: #9ba4b3;
-  opacity: 1;
-}
-
-#Message-model-chat-input:focus {
   background: #ffffff;
 
-  border-color: #b7d3f5;
+  border-top: 1px solid #eeeeee;
 
-  box-shadow: 0 0 0 3px rgba(120, 172, 233, 0.12);
+  overflow: visible;
 }
 
-#Message-model-chat-input:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
 
 /* =========================================================
-   SEND BUTTON
+   9. ADD / SEND BUTTONS
+   Change the SVG file to change the icon.
 ========================================================= */
 
+#U9-message-chat-add-button,
 #Message-model-chat-send {
   display: flex;
-  flex: 0 0 44px;
-
   align-items: center;
   justify-content: center;
 
-  width: 44px;
-  height: 44px;
+  flex: 0 0 42px;
+
+  width: 42px;
+  height: 42px;
 
   margin: 0;
   padding: 0;
 
-  background: var(--chat-primary);
-
   border: none;
   border-radius: 50%;
 
+  background: transparent;
+
   cursor: pointer;
 
-  transition:
-    background 0.18s ease,
-    opacity 0.18s ease,
-    transform 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-#Message-model-chat-send:hover:not(:disabled) {
-  background: var(--chat-primary-hover);
+
+/* Add button icon */
+
+#U9-message-chat-add-button img {
+  display: block;
+
+  width: 24px;
+  height: 24px;
+
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: contain;
+
+  pointer-events: none;
 }
 
-#Message-model-chat-send:active:not(:disabled) {
-  transform: scale(0.96);
-}
 
-#Message-model-chat-send:focus-visible {
-  outline: 2px solid var(--chat-primary);
-  outline-offset: 3px;
-}
-
-#Message-model-chat-send:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  transform: none;
-}
+/* Send button icon */
 
 #Message-model-chat-send img {
   display: block;
 
-  width: 20px;
-  height: 20px;
+  width: 23px;
+  height: 23px;
+
+  max-width: 100%;
+  max-height: 100%;
 
   object-fit: contain;
 
-  filter: brightness(0) invert(1);
+  pointer-events: none;
 }
 
-/* =========================================================
-   ACCESSIBILITY
-========================================================= */
 
-#Message-model-chat-page button:focus-visible {
-  outline: 2px solid var(--chat-primary);
+/* Add button hover */
+
+#U9-message-chat-add-button:hover {
+  background: #f1f3f5;
+}
+
+#U9-message-chat-add-button:active {
+  background: #e5e8eb;
+}
+
+
+/* Send button */
+
+#Message-model-chat-send {
+  background: #1687f8;
+}
+
+#Message-model-chat-send:hover {
+  background: #0877e5;
+}
+
+#Message-model-chat-send:active {
+  background: #0668cb;
+}
+
+
+/* Keyboard focus */
+
+#U9-message-chat-add-button:focus-visible,
+#Message-model-chat-send:focus-visible {
+  outline: 2px solid #7aa7ff;
   outline-offset: 2px;
 }
 
-#Message-model-chat-page button:disabled {
+
+/* Disabled send button, if chat.js sets disabled */
+
+#Message-model-chat-send:disabled {
+  opacity: 0.45;
+
   cursor: not-allowed;
 }
 
+
 /* =========================================================
-   RESPONSIVE: TABLET AND MOBILE
+   10. TELEGRAM-STYLE TEXTAREA
+
+   - Single line: input height stays compact
+   - Multiple lines: height grows
+   - Text is vertically centered when only one line is present
+   - Text starts near the top when multiple lines are present
 ========================================================= */
 
-@media (max-width: 480px) {
-  #Message-model-chat-header {
-    gap: 10px;
+#Message-model-chat-input {
+  display: block;
 
-    min-height: 60px;
+  flex: 1 1 0;
 
-    padding: 8px 12px;
+  width: 0;
+  min-width: 0;
+
+  height: 42px;
+  min-height: 42px;
+  max-height: 120px;
+
+  margin: 0;
+  padding: 11px 14px;
+
+  border: 1px solid #e1e4e8;
+  border-radius: 22px;
+
+  outline: none;
+
+  background: #f2f4f7;
+  color: #202124;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+
+  text-align: left;
+
+  resize: none;
+
+  overflow-x: hidden;
+  overflow-y: auto;
+
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
+  box-shadow: none;
+
+  -webkit-appearance: none;
+  appearance: none;
+
+  -webkit-user-select: text;
+  user-select: text;
+
+  scrollbar-width: thin;
+  scrollbar-color: #c5c9cf transparent;
+}
+
+
+/* Placeholder: same line height and vertical alignment as input text */
+
+#Message-model-chat-input::placeholder {
+  color: #858b94;
+
+  opacity: 1;
+
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+
+  text-align: left;
+}
+
+
+/* Focused input */
+
+#Message-model-chat-input:focus {
+  border-color: #b9cfe8;
+
+  background: #f7f9fc;
+}
+
+
+/* Textarea scrollbar */
+
+#Message-model-chat-input::-webkit-scrollbar {
+  width: 4px;
+}
+
+#Message-model-chat-input::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#Message-model-chat-input::-webkit-scrollbar-thumb {
+  background: #c5c9cf;
+  border-radius: 8px;
+}
+
+
+/* =========================================================
+   11. FORM ALIGNMENT WHEN TEXTAREA GROWS
+
+   Buttons stay aligned with the bottom of the growing textarea.
+========================================================= */
+
+#Message-model-chat-form:has(#Message-model-chat-input) {
+  align-items: flex-end;
+}
+
+
+/* =========================================================
+   12. MOBILE LAYOUT
+========================================================= */
+
+@media (max-width: 600px) {
+  #U9-message-normal-modal-content.message-inner-page {
+    min-height: 0;
+
+    overflow: hidden;
   }
 
-  #Message-model-chat-back {
-    flex-basis: 32px;
+  #U9-message-normal-modal-content.message-inner-page
+  #Message-model-pages {
+    min-height: 0;
 
-    width: 32px;
-    height: 32px;
+    overflow: hidden;
+  }
+
+  #Message-model-chat-page {
+    min-height: 0;
+
+    overflow: hidden;
+  }
+
+  #U9-message-normal-modal-title {
+    flex-shrink: 0;
+  }
+
+  #Message-model-chat-header {
+    flex-shrink: 0;
+
+    min-height: 58px;
+
+    padding: 8px 12px;
+    gap: 10px;
   }
 
   #Message-model-chat-avatar {
+    flex-basis: 38px;
+
+    width: 38px;
+    height: 38px;
+  }
+
+  #Message-model-chat-more {
+    flex-basis: 36px;
+
+    width: 36px;
+    height: 36px;
+  }
+
+  #Message-model-chat-messages {
+    flex: 1 1 0;
+
+    min-height: 0;
+
+    padding: 12px 10px;
+    gap: 9px;
+
+    overscroll-behavior: contain;
+  }
+
+  #Message-model-chat-form {
+    flex-shrink: 0;
+
+    padding: 8px 9px;
+
+    gap: 6px;
+
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+  }
+
+  #U9-message-chat-add-button,
+  #Message-model-chat-send {
     flex-basis: 40px;
 
     width: 40px;
     height: 40px;
   }
 
-  #Message-model-chat-name {
-    font-size: 14px;
+  #U9-message-chat-add-button img {
+    width: 23px;
+    height: 23px;
   }
 
-  #Message-model-chat-status {
-    font-size: 11px;
-  }
-
-  #Message-model-chat-more {
-    flex-basis: 34px;
-
-    width: 34px;
-    height: 34px;
-  }
-
-  #Message-model-chat-messages {
-    padding: 14px 11px;
-  }
-
-  #Message-model-chat-messages .U9-chat-message-list {
-    padding: 10px 3px;
-  }
-
-  #Message-model-chat-empty-avatar {
-    width: 72px;
-    height: 72px;
-  }
-
-  #Message-model-chat-empty-name {
-    font-size: 15px;
-  }
-
-  #Message-model-chat-form {
-    gap: 8px;
-
-    min-height: 62px;
-
-    padding: 9px 10px;
+  #Message-model-chat-send img {
+    width: 22px;
+    height: 22px;
   }
 
   #Message-model-chat-input {
-    height: 42px;
+    min-height: 40px;
+    height: 40px;
+    max-height: 112px;
 
-    padding: 0 13px;
+    padding: 10px 13px;
 
-    font-size: 14px;
+    font-size: 16px;
+    line-height: 20px;
   }
 
-  #Message-model-chat-send {
-    flex-basis: 42px;
-
-    width: 42px;
-    height: 42px;
+  #Message-model-chat-input::placeholder {
+    font-size: 16px;
+    line-height: 20px;
   }
 
-  #Message-model-chat-messages .U9-chat-message-content,
-  #Message-model-chat-messages .chat-message-content {
-    max-width: 82%;
-  }
-
-  #Message-model-chat-messages .U9-chat-message-bubble,
-  #Message-model-chat-messages .chat-message-bubble {
-    padding: 9px 11px;
-
-    font-size: 14px;
+  .U9-chat-message-bubble,
+  .chat-message-bubble {
+    max-width: 85%;
   }
 }
 
+
 /* =========================================================
-   RESPONSIVE: VERY SMALL SCREENS
+   13. SMALL MOBILE
 ========================================================= */
 
-@media (max-width: 340px) {
+@media (max-width: 380px) {
   #Message-model-chat-header {
-    gap: 7px;
+    padding-right: 9px;
+    padding-left: 9px;
 
-    padding-right: 8px;
-    padding-left: 8px;
-  }
-
-  #Message-model-chat-messages {
-    padding-right: 8px;
-    padding-left: 8px;
-  }
-
-  #Message-model-chat-messages .U9-chat-message-list {
-    padding-right: 2px;
-    padding-left: 2px;
+    gap: 8px;
   }
 
   #Message-model-chat-form {
-    gap: 7px;
+    padding-right: 6px;
+    padding-left: 6px;
 
-    padding-right: 8px;
-    padding-left: 8px;
+    gap: 5px;
   }
 
-  #Message-model-chat-empty-avatar {
-    width: 64px;
-    height: 64px;
+  #U9-message-chat-add-button,
+  #Message-model-chat-send {
+    flex-basis: 36px;
+
+    width: 36px;
+    height: 36px;
   }
 
-  #Message-model-chat-more {
-    flex-basis: 30px;
-
-    width: 30px;
-    height: 30px;
+  #Message-model-chat-input {
+    padding-right: 11px;
+    padding-left: 11px;
   }
 
-  #Message-model-chat-messages .U9-chat-message-content,
-  #Message-model-chat-messages .chat-message-content {
-    max-width: 86%;
+  .U9-chat-message-bubble,
+  .chat-message-bubble {
+    max-width: 88%;
   }
 }
 
+
 /* =========================================================
-   REDUCED MOTION
+   14. REDUCE MOTION
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
@@ -1012,7 +959,6 @@
   #Message-model-chat-page *::after {
     scroll-behavior: auto !important;
     animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
