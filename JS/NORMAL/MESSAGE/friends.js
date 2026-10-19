@@ -32,7 +32,7 @@
     mute: "/SSVG/normal/test2.svg",
     delete: "/SSVG/normal/test3.svg"
   };
-  const DEFAULT_AVATAR = "/SSVG/account/account-edit-button.svg";
+  const DEFAULT_AVATAR = "/SSVG/avatar/profile.svg";
   const DEFAULT_AVATAR_FRAME = "/SSVG/avatar/ordinary.svg";
 
   const SUPABASE_STORAGE_HOSTS = new Map([
