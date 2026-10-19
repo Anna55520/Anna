@@ -1,3 +1,4 @@
+
 /* =================================================
    U9 MESSAGE NORMAL MODAL
    File: CSS/NORMAL/normal-message.css
@@ -43,17 +44,6 @@
   pointer-events: none;
 
   transition: visibility 0s linear 0.45s;
-}
-
-/* Keep the modal at the viewport top when the toolbar collapses. */
-#U9-message-normal-modal.message-toolbar-collapsed {
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-
-  height: 100vh;
-  height: 100dvh;
 }
 
 #U9-message-normal-modal.modal-open {
@@ -109,7 +99,10 @@
 
 /* =================================================
    MESSAGE HEADER
-   Vertically align title and close/back button.
+   Unified with History / Inbox / Gift:
+   - Height: 55px
+   - Centered title
+   - Left close button
 ================================================= */
 
 #U9-message-normal-modal-title {
@@ -125,17 +118,21 @@
   height: 55px;
   min-height: 55px;
 
-  padding: 0 55px;
+  padding: 0 60px;
 
   box-sizing: border-box;
 
   border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+
   background: #78ace9;
 
   color: #ffffff;
+
   font-size: 20px;
   font-weight: 600;
-  line-height: 1;
+  line-height: 1.3;
+
   text-align: center;
 
   z-index: 2;
@@ -145,8 +142,8 @@
   position: absolute;
 
   top: 50%;
-  left: 55px;
-  right: 55px;
+  left: 60px;
+  right: 60px;
 
   display: block;
 
@@ -158,9 +155,11 @@
   text-overflow: ellipsis;
 
   color: #ffffff;
+
   font-size: inherit;
   font-weight: inherit;
   line-height: 1.2;
+
   text-align: center;
 
   transform: translateY(-50%);
@@ -171,13 +170,15 @@
 
 /* =================================================
    HEADER CLOSE / BACK BUTTON
+   Same dimensions and position as other normal modals
 ================================================= */
 
 #U9-message-normal-modal-close {
   position: absolute;
 
-  top: calc(50% + 1px);
-  left: 12px;
+  top: calc(50% + 2px);
+  left: 15px;
+  right: auto;
 
   display: flex;
   align-items: center;
@@ -185,12 +186,14 @@
 
   width: 36px;
   height: 36px;
+
   padding: 0;
+  margin: 0;
 
   box-sizing: border-box;
 
   border: none;
-  border-radius: 8px;
+  border-radius: 50%;
   outline: none;
 
   background: transparent;
@@ -208,6 +211,9 @@
   transition:
     background-color 0.2s ease,
     transform 0.2s ease;
+
+  -webkit-appearance: none;
+  appearance: none;
 }
 
 #U9-message-normal-modal-close.message-home-close {
@@ -794,9 +800,6 @@
   box-sizing: border-box;
 }
 
-
-/* Display the actual chat SVG supplied by JavaScript. */
-
 #Message-model-friends-list .Message-model-home-friend-row
 .Message-model-contact-chat .Message-model-contact-chat-icon {
   display: block !important;
@@ -981,18 +984,19 @@
 
 @media (max-width: 480px) {
   #U9-message-normal-modal-title {
-    padding-right: 50px;
-    padding-left: 50px;
+    padding-right: 55px;
+    padding-left: 55px;
     font-size: 18px;
   }
 
   #U9-message-normal-modal-title-text {
-    left: 50px;
-    right: 50px;
+    left: 55px;
+    right: 55px;
   }
 
   #U9-message-normal-modal-close {
-    left: 8px;
+    left: 10px;
+    right: auto;
   }
 
   #U9-message-normal-modal-close img {
@@ -1139,29 +1143,6 @@
 
 
 /* =================================================
-   REDUCED MOTION
-================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-  #U9-message-normal-modal,
-  #U9-message-normal-modal-content,
-  #U9-message-normal-modal-close,
-  #Message-model-navigation .Message-model-nav-button,
-  #Message-model-navigation .Message-model-nav-icon,
-  #Message-model-friends-list .Message-model-home-friend-row,
-  #Message-model-friends-list .Message-model-contact-chat {
-    transition: none;
-  }
-
-  #Message-model-navigation .Message-model-nav-button:hover,
-  #Message-model-friends-list .Message-model-contact-chat:active,
-  .Message-model-contact-chat:active {
-    transform: none;
-  }
-}
-
-
-/* =================================================
    HOME GROUPS: GROUP LIST ROWS
 ================================================= */
 
@@ -1175,17 +1156,28 @@
   display: flex;
   align-items: center;
   gap: 12px;
+
   width: 100%;
   min-width: 0;
   min-height: 68px;
+
   flex: 0 0 auto;
+
   padding: 11px 13px;
+
   box-sizing: border-box;
+
   border: 1px solid #e8eaf0;
   border-radius: 12px;
+
   background: #ffffff;
+
   box-shadow: 0 2px 6px rgb(24 39 75 / 3%);
-  transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease;
+
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
 }
 
 #Message-model-groups-list .Message-model-home-group-row:hover {
@@ -1198,21 +1190,29 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   flex: 0 0 42px;
+
   width: 42px;
   height: 42px;
+
   overflow: hidden;
+
   box-sizing: border-box;
+
   border: 1px solid #e0e7f0;
   border-radius: 12px;
+
   background: #f1f5fb;
   color: #477fbd;
 }
 
 #Message-model-groups-list .Message-model-home-group-avatar-image {
   display: block;
+
   width: 100%;
   height: 100%;
+
   object-fit: cover;
   object-position: center;
 }
@@ -1221,8 +1221,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+
   width: 100%;
   height: 100%;
+
   color: #477fbd;
   font-size: 17px;
   font-weight: 750;
@@ -1239,28 +1241,36 @@
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
+
   gap: 8px;
   min-width: 0;
 }
 
 #Message-model-groups-list .Message-model-home-group-name {
   min-width: 0;
+
   overflow: hidden;
+
   color: #242933;
   font-size: 14px;
   font-weight: 650;
   line-height: 1.45;
+
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 #Message-model-groups-list .Message-model-home-group-role {
   flex: 0 0 auto;
+
   padding: 3px 7px;
+
   border: 1px solid #e1e7f2;
   border-radius: 999px;
+
   background: #f6f8fc;
   color: #5f6b82;
+
   font-size: 10px;
   font-weight: 650;
   line-height: 1.3;
@@ -1268,11 +1278,15 @@
 
 #Message-model-groups-list .Message-model-home-group-description {
   margin-top: 3px;
+
   overflow: hidden;
+
   color: #707888;
   font-size: 12px;
   line-height: 1.45;
+
   overflow-wrap: anywhere;
+
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -1280,8 +1294,11 @@
 
 #Message-model-groups-list .Message-model-home-group-id {
   margin-top: 4px;
+
   overflow-wrap: anywhere;
+
   color: #8a91a0;
+
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 10px;
   line-height: 1.35;
@@ -1295,18 +1312,26 @@
 #Message-model-groups-list .Message-model-home-group-chat {
   display: inline-flex;
   flex: 0 0 38px;
+
   align-items: center;
   justify-content: center;
+
   width: 38px;
   height: 38px;
   min-width: 38px;
+
   margin: 0;
   padding: 0;
+
   border: 1px solid #e5e9f2;
   border-radius: 10px;
+
   background: #f5f7fc;
+
   cursor: pointer;
+
   box-sizing: border-box;
+
   transition:
     background-color 160ms ease,
     border-color 160ms ease,
@@ -1316,9 +1341,12 @@
 
 #Message-model-groups-list .Message-model-home-group-chat-icon {
   display: block;
+
   width: 22px;
   height: 22px;
+
   object-fit: contain;
+
   pointer-events: none;
   user-select: none;
 }
@@ -1342,12 +1370,16 @@
 #Message-model-groups-list .Message-model-home-groups-state {
   margin: 0;
   padding: 16px 14px;
+
   border: 1px solid #e8eaf0;
   border-radius: 12px;
+
   background: #fafbfe;
   color: #78808e;
+
   font-size: 13px;
   line-height: 1.6;
+
   text-align: center;
   overflow-wrap: anywhere;
 }
@@ -1357,6 +1389,11 @@
   background: #fffafa;
   color: #c62828;
 }
+
+
+/* =================================================
+   GROUPS RESPONSIVE
+================================================= */
 
 @media (max-width: 480px) {
   #Message-model-groups-list .Message-model-home-group-row {
@@ -1399,13 +1436,28 @@
   }
 }
 
+
+/* =================================================
+   REDUCED MOTION
+================================================= */
+
 @media (prefers-reduced-motion: reduce) {
+  #U9-message-normal-modal,
+  #U9-message-normal-modal-content,
+  #U9-message-normal-modal-close,
+  #Message-model-navigation .Message-model-nav-button,
+  #Message-model-navigation .Message-model-nav-icon,
+  #Message-model-friends-list .Message-model-home-friend-row,
+  #Message-model-friends-list .Message-model-contact-chat,
   #Message-model-groups-list .Message-model-home-group-row,
   #Message-model-groups-list .Message-model-home-group-chat {
     transition: none;
   }
 
-  #Message-model-groups-list .Message-model-home-group-chat:active {
+  #Message-model-navigation .Message-model-nav-button:hover,
+  #Message-model-friends-list .Message-model-contact-chat:active,
+  #Message-model-groups-list .Message-model-home-group-chat:active,
+  .Message-model-contact-chat:active {
     transform: none;
   }
 }
