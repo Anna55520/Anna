@@ -29,7 +29,7 @@
     "/SSVG/account/back.svg";
 
   const DEFAULT_CHAT_AVATAR =
-    "/SSVG/normal/chat.svg";
+    "/SSVG/account/account-edit-button.svg";
 
   const DEFAULT_CHAT_FRAME =
     "/SSVG/avatar/ordinary.svg";
