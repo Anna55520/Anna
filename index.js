@@ -1,224 +1,2530 @@
+<!DOCTYPE html>
 
-/* =================================================
-   U9 PLATFORM MAINTENANCE
-================================================= */
+<html lang="zh">
 
-(() => {
-  "use strict";
+<head>
 
-  const modal = document.getElementById(
-    "U9-platform-maintenance-modal"
-  );
+  <meta charset="UTF-8">
 
-  if (!modal || modal.dataset.initialized === "true") {
-    return;
-  }
+<meta
+name="viewport"
+content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
 
-  modal.dataset.initialized = "true";
+>
 
-  const messageElement = document.getElementById(
-    "U9-platform-maintenance-message"
-  );
+  <title>U9</title>
 
-  const durationElement = document.getElementById(
-    "U9-platform-maintenance-duration-value"
-  );
+  <!-- =========================
+      FAVICON
+  ========================= -->
 
-  let maintenanceEnabled = false;
-  let previousBodyOverflow = "";
+  <link
+    rel="icon"
+    type="image/svg+xml"
+    href="SSVG/logo/U9website.svg"
+  >
 
-  function formatDuration(hours) {
-    const value = Number(hours);
+  <!-- =========================
+      CSS
+  ========================= -->
 
-    if (!Number.isFinite(value) || value < 1 || value > 720) {
-      return "Approximately 2 hours";
-    }
+  <link rel="stylesheet" href="index.css">
 
-    if (value === 1) {
-      return "Approximately 1 hour";
-    }
+  <!-- CONTAINER -->
 
-    if (Number.isInteger(value)) {
-      return `Approximately ${value} hours`;
-    }
+  <link rel="stylesheet" href="CSS/CONTAINER/container-tool.css">
 
-    return `Approximately ${value} hours`;
-  }
+  <!-- HEADER -->
 
-  function showMaintenance(settings = {}) {
-    if (settings.maintenance_enabled !== true) {
-      return;
-    }
+  <link rel="stylesheet" href="CSS/HEADER/header.css">
 
-    maintenanceEnabled = true;
+  <!-- PROFILE -->
 
-    const message =
-      typeof settings.maintenance_message === "string" &&
-      settings.maintenance_message.trim()
-        ? settings.maintenance_message.trim()
-        : "We are currently performing maintenance. Please try again later.";
+  <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile.css">
 
-    messageElement.textContent = message;
+  <!-- PROFILE PAGE -->
 
-    durationElement.textContent = formatDuration(
-      settings.maintenance_duration_hours
-    );
-
-    if (modal.hidden) {
-      previousBodyOverflow = document.body.style.overflow;
-    }
-
-    modal.hidden = false;
-    modal.setAttribute("aria-hidden", "false");
-
-    document.body.style.overflow = "hidden";
-  }
-
-  function hideMaintenance() {
-    if (maintenanceEnabled) {
-      return;
-    }
-
-    modal.hidden = true;
-    modal.setAttribute("aria-hidden", "true");
-
-    document.body.style.overflow = previousBodyOverflow;
-  }
-
-  /*
-   * Public methods for the future maintenance-status API.
-   * The API integration will call these methods after
-   * reading the u9-settings table through the Vercel proxy.
-   */
-  window.U9PlatformMaintenance = Object.freeze({
-    update(settings) {
-      if (!settings || typeof settings !== "object") {
-        return;
-      }
-
-      if (settings.maintenance_enabled === true) {
-        showMaintenance(settings);
-        return;
-      }
-
-      maintenanceEnabled = false;
-      hideMaintenance();
-    },
-
-    show: showMaintenance,
-
-    isActive() {
-      return maintenanceEnabled;
-    }
-  });
-
-  /*
-   * Prevent Escape from dismissing the maintenance modal.
-   */
-  document.addEventListener(
-    "keydown",
-    (event) => {
-      if (maintenanceEnabled && event.key === "Escape") {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-      }
-    },
-    true
-  );
-
-  /*
-   * Prevent background interaction while maintenance is active.
-   */
-  document.addEventListener(
-    "click",
-    (event) => {
-      if (!maintenanceEnabled) {
-        return;
-      }
-
-      if (!modal.contains(event.target)) {
-        event.preventDefault();
-        event.stopImmediatePropagation();
-      }
-    },
-    true
-  );
-})();
+  <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-1.css">
+  <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-2.css">
+  <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-3.css">
+  <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-4.css">
+  <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-5.css">
 
 
-/* =================================================
-   U9 PLATFORM MAINTENANCE API
-================================================= */
+  <!-- Setting -->
 
-(() => {
-  "use strict";
+  <!-- Setting <link rel="stylesheet" href= -->
 
-  const API_URL = "/api/u9-settings";
-  const REFRESH_INTERVAL_MS = 200000;
 
-  async function loadPlatformSettings() {
-    try {
-      const response = await fetch(API_URL, {
-        method: "GET",
-        cache: "no-store",
-        credentials: "same-origin",
-        headers: {
-          Accept: "application/json"
-        }
-      });
+  <!-- ACCOUNT MODAL -->
 
-      if (!response.ok) {
-        throw new Error(`Platform settings request failed: ${response.status}`);
-      }
+  <link rel="stylesheet" href="CSS/MODAL/account-register-modal.css">
+  <link rel="stylesheet" href="CSS/MODAL/account-login-modal.css">
+  <link rel="stylesheet" href="CSS/MODAL/account-logout-modal.css">
+  <link rel="stylesheet" href="CSS/MODAL/profile-picture-modal.css">
 
-      const result = await response.json();
+  <link rel="stylesheet" href="CSS/MODAL/exchange-modal.css">
 
-      // Accept a single row, an array containing one row,
-      // or a response wrapped in a "data" property.
-      const settings = Array.isArray(result)
-        ? result[0]
-        : result?.data
-          ? Array.isArray(result.data)
-            ? result.data[0]
-            : result.data
-          : result;
 
-      if (
-        !settings ||
-        typeof settings.maintenance_enabled !== "boolean"
-      ) {
-        throw new Error("Invalid platform settings response.");
-      }
+  <!-- NORMAL -->
 
-      if (window.U9PlatformMaintenance) {
-        window.U9PlatformMaintenance.update({
-          maintenance_enabled: settings.maintenance_enabled,
-          maintenance_duration_hours:
-            settings.maintenance_duration_hours,
-          maintenance_message:
-            typeof settings.maintenance_message === "string" &&
-            settings.maintenance_message.trim()
-              ? settings.maintenance_message.trim()
-              : "We are currently performing maintenance. Please try again later."
-        });
-      }
-    } catch (error) {
-      // Do not incorrectly dismiss an already-active maintenance modal
-      // if the API temporarily becomes unavailable.
-      console.error("Unable to load platform maintenance settings:", error);
-    }
-  }
+  <!-- message -->
+  <link rel="stylesheet" href="CSS/NORMAL/normal-message.css">
+  <link rel="stylesheet" href="CSS/NORMAL/MESSAGE/add-friends.css">
+  <link rel="stylesheet" href="CSS/NORMAL/MESSAGE/customer-service.css">
+  <link rel="stylesheet" href="CSS/NORMAL/MESSAGE/friends.css">
+  <link rel="stylesheet" href="CSS/NORMAL/MESSAGE/group.css">
+  <link rel="stylesheet" href="CSS/NORMAL/MESSAGE/chat.css">
 
-  // Read the current status as soon as the page is ready.
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadPlatformSettings, {
-      once: true
-    });
-  } else {
-    loadPlatformSettings();
-  }
+  <!-- inbox -->
+  <link rel="stylesheet" href="CSS/NORMAL/normal-inbox.css">
 
-  // Refresh periodically so Admin changes reach the user interface.
-  window.setInterval(loadPlatformSettings, REFRESH_INTERVAL_MS);
-})();
+  <!-- gift -->
+  <link rel="stylesheet" href="CSS/NORMAL/normal-gift.css">
 
+  <!-- history -->
+  <link rel="stylesheet" href="CSS/NORMAL/normal-history.css">
+  <link rel="stylesheet" href="CSS/NORMAL/HISTORY/shop-page.css">
+  <link rel="stylesheet" href="CSS/NORMAL/HISTORY/save-page.css">
+  <link rel="stylesheet" href="CSS/NORMAL/HISTORY/order-page.css">
+
+
+  <!-- PAGE --><!-- PAGE -->
+
+  <!-- HOME -->
+
+  <link rel="stylesheet" href="CSS/PAGE/HOME/home-page.css">
+
+  <!-- SHOP -->
+
+  <link rel="stylesheet" href="CSS/PAGE/SHOP/shop-page.css">
+
+  <!-- AUCTION -->
+
+  <link rel="stylesheet" href="CSS/PAGE/AUCTION/auction-page.css">
+
+  <!-- TEST1 -->
+
+  <link rel="stylesheet" href="CSS/PAGE/TEST1/test1-page.css">
+
+  <!-- TEST2 -->
+
+  <link rel="stylesheet" href="CSS/PAGE/TEST2/test2-page.css">
+
+  <!-- PAGE --><!-- PAGE -->
+
+</head>
+
+
+<body>
+
+
+  <!-- =================================================
+      HEADER
+  ================================================= -->
+
+  <header id="U9-page-header">
+
+
+    <!-- =========================
+        UNINE LOGO
+    ========================= -->
+
+    <div id="U9-page-header-u9-logo">
+
+      <img
+        src="SSVG/logo/uninelogo.svg"
+        alt="Unine"
+      >
+
+    </div>
+
+
+    <!-- =========================
+        HEADER ACTIONS
+    ========================= -->
+
+    <div id="U9-page-header-actions">
+
+
+    <!-- HEADER LOADING -->
+
+    <div
+        id="U9-page-header-loading"
+    >
+
+        <img
+        src="SSVG/logo/loading.svg"
+        alt="Loading"
+        >
+
+    </div>
+
+
+    <!-- REGISTER -->
+
+    <button
+        id="U9-page-header-register"
+        type="button"
+    >
+        Register
+    </button>
+
+
+    <!-- LOGIN -->
+
+    <button
+        id="U9-page-header-login"
+        type="button"
+    >
+        Login
+    </button>
+
+
+    <!-- USER -->
+
+    <button
+        id="U9-page-header-user"
+        type="button"
+    >
+
+        <svg
+        id="U9-page-header-user-icon"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+        >
+
+        <circle
+            cx="12"
+            cy="8"
+            r="4"
+        />
+
+        <path
+            d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"
+        />
+
+        </svg>
+
+
+        <span
+        id="U9-page-header-username"
+        ></span>
+
+    </button>
+
+
+    <!-- CONTAINER TOOL TOGGLE -->
+
+    <button
+      id="U9-page-header-tool-toggle"
+      type="button"
+      aria-label="Hide toolbar"
+      aria-expanded="true"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 15l6-6 6 6" />
+      </svg>
+    </button>
+
+    </div>
+
+
+  </header>
+
+
+  <!-- =================================================
+      CONTAINER TOOL
+  ================================================= -->
+
+  <div id="U9-page-container-tool">
+
+
+    <!-- =========================
+        NORMAL TOOL
+    ========================= -->
+
+    <div id="U9-page-container-tool-normal">
+
+
+      <!-- MENU -->
+
+      <button
+        id="U9-page-container-tool-menu"
+        type="button"
+      >
+
+        <img
+          src="SSVG/button/menu.svg"
+          alt=""
+          aria-hidden="true"
+        >
+
+      </button>
+
+
+      <!-- SEARCH -->
+
+      <div id="U9-page-container-tool-search">
+
+        <input
+          id="U9-page-container-tool-search-input"
+          type="text"
+          placeholder="Search..."
+          autocomplete="off"
+        >
+
+
+        <button
+          id="U9-page-container-tool-search-button"
+          type="button"
+        >
+
+          <img
+            src="SSVG/button/search.svg"
+            alt=""
+            aria-hidden="true"
+          >
+
+        </button>
+
+      </div>
+
+
+      <!-- MESSAGE -->
+
+      <button
+        id="U9-page-container-tool-message"
+        type="button"
+      >
+
+        <img
+          src="SSVG/button/message.svg"
+          alt=""
+          aria-hidden="true"
+        >
+
+      </button>
+
+
+      <!-- INBOX -->
+
+      <button
+        id="U9-page-container-tool-inbox"
+        type="button"
+      >
+
+        <img
+          src="SSVG/button/inbox.svg"
+          alt=""
+          aria-hidden="true"
+        >
+
+      </button>
+
+
+      <!-- GIFT -->
+
+      <button
+        id="U9-page-container-tool-gift"
+        type="button"
+      >
+
+        <img
+          src="SSVG/button/gift.svg"
+          alt=""
+          aria-hidden="true"
+        >
+
+      </button>
+
+
+      <!-- HISTORY -->
+
+      <button
+        id="U9-page-container-tool-history"
+        type="button"
+      >
+
+        <img
+          src="SSVG/button/history.svg"
+          alt=""
+          aria-hidden="true"
+        >
+
+      </button>
+
+    </div>
+
+
+    <!-- =========================
+        PAGE MENU
+    ========================= -->
+
+    <div id="U9-page-container-tool-pages">
+
+
+      <!-- PROFILE -->
+
+      <button
+        id="U9-page-container-tool-profile"
+        type="button"
+        aria-label="Profile"
+      >
+
+        <img
+          src="SSVG/button/new.svg"
+          alt=""
+        >
+
+      </button>
+
+
+      <!-- PREVIOUS -->
+
+      <button
+        id="U9-page-container-tool-pages-prev"
+        type="button"
+        aria-label="Previous"
+      >
+        &lt;
+      </button>
+
+
+      <!-- HOME -->
+
+      <button
+        id="U9-page-container-tool-home"
+        type="button"
+      >
+        Home
+      </button>
+
+
+      <!-- SHOP -->
+
+      <button
+        id="U9-page-container-tool-shop-page"
+        type="button"
+      >
+        Shop
+      </button>
+
+
+      <!-- AUCTION -->
+
+      <button
+        id="U9-page-container-tool-auction"
+        type="button"
+      >
+        Auction
+      </button>
+
+
+      <!-- TEST 1 -->
+
+      <button
+        id="U9-page-container-tool-test1"
+        type="button"
+      >
+        Test1
+      </button>
+
+
+      <!-- TEST 2 -->
+
+      <button
+        id="U9-page-container-tool-test2"
+        type="button"
+      >
+        Test2
+      </button>
+
+
+      <!-- NEXT -->
+
+      <button
+        id="U9-page-container-tool-pages-next"
+        type="button"
+        aria-label="Next"
+      >
+        &gt;
+      </button>
+
+
+    </div>
+
+
+  </div>
+
+
+  <!-- =================================================
+      MAIN PAGES
+  ================================================= -->
+
+  <div id="U9-page-pages">
+
+
+    <!-- =========================
+        HOME
+    ========================= -->
+
+    <div id="U9-page-home">
+      home
+    </div>
+
+
+    <!-- SHOP -->
+
+    <div id="U9-page-shop">
+      Shop
+    </div>
+
+
+    <!-- AUCTION -->
+
+    <div id="U9-page-auction">
+
+      <div class="U9-auction-container">
+
+        <!-- =========================
+            TOP
+        ========================= -->
+
+        <div class="U9-auction-top">
+
+          <div class="U9-auction-title">
+            <h1>Task Order</h1>
+            <p>Complete tasks and earn Coins</p>
+          </div>
+
+          <div class="U9-auction-coins-box">
+            <span>Coins</span>
+            <strong id="U9-auction-coins">0.00</strong>
+          </div>
+
+        </div>
+
+        <!-- =========================
+            AUCTION TOOL BUTTONS
+        ========================= -->
+
+        <div id="U9-auction-tools">
+
+          <!-- BUTTON 1 -->
+
+          <button
+            id="U9-auction-tool-1"
+            type="button"
+            aria-label="Auction Tool 1"
+          >
+            <img
+              src="SSVG/button/rule.svg"
+              alt=""
+              aria-hidden="true"
+            >
+          </button>
+
+
+          <!-- BUTTON 2 -->
+
+          <button
+            id="U9-auction-tool-2"
+            type="button"
+            aria-label="Auction Tool 2"
+          >
+            <img
+              src="SSVG/button/exchange.svg"
+              alt=""
+              aria-hidden="true"
+            >
+          </button>
+
+
+          <!-- BUTTON 3: HISTORY -->
+
+          <button
+            id="U9-auction-tool-3"
+            type="button"
+            aria-label="History"
+          >
+            <img
+              src="SSVG/button/history-order.svg"
+              alt=""
+              aria-hidden="true"
+            >
+          </button>
+
+        </div>
+
+        <!-- =========================
+            ROUND
+        ========================= -->
+
+        <div class="U9-auction-round-card">
+
+          <div>
+            <span class="U9-auction-label">
+              Current Round
+            </span>
+
+            <strong id="U9-auction-round">
+              0 / 0
+            </strong>
+          </div>
+
+          <div
+            id="U9-auction-cooldown"
+            class="U9-auction-cooldown"
+          >
+          </div>
+
+        </div>
+
+
+        <!-- =========================
+            MATCHING
+        ========================= -->
+
+        <div
+          id="U9-auction-matching"
+          class="U9-auction-matching"
+        >
+
+          <div class="U9-auction-spinner"></div>
+
+          <h2>Matching Task</h2>
+
+          <p id="U9-auction-matching-text">
+            Please wait...
+          </p>
+
+        </div>
+
+
+        <!-- =========================
+            ORDER
+        ========================= -->
+
+        <div
+          id="U9-auction-order"
+          class="U9-auction-order"
+        >
+
+          <div class="U9-auction-order-header">
+
+            <span>Current Task</span>
+
+            <span
+              id="U9-auction-order-status"
+              class="U9-auction-status"
+            >
+              Pending
+            </span>
+
+          </div>
+
+          
+          <div class="U9-auction-product">
+
+            <img
+              id="U9-auction-product-image"
+              class="U9-auction-product-image"
+              src=""
+              alt="Product"
+              style="display:none;"
+            >
+
+            <h2 id="U9-auction-product-name">
+              -
+            </h2>
+
+            <p id="U9-auction-product-description">
+              -
+            </p>
+
+          </div>
+
+
+          <div class="U9-auction-price-row">
+
+            <div>
+              <span>Price</span>
+              <strong id="U9-auction-product-price">
+                0.00
+              </strong>
+            </div>
+
+            <div>
+              <span>Profit</span>
+              <strong id="U9-auction-product-profit">
+                +0.00
+              </strong>
+            </div>
+
+          </div>
+
+
+          <a
+            id="U9-auction-product-url"
+            class="U9-auction-product-link"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="display:none;"
+          >
+            View Product
+          </a>
+
+
+          <button
+            id="U9-auction-complete"
+            type="button"
+            disabled
+          >
+            Complete Task
+          </button>
+
+        </div>
+
+
+        <!-- =========================
+            START
+        ========================= -->
+
+        <div
+          id="U9-auction-start-area"
+          class="U9-auction-start-area"
+        >
+
+          <button
+            id="U9-auction-start"
+            type="button"
+          >
+            Start Task
+          </button>
+
+          <p>
+            Minimum 50 Coins required to start
+          </p>
+
+        </div>
+
+
+        <!-- =========================
+            MESSAGE
+        ========================= -->
+
+        <div
+          id="U9-auction-message"
+          class="U9-auction-message"
+        >
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- TEST 1 -->
+
+    <div id="U9-page-test1">
+      Test1
+    </div>
+
+
+    <!-- TEST 2 -->
+
+    <div id="U9-page-test2">
+      Test2
+    </div>
+
+
+  </div>
+
+
+  <!-- =================================================
+      PROFILE MODAL
+  ================================================= -->
+
+  <div id="U9-profile-modal">
+
+    <div id="U9-profile-modal-content">
+
+      <!-- =================================
+          PROFILE SINGLE HEADER
+      ================================= -->
+
+      <div id="U9-profile-modal-header">
+
+        <button
+          id="U9-profile-modal-close"
+          type="button"
+          aria-label="Close"
+        >
+
+          <img
+            id="U9-profile-modal-close-icon"
+            src="SSVG/account/close.svg"
+            alt=""
+            aria-hidden="true"
+          >
+
+        </button>
+
+
+        <div id="U9-profile-modal-title">
+          Profile
+        </div>
+
+
+        <img
+          id="U9-profile-modal-icon"
+          src="SSVG/logo/U9website.svg"
+          alt=""
+          aria-hidden="true"
+        >
+
+      </div>
+
+
+      <!-- =================================
+          PROFILE BODY
+      ================================= -->
+
+      <div id="U9-profile-modal-body">
+
+
+        <!-- =================================
+            PROFILE MAIN
+        ================================= -->
+
+        <div id="U9-profile-main">
+
+          <!-- Avatar -->
+
+          <div id="U9-profile-avatar">
+
+            <img
+              id="U9-profile-avatar-image"
+              src="SSVG/avatar/profile.svg"
+              alt="Avatar"
+            >
+
+            <img
+              id="U9-profile-avatar-frame"
+              src="SSVG/avatar/ordinary.svg"
+              alt=""
+              aria-hidden="true"
+            >
+
+          </div>
+
+
+          <!-- Loading -->
+
+          <div id="U9-profile-info-loading">
+
+            <img
+              src="SSVG/logo/loading.svg"
+              alt="Loading"
+            >
+
+          </div>
+
+
+          <!-- Profile Info -->
+
+          <div id="U9-profile-info">
+
+            <div id="U9-profile-username"></div>
+
+            <div id="U9-profile-account"></div>
+
+
+            <div id="U9-profile-balance-container">
+
+              <div id="U9-profile-balance-info">
+
+                <div
+                  id="U9-profile-balance-title"
+                >
+                  Balance
+                </div>
+
+
+                <div
+                  id="U9-profile-balance-value-row"
+                >
+
+                  <div
+                    id="U9-profile-balance"
+                  ></div>
+
+
+                  <div
+                    id="U9-profile-coins"
+                    hidden
+                  ></div>
+
+
+                  <button
+                    id="U9-profile-balance-toggle"
+                    type="button"
+                    aria-label="Show Coins"
+                  >
+
+                    <img
+                      src="SSVG/account/account-edit-button.svg"
+                      alt=""
+                      aria-hidden="true"
+                    >
+
+                  </button>
+
+                </div>
+
+              </div>
+
+
+              <div id="U9-profile-balance-buttons">
+
+                <button
+                  id="U9-profile-button-1"
+                  type="button"
+                >
+
+                  <img
+                    src="SSVG/account/account-edit-button.svg"
+                    alt=""
+                    aria-hidden="true"
+                  >
+
+                  <span>
+                    Button 1
+                  </span>
+
+                </button>
+
+
+                <button
+                  id="U9-profile-button-2"
+                  type="button"
+                >
+
+                  <img
+                    src="SSVG/account/account-edit-button.svg"
+                    alt=""
+                    aria-hidden="true"
+                  >
+
+                  <span>
+                    Button 2
+                  </span>
+
+                </button>
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Main Buttons -->
+
+          <div id="U9-profile-buttons">
+
+            <button
+              id="U9-profile-button-3"
+              type="button"
+            >
+
+              <img
+                src="SSVG/account/account-edit-button.svg"
+                alt=""
+                aria-hidden="true"
+              >
+
+              <span>
+                Button 3
+              </span>
+
+            </button>
+
+
+            <button
+              id="U9-profile-button-4"
+              type="button"
+            >
+
+              <img
+                src="SSVG/account/account-edit-button.svg"
+                alt=""
+                aria-hidden="true"
+              >
+
+              <span>
+                Button 4
+              </span>
+
+            </button>
+
+
+            <button
+              id="U9-profile-button-5"
+              type="button"
+            >
+
+              <img
+                src="SSVG/account/account-edit-button.svg"
+                alt=""
+                aria-hidden="true"
+              >
+
+              <span>
+                Button 5
+              </span>
+
+            </button>
+
+
+            <!-- Button 6 -->
+
+            <button
+              id="U9-profile-button-6"
+              type="button"
+            >
+
+              <img
+                src="SSVG/account/account-edit-button.svg"
+                alt=""
+                aria-hidden="true"
+              >
+
+              <span>
+                Logout
+              </span>
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- =================================
+            PROFILE PAGE 1
+        ================================= -->
+
+        <div id="U9-profile-page1">
+
+          <div id="U9-profile-page1-content">
+            <!-- Page 1 content -->
+          </div>
+
+        </div>
+
+
+        <!-- =================================
+            PROFILE PAGE 2
+        ================================= -->
+
+        <div id="U9-profile-page2">
+
+          <div id="U9-profile-page2-content">
+            <!-- Page 2 content -->
+          </div>
+
+        </div>
+
+
+        <!-- =================================
+            PROFILE PAGE 3
+        ================================= -->
+
+        <div id="U9-profile-page3">
+
+          <div id="U9-profile-page3-content">
+            <!-- Page 3 content -->
+          </div>
+
+        </div>
+
+
+        <!-- =================================
+            PROFILE PAGE 4
+        ================================= -->
+
+        <div id="U9-profile-page4">
+
+          <div id="U9-profile-page4-content">
+            <!-- Page 4 content -->
+          </div>
+
+        </div>
+
+
+        <!-- =================================
+            PROFILE PAGE 5
+        ================================= -->
+
+        <div id="U9-profile-page5">
+
+          <div id="U9-profile-page5-content">
+            <!-- Page 5 content -->
+          </div>
+
+        </div>
+
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =================================================
+      REGISTER MODAL
+  ================================================= -->
+
+  <div id="U9-register-modal">
+
+
+    <div id="U9-register-modal-content">
+
+
+      <button
+        id="U9-register-modal-close"
+      >
+        ×
+      </button>
+
+
+      <h2>
+        Register
+      </h2>
+
+
+      <form
+        id="U9-register-form"
+      >
+
+
+        <label
+          for="U9-register-username"
+        >
+          Username
+        </label>
+
+
+        <input
+          type="text"
+          id="U9-register-username"
+          name="username"
+          autocomplete="username"
+          required
+        >
+
+
+        <label
+          for="U9-register-email"
+        >
+          Email
+        </label>
+
+
+        <input
+          type="email"
+          id="U9-register-email"
+          name="email"
+          autocomplete="email"
+          required
+        >
+
+
+        <label
+          for="U9-register-password"
+        >
+          Password
+        </label>
+
+
+        <div
+          id="U9-register-password-wrapper"
+        >
+
+          <input
+            type="password"
+            id="U9-register-password"
+            name="password"
+            autocomplete="new-password"
+            required
+          >
+
+
+          <button
+            type="button"
+            id="U9-register-password-toggle"
+          >
+            Show
+          </button>
+
+        </div>
+
+
+        <label
+          for="U9-register-confirm-password"
+        >
+          Confirm Password
+        </label>
+
+
+        <div
+          id="U9-register-confirm-password-wrapper"
+        >
+
+          <input
+            type="password"
+            id="U9-register-confirm-password"
+            name="confirm-password"
+            autocomplete="new-password"
+            required
+          >
+
+
+          <button
+            type="button"
+            id="U9-register-confirm-password-toggle"
+          >
+            Show
+          </button>
+
+        </div>
+
+
+        <button
+          type="submit"
+          id="U9-register-submit"
+        >
+          Register
+        </button>
+
+
+      </form>
+
+
+    </div>
+
+
+  </div>
+
+
+  <!-- =================================================
+      LOGIN MODAL
+  ================================================= -->
+
+  <div id="U9-login-modal">
+
+
+    <div id="U9-login-modal-content">
+
+
+      <button
+        id="U9-login-modal-close"
+      >
+        ×
+      </button>
+
+
+      <h2>
+        Login
+      </h2>
+
+
+      <form
+        id="U9-login-form"
+      >
+
+
+        <label
+          for="U9-login-email"
+        >
+          Email
+        </label>
+
+
+        <input
+          type="email"
+          id="U9-login-email"
+          name="email"
+          autocomplete="email"
+          required
+        >
+
+
+        <label
+          for="U9-login-password"
+        >
+          Password
+        </label>
+
+
+        <div
+          id="U9-login-password-wrapper"
+        >
+
+          <input
+            type="password"
+            id="U9-login-password"
+            name="password"
+            autocomplete="current-password"
+            required
+          >
+
+
+          <button
+            type="button"
+            id="U9-login-password-toggle"
+          >
+            Show
+          </button>
+
+        </div>
+
+
+        <button
+          type="submit"
+          id="U9-login-submit"
+        >
+          Login
+        </button>
+
+
+      </form>
+
+
+    </div>
+
+
+  </div>
+
+
+  <!-- =================================================
+      LOGOUT CONFIRM MODAL
+  ================================================= -->
+
+  <div id="U9-account-logout">
+
+
+    <div id="U9-account-logout-content">
+
+
+      <h2>
+        Are you sure you want to exit?
+      </h2>
+
+
+      <div id="U9-account-logout-actions">
+
+
+        <button
+          id="U9-account-logout-no"
+          type="button"
+        >
+          No
+        </button>
+
+
+        <button
+          id="U9-account-logout-yes"
+          type="button"
+          disabled
+        >
+          Yes
+          (
+          <span id="U9-account-logout-countdown">
+            5
+          </span>
+          )
+        </button>
+
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+  <!-- =================================================
+      MESSAGE MODAL
+  ================================================= -->
+
+  <div id="U9-message-normal-modal">
+
+    <div
+      id="U9-message-normal-modal-content"
+      class="message-home"
+    >
+
+      <!-- =========================
+          MESSAGE HEADER
+      ========================= -->
+
+      <header id="U9-message-normal-modal-title">
+
+        <!-- HEADER BACK / CLOSE BUTTON -->
+
+        <button
+          id="U9-message-normal-modal-close"
+          class="message-home-close"
+          type="button"
+          aria-label="Close Message"
+        >
+          ×
+        </button>
+
+        <!-- CENTER TITLE -->
+
+        <span id="U9-message-normal-modal-title-text">
+          Message
+        </span>
+
+      </header>
+
+
+      <!-- =========================
+          MESSAGE HOME
+      ========================= -->
+
+      <div id="Message-model-home">
+
+        <!-- =========================
+            FOUR NAVIGATION BUTTONS
+        ========================= -->
+
+        <nav
+          id="Message-model-navigation"
+          role="tablist"
+          aria-label="Message navigation"
+        >
+
+          <!-- FRIENDS -->
+
+          <button
+            id="Message-model-friends-button"
+            class="Message-model-nav-button"
+            type="button"
+            role="tab"
+            data-page="friends"
+            aria-controls="Message-model-friends-page"
+            aria-selected="false"
+          >
+
+            <img
+              class="Message-model-nav-icon"
+              src="/SSVG/normal/friends.svg"
+              alt=""
+            >
+
+            <span class="Message-model-nav-label">
+              Friends
+            </span>
+
+            <span class="Message-model-nav-description">
+              Your accepted friends
+            </span>
+
+          </button>
+
+
+          <!-- ADD FRIENDS -->
+
+          <button
+            id="Message-model-add-friends-button"
+            class="Message-model-nav-button"
+            type="button"
+            role="tab"
+            data-page="add-friends"
+            aria-controls="Message-model-add-friends-page"
+            aria-selected="false"
+          >
+
+            <img
+              class="Message-model-nav-icon"
+              src="/SSVG/normal/add-friend.svg"
+              alt=""
+            >
+
+            <span class="Message-model-nav-label">
+              Add Friend
+            </span>
+
+            <span class="Message-model-nav-description">
+              Search accounts and friend requests
+            </span>
+
+          </button>
+
+
+          <!-- GROUP -->
+
+          <button
+            id="Message-model-group-button"
+            class="Message-model-nav-button"
+            type="button"
+            role="tab"
+            data-page="group"
+            aria-controls="Message-model-group-page"
+            aria-selected="false"
+          >
+
+            <img
+              class="Message-model-nav-icon"
+              src="/SSVG/normal/group.svg"
+              alt=""
+            >
+
+            <span class="Message-model-nav-label">
+              Group
+            </span>
+
+            <span class="Message-model-nav-description">
+              Search, request and join groups
+            </span>
+
+          </button>
+
+
+          <!-- CUSTOMER SERVICE -->
+
+          <button
+            id="Message-model-customer-service-button"
+            class="Message-model-nav-button"
+            type="button"
+            role="tab"
+            data-page="customer-service"
+            aria-controls="Message-model-customer-service-page"
+            aria-selected="false"
+          >
+
+            <img
+              class="Message-model-nav-icon"
+              src="/SSVG/normal/support.svg"
+              alt=""
+            >
+
+            <span class="Message-model-nav-label">
+              Support
+            </span>
+
+            <span class="Message-model-nav-description">
+              Contact platform support
+            </span>
+
+          </button>
+
+        </nav>
+
+
+        <!-- =========================
+            ACCEPTED FRIENDS LIST
+        ========================= -->
+
+        <section
+          id="Message-model-friends-list-section"
+          aria-label="Accepted friends"
+        >
+
+          <h3 class="Message-model-list-heading">
+            Friends
+          </h3>
+
+          <div id="Message-model-friends-list">
+
+            <!-- friends.js / message home renderer inserts rows here -->
+
+            <div
+              class="Message-model-empty"
+              id="Message-model-friends-list-empty"
+            >
+              No friends to display.
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- =========================
+            JOINED GROUPS LIST
+        ========================= -->
+
+        <section
+          id="Message-model-groups-list-section"
+          aria-label="Joined groups"
+        >
+
+          <h3 class="Message-model-list-heading">
+            Groups
+          </h3>
+
+          <div id="Message-model-groups-list">
+
+            <!-- group list renderer inserts rows here -->
+
+            <div
+              class="Message-model-empty"
+              id="Message-model-groups-list-empty"
+            >
+              No groups to display.
+            </div>
+
+          </div>
+
+        </section>
+
+      </div>
+
+
+      <!-- =========================
+          MESSAGE PAGES
+      ========================= -->
+
+      <div id="Message-model-pages">
+
+
+        <!-- =========================
+            FRIENDS PAGE
+        ========================= -->
+
+        <section
+          id="Message-model-friends-page"
+          class="Message-model-page"
+          role="tabpanel"
+          aria-hidden="true"
+          hidden
+        >
+
+          <div id="Message-model-friends-root"></div>
+
+        </section>
+
+
+        <!-- =========================
+            ADD FRIENDS PAGE
+        ========================= -->
+
+        <section
+          id="Message-model-add-friends-page"
+          class="Message-model-page"
+          role="tabpanel"
+          aria-hidden="true"
+          hidden
+        >
+
+          <div id="Message-model-add-friends-root"></div>
+
+        </section>
+
+
+        <!-- =========================
+            GROUP PAGE
+        ========================= -->
+
+        <section
+          id="Message-model-group-page"
+          class="Message-model-page"
+          role="tabpanel"
+          aria-hidden="true"
+          hidden
+        >
+
+          <div id="Message-model-group-root"></div>
+
+        </section>
+
+
+        <!-- =========================
+            CUSTOMER SERVICE PAGE
+        ========================= -->
+
+        <section
+          id="Message-model-customer-service-page"
+          class="Message-model-page"
+          role="tabpanel"
+          aria-hidden="true"
+          hidden
+        >
+
+          <div id="Message-model-customer-service-root"></div>
+
+        </section>
+
+
+        <!-- =========================
+            CHAT PAGE
+        ========================= -->
+
+        <section
+          id="Message-model-chat-page"
+          class="Message-model-page"
+          aria-hidden="true"
+          hidden
+        >
+
+          <!-- CHAT HEADER
+              Back button is handled by the main Message Header.
+          -->
+
+          <div id="Message-model-chat-header">
+
+            <!-- CHAT AVATAR -->
+
+            <img
+              id="Message-model-chat-avatar"
+              src="/SSVG/avatar/profile.svg"
+              alt=""
+            >
+
+            <!-- CHAT USER INFO -->
+
+            <div id="Message-model-chat-user-info">
+
+              <div id="Message-model-chat-name">
+                Chat
+              </div>
+
+              <div id="Message-model-chat-status">
+                Conversation
+              </div>
+
+            </div>
+
+            <!-- MORE OPTIONS -->
+
+            <button
+              id="Message-model-chat-more"
+              type="button"
+              aria-label="More chat options"
+            >
+              ⋯
+            </button>
+
+          </div>
+
+
+          <!-- CHAT MESSAGES -->
+
+          <div
+            id="Message-model-chat-messages"
+            aria-live="polite"
+            aria-relevant="additions"
+          >
+
+            <!-- Messages will be rendered here -->
+
+          </div>
+
+
+          <!-- CHAT INPUT -->
+
+          <form id="Message-model-chat-form">
+
+            <input
+              id="Message-model-chat-input"
+              type="text"
+              placeholder="Type a message..."
+              autocomplete="off"
+              aria-label="Type a message"
+            >
+
+            <button
+              id="Message-model-chat-send"
+              type="submit"
+              aria-label="Send message"
+            >
+
+              <img
+                src="/SSVG/normal/send.svg"
+                alt=""
+              >
+
+            </button>
+
+          </form>
+
+        </section>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =================================================
+      INBOX MODAL
+  ================================================= -->
+
+  <div id="U9-inbox-normal-modal">
+
+
+    <div id="U9-inbox-normal-modal-content">
+
+
+      <div id="U9-inbox-normal-modal-title">
+
+        Inbox
+
+        <button
+          id="U9-inbox-normal-modal-close"
+          type="button"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+  <!-- =================================================
+      GIFT MODAL
+  ================================================= -->
+
+  <div id="U9-gift-normal-modal">
+
+
+    <div id="U9-gift-normal-modal-content">
+
+
+      <div id="U9-gift-normal-modal-title">
+
+        Gift
+
+        <button
+          id="U9-gift-normal-modal-close"
+          type="button"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+  <!-- =================================================
+      HISTORY MODAL
+  ================================================= -->
+
+  <div id="U9-history-normal-modal">
+
+    <div id="U9-history-normal-modal-content">
+
+      <!-- TITLE -->
+      <div id="U9-history-normal-modal-title">
+
+        <span>History</span>
+
+        <button
+          id="U9-history-normal-modal-close"
+          type="button"
+          aria-label="Close History"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <!-- PAGE NAVIGATION -->
+      <div id="History-model-navigation">
+
+        <button
+          id="History-model-shop-button"
+          class="History-model-nav-button"
+          type="button"
+          data-history-page="shop"
+        >
+          Shop Page
+        </button>
+
+        <button
+          id="History-model-Save-button"
+          class="History-model-nav-button"
+          type="button"
+          data-history-page="save"
+        >
+          Save Page
+        </button>
+
+        <button
+          id="History-model-Order-button"
+          class="History-model-nav-button"
+          type="button"
+          data-history-page="order"
+        >
+          Order Page
+        </button>
+
+      </div>
+
+      <!-- PAGE CONTENT -->
+      <div id="History-model-pages">
+
+        <!-- SHOP PAGE -->
+        <section
+          id="History-model-shop-Page"
+          class="History-model-page"
+          data-page="shop"
+          aria-hidden="false"
+        >
+          <h2>Shop Page</h2>
+          <p>Shop page content will be added here.</p>
+        </section>
+
+        <!-- SAVE PAGE -->
+        <section
+          id="History-model-Save-Page"
+          class="History-model-page"
+          data-page="save"
+          aria-hidden="true"
+          hidden
+        >
+          <h2>Save Page</h2>
+          <p>Save page content will be added here.</p>
+        </section>
+
+        <!-- ORDER PAGE -->
+        <section
+          id="History-model-Order-Page"
+          class="History-model-page"
+          data-page="order"
+          aria-hidden="true"
+          hidden
+        >
+        </section>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- =================================================
+      PROFILE PICTURE MODAL
+  ================================================= -->
+
+  <div
+  id="U9-profile-picture-modal"
+  aria-hidden="true"
+  >
+
+
+  <div
+      id="U9-profile-picture-modal-overlay"
+  ></div>
+
+
+  <div
+      id="U9-profile-picture-modal-content"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="U9-profile-picture-modal-title"
+  >
+
+
+      <!-- =================================
+          HEADER
+      ================================= -->
+
+      <div
+      id="U9-profile-picture-modal-header"
+      >
+
+
+      <button
+          id="U9-profile-picture-modal-close"
+          type="button"
+          aria-label="Close"
+      >
+          ×
+      </button>
+
+
+      <div
+          id="U9-profile-picture-modal-title"
+      >
+          Profile Picture
+      </div>
+
+
+      <div
+          id="U9-profile-picture-modal-header-space"
+      ></div>
+
+
+      </div>
+
+
+      <!-- =================================
+          BODY
+      ================================= -->
+
+      <div
+      id="U9-profile-picture-modal-body"
+      >
+
+
+      <!-- =================================
+          SELECT AREA
+      ================================= -->
+
+      <div
+          id="U9-profile-picture-modal-select"
+      >
+
+
+          <div
+          id="U9-profile-picture-modal-select-icon"
+          >
+          <img
+              src="SSVG/account/account-edit-button.svg"
+              alt=""
+              aria-hidden="true"
+          >
+          </div>
+
+
+          <div
+          id="U9-profile-picture-modal-select-title"
+          >
+          Choose a picture
+          </div>
+
+
+          <div
+          id="U9-profile-picture-modal-select-description"
+          >
+          PNG, JPG, JPEG, GIF, WEBP, SVG and other image formats
+          </div>
+
+
+          <button
+          id="U9-profile-picture-modal-select-button"
+          type="button"
+          >
+          Select Image
+          </button>
+
+
+          <input
+          id="U9-profile-picture-modal-file"
+          type="file"
+          accept="image/*"
+          hidden
+          >
+
+
+      </div>
+
+
+      <!-- =================================
+          EDIT AREA
+      ================================= -->
+
+      <div
+          id="U9-profile-picture-modal-editor"
+          hidden
+      >
+
+
+          <!-- CROP AREA -->
+
+          <div
+          id="U9-profile-picture-modal-crop-area"
+          >
+
+
+          <div
+              id="U9-profile-picture-modal-image-container"
+          >
+
+              <img
+              id="U9-profile-picture-modal-image"
+              src=""
+              alt="Profile picture preview"
+              draggable="false"
+              >
+
+          </div>
+
+
+          <div
+              id="U9-profile-picture-modal-crop-frame"
+              aria-hidden="true"
+          ></div>
+
+
+          </div>
+
+
+          <!-- ZOOM -->
+
+          <div
+          id="U9-profile-picture-modal-zoom"
+          >
+
+
+          <button
+              id="U9-profile-picture-modal-zoom-out"
+              type="button"
+              aria-label="Zoom out"
+          >
+              −
+          </button>
+
+
+          <input
+              id="U9-profile-picture-modal-zoom-range"
+              type="range"
+              min="1"
+              max="3"
+              step="0.01"
+              value="1"
+              aria-label="Zoom"
+          >
+
+
+          <button
+              id="U9-profile-picture-modal-zoom-in"
+              type="button"
+              aria-label="Zoom in"
+          >
+              +
+          </button>
+
+
+          </div>
+
+
+          <!-- ACTIONS -->
+
+          <div
+          id="U9-profile-picture-modal-editor-actions"
+          >
+
+
+          <button
+              id="U9-profile-picture-modal-reset"
+              type="button"
+          >
+              Reset
+          </button>
+
+
+          <button
+              id="U9-profile-picture-modal-change"
+              type="button"
+          >
+              Change Image
+          </button>
+
+
+          <button
+              id="U9-profile-picture-modal-confirm"
+              type="button"
+          >
+              Confirm
+          </button>
+
+
+          </div>
+
+
+      </div>
+
+
+      <!-- =================================
+          LOADING
+      ================================= -->
+
+      <div
+          id="U9-profile-picture-modal-loading"
+          hidden
+      >
+
+
+          <img
+          src="SSVG/logo/loading.svg"
+          alt="Loading"
+          >
+
+
+          <div
+          id="U9-profile-picture-modal-loading-text"
+          >
+          Uploading...
+          </div>
+
+
+      </div>
+
+
+      <!-- =================================
+          MESSAGE
+      ================================= -->
+
+      <div
+          id="U9-profile-picture-modal-message"
+          role="status"
+          aria-live="polite"
+      ></div>
+
+
+      </div>
+
+
+  </div>
+
+  </div>
+
+  <!-- =================================================
+      EXCHANGE MODAL
+  ================================================= -->
+
+  <div
+    id="U9-exchange-modal"
+    aria-hidden="true"
+  >
+    <!-- Background overlay: clicking it will NOT close the modal -->
+    <div id="U9-exchange-modal-overlay"></div>
+
+    <section
+      id="U9-exchange-modal-content"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="U9-exchange-modal-title"
+    >
+      <!-- FIXED HEADER -->
+      <div id="U9-exchange-modal-header">
+        <h2 id="U9-exchange-modal-title">Exchange</h2>
+
+        <button
+          id="U9-exchange-modal-close"
+          type="button"
+          aria-label="Close Exchange"
+        >×</button>
+      </div>
+
+      <!-- SCROLLABLE BODY -->
+      <div id="U9-exchange-modal-body">
+
+        <!-- EXCHANGE DIRECTION -->
+        <div id="U9-exchange-direction">
+          <button
+            type="button"
+            class="U9-exchange-direction-button active"
+            data-exchange-type="balance_to_coins"
+            aria-pressed="true"
+          >
+            Balance → Coins
+          </button>
+
+          <button
+            type="button"
+            class="U9-exchange-direction-button"
+            data-exchange-type="coins_to_balance"
+            aria-pressed="false"
+          >
+            Coins → Balance
+          </button>
+        </div>
+
+        <!-- RATE AND FEE -->
+        <div id="U9-exchange-info">
+          <div class="U9-exchange-info-row">
+            <span>Exchange Rate</span>
+            <strong id="U9-exchange-rate">Loading...</strong>
+          </div>
+
+          <div class="U9-exchange-info-row">
+            <span>Exchange Fee</span>
+            <strong id="U9-exchange-fee-rate">Loading...</strong>
+          </div>
+        </div>
+
+        <!-- AMOUNT FORM -->
+        <form id="U9-exchange-form">
+          <label
+            id="U9-exchange-amount-label"
+            for="U9-exchange-amount"
+          >
+            Balance Amount
+          </label>
+
+          <input
+            id="U9-exchange-amount"
+            name="amount"
+            type="number"
+            min="0.01"
+            step="0.01"
+            inputmode="decimal"
+            placeholder="Enter amount"
+            autocomplete="off"
+            required
+          >
+
+          <!-- AVAILABLE BALANCE -->
+          <div id="U9-exchange-available">
+            Available Balance:
+            <strong id="U9-exchange-available-value">—</strong>
+          </div>
+
+          <!-- EXCHANGE PREVIEW -->
+          <div id="U9-exchange-preview">
+            <div class="U9-exchange-preview-row">
+              <span>Gross Amount</span>
+              <strong id="U9-exchange-gross">—</strong>
+            </div>
+
+            <div class="U9-exchange-preview-row">
+              <span>Fee Amount</span>
+              <strong id="U9-exchange-fee">—</strong>
+            </div>
+
+            <div class="U9-exchange-preview-row total">
+              <span>You Receive</span>
+              <strong id="U9-exchange-net">—</strong>
+            </div>
+          </div>
+
+          <!-- MESSAGE -->
+          <div
+            id="U9-exchange-message"
+            role="status"
+            aria-live="polite"
+          ></div>
+
+          <!-- SUBMIT -->
+          <button
+            id="U9-exchange-submit"
+            type="submit"
+            disabled
+          >
+            Exchange
+          </button>
+        </form>
+
+      </div>
+    </section>
+  </div>
+
+
+  <!-- =================================================
+      PLATFORM MAINTENANCE MODAL
+  ================================================= -->
+
+  <div
+  id="U9-platform-maintenance-modal"
+  hidden
+  aria-hidden="true"
+  >
+  <div id="U9-platform-maintenance-overlay"></div>
+
+  <section
+      id="U9-platform-maintenance-content"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="U9-platform-maintenance-title"
+      aria-describedby="U9-platform-maintenance-message"
+  >
+      <div id="U9-platform-maintenance-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+          <path
+          d="M12 3L21 19H3L12 3Z"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linejoin="round"
+          />
+          <path
+          d="M12 9V13"
+          stroke="currentColor"
+          stroke-width="1.7"
+          stroke-linecap="round"
+          />
+          <circle cx="12" cy="16" r="1" fill="currentColor" />
+      </svg>
+      </div>
+
+      <div id="U9-platform-maintenance-badge">
+      SYSTEM MAINTENANCE
+      </div>
+
+      <h2 id="U9-platform-maintenance-title">
+      Scheduled Maintenance
+      </h2>
+
+      <p id="U9-platform-maintenance-message">
+      We are currently performing maintenance.
+      Please try again later.
+      </p>
+
+      <div id="U9-platform-maintenance-duration">
+      <span id="U9-platform-maintenance-duration-label">
+          Estimated Duration
+      </span>
+
+      <strong id="U9-platform-maintenance-duration-value">
+          Approximately 2 hours
+      </strong>
+      </div>
+
+      <div id="U9-platform-maintenance-footer">
+      Thank you for your patience.
+      </div>
+  </section>
+  </div>
+
+
+  <!-- =================================================
+      JS
+  ================================================= -->
+
+  <script src="index.js"></script>
+  <script src="JS/SUPABASE/supabase-client.js"></script>
+
+  <!-- =================================================
+      HEADER
+  ================================================= -->
+
+  <script src="JS/HEADER/header.js"></script>
+
+
+  <!-- =================================================
+      WINDOW MANAGER
+  ================================================= -->
+
+  <script src="JS/CONTAINER/window-manager.js"></script>
+
+
+  <!-- =================================================
+      PROFILE
+  ================================================= -->
+
+  <script src="JS/PROFILE/PROFILE/profile.js"></script>
+
+
+  <!-- =================================================
+      PROFILE PAGE
+  ================================================= -->
+
+  <script src="JS/PROFILE/PROFILE/profile-page-1.js"></script>
+
+  <script src="JS/PROFILE/PROFILE/profile-page-2.js"></script>
+
+  <script src="JS/PROFILE/PROFILE/profile-page-3.js"></script>
+
+  <script src="JS/PROFILE/PROFILE/profile-page-4.js"></script>
+
+  <script src="JS/PROFILE/PROFILE/profile-page-5.js"></script>
+
+
+  <!-- =================================================
+      ACCOUNT MODAL
+  ================================================= -->
+
+  <script src="JS/MODAL/account-register-modal.js"></script>
+
+  <script src="JS/MODAL/account-login-modal.js"></script>
+
+  <script src="JS/MODAL/account-logout-modal.js"></script>
+
+  <script src="JS/MODAL/profile-picture-modal.js"></script>
+
+  <script src="JS/MODAL/exchange-modal.js"></script>
+
+
+  <!-- =================================================
+      NORMAL
+  ================================================= -->
+
+  <!-- message -->
+  <script src="JS/NORMAL/normal-message.js"></script>
+  <script src="JS/NORMAL/MESSAGE/add-friends.js"></script>
+  <script src="JS/NORMAL/MESSAGE/customer-service.js"></script>
+  <script src="JS/NORMAL/MESSAGE/friends.js"></script>
+  <script src="JS/NORMAL/MESSAGE/group.js"></script>
+  <script src="JS/NORMAL/MESSAGE/chat.js"></script>
+
+  <!-- inbox -->
+  <script src="JS/NORMAL/normal-inbox.js"></script>
+
+  <!-- gift -->
+  <script src="JS/NORMAL/normal-gift.js"></script>
+
+  <!-- history -->
+  <script src="JS/NORMAL/normal-history.js"></script>
+  <script src="JS/NORMAL/HISTORY/shop-page.js"></script>
+  <script src="JS/NORMAL/HISTORY/save-page.js"></script>
+  <script src="JS/NORMAL/HISTORY/order-page.js"></script>
+
+
+  <!-- =================================================
+      CONTAINER
+  ================================================= -->
+
+  <script src="JS/CONTAINER/container-tool.js"></script>
+
+  <script src="JS/CONTAINER/search-tool.js"></script>
+
+
+  <!-- =================================================
+      PAGE
+  ================================================= -->
+
+
+  <!-- HOME -->
+
+  <script src="JS/PAGE/HOME/home-page.js"></script>
+
+
+  <!-- SHOP -->
+
+  <script src="JS/PAGE/SHOP/shop-page.js"></script>
+
+
+
+  <!-- AUCTION -->
+
+  <script src="JS/PAGE/AUCTION/auction-page.js"></script>
+
+
+  <!-- TEST1 -->
+
+  <script src="JS/PAGE/TEST1/test1-page.js"></script>
+
+
+  <!-- TEST2 -->
+
+  <script src="JS/PAGE/TEST2/test2-page.js"></script>
+
+
+  <!-- =================================================
+      END JS
+  ================================================= -->
+
+
+</body>
+
+</html>
