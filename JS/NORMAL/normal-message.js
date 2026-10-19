@@ -1,4 +1,3 @@
-
 /* =================================================
    U9 MESSAGE NORMAL MODAL
    File: JS/NORMAL/normal-message.js
