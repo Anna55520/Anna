@@ -209,11 +209,6 @@
   font-size: 20px;
 }
 
-#U9-message-normal-modal-close.message-back-button {
-  background: transparent;
-  color: #ffffff;
-}
-
 #U9-message-normal-modal-close img {
   display: block;
 
@@ -227,12 +222,6 @@
   pointer-events: none;
   user-select: none;
 }
-
-#U9-message-normal-modal-close:hover {
-  background: rgba(255, 255, 255, 0.16);
-}
-
-
 
 #U9-message-normal-modal-close:focus-visible {
   outline: 2px solid #ffffff;
