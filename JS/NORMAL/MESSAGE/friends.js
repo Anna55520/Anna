@@ -116,7 +116,7 @@
     if (!url) return true;
     return url === DEFAULT_AVATAR ||
       url === "/SSVG/avatar/profile.svg" ||
-      url.endsWith("/SSVG/avatar/profile.svg") ||
+       url.endsWith("/SSVG/account/account-edit-button.svg") ||
       url.endsWith("/SSVG/avatar/profile.svg");
   }
 
