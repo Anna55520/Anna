@@ -1,256 +1,153 @@
 
-/* =========================
-   INBOX NORMAL MODAL
-========================= */
+/* =========================================================
+   U9 INBOX NORMAL MODAL
+   Fullscreen Modal / Window Manager Integration
+========================================================= */
 
+(function () {
+  "use strict";
 
-/* =========================
-   ELEMENTS
-========================= */
+  /* =======================================================
+     ELEMENTS
+  ======================================================= */
 
-const inboxModal =
-  document.getElementById(
+  const inboxModal = document.getElementById(
     "U9-inbox-normal-modal"
   );
 
-
-const inboxModalContent =
-  document.getElementById(
+  const inboxModalContent = document.getElementById(
     "U9-inbox-normal-modal-content"
   );
 
-
-const inboxModalClose =
-  document.getElementById(
+  const inboxModalClose = document.getElementById(
     "U9-inbox-normal-modal-close"
   );
 
+  /* =======================================================
+     OPEN INBOX MODAL
+  ======================================================= */
 
-/* =========================
-   OPEN INBOX MODAL
-========================= */
-
-function openInboxModal() {
-
-  if (
-    !inboxModal ||
-    !inboxModalContent
-  ) {
-
-    return false;
-
-  }
-
-
-  inboxModal.classList.remove(
-    "modal-closing"
-  );
-
-
-  inboxModal.classList.add(
-    "modal-open"
-  );
-
-
-  return true;
-
-}
-
-
-/* =========================
-   CLOSE INBOX MODAL
-========================= */
-
-function closeInboxModal() {
-
-  if (
-    !inboxModal ||
-    !inboxModalContent
-  ) {
-
-    return false;
-
-  }
-
-
-  if (
-    !inboxModal.classList.contains(
-      "modal-open"
-    )
-  ) {
-
-    return true;
-
-  }
-
-
-  inboxModal.classList.remove(
-    "modal-open"
-  );
-
-
-  inboxModal.classList.add(
-    "modal-closing"
-  );
-
-
-  let finished =
-    false;
-
-
-  function finishClose() {
-
-    if (
-      finished
-    ) {
-
-      return;
-
+  function openInboxModal() {
+    if (!inboxModal || !inboxModalContent) {
+      return false;
     }
 
+    inboxModal.classList.remove("modal-closing");
 
-    finished =
-      true;
+    inboxModal.classList.add("modal-open");
 
+    return true;
+  }
 
-    inboxModal.classList.remove(
-      "modal-closing"
-    );
+  /* =======================================================
+     CLOSE INBOX MODAL
+  ======================================================= */
 
+  function closeInboxModal() {
+    if (!inboxModal || !inboxModalContent) {
+      return false;
+    }
 
-    inboxModalContent.removeEventListener(
+    if (!inboxModal.classList.contains("modal-open")) {
+      return true;
+    }
+
+    inboxModal.classList.remove("modal-open");
+
+    inboxModal.classList.add("modal-closing");
+
+    let finished = false;
+    let fallbackTimer = null;
+
+    function finishClose() {
+      if (finished) {
+        return;
+      }
+
+      finished = true;
+
+      if (fallbackTimer !== null) {
+        clearTimeout(fallbackTimer);
+      }
+
+      inboxModalContent.removeEventListener(
+        "transitionend",
+        handleCloseAnimation
+      );
+
+      inboxModal.classList.remove("modal-closing");
+    }
+
+    function handleCloseAnimation(event) {
+      if (event.target !== inboxModalContent) {
+        return;
+      }
+
+      if (event.propertyName !== "transform") {
+        return;
+      }
+
+      finishClose();
+    }
+
+    inboxModalContent.addEventListener(
       "transitionend",
       handleCloseAnimation
     );
 
+    fallbackTimer = setTimeout(finishClose, 700);
+
+    return true;
   }
 
+  /* =======================================================
+     WINDOW MANAGER
+  ======================================================= */
 
-  function handleCloseAnimation(
-    event
+  if (
+    window.U9WindowManager &&
+    typeof window.U9WindowManager.register === "function"
   ) {
+    window.U9WindowManager.register("inbox", {
+      open: openInboxModal,
 
-    if (
-      event.propertyName !==
-      "transform"
-    ) {
+      close: closeInboxModal,
 
-      return;
-
-    }
-
-
-    finishClose();
-
-  }
-
-
-  inboxModalContent.addEventListener(
-    "transitionend",
-    handleCloseAnimation
-  );
-
-
-  setTimeout(
-    finishClose,
-    700
-  );
-
-
-  return true;
-
-}
-
-
-/* =========================
-   WINDOW MANAGER
-========================= */
-
-if (
-  window.U9WindowManager
-) {
-
-  window.U9WindowManager.register(
-    "inbox",
-    {
-
-      open:
-        openInboxModal,
-
-      close:
-        closeInboxModal,
-
-      isOpen:
-        function () {
-
-          if (
-            !inboxModal
-          ) {
-
-            return false;
-
-          }
-
-
-          return (
-            inboxModal.classList.contains(
-              "modal-open"
-            ) ||
-
-            inboxModal.classList.contains(
-              "modal-closing"
-            )
-          );
-
+      isOpen: function () {
+        if (!inboxModal) {
+          return false;
         }
 
-    }
-  );
-
-}
-
-
-/* =========================
-   GLOBAL FUNCTIONS
-========================= */
-
-window.openInboxModal =
-  openInboxModal;
-
-
-window.closeInboxModal =
-  closeInboxModal;
-
-
-/* =========================
-   CLOSE BUTTON
-========================= */
-
-if (
-  inboxModalClose
-) {
-
-  inboxModalClose.addEventListener(
-    "click",
-    function () {
-
-      if (
-        window.U9WindowManager
-      ) {
-
-        window.U9WindowManager.close(
-          "inbox"
+        return (
+          inboxModal.classList.contains("modal-open") ||
+          inboxModal.classList.contains("modal-closing")
         );
-
       }
+    });
+  }
 
-      else {
+  /* =======================================================
+     GLOBAL FUNCTIONS
+  ======================================================= */
 
+  window.openInboxModal = openInboxModal;
+
+  window.closeInboxModal = closeInboxModal;
+
+  /* =======================================================
+     CLOSE BUTTON
+  ======================================================= */
+
+  if (inboxModalClose) {
+    inboxModalClose.addEventListener("click", function () {
+      if (
+        window.U9WindowManager &&
+        typeof window.U9WindowManager.close === "function"
+      ) {
+        window.U9WindowManager.close("inbox");
+      } else {
         closeInboxModal();
-
       }
-
-    }
-  );
-
-}
+    });
+  }
+})();
