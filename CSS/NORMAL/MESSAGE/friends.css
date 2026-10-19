@@ -144,17 +144,10 @@
 /* =================================================
    AVATAR STACK
 
-   The wrapper reserves enough horizontal space for
-   the larger frame so the frame does not crowd the
-   username or action buttons.
-
    Desktop:
    - Layout slot: 58px
    - Base avatar: 37px
    - Frame: 71px
-
-   The base-avatar/frame ratio follows the proportions
-   used in the Profile page.
 ================================================= */
 
 #Message-model-friends-root .U9-friend-avatar {
@@ -189,10 +182,6 @@
 
 /* =================================================
    BASE AVATAR IMAGE
-
-   The actual avatar is centered and remains smaller
-   than the frame. CSS overrides inline styles from
-   friends.js.
 ================================================= */
 
 #Message-model-friends-root .U9-friend-avatar-image {
@@ -202,8 +191,6 @@
   left: 50% !important;
   right: auto !important;
   bottom: auto !important;
-
-  /* 不要再添加 inset: auto !important */
 
   z-index: 1;
   display: block;
@@ -232,10 +219,6 @@
 
 /* =================================================
    AVATAR FRAME IMAGE
-
-   The frame is centered independently of the avatar.
-   It is larger than the base avatar and extends
-   outside the avatar's layout slot.
 ================================================= */
 
 #Message-model-friends-root .U9-friend-avatar-frame-image {
@@ -245,8 +228,6 @@
   left: 50% !important;
   right: auto !important;
   bottom: auto !important;
-
-  /* 不要再添加 inset: auto !important */
 
   z-index: 2;
   display: block;
@@ -280,9 +261,6 @@
 
 /* =================================================
    AVATAR INITIALS FALLBACK
-
-   This appears only when the selected avatar and
-   the default avatar cannot load.
 ================================================= */
 
 #Message-model-friends-root .U9-friend-avatar-fallback {
@@ -292,8 +270,6 @@
   left: 50% !important;
   right: auto !important;
   bottom: auto !important;
-
-  /* 不要再添加 inset: auto !important */
 
   z-index: 1;
   display: flex;
@@ -382,6 +358,7 @@
 
 /* =================================================
    ACTION BUTTON
+   All four buttons share the same framed appearance.
 ================================================= */
 
 #Message-model-friends-root .U9-friend-action {
@@ -399,10 +376,10 @@
 
   padding: 8px;
 
-  border: 1px solid transparent;
+  border: 1px solid #e5e9f5;
   border-radius: 9px;
 
-  background: transparent;
+  background: #f3f5fc;
 
   cursor: pointer;
 
@@ -430,38 +407,38 @@
 
 
 /* =================================================
-   CHAT ACTION
+   ALL ACTION BUTTONS - HOVER
 ================================================= */
 
-#Message-model-friends-root .U9-friend-action-chat {
-  border-color: #e5e9f5;
-
-  background: #f3f5fc;
-}
-
-#Message-model-friends-root .U9-friend-action-chat:hover {
+#Message-model-friends-root .U9-friend-action:hover {
   border-color: #d4dcf7;
 
   background: #e9edfc;
 }
 
-#Message-model-friends-root .U9-friend-action-chat:active {
+
+/* =================================================
+   ALL ACTION BUTTONS - ACTIVE
+================================================= */
+
+#Message-model-friends-root .U9-friend-action:active {
   background: #dfe5fb;
 }
 
 
 /* =================================================
    PLACEHOLDER ACTIONS
-   Observe, Mute and Delete are not enabled yet.
+   Observe, Mute and Delete have no business function
+   until their functionality is implemented.
 ================================================= */
 
 #Message-model-friends-root .U9-friend-action:disabled {
-  opacity: 0.42;
-  cursor: default;
+  opacity: 1;
+  cursor: pointer;
 }
 
 #Message-model-friends-root .U9-friend-action:disabled img {
-  filter: grayscale(1);
+  filter: none;
 }
 
 
