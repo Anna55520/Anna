@@ -571,24 +571,15 @@
 
   function renderChatIcon() {
     return `
-      <svg
+      <img
         class="Message-model-contact-chat-icon"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
+        src="/SSVG/normal/chat.svg"
+        alt=""
+        aria-hidden="true"
         width="22"
         height="22"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.8"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        aria-hidden="true"
-        focusable="false"
-      >
-        <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H5l-1.5 2v-5.1A7.5 7.5 0 1 1 20 11.5Z" />
-        <path d="M8 11h8" />
-        <path d="M8 14h5" />
-      </svg>
+        draggable="false"
+      />
     `;
   }
 
