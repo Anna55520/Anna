@@ -1,3 +1,4 @@
+
 /* =========================
    HISTORY NORMAL MODAL
 ========================= */
@@ -70,6 +71,7 @@
       const isActive = key === pageName;
 
       page.hidden = !isActive;
+
       page.setAttribute(
         "aria-hidden",
         String(!isActive)
@@ -112,8 +114,8 @@
     );
 
     /*
-     * If no page is selected, show Shop Page.
-     * Do not reset an already selected page.
+     * Preserve the currently selected page.
+     * Shop is the initial page.
      */
     showHistoryPage(currentHistoryPage);
 
@@ -188,6 +190,9 @@
       handleCloseAnimation
     );
 
+    /*
+     * Fallback in case transitionend does not fire.
+     */
     setTimeout(
       finishClose,
       700
@@ -301,7 +306,10 @@
     historyModalClose.addEventListener(
       "click",
       function () {
-        if (window.U9WindowManager) {
+        if (
+          window.U9WindowManager &&
+          typeof window.U9WindowManager.close === "function"
+        ) {
           window.U9WindowManager.close("history");
         } else {
           closeHistoryModal();
