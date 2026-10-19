@@ -5,7 +5,8 @@
 
    Responsibilities:
    - Message modal and animations
-   - Header and navigation
+   - Unified 55px header
+   - Header title centered / close button left
    - Message home layout
    - Home friends and groups
    - Home friend avatar and frame
@@ -99,10 +100,10 @@
 
 /* =================================================
    MESSAGE HEADER
-   Unified with History / Inbox / Gift:
-   - Height: 55px
+   Unified with History / Inbox / Gift
+   - Fixed height: 55px
    - Centered title
-   - Left close button
+   - Close button on the left
 ================================================= */
 
 #U9-message-normal-modal-title {
@@ -126,7 +127,6 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.18);
 
   background: #78ace9;
-
   color: #ffffff;
 
   font-size: 20px;
@@ -170,7 +170,8 @@
 
 /* =================================================
    HEADER CLOSE / BACK BUTTON
-   Same dimensions and position as other normal modals
+   Unified dimensions and position
+   No hover or active effects
 ================================================= */
 
 #U9-message-normal-modal-close {
@@ -187,8 +188,8 @@
   width: 36px;
   height: 36px;
 
-  padding: 0;
   margin: 0;
+  padding: 0;
 
   box-sizing: border-box;
 
@@ -208,17 +209,13 @@
 
   transform: translateY(-50%);
 
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s ease;
-
   -webkit-appearance: none;
   appearance: none;
 }
 
 #U9-message-normal-modal-close.message-home-close {
   color: #ffffff;
-  font-size: 30px;
+  font-size: 20px;
 }
 
 #U9-message-normal-modal-close.message-back-button {
@@ -238,14 +235,6 @@
 
   pointer-events: none;
   user-select: none;
-}
-
-#U9-message-normal-modal-close:hover {
-  background: rgba(255, 255, 255, 0.16);
-}
-
-#U9-message-normal-modal-close:active {
-  transform: translateY(-50%) scale(0.94);
 }
 
 #U9-message-normal-modal-close:focus-visible {
@@ -760,7 +749,6 @@
 
 /* =================================================
    HOME CHAT BUTTON
-   Uses /SSVG/normal/chat.svg from the HTML img.
 ================================================= */
 
 #Message-model-friends-list .Message-model-home-friend-row
@@ -1277,19 +1265,18 @@
 }
 
 #Message-model-groups-list .Message-model-home-group-description {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+
   margin-top: 3px;
 
   overflow: hidden;
+  overflow-wrap: anywhere;
 
   color: #707888;
   font-size: 12px;
   line-height: 1.45;
-
-  overflow-wrap: anywhere;
-
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
 }
 
 #Message-model-groups-list .Message-model-home-group-id {
@@ -1439,12 +1426,12 @@
 
 /* =================================================
    REDUCED MOTION
+   Single consolidated rule
 ================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   #U9-message-normal-modal,
   #U9-message-normal-modal-content,
-  #U9-message-normal-modal-close,
   #Message-model-navigation .Message-model-nav-button,
   #Message-model-navigation .Message-model-nav-icon,
   #Message-model-friends-list .Message-model-home-friend-row,
@@ -1459,5 +1446,34 @@
   #Message-model-groups-list .Message-model-home-group-chat:active,
   .Message-model-contact-chat:active {
     transform: none;
+  }
+}
+
+
+/* =================================================
+   MOBILE HEADER
+   Same size and position as History / Inbox / Gift
+================================================= */
+
+@media (max-width: 480px) {
+  #U9-message-normal-modal-title {
+    padding-right: 55px;
+    padding-left: 55px;
+    font-size: 18px;
+  }
+
+  #U9-message-normal-modal-title-text {
+    left: 55px;
+    right: 55px;
+  }
+
+  #U9-message-normal-modal-close {
+    left: 10px;
+    right: auto;
+  }
+
+  #U9-message-normal-modal-close img {
+    width: 22px;
+    height: 22px;
   }
 }
