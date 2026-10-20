@@ -345,8 +345,9 @@
   flex-direction: column;
   align-items: flex-start;
 
-  gap: 0;
+  gap: 4px;
 
+  width: fit-content;
   min-width: 0;
   max-width: min(78%, 520px);
 
@@ -354,7 +355,10 @@
 }
 
 .U9-chat-message-bubble {
-  max-width: 100%;
+  display: block;
+
+  width: fit-content;
+  max-width: min(78%, 520px);
   min-width: 0;
 
   padding: 10px 13px;
@@ -371,6 +375,10 @@
   word-break: break-word;
 
   box-sizing: border-box;
+}
+
+.U9-chat-message-content > .U9-chat-message-bubble {
+  max-width: 100%;
 }
 
 .U9-chat-bubble-own {
@@ -426,9 +434,10 @@
 }
 
 .U9-chat-message-sender {
+  display: block;
   max-width: 100%;
 
-  margin-bottom: 4px;
+  margin-bottom: 0;
 
   color: var(--chat-primary-dark);
 
@@ -440,6 +449,31 @@
   word-break: break-word;
 }
 
+
+/* =========================================================
+   MESSAGE MEDIA / SPECIAL CONTENT
+========================================================= */
+
+.U9-chat-message-deleted {
+  color: inherit;
+  font-style: italic;
+  opacity: 0.65;
+}
+
+.U9-chat-message-image {
+  display: block;
+  max-width: 100%;
+  max-height: 280px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.U9-chat-message-caption {
+  margin-top: 6px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
 
 /* =========================================================
    EMPTY STATE
@@ -500,10 +534,17 @@
 }
 
 .U9-chat-system-message-error {
-  color: var(--chat-danger);
+  align-self: stretch;
+  margin: 10px 0;
 
+  color: var(--chat-danger);
   background: var(--chat-danger-bg);
   border-color: #f6d5d8;
+}
+
+.U9-chat-system-message-info {
+  margin: auto;
+  text-align: center;
 }
 
 
