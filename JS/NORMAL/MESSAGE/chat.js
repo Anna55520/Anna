@@ -39,10 +39,6 @@
   const MAX_MESSAGE_LENGTH = 5000;
   const CHAT_INPUT_MAX_HEIGHT = 132;
 
-  const CHAT_BLUE = "#78ace9";
-  const CHAT_BLUE_LIGHT = "#dcecff";
-  const CHAT_GRAY = "#f0f2f5";
-
   /* =================================================
      DOM ELEMENTS
   ================================================= */
@@ -922,26 +918,6 @@
 
     notice.setAttribute("role", "status");
 
-    notice.style.boxSizing = "border-box";
-    notice.style.maxWidth = "100%";
-    notice.style.padding = "12px 14px";
-    notice.style.borderRadius = "10px";
-    notice.style.fontSize = "13px";
-    notice.style.lineHeight = "1.5";
-    notice.style.overflowWrap = "anywhere";
-
-    if (type === "error") {
-      notice.style.margin = "10px 0";
-      notice.style.background = "#fff1f1";
-      notice.style.color = "#b42318";
-    } else {
-      notice.style.margin = "auto";
-      notice.style.alignSelf = "center";
-      notice.style.textAlign = "center";
-      notice.style.background = "#f3f6fb";
-      notice.style.color = "#687080";
-    }
-
     return notice;
   }
 
@@ -1036,17 +1012,6 @@
           : "U9-chat-message-other"
       );
 
-    row.style.display = "flex";
-    row.style.width = "100%";
-    row.style.margin = "5px 0";
-
-    row.style.justifyContent =
-      isOwnMessage
-        ? "flex-end"
-        : "flex-start";
-
-    row.style.boxSizing = "border-box";
-
     const bubble = document.createElement("div");
 
     bubble.className =
@@ -1057,31 +1022,13 @@
           : "U9-chat-bubble-other"
       );
 
-    bubble.style.maxWidth =
-      currentChatUser?.type === "group"
-        ? "min(78%, 520px)"
-        : "min(78%, 520px)";
-
-    bubble.style.padding = "10px 13px";
-    bubble.style.borderRadius = "15px";
-    bubble.style.overflowWrap = "anywhere";
-    bubble.style.boxSizing = "border-box";
-
-    bubble.style.background =
-      isOwnMessage
-        ? CHAT_BLUE_LIGHT
-        : CHAT_GRAY;
-
-    bubble.style.color = "#222222";
-
     if (message.deleted_at) {
       const deleted = document.createElement("div");
 
       deleted.textContent =
         "This message was deleted.";
 
-      deleted.style.fontStyle = "italic";
-      deleted.style.opacity = "0.65";
+      deleted.className = "U9-chat-message-deleted";
 
       bubble.appendChild(deleted);
     } else if (
@@ -1099,11 +1046,7 @@
         image.alt = "Image message";
         image.loading = "lazy";
 
-        image.style.display = "block";
-        image.style.maxWidth = "100%";
-        image.style.maxHeight = "280px";
-        image.style.borderRadius = "8px";
-        image.style.objectFit = "contain";
+        image.className = "U9-chat-message-image";
 
         bubble.appendChild(image);
       } else {
@@ -1122,9 +1065,8 @@
         const caption =
           document.createElement("div");
 
+        caption.className = "U9-chat-message-caption";
         caption.textContent = message.content;
-        caption.style.marginTop = "6px";
-        caption.style.whiteSpace = "pre-wrap";
 
         bubble.appendChild(caption);
       }
@@ -1134,11 +1076,6 @@
       text.className = "U9-chat-message-text";
 
       text.textContent = message.content || "";
-
-      text.style.whiteSpace = "pre-wrap";
-      text.style.overflowWrap = "anywhere";
-      text.style.fontSize = "14px";
-      text.style.lineHeight = "1.5";
 
       bubble.appendChild(text);
     }
@@ -1150,12 +1087,6 @@
     time.textContent = formatMessageTime(
       message.created_at
     );
-
-    time.style.marginTop = "5px";
-    time.style.fontSize = "10px";
-    time.style.lineHeight = "1.3";
-    time.style.opacity = "0.62";
-    time.style.textAlign = "right";
 
     bubble.appendChild(time);
 
@@ -1169,14 +1100,6 @@
       content.className =
         "U9-chat-message-content";
 
-      content.style.display = "flex";
-      content.style.flexDirection = "column";
-      content.style.alignItems = "flex-start";
-      content.style.gap = "4px";
-      content.style.flex = "0 1 auto";
-      content.style.minWidth = "0";
-      content.style.maxWidth = "min(78%, 520px)";
-
       const sender =
         document.createElement("div");
 
@@ -1188,12 +1111,6 @@
         message.sender_name ||
         "Group member"
       );
-
-      sender.style.maxWidth = "100%";
-      sender.style.color = "#7e899a";
-      sender.style.fontSize = "11px";
-      sender.style.lineHeight = "1.3";
-      sender.style.overflowWrap = "anywhere";
 
       content.appendChild(sender);
       content.appendChild(bubble);
@@ -1263,13 +1180,6 @@
 
     list.className = "U9-chat-message-list";
 
-    list.style.display = "flex";
-    list.style.flexDirection = "column";
-    list.style.width = "100%";
-    list.style.minHeight = "100%";
-    list.style.boxSizing = "border-box";
-    list.style.padding = "12px 14px";
-
     if (nextMessages.length === 0) {
       const empty = document.createElement("div");
 
@@ -1277,13 +1187,6 @@
 
       empty.textContent =
         "No messages yet. Say hello!";
-
-      empty.style.margin = "auto";
-      empty.style.padding = "24px 12px";
-      empty.style.textAlign = "center";
-      empty.style.color = "#858b96";
-      empty.style.fontSize = "13px";
-      empty.style.lineHeight = "1.6";
 
       list.appendChild(empty);
     } else {
