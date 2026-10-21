@@ -13,7 +13,7 @@
    - Mobile virtual-keyboard viewport adjustment
    - Centered loading and empty-state messages
    - Customer-service read / close support
-   - Attachment button reserved for future add.js
+   - Send image messages in one-to-one chats
    - Stop refreshing after leaving Chat
 ================================================= */
 
@@ -83,13 +83,11 @@
     "Message-model-chat-send"
   );
 
-  /*
-   * Reserved for future add.js.
-   * This button intentionally has no click handler.
-   */
   const chatAttachmentButton = document.getElementById(
-    "U9-message-chat-attachment-button"
+    "U9-message-chat-add-button"
   );
+
+  let chatImageFileInput = null;
 
   /* =================================================
      STATE
@@ -1035,7 +1033,7 @@
       message.message_type === "image"
     ) {
       const mediaURL = normalizeImageURL(
-        message.media_path,
+        message.media_url || message.media_path,
         ""
       );
 
@@ -1919,6 +1917,163 @@
   }
 
   /* =================================================
+     ONE-TO-ONE IMAGE MESSAGES
+  ================================================= */
+
+  function bindImageAttachment() {
+    if (!chatAttachmentButton || chatImageFileInput) return;
+
+    chatImageFileInput = document.createElement("input");
+    chatImageFileInput.type = "file";
+    chatImageFileInput.accept = "image/*";
+    chatImageFileInput.hidden = true;
+    chatImageFileInput.setAttribute("aria-label", "Choose an image");
+    document.body.appendChild(chatImageFileInput);
+
+    chatAttachmentButton.addEventListener("click", function () {
+      if (isSendingMessage) return;
+
+      if (!currentChatUser || currentChatUser.type !== "friend") {
+        appendChatNotice(
+          "Image sending is currently available in one-to-one chats only.",
+          "error"
+        );
+        return;
+      }
+
+      chatImageFileInput.value = "";
+      chatImageFileInput.click();
+    });
+
+    chatImageFileInput.addEventListener("change", async function () {
+      const file = chatImageFileInput.files && chatImageFileInput.files[0];
+      if (!file) return;
+
+      if (!file.type || !file.type.startsWith("image/")) {
+        appendChatNotice("Please choose an image file.", "error");
+        return;
+      }
+
+      if (file.size > 12 * 1024 * 1024) {
+        appendChatNotice("The image must be smaller than 12 MB.", "error");
+        return;
+      }
+
+      try {
+        await sendImageMessage(file);
+      } catch (error) {
+        console.error("U9 Chat: Could not send image.", error);
+        appendChatNotice(getReadableError(error), "error");
+      }
+    });
+  }
+
+  async function compressImageToBase64(file) {
+    const sourceURL = await new Promise(function (resolve, reject) {
+      const reader = new FileReader();
+      reader.onload = function () { resolve(String(reader.result || "")); };
+      reader.onerror = function () { reject(new Error("Could not read the selected image.")); };
+      reader.readAsDataURL(file);
+    });
+
+    const image = await new Promise(function (resolve, reject) {
+      const img = new Image();
+      img.onload = function () { resolve(img); };
+      img.onerror = function () { reject(new Error("This image could not be opened.")); };
+      img.src = sourceURL;
+    });
+
+    const maxSide = 1600;
+    const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Image processing is not supported by this browser.");
+
+    // Flatten transparent pixels onto white before converting to JPEG.
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    let quality = 0.82;
+    let dataURL = canvas.toDataURL("image/jpeg", quality);
+    while (dataURL.length > 2_300_000 && quality > 0.48) {
+      quality -= 0.08;
+      dataURL = canvas.toDataURL("image/jpeg", quality);
+    }
+
+    const base64 = dataURL.split(",")[1] || "";
+    if (!base64 || base64.length > 2_300_000) {
+      throw new Error("The compressed image is too large. Please choose a smaller image.");
+    }
+
+    return base64;
+  }
+
+  async function sendImageMessage(file) {
+    if (!currentChatUser || currentChatUser.type !== "friend") return;
+
+    const targetId = String(currentChatUser.id);
+    const requestVersion = currentRequestVersion;
+    const targetType = String(currentChatUser.type || "friend");
+
+    isSendingMessage = true;
+    if (chatSendButton) chatSendButton.disabled = true;
+    if (chatAttachmentButton) chatAttachmentButton.disabled = true;
+
+    appendChatNotice("Preparing image…", "info");
+
+    try {
+      await resolveCurrentUserId();
+      const fileBase64 = await compressImageToBase64(file);
+
+      if (
+        !isChatActive ||
+        requestVersion !== currentRequestVersion ||
+        String(currentChatUser?.id) !== targetId ||
+        String(currentChatUser?.type || "friend") !== targetType
+      ) {
+        return;
+      }
+
+      appendChatNotice("Uploading image…", "info");
+      const uploadResult = await callMessageAPI("upload_image", {
+        receiver_id: targetId,
+        content_type: "image/jpeg",
+        file_base64: fileBase64
+      });
+
+      if (!uploadResult.media_path) {
+        throw new Error("The image uploaded, but no storage path was returned.");
+      }
+
+      await callMessageAPI("send_message", {
+        receiver_id: targetId,
+        message_type: "image",
+        content: "[image]",
+        media_path: uploadResult.media_path
+      });
+
+      if (
+        isChatActive &&
+        requestVersion === currentRequestVersion &&
+        String(currentChatUser?.id) === targetId &&
+        String(currentChatUser?.type || "friend") === targetType
+      ) {
+        removeTemporaryNotice();
+        lastRenderedSignature = null;
+        await loadChatMessages({ silent: true });
+      }
+    } finally {
+      isSendingMessage = false;
+      if (chatSendButton) chatSendButton.disabled = false;
+      if (chatAttachmentButton) chatAttachmentButton.disabled = false;
+    }
+  }
+
+  /* =================================================
      BIND UI EVENTS ONCE
   ================================================= */
 
@@ -1997,11 +2152,7 @@
       );
     }
 
-    /*
-     * Intentionally do not add a click listener to
-     * chatAttachmentButton. Future add.js can own it.
-     */
-    void chatAttachmentButton;
+    bindImageAttachment();
   }
 
   /* =================================================
