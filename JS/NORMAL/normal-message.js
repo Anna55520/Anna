@@ -80,6 +80,9 @@
   let homeFriendsRequest = null;
   let homeFriends = [];
   let homeFriendsById = new Map();
+  let unreadRefreshTimer = null;
+  let unreadRefreshInFlight = false;
+  let unreadBySender = {};
 
   let homeGroupsRequest = null;
   let homeGroups = [];
@@ -468,6 +471,67 @@
     }
 
     return result;
+  }
+
+  /* =================================================
+     UNREAD MESSAGE INDICATORS (ONE-TO-ONE FRIEND CHAT)
+  ================================================= */
+
+  async function refreshMessageUnreadIndicators() {
+    if (unreadRefreshInFlight) return;
+    unreadRefreshInFlight = true;
+
+    try {
+      const result = await callMessageAPI("get_unread_messages");
+      unreadBySender = result.unread_by_sender &&
+        typeof result.unread_by_sender === "object"
+        ? result.unread_by_sender
+        : {};
+
+      const messageButton = document.getElementById(
+        "U9-page-container-tool-message"
+      );
+      if (messageButton) {
+        messageButton.classList.toggle(
+          "has-unread",
+          Boolean(result.has_unread)
+        );
+        messageButton.setAttribute(
+          "aria-label",
+          result.has_unread ? "Messages, unread messages" : "Messages"
+        );
+      }
+
+      document.querySelectorAll(
+        "#Message-model-friends-list [data-home-chat-friend-id]"
+      ).forEach(function (button) {
+        const friendId = String(button.dataset.homeChatFriendId || "");
+        const hasUnread = Number(unreadBySender[friendId] || 0) > 0;
+        button.classList.toggle("has-unread", hasUnread);
+        button.setAttribute(
+          "aria-label",
+          hasUnread ? "Open chat, unread messages" : "Open chat"
+        );
+        button.title = hasUnread ? "Unread messages" : "Chat";
+      });
+    } catch (error) {
+      // Keep the last known state when the API is temporarily unavailable.
+      console.warn("U9 Message: Could not refresh unread indicators.", error);
+    } finally {
+      unreadRefreshInFlight = false;
+    }
+  }
+
+  function startUnreadMessagePolling() {
+    if (unreadRefreshTimer !== null) {
+      window.clearInterval(unreadRefreshTimer);
+    }
+
+    refreshMessageUnreadIndicators();
+    unreadRefreshTimer = window.setInterval(
+      refreshMessageUnreadIndicators,
+      5000
+    );
   }
 
   /* =================================================
@@ -914,6 +978,7 @@
         );
 
         renderHomeFriends(friends);
+        refreshMessageUnreadIndicators();
 
         console.log(
           "U9 Message Home: Friends loaded.",
@@ -2259,6 +2324,8 @@
     return loadHomeFriends();
   };
 
+  window.refreshMessageUnreadIndicators = refreshMessageUnreadIndicators;
+
   window.refreshMessageHomeGroups = function () {
     return loadHomeGroups();
   };
@@ -2287,6 +2354,11 @@
     bindHomeFriendsEvents();
     bindGroupChatEvents();
     initializeMessageNavigation();
+    startUnreadMessagePolling();
+
+    document.addEventListener("visibilitychange", function () {
+      if (!document.hidden) refreshMessageUnreadIndicators();
+    });
     registerMessageWindowManager();
 
     console.log(
