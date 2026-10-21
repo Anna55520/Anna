@@ -354,6 +354,24 @@ button:not(#U9-page-container-tool-search-button):hover {
 }
 
 
+#U9-page-container-tool-message {
+  position: relative;
+}
+
+#U9-page-container-tool-message.has-unread::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f04452;
+  border: 2px solid #fff;
+  box-sizing: content-box;
+  pointer-events: none;
+}
+
 #U9-page-container-tool-message img {
 
   display: block;
