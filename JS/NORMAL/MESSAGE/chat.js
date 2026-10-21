@@ -1352,6 +1352,35 @@
 
         renderMessages(messages);
 
+        // Only mark one-to-one friend messages as read after this
+        // conversation has loaded and rendered successfully. Image and
+        // text messages use the same read_at state.
+        const hasUnreadFriendMessages =
+          targetType === "friend" &&
+          messages.some(function (message) {
+            return (
+              String(message.sender_id) === targetId &&
+              !message.read_at &&
+              !message.deleted_at
+            );
+          });
+
+        if (hasUnreadFriendMessages) {
+          try {
+            await callMessageAPI("mark_messages_read", {
+              other_user_id: targetId
+            });
+            if (typeof window.refreshMessageUnreadIndicators === "function") {
+              await window.refreshMessageUnreadIndicators();
+            }
+          } catch (readError) {
+            console.warn(
+              "U9 Chat: Could not update friend-message read status.",
+              readError
+            );
+          }
+        }
+
         if (
           targetType === "customer_service"
         ) {
