@@ -115,7 +115,7 @@
   /* =================================================
      IMAGE URL
   ================================================= */
-
+  
   function normalizeImageURL(value, fallback) {
     if (typeof value !== "string") {
       return fallback;
@@ -125,14 +125,38 @@
 
     if (!url) return fallback;
 
+    // Route signed Supabase Storage URLs through Vercel.
+    try {
+      const parsed = new URL(url);
+
+      if (
+        parsed.protocol === "https:" &&
+        parsed.hostname ===
+          "vjlpowhxmflpkjlukkfy.supabase.co" &&
+        parsed.pathname.startsWith(
+          "/storage/v1/object/sign/"
+        )
+      ) {
+        const storagePath = parsed.pathname.slice(
+          "/storage/v1/object/sign/".length
+        );
+
+        // Preserve the signed URL query string, including token.
+        return (
+          "/chat-storage/" +
+          storagePath +
+          parsed.search
+        );
+      }
+    } catch (error) {
+      // Continue with normal URL validation.
+    }
+
     if (/^https?:\/\//i.test(url)) {
       return url;
     }
 
-    if (
-      url.startsWith("/") &&
-      !url.startsWith("//")
-    ) {
+    if (url.startsWith("/") && !url.startsWith("//")) {
       return url;
     }
 
@@ -146,6 +170,7 @@
 
     return fallback;
   }
+
 
   /* =================================================
      SESSION TOKEN
