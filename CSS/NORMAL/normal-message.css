@@ -828,6 +828,26 @@
 }
 
 #Message-model-friends-list .Message-model-home-friend-row
+.Message-model-contact-chat {
+  position: relative;
+}
+
+#Message-model-friends-list .Message-model-home-friend-row
+.Message-model-contact-chat.has-unread::after {
+  content: "";
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f04452;
+  border: 2px solid #fff;
+  box-sizing: content-box;
+  pointer-events: none;
+}
+
+#Message-model-friends-list .Message-model-home-friend-row
 .Message-model-contact-chat .Message-model-contact-chat-icon {
   display: block !important;
 
