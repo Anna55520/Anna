@@ -95,6 +95,10 @@
     {
       "source": "/api/u9-order-history",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/u9-order-history"
+    },
+    {
+      "source": "/chat-storage/:path*",
+      "destination": "https://vjlpowhxmflpkjlukkfy.supabase.co/storage/v1/object/sign/:path*"
     }
   ]
 }
