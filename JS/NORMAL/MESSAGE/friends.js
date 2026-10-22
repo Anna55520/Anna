@@ -6,8 +6,8 @@
    1. Load friends through the Vercel message-api proxy
    2. Keep existing Bearer/cookie session authentication
    3. No duplicate Friends heading
-   4. Four SVG action icons
-   5. Only Chat opens the chat page
+   4. Two actions only: Delete and Chat
+   5. Chat opens the existing chat page; Delete uses a separate Edge Function
    6. Scrollable friends list (layout controlled by CSS)
    7. Support custom and free avatars
    8. Display selected avatar frames
@@ -24,13 +24,11 @@
   /* ================= CONFIGURATION ================= */
 
   const MESSAGE_API_URL = "/api/message-api";
+  const DELETE_FRIEND_API_URL = "/api/delete-friend";
   const FREE_AVATAR_API_URL = "/api/avatar-free";
   const FRIENDS_ROOT_ID = "Message-model-friends-root";
   const ACTION_ICON_URLS = {
-    chat: "/SSVG/normal/chat.svg",
-    observe: "/SSVG/normal/test1.svg",
-    mute: "/SSVG/normal/test2.svg",
-    delete: "/SSVG/normal/test3.svg"
+    chat: "/SSVG/normal/chat.svg"
   };
   const DEFAULT_AVATAR = "/SSVG/avatar/profile.svg";
   const DEFAULT_AVATAR_FRAME = "/SSVG/avatar/ordinary.svg";
@@ -281,6 +279,41 @@
     return result;
   }
 
+  /* ================= SEPARATE DELETE-FRIEND EDGE FUNCTION ================= */
+
+  async function deleteFriend(friendId) {
+    const headers = {
+      "Content-Type": "application/json",
+      Accept: "application/json"
+    };
+    const token = getSessionToken();
+    if (token) headers.Authorization = "Bearer " + token;
+
+    const response = await fetch(DELETE_FRIEND_API_URL, {
+      method: "POST",
+      headers,
+      credentials: "include",
+      cache: "no-store",
+      body: JSON.stringify({ friend_id: friendId })
+    });
+
+    let result;
+    try {
+      result = await response.json();
+    } catch (_) {
+      throw new Error("Invalid response from the delete-friend service.");
+    }
+
+    if (!response.ok || result?.success !== true) {
+      const error = new Error(result?.error || result?.message ||
+        `Could not delete friend (${response.status}).`);
+      error.status = response.status;
+      throw error;
+    }
+
+    return result;
+  }
+
   /* ================= STATUS / EMPTY STATE ================= */
 
   function renderMessage(message, type = "info") {
@@ -320,14 +353,15 @@
   /* ================= ACTION BUTTON ================= */
 
   function renderActionButton(friend, action, label, enabled) {
-    const iconURL = ACTION_ICON_URLS[action] || ACTION_ICON_URLS.chat;
+    const iconURL = ACTION_ICON_URLS[action];
     return `
       <button class="U9-friend-action U9-friend-action-${escapeHTML(action)}"
         type="button" data-friend-action="${escapeHTML(action)}"
         data-friend-id="${escapeHTML(friend.id)}"
         aria-label="${escapeHTML(label)}" title="${escapeHTML(label)}"
         ${enabled ? "" : "disabled"}>
-        <img src="${escapeHTML(iconURL)}" alt="" aria-hidden="true" draggable="false">
+        ${iconURL ? `<img src="${escapeHTML(iconURL)}" alt="" aria-hidden="true" draggable="false">` : ""}
+        <span>${escapeHTML(label)}</span>
       </button>`;
   }
 
@@ -377,10 +411,8 @@
                   <div class="U9-friend-account">${account ? "@" + escapeHTML(account) : "Friend"}</div>
                 </div>
                 <div class="U9-friend-actions">
-                  ${renderActionButton(friend, "observe", "Observe", true)}
-                  ${renderActionButton(friend, "mute", "Mute", true)}
+                  ${renderActionButton(friend, "observe", "Delete", true)}
                   ${renderActionButton(friend, "chat", "Chat", true)}
-                  ${renderActionButton(friend, "delete", "Delete friend", true)}
                 </div>
               </article>`;
           }).join("")}
@@ -396,6 +428,32 @@
   function bindActionButtons(friends) {
     const root = getRoot();
     if (!root) return;
+
+    root.querySelectorAll('[data-friend-action="observe"]').forEach(function (button) {
+      button.addEventListener("click", async function () {
+        const friend = friends.find(item => String(item.id) === String(button.dataset.friendId));
+        if (!friend || button.disabled) return;
+
+        const displayName = friend.username || friend.account || "this friend";
+        const confirmed = window.confirm(
+          `Remove ${displayName} from your friends?\n\nThis will end the friendship for both of you. Your existing chat history will not be deleted.`
+        );
+        if (!confirmed) return;
+
+        button.disabled = true;
+        try {
+          await deleteFriend(friend.id);
+          window.dispatchEvent(new CustomEvent("u9:friendship-updated", {
+            detail: { friend_id: friend.id, deleted: true }
+          }));
+          await loadFriends();
+        } catch (error) {
+          console.error("U9 Friends: Could not delete friend.", error);
+          window.alert(error?.message || "Could not delete this friend. Please try again.");
+          button.disabled = false;
+        }
+      });
+    });
 
     root.querySelectorAll('[data-friend-action="chat"]').forEach(function (button) {
       button.addEventListener("click", function () {
