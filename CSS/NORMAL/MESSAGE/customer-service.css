@@ -515,3 +515,24 @@
     scroll-behavior: auto !important;
   }
 }
+
+
+/* Unread customer-service conversations use the same red-dot language as chat. */
+#Message-model-customer-service-root .u9-cs-row-button {
+  position: relative;
+}
+
+#Message-model-customer-service-root .u9-cs-row-button.has-unread::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #f04452;
+  border: 2px solid #fff;
+  box-sizing: content-box;
+  pointer-events: none;
+  z-index: 2;
+}
