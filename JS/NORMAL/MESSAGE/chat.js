@@ -985,7 +985,8 @@
   ) {
     if (!chatMessages) return;
 
-    const existing = chatMessages.querySelector(
+    const noticeHost = chatPage || chatMessages;
+    const existing = noticeHost.querySelector(
       ".U9-chat-temporary-notice"
     );
 
@@ -1002,13 +1003,16 @@
       "U9-chat-temporary-notice"
     );
 
-    chatMessages.appendChild(notice);
+    // Keep temporary upload/status notices outside the scrollable messages
+    // viewport so they sit above the composer instead of being clipped behind it.
+    noticeHost.appendChild(notice);
   }
 
   function removeTemporaryNotice() {
-    if (!chatMessages) return;
+    const noticeHost = chatPage || chatMessages;
+    if (!noticeHost) return;
 
-    chatMessages
+    noticeHost
       .querySelectorAll(
         ".U9-chat-temporary-notice"
       )
@@ -1504,6 +1508,18 @@
           }
         }
 
+        // An async mark-read call above can finish after the user has closed
+        // or switched conversations. Stop here before touching the cleared user.
+        if (
+          !isChatActive ||
+          requestVersion !== currentRequestVersion ||
+          !currentChatUser ||
+          String(currentChatUser.id) !== targetId ||
+          String(currentChatUser.type || "friend") !== targetType
+        ) {
+          return messages;
+        }
+
         if (
           targetType === "customer_service"
         ) {
@@ -1559,8 +1575,10 @@
             }
           }
         } else if (chatStatus) {
+          // The chat may have been closed while an async read-status request
+          // was in flight. Never dereference the cleared currentChatUser.
           chatStatus.textContent =
-            currentChatUser.status ||
+            currentChatUser?.status ||
             (
               targetType === "group"
                 ? "Group"
