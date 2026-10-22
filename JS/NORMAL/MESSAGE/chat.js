@@ -1375,6 +1375,25 @@
 
         renderMessages(messages);
 
+        // A group is marked read only after its latest messages were fetched
+        // successfully and rendered into the currently open chat.
+        if (targetType === "group") {
+          try {
+            const lastSeenGroupMessage = messages.length ? messages[messages.length - 1] : null;
+            if (lastSeenGroupMessage && lastSeenGroupMessage.id) {
+              await callGroupAPI("mark_group_messages_read", {
+                group_id: String(currentChatUser.group_id || targetId),
+                last_seen_message_id: String(lastSeenGroupMessage.id)
+              });
+            }
+            if (typeof window.refreshMessageUnreadIndicators === "function") {
+              await window.refreshMessageUnreadIndicators();
+            }
+          } catch (readError) {
+            console.warn("U9 Chat: Could not update group-message read status.", readError);
+          }
+        }
+
         // Only mark one-to-one friend messages as read after this
         // conversation has loaded and rendered successfully. Image and
         // text messages use the same read_at state.
@@ -1958,11 +1977,8 @@
     chatAttachmentButton.addEventListener("click", function () {
       if (isSendingMessage) return;
 
-      if (!currentChatUser || currentChatUser.type !== "friend") {
-        appendChatNotice(
-          "Image sending is currently available in one-to-one chats only.",
-          "error"
-        );
+      if (!currentChatUser || !["friend", "group"].includes(String(currentChatUser.type || "friend"))) {
+        appendChatNotice("Image sending is not available in this conversation.", "error");
         return;
       }
 
@@ -2038,7 +2054,7 @@
   }
 
   async function sendImageMessage(file) {
-    if (!currentChatUser || currentChatUser.type !== "friend") return;
+    if (!currentChatUser || !["friend", "group"].includes(String(currentChatUser.type || "friend"))) return;
 
     const targetId = String(currentChatUser.id);
     const requestVersion = currentRequestVersion;
@@ -2064,22 +2080,38 @@
       }
 
       appendChatNotice("Uploading image…", "info");
-      const uploadResult = await callMessageAPI("upload_image", {
-        receiver_id: targetId,
-        content_type: "image/jpeg",
-        file_base64: fileBase64
-      });
-
-      if (!uploadResult.media_path) {
-        throw new Error("The image uploaded, but no storage path was returned.");
+      let uploadResult;
+      if (targetType === "group") {
+        const groupId = String(currentChatUser.group_id || targetId);
+        uploadResult = await callGroupAPI("upload_group_image", {
+          group_id: groupId,
+          content_type: "image/jpeg",
+          file_base64: fileBase64
+        });
+        if (!uploadResult.media_path) {
+          throw new Error("The image uploaded, but no storage path was returned.");
+        }
+        await callGroupAPI("send_group_message", {
+          group_id: groupId,
+          message_type: "image",
+          media_path: uploadResult.media_path
+        });
+      } else {
+        uploadResult = await callMessageAPI("upload_image", {
+          receiver_id: targetId,
+          content_type: "image/jpeg",
+          file_base64: fileBase64
+        });
+        if (!uploadResult.media_path) {
+          throw new Error("The image uploaded, but no storage path was returned.");
+        }
+        await callMessageAPI("send_message", {
+          receiver_id: targetId,
+          message_type: "image",
+          content: "[image]",
+          media_path: uploadResult.media_path
+        });
       }
-
-      await callMessageAPI("send_message", {
-        receiver_id: targetId,
-        message_type: "image",
-        content: "[image]",
-        media_path: uploadResult.media_path
-      });
 
       if (
         isChatActive &&
