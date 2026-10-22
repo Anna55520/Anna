@@ -300,7 +300,7 @@
           <div class="u9-group-panel-heading">
             <div>
               <h3 class="u9-group-panel-title" id="u9-group-review-title">Requests to Review</h3>
-              <p class="u9-group-panel-description">Pending join requests for groups you own or administer.</p>
+              <p class="u9-group-panel-description">Pending join requests for groups you own.</p>
             </div>
             <span class="u9-group-count" id="u9-group-review-count">0</span>
           </div>
@@ -597,13 +597,13 @@
       myGroups = Array.isArray(result.groups) ? result.groups : [];
       myRequests = Array.isArray(result.requests) ? result.requests : [];
 
-      // Fetch review queues only for groups this user actively moderates.
-      const moderatorGroups = myGroups.filter((item) => {
+      // Only group owners can review join requests.
+      const ownerGroups = myGroups.filter((item) => {
         const membership = item.membership || {};
-        return membership.status === "active" && ["owner", "admin"].includes(membership.role);
+        return membership.status === "active" && membership.role === "owner";
       });
       const reviewResults = await Promise.allSettled(
-        moderatorGroups.map(async (item) => {
+        ownerGroups.map(async (item) => {
           const group = item.group || item;
           const response = await callGroupAPI("list_group_join_requests", { group_id: group.id });
           return Array.isArray(response.requests) ? response.requests : [];
