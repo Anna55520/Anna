@@ -112,6 +112,28 @@
 
   let activeMessageLoadPromise = null;
 
+  // In-memory only: survives navigation within this page, resets on reload.
+  const conversationMessageCache = new Map();
+
+  function getConversationCacheKey(type, id) {
+    const accountId = currentUserId ? String(currentUserId) : "anonymous";
+    return accountId + ":" + String(type || "friend") + ":" + String(id || "");
+  }
+
+  function getCachedConversationMessages(type, id) {
+    const key = getConversationCacheKey(type, id);
+    return conversationMessageCache.has(key)
+      ? conversationMessageCache.get(key)
+      : null;
+  }
+
+  function cacheConversationMessages(type, id, messages) {
+    if (!Array.isArray(messages)) return;
+    const key = getConversationCacheKey(type, id);
+    // Keep a shallow copy so callers cannot accidentally mutate the cache array.
+    conversationMessageCache.set(key, messages.slice());
+  }
+
   /* =================================================
      IMAGE URL
   ================================================= */
@@ -1063,15 +1085,71 @@
       );
 
       if (mediaURL) {
-        const image = document.createElement("img");
+        const imageWrap = document.createElement("div");
+        imageWrap.className = "U9-chat-image-wrap is-loading";
 
-        image.src = mediaURL;
+        const loader = document.createElement("img");
+        loader.className = "U9-chat-image-loader";
+        loader.src = "/SSVG/logo/loading.svg";
+        loader.alt = "Loading image";
+        loader.setAttribute("aria-hidden", "true");
+
+        const image = document.createElement("img");
+        image.className = "U9-chat-message-image";
         image.alt = "Image message";
         image.loading = "lazy";
+        image.decoding = "async";
 
-        image.className = "U9-chat-message-image";
+        const errorState = document.createElement("div");
+        errorState.className = "U9-chat-image-error";
+        errorState.textContent = "Image could not be loaded.";
+        errorState.hidden = true;
 
-        bubble.appendChild(image);
+        const retryButton = document.createElement("button");
+        retryButton.type = "button";
+        retryButton.className = "U9-chat-image-retry";
+        retryButton.textContent = "Retry";
+        retryButton.hidden = true;
+
+        function showImageError() {
+          imageWrap.classList.remove("is-loading", "is-loaded");
+          imageWrap.classList.add("has-error");
+          loader.hidden = true;
+          image.hidden = true;
+          errorState.hidden = false;
+          retryButton.hidden = false;
+        }
+
+        function showLoadedImage() {
+          imageWrap.classList.remove("is-loading", "has-error");
+          imageWrap.classList.add("is-loaded");
+          loader.hidden = true;
+          image.hidden = false;
+          errorState.hidden = true;
+          retryButton.hidden = true;
+        }
+
+        image.addEventListener("load", showLoadedImage);
+        image.addEventListener("error", showImageError);
+        retryButton.addEventListener("click", function () {
+          imageWrap.classList.remove("has-error", "is-loaded");
+          imageWrap.classList.add("is-loading");
+          loader.hidden = false;
+          errorState.hidden = true;
+          retryButton.hidden = true;
+          image.hidden = true;
+          // Reassigning the same URL lets the browser retry its request.
+          image.src = mediaURL;
+        });
+
+        imageWrap.append(loader, image, errorState, retryButton);
+        bubble.appendChild(imageWrap);
+        image.src = mediaURL;
+
+        // Cached images can complete before the load handler is observed.
+        if (image.complete && image.naturalWidth > 0) {
+          showLoadedImage();
+        }
       } else {
         const imageLabel =
           document.createElement("div");
@@ -1373,6 +1451,7 @@
           ? result.messages
           : [];
 
+        cacheConversationMessages(targetType, targetId, messages);
         renderMessages(messages);
 
         // A group is marked read only after its latest messages were fetched
@@ -1499,14 +1578,9 @@
         const errorMessage =
           getReadableError(error);
 
-        if (
-          silent &&
-          lastRenderedSignature !== null
-        ) {
-          /*
-           * Replace the previous temporary notice instead
-           * of appending one error every four seconds.
-           */
+        if (lastRenderedSignature !== null) {
+          // Keep cached/previous messages visible if a background refresh fails.
+          // appendChatNotice replaces the prior temporary notice to avoid duplicates.
           appendChatNotice(
             errorMessage,
             "error"
@@ -2338,10 +2412,20 @@
     resizeChatInput();
 
     if (changedConversation) {
-      showChatNotice(
-        "Loading conversation...",
-        "info"
+      const cachedMessages = getCachedConversationMessages(
+        nextChatType,
+        nextUserId
       );
+
+      if (cachedMessages !== null) {
+        // Render cached messages immediately; loadChatMessages below refreshes them.
+        renderMessages(cachedMessages, true);
+      } else {
+        showChatNotice(
+          "Loading conversation...",
+          "info"
+        );
+      }
     }
 
     requestAnimationFrame(function () {
