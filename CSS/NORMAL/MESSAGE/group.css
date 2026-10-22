@@ -1,5 +1,5 @@
 /* =========================================================
-   U9 MESSAGE â€” GROUP PAGE
+   U9 MESSAGE Ã¢â‚¬â€ GROUP PAGE
    File: CSS/NORMAL/MESSAGE/group.css
    Clean white / slate / indigo design. No green background.
    Scoped to #Message-model-group-root only.
@@ -412,6 +412,15 @@
   color: var(--u9-group-danger);
 }
 #Message-model-group-root .u9-group-button-danger:hover { background: #fff4f5; }
+#Message-model-group-root .u9-group-card-actions [data-action="delete-group"],
+#Message-model-group-root .u9-group-card-actions [data-action="leave-group"] {
+  min-height: 36px;
+}
+#Message-model-group-root .u9-group-card-actions [data-action="delete-group"]:disabled,
+#Message-model-group-root .u9-group-card-actions [data-action="leave-group"]:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
 #Message-model-group-root .u9-group-button-joined {
   border-color: #d7dcf2;
   background: #f0f2ff;
