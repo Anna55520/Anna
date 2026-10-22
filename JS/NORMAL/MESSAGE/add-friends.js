@@ -118,7 +118,7 @@
             class="u9-af-label"
             for="u9-af-search-input"
           >
-            Username or Account
+            Account
           </label>
 
           <div class="u9-af-search-row">
@@ -130,8 +130,8 @@
               name="search"
               maxlength="100"
               autocomplete="off"
-              placeholder="Enter a username or account"
-              aria-label="Search username or account"
+              placeholder="Enter the full account (e.g. A1B2C3)"
+              aria-label="Search by account only"
               required
             >
 
@@ -198,7 +198,7 @@
           class="u9-af-results-status"
           aria-live="polite"
         >
-          Search by username or account to find someone.
+          Search by exact account to find someone.
         </p>
 
         <div
@@ -1056,7 +1056,7 @@
     ) {
 
       showResultsStatus(
-        "No users found. Check the username or account and try again."
+        "No user found for that account. Check the full account and try again."
       );
 
       return;
@@ -1103,10 +1103,10 @@
       searchInput.value.trim();
 
 
-    if (q.length < 2) {
+    if (!/^[A-Z][A-Z0-9]{5}$/i.test(q)) {
 
       showFeedback(
-        "Enter at least 2 characters to search.",
+        "Enter the complete 6-character account (starts with a letter).",
         "error"
       );
 
@@ -2326,7 +2326,7 @@
   ======================================================= */
 
   showResultsStatus(
-    "Search by username or account to find someone."
+    "Search by exact account to find someone."
   );
 
 
@@ -2345,7 +2345,12 @@
    * module loads; navigating back to Add Friend refreshes the
    * relationship lists without rebuilding the form or losing state.
    */
-  window.initializeAddFriendsPage = function initializeAddFriendsPage() {
+  window.initializeAddFriendsPage = async function initializeAddFriendsPage() {
+    try {
+      await callMessageAPI("mark_friend_requests_read");
+    } catch (error) {
+      console.warn("U9 Add Friend: could not mark requests as read.", error);
+    }
     return loadRelationships();
   };
 
