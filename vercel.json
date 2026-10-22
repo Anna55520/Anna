@@ -37,6 +37,10 @@
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/message-api"
     },
     {
+      "source": "/api/delete-friend",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/delete-friend"
+    },
+    {
       "source": "/api/group-api",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/group-api"
     },
