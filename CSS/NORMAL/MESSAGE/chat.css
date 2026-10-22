@@ -603,6 +603,19 @@
   text-align: center;
 }
 
+/* Temporary upload/error notices are layered above the composer rather than
+   appended to the scrollable message list where they can sit behind the input. */
+#Message-model-chat-page .U9-chat-temporary-notice {
+  position: absolute;
+  z-index: 30;
+  left: 12px;
+  right: 12px;
+  bottom: 70px;
+  max-width: calc(100% - 24px);
+  margin: 0 auto;
+  box-shadow: 0 4px 18px rgb(25 42 70 / 14%);
+}
+
 
 /* =========================================================
    CHAT COMPOSER
@@ -801,6 +814,13 @@
 ========================================================= */
 
 @media (max-width: 480px) {
+  #Message-model-chat-page .U9-chat-temporary-notice {
+    left: 8px;
+    right: 8px;
+    bottom: 62px;
+    max-width: calc(100% - 16px);
+  }
+
   #Message-model-chat-header {
     gap: 10px;
 
