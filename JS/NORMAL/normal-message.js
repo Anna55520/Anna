@@ -79,6 +79,7 @@
 
   let homeFriendsRequest = null;
   let homeFriends = [];
+  let homeFriendsLoaded = false;
   let homeFriendsById = new Map();
   let unreadRefreshTimer = null;
   let unreadRefreshInFlight = false;
@@ -87,6 +88,7 @@
 
   let homeGroupsRequest = null;
   let homeGroups = [];
+  let homeGroupsLoaded = false;
 
   /* =================================================
      DOM HELPERS
@@ -959,27 +961,39 @@
      HOME FRIENDS: LOAD FROM SERVER
   ================================================= */
 
-  function loadHomeFriends() {
+  function loadHomeFriends(options = {}) {
     const container = getHomeFriendsList();
 
     if (!container) {
       return Promise.resolve([]);
     }
 
+    const force = options.force === true;
+
     /*
-     * Avoid duplicate requests while the same request
-     * is still running.
+     * Keep the successfully loaded list for this page session.
+     * Opening/closing the Message home must not trigger another
+     * list_friends request unless an explicit refresh is requested.
      */
+    if (homeFriendsLoaded && !force) {
+      refreshMessageUnreadIndicators();
+      return Promise.resolve(homeFriends);
+    }
+
+    /* Avoid duplicate requests while the same request is running. */
     if (homeFriendsRequest) {
       return homeFriendsRequest;
     }
 
     bindHomeFriendsEvents();
 
-    renderHomeFriendsMessage(
-      "Loading friends...",
-      "loading"
-    );
+    // Do not blank an already rendered list during a manual/background refresh.
+    if (!homeFriendsLoaded) {
+      renderHomeFriendsMessage(
+        "Loading friends...",
+        "loading"
+      );
+    }
 
     homeFriendsRequest = (async function () {
       try {
@@ -992,6 +1006,7 @@
         );
 
         renderHomeFriends(friends);
+        homeFriendsLoaded = true;
         refreshMessageUnreadIndicators();
 
         console.log(
@@ -1008,7 +1023,9 @@
           error
         );
 
-        if (
+        if (homeFriendsLoaded) {
+          console.warn("U9 Message Home: Refresh failed; keeping cached friends.");
+        } else if (
           error?.status === 401 ||
           /authentication required|invalid session|session expired|unauthorized/i.test(
             String(error?.message || "")
@@ -1277,18 +1294,29 @@
      HOME GROUPS: LOAD FROM group-api
   ================================================= */
 
-  function loadHomeGroups() {
+  function loadHomeGroups(options = {}) {
     const container = getHomeGroupsList();
 
     if (!container) {
       return Promise.resolve([]);
     }
 
+    const force = options.force === true;
+
+    // Reuse the group list for the lifetime of this page session.
+    if (homeGroupsLoaded && !force) {
+      refreshMessageUnreadIndicators();
+      return Promise.resolve(homeGroups);
+    }
+
     if (homeGroupsRequest) {
       return homeGroupsRequest;
     }
 
-    renderHomeGroupsMessage("Loading groups…", "loading");
+    // Preserve the current list while a forced refresh runs in the background.
+    if (!homeGroupsLoaded) {
+      renderHomeGroupsMessage("Loading groups…", "loading");
+    }
 
     if (container.dataset.homeGroupsClickBound !== "true") {
       container.dataset.homeGroupsClickBound = "true";
@@ -1310,6 +1338,7 @@
         const groups = normalizeHomeGroups(result.groups);
 
         renderHomeGroups(groups);
+        homeGroupsLoaded = true;
         // Apply current per-group unread dots immediately after the list is rendered.
         refreshMessageUnreadIndicators();
 
@@ -1325,7 +1354,9 @@
           error
         );
 
-        if (
+        if (homeGroupsLoaded) {
+          console.warn("U9 Message Home: Refresh failed; keeping cached groups.");
+        } else if (
           error?.status === 401 ||
           /authentication required|invalid session|session expired|unauthorized/i.test(
             String(error?.message || "")
@@ -2338,13 +2369,13 @@
   window.closeMessageChat = closeMessageChat;
 
   window.refreshMessageHomeFriends = function () {
-    return loadHomeFriends();
+    return loadHomeFriends({ force: true });
   };
 
   window.refreshMessageUnreadIndicators = refreshMessageUnreadIndicators;
 
   window.refreshMessageHomeGroups = function () {
-    return loadHomeGroups();
+    return loadHomeGroups({ force: true });
   };
 
   window.getCurrentMessageChatUser = function () {
