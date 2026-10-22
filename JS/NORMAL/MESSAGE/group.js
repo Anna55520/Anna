@@ -11,6 +11,8 @@
    - list_my_groups
    - request_join_group
    - cancel_join_request
+   - delete_group (owner only)
+   - leave_group (active non-owner members)
 
    Optional group owner/admin actions are supported by the API:
    - list_group_join_requests
@@ -410,6 +412,9 @@
             <p class="u9-group-id-line"><span>Group ID</span><code>${escapeHTML(group.id)}</code></p>
             <div class="u9-group-card-actions">
               <button type="button" class="u9-group-button u9-group-button-primary" data-action="open-group" data-group-id="${escapeHTML(group.id)}">Open Group Chat</button>
+              ${membership.role === "owner"
+                ? `<button type="button" class="u9-group-button u9-group-button-danger" data-action="delete-group" data-group-id="${escapeHTML(group.id)}">Delete Group</button>`
+                : `<button type="button" class="u9-group-button u9-group-button-outline" data-action="leave-group" data-group-id="${escapeHTML(group.id)}">Leave Group</button>`}
             </div>
           </div>
         </article>
@@ -730,6 +735,38 @@
     }));
   }
 
+  async function manageGroupMembership(action, groupId, button) {
+    const groupIdValue = String(groupId || "").trim();
+    if (!UUID_PATTERN.test(groupIdValue)) {
+      throw new Error("A valid Group ID is required.");
+    }
+
+    const isDelete = action === "delete_group";
+    const confirmation = isDelete
+      ? "Delete this group permanently? All group members and all group chat messages will be deleted. This cannot be undone."
+      : "Leave this group? Your previous messages and the group's chat history will be kept.";
+
+    if (!window.confirm(confirmation)) return;
+
+    setNotice();
+    setBusy(button, true, isDelete ? "Deleting…" : "Leaving…");
+    try {
+      await callGroupAPI(action, { group_id: groupIdValue });
+      if (isDelete) {
+        myGroups = myGroups.filter((item) => String((item.group || item).id) !== groupIdValue);
+        setNotice("Group deleted successfully.", "success");
+      } else {
+        myGroups = myGroups.filter((item) => String((item.group || item).id) !== groupIdValue);
+        setNotice("You have left the group. Chat history has been kept.", "success");
+      }
+      renderJoinedGroups();
+      emitMembershipChanged();
+      await loadMyGroups({ silent: true });
+    } finally {
+      if (button?.isConnected) setBusy(button, false);
+    }
+  }
+
   function bindEvents() {
     const root = getRoot();
     if (!root || root.dataset.u9GroupBound === "true") return;
@@ -794,6 +831,10 @@
           await cancelJoinRequest({ requestId: button.dataset.requestId, groupId }, button);
         } else if (action === "open-group") {
           openGroupChat(groupId);
+        } else if (action === "delete-group") {
+          await manageGroupMembership("delete_group", groupId, button);
+        } else if (action === "leave-group") {
+          await manageGroupMembership("leave_group", groupId, button);
         } else if (action === "review-join-request") {
           await reviewJoinRequest(
             button.dataset.requestId,
