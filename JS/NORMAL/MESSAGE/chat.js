@@ -1097,7 +1097,9 @@
         const image = document.createElement("img");
         image.className = "U9-chat-message-image";
         image.alt = "Image message";
-        image.loading = "lazy";
+        // Do not lazy-load chat images while CSS hides them behind the loader.
+        // Some browsers defer hidden lazy images indefinitely, leaving the spinner visible.
+        image.loading = "eager";
         image.decoding = "async";
 
         const errorState = document.createElement("div");
@@ -2477,8 +2479,8 @@
         chatType: nextChatType,
         targetId: nextUserId,
         targetName:
-          currentChatUser.name ||
-          currentChatUser.username ||
+          currentChatUser?.name ||
+          currentChatUser?.username ||
           "User"
       }
     );
