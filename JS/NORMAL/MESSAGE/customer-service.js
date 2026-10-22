@@ -39,7 +39,10 @@
     agentConversations: [],
     isAgent: false,
     currentUserId: null,
-    lastError: ""
+    lastError: "",
+    unreadCacheAt: 0,
+    unreadSummaryPromise: null,
+    unreadSummaryCache: { has_unread: false, unread_by_conversation: {} }
   };
 
   function getRoot() {
@@ -129,6 +132,99 @@
     }
 
     return result;
+  }
+
+  // Read the existing message read_at state through the current API. To keep
+  // polling lightweight, only inspect conversations whose last activity is
+  // newer than the customer's/agent's last-read timestamp (or has never been read).
+  async function getUnreadCounts(conversations, incomingSenderType) {
+    const rows = Array.isArray(conversations) ? conversations : [];
+    const counts = {};
+    const candidates = rows.filter(function (conversation) {
+      const id = String(conversation?.id || "");
+      if (!id) return false;
+      const readAt = incomingSenderType === "agent"
+        ? conversation.customer_last_read_at
+        : conversation.agent_last_read_at;
+      const lastActivity = conversation.last_message_at || conversation.updated_at;
+      if (readAt && lastActivity) {
+        return new Date(lastActivity).getTime() > new Date(readAt).getTime();
+      }
+      return true;
+    });
+
+    // Bound concurrency so a user with many historical conversations does not
+    // create a burst of requests against the existing Edge Function.
+    let nextIndex = 0;
+    const workers = Array.from({ length: Math.min(4, candidates.length) }, async function () {
+      while (nextIndex < candidates.length) {
+        const conversation = candidates[nextIndex++];
+        const id = String(conversation.id);
+        try {
+          const result = await callCustomerServiceAPI("list_messages", {
+            conversation_id: id,
+            limit: 200
+          });
+          const messages = Array.isArray(result.messages) ? result.messages : [];
+          const unread = messages.filter(function (message) {
+            return message.sender_type === incomingSenderType && !message.read_at && !message.deleted_at;
+          }).length;
+          if (unread > 0) counts[id] = unread;
+        } catch (error) {
+          // Keep the indicator conservative if an individual conversation fails.
+          console.warn("U9 Customer Service: Could not inspect unread messages for conversation.", id, error);
+        }
+      }
+    });
+    await Promise.all(workers);
+    return counts;
+  }
+
+  async function loadUnreadSummary(force) {
+    const now = Date.now();
+    if (!force && state.unreadSummaryCache && now - state.unreadCacheAt < 10000) {
+      return state.unreadSummaryCache;
+    }
+    if (state.unreadSummaryPromise) return state.unreadSummaryPromise;
+
+    state.unreadSummaryPromise = (async function () {
+      const mineResult = await callCustomerServiceAPI("list_my_conversations", { limit: 100 });
+      const mine = Array.isArray(mineResult.conversations) ? mineResult.conversations : [];
+      const customerUnread = await getUnreadCounts(mine, "agent");
+      let agentUnread = {};
+      try {
+        const agentStatus = await callCustomerServiceAPI("get_my_agent_status", {});
+        if (agentStatus.is_agent === true) {
+          const agentResult = await callCustomerServiceAPI("list_agent_conversations", { status: "active", limit: 100 });
+          const agentRows = Array.isArray(agentResult.conversations) ? agentResult.conversations : [];
+          agentUnread = await getUnreadCounts(agentRows, "customer");
+        }
+      } catch (error) {
+        // A normal customer is not allowed to load the agent queue; that is expected.
+      }
+      const combined = { ...customerUnread, ...agentUnread };
+      const summary = {
+        has_unread: Object.values(combined).some(function (count) { return Number(count) > 0; }),
+        unread_by_conversation: combined
+      };
+      state.unreadSummaryCache = summary;
+      state.unreadCacheAt = Date.now();
+      return summary;
+    })();
+
+    try {
+      return await state.unreadSummaryPromise;
+    } finally {
+      state.unreadSummaryPromise = null;
+    }
+  }
+
+  window.getCustomerServiceUnreadSummary = function (force) {
+    return loadUnreadSummary(force === true);
+  };
+
+  function invalidateUnreadSummary() {
+    state.unreadCacheAt = 0;
   }
 
   function readCurrentUserId() {
@@ -326,7 +422,7 @@
             <p class="u9-cs-conversation-meta">${escapeHTML(updated || "Conversation")}</p>
             <p class="u9-cs-conversation-id">Reference: ${escapeHTML(String(conversation.id || "").slice(0, 8).toUpperCase())}</p>
           </div>
-          <button type="button" class="u9-cs-row-button" data-cs-action="open-customer" data-conversation-id="${escapeHTML(conversation.id)}">${isClosed ? "View history" : "Open chat"}</button>
+          <button type="button" class="u9-cs-row-button${Number(conversation.unread_count || 0) > 0 ? " has-unread" : ""}" data-cs-action="open-customer" data-conversation-id="${escapeHTML(conversation.id)}" aria-label="${Number(conversation.unread_count || 0) > 0 ? "Open chat, unread messages" : "Open chat"}">${isClosed ? "View history" : "Open chat"}</button>
         </article>`;
     }).join("");
   }
@@ -376,7 +472,7 @@
             <p class="u9-cs-conversation-meta">${escapeHTML(assignmentText)}</p>
             <p class="u9-cs-conversation-id">Last activity: ${escapeHTML(updated || "—")}</p>
           </div>
-          <button type="button" class="u9-cs-row-button" data-cs-action="${action}" data-conversation-id="${escapeHTML(conversation.id)}">${label}</button>
+          <button type="button" class="u9-cs-row-button${Number(conversation.unread_count || 0) > 0 ? " has-unread" : ""}" data-cs-action="${action}" data-conversation-id="${escapeHTML(conversation.id)}" aria-label="${Number(conversation.unread_count || 0) > 0 ? "Open conversation, unread messages" : label}">${label}</button>
         </article>`;
     }).join("");
   }
@@ -407,6 +503,10 @@
       try {
         const mine = await callCustomerServiceAPI("list_my_conversations", { limit: 100 });
         state.myConversations = Array.isArray(mine.conversations) ? mine.conversations : [];
+        const customerUnreadCounts = await getUnreadCounts(state.myConversations, "agent");
+        state.myConversations = state.myConversations.map(function (conversation) {
+          return { ...conversation, unread_count: Number(customerUnreadCounts[String(conversation.id)] || 0) };
+        });
         state.currentUserId = readCurrentUserId();
         setNotice("", "");
 
@@ -424,6 +524,10 @@
                 limit: 100
               });
               state.agentConversations = Array.isArray(agentResult.conversations) ? agentResult.conversations : [];
+              const agentUnreadCounts = await getUnreadCounts(state.agentConversations, "customer");
+              state.agentConversations = state.agentConversations.map(function (conversation) {
+                return { ...conversation, unread_count: Number(agentUnreadCounts[String(conversation.id)] || 0) };
+              });
               setAgentNotice("", "");
             } catch (agentError) {
               console.warn("U9 Customer Service: Agent queue unavailable.", agentError);
@@ -527,6 +631,7 @@
       if (index >= 0) state.myConversations[index] = { ...state.myConversations[index], ...conversation };
       else state.myConversations.unshift(conversation);
       updateAllViews();
+      invalidateUnreadSummary();
       setNotice(result.created ? "Your support conversation is ready." : "Opening your existing support conversation.", "success");
       openChat(conversation, "customer");
     } catch (error) {
@@ -557,6 +662,7 @@
       if (ix >= 0) state.agentConversations[ix] = { ...state.agentConversations[ix], ...claimed };
       else state.agentConversations.unshift(claimed);
       updateAllViews();
+      invalidateUnreadSummary();
       setAgentNotice("Conversation accepted.", "success");
       openChat(claimed, "agent");
     } catch (error) {
@@ -603,6 +709,7 @@
     });
 
     window.addEventListener("u9:customer-service:conversation-updated", function () {
+      invalidateUnreadSummary();
       if (isPageActive()) refreshPage({ silent: true });
     });
   }
