@@ -525,6 +525,36 @@
         console.warn("U9 Message: Could not refresh group unread indicators.", error);
       }
 
+      let friendRequestsHaveUnread = false;
+      try {
+        const requestSummary = await callMessageAPI("get_unread_friend_requests");
+        friendRequestsHaveUnread = requestSummary?.has_unread === true || Number(requestSummary?.unread_count || 0) > 0;
+      } catch (error) {
+        console.warn("U9 Message: Could not refresh friend-request unread indicator.", error);
+      }
+
+      let groupRequestsHaveUnread = false;
+      try {
+        const requestSummary = await callGroupAPI("get_unread_group_join_requests");
+        groupRequestsHaveUnread = requestSummary?.has_unread === true || Number(requestSummary?.unread_count || 0) > 0;
+      } catch (error) {
+        console.warn("U9 Message: Could not refresh group-request unread indicator.", error);
+      }
+
+      const addFriendsButton = document.getElementById("Message-model-add-friends-button");
+      if (addFriendsButton) {
+        addFriendsButton.classList.toggle("has-unread", friendRequestsHaveUnread);
+        addFriendsButton.setAttribute("aria-label", friendRequestsHaveUnread ? "Add Friend, unread friend requests" : "Add Friend");
+        addFriendsButton.title = friendRequestsHaveUnread ? "Unread friend requests" : "Add Friend";
+      }
+
+      const groupButton = document.getElementById("Message-model-group-button");
+      if (groupButton) {
+        groupButton.classList.toggle("has-unread", groupRequestsHaveUnread);
+        groupButton.setAttribute("aria-label", groupRequestsHaveUnread ? "Group, unread join requests" : "Group");
+        groupButton.title = groupRequestsHaveUnread ? "Unread group join requests" : "Group";
+      }
+
       let customerServiceHasUnread = false;
       try {
         if (typeof window.getCustomerServiceUnreadSummary === "function") {
@@ -536,7 +566,7 @@
         console.warn("U9 Message: Could not refresh customer service unread indicator.", error);
       }
 
-      const hasAnyUnread = friendHasUnread || groupHasUnread || customerServiceHasUnread;
+      const hasAnyUnread = friendHasUnread || groupHasUnread || customerServiceHasUnread || friendRequestsHaveUnread || groupRequestsHaveUnread;
       const customerServiceButton = document.getElementById("Message-model-customer-service-button");
       if (customerServiceButton) {
         customerServiceButton.classList.toggle("has-unread", customerServiceHasUnread);
