@@ -1546,6 +1546,11 @@
                     getCustomerServiceConversationId()
                 }
               );
+              // Refresh customer-service row and global red dots only after the
+              // API confirms the incoming messages were marked as read.
+              window.dispatchEvent(new CustomEvent("u9:customer-service:conversation-updated", {
+                detail: { conversation_id: getCustomerServiceConversationId(), read: true }
+              }));
             } catch (readError) {
               console.warn(
                 "U9 Chat: Could not update customer-service read status.",
