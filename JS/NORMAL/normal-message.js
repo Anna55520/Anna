@@ -525,7 +525,25 @@
         console.warn("U9 Message: Could not refresh group unread indicators.", error);
       }
 
-      const hasAnyUnread = friendHasUnread || groupHasUnread;
+      let customerServiceHasUnread = false;
+      try {
+        if (typeof window.getCustomerServiceUnreadSummary === "function") {
+          const customerServiceSummary = await window.getCustomerServiceUnreadSummary(false);
+          customerServiceHasUnread = customerServiceSummary?.has_unread === true;
+        }
+      } catch (error) {
+        // Do not break friend/group unread indicators if customer-service polling fails.
+        console.warn("U9 Message: Could not refresh customer service unread indicator.", error);
+      }
+
+      const hasAnyUnread = friendHasUnread || groupHasUnread || customerServiceHasUnread;
+      const customerServiceButton = document.getElementById("Message-model-customer-service-button");
+      if (customerServiceButton) {
+        customerServiceButton.classList.toggle("has-unread", customerServiceHasUnread);
+        customerServiceButton.setAttribute("aria-label", customerServiceHasUnread ? "Customer Service, unread messages" : "Customer Service");
+        customerServiceButton.title = customerServiceHasUnread ? "Unread customer service messages" : "Customer Service";
+      }
+
       ["U9-page-container-tool-message", "U9-page-container-tool-menu"].forEach(function (id) {
         const button = document.getElementById(id);
         if (!button) return;
