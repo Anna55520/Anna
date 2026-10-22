@@ -8,7 +8,7 @@
    - Selected avatar and avatar frame
    - Avatar frame surrounds the base avatar
    - Responsive avatar/frame sizes
-   - Four action buttons
+   - Delete and Chat action buttons
    - Loading, error and empty states
 ================================================= */
 
@@ -358,7 +358,7 @@
 
 /* =================================================
    ACTION BUTTON
-   All four buttons share the same framed appearance.
+   Delete and Chat buttons share the same framed appearance.
 ================================================= */
 
 #Message-model-friends-root .U9-friend-action {
@@ -367,19 +367,23 @@
   align-items: center;
   justify-content: center;
 
-  flex: 0 0 34px;
+  flex: 0 0 auto;
 
-  width: 34px;
-  height: 34px;
+  min-width: 64px;
+  min-height: 34px;
 
-  min-width: 0;
-
-  padding: 8px;
+  gap: 5px;
+  padding: 7px 10px;
 
   border: 1px solid #e5e9f5;
   border-radius: 9px;
 
   background: #f3f5fc;
+  color: #26324b;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
 
   cursor: pointer;
 
@@ -397,8 +401,9 @@
 #Message-model-friends-root .U9-friend-action img {
   display: block;
 
-  width: 100%;
-  height: 100%;
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
 
   object-fit: contain;
 
@@ -425,11 +430,20 @@
   background: #dfe5fb;
 }
 
+#Message-model-friends-root .U9-friend-action-observe {
+  border-color: #f0caca;
+  background: #fff5f5;
+  color: #b42318;
+}
+
+#Message-model-friends-root .U9-friend-action-observe:hover {
+  border-color: #e6a6a6;
+  background: #feecec;
+}
+
 
 /* =================================================
-   PLACEHOLDER ACTIONS
-   Observe, Mute and Delete have no business function
-   until their functionality is implemented.
+   DELETE BUTTON INTERACTION STATES
 ================================================= */
 
 #Message-model-friends-root .U9-friend-action:disabled {
@@ -552,16 +566,20 @@
   }
 
   #Message-model-friends-root .U9-friend-actions {
-    gap: 15px;
+    gap: 6px;
   }
 
   #Message-model-friends-root .U9-friend-action {
-    flex-basis: 30px;
+    min-width: 56px;
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 11px;
+  }
 
-    width: 30px;
-    height: 30px;
-
-    padding: 7px;
+  #Message-model-friends-root .U9-friend-action img {
+    flex-basis: 12px;
+    width: 12px;
+    height: 12px;
   }
 
   #Message-model-friends-root .U9-friend-name {
@@ -599,13 +617,20 @@
     gap: 0;
   }
 
+  #Message-model-friends-root .U9-friend-actions {
+    gap: 5px;
+  }
+
   #Message-model-friends-root .U9-friend-action {
-    flex-basis: 27px;
+    min-width: 48px;
+    min-height: 29px;
+    gap: 3px;
+    padding: 5px 6px;
+    font-size: 10px;
+  }
 
-    width: 27px;
-    height: 29px;
-
-    padding: 6px;
+  #Message-model-friends-root .U9-friend-action img {
+    display: none;
   }
 
   #Message-model-friends-root .U9-friend-avatar-fallback {
