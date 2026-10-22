@@ -83,6 +83,7 @@
   let unreadRefreshTimer = null;
   let unreadRefreshInFlight = false;
   let unreadBySender = {};
+  let unreadByGroup = {};
 
   let homeGroupsRequest = null;
   let homeGroups = [];
@@ -482,41 +483,54 @@
     unreadRefreshInFlight = true;
 
     try {
-      const result = await callMessageAPI("get_unread_messages");
-      unreadBySender = result.unread_by_sender &&
-        typeof result.unread_by_sender === "object"
-        ? result.unread_by_sender
-        : {};
+      let friendHasUnread = Object.values(unreadBySender).some((count) => Number(count) > 0);
+      let groupHasUnread = Object.values(unreadByGroup).some((count) => Number(count) > 0);
 
-      const messageButton = document.getElementById(
-        "U9-page-container-tool-message"
-      );
-      if (messageButton) {
-        messageButton.classList.toggle(
-          "has-unread",
-          Boolean(result.has_unread)
-        );
-        messageButton.setAttribute(
-          "aria-label",
-          result.has_unread ? "Messages, unread messages" : "Messages"
-        );
+      try {
+        const result = await callMessageAPI("get_unread_messages");
+        unreadBySender = result.unread_by_sender && typeof result.unread_by_sender === "object"
+          ? result.unread_by_sender : {};
+        friendHasUnread = Boolean(result.has_unread) || Object.values(unreadBySender).some((count) => Number(count) > 0);
+
+        document.querySelectorAll("#Message-model-friends-list [data-home-chat-friend-id]").forEach(function (button) {
+          const friendId = String(button.dataset.homeChatFriendId || "");
+          const hasUnread = Number(unreadBySender[friendId] || 0) > 0;
+          button.classList.toggle("has-unread", hasUnread);
+          button.setAttribute("aria-label", hasUnread ? "Open chat, unread messages" : "Open chat");
+          button.title = hasUnread ? "Unread messages" : "Chat";
+        });
+      } catch (error) {
+        console.warn("U9 Message: Could not refresh friend unread indicators.", error);
       }
 
-      document.querySelectorAll(
-        "#Message-model-friends-list [data-home-chat-friend-id]"
-      ).forEach(function (button) {
-        const friendId = String(button.dataset.homeChatFriendId || "");
-        const hasUnread = Number(unreadBySender[friendId] || 0) > 0;
-        button.classList.toggle("has-unread", hasUnread);
-        button.setAttribute(
-          "aria-label",
-          hasUnread ? "Open chat, unread messages" : "Open chat"
-        );
-        button.title = hasUnread ? "Unread messages" : "Chat";
+      try {
+        const result = await callGroupAPI("list_my_groups");
+        const groups = normalizeHomeGroups(result.groups);
+        unreadByGroup = {};
+        groups.forEach(function (group) {
+          unreadByGroup[String(group.id)] = Number(group.unread_count || 0);
+        });
+        groupHasUnread = Object.values(unreadByGroup).some((count) => Number(count) > 0);
+
+        document.querySelectorAll("#Message-model-groups-list [data-home-chat-group-id]").forEach(function (button) {
+          const groupId = String(button.dataset.homeChatGroupId || "");
+          const hasUnread = Number(unreadByGroup[groupId] || 0) > 0;
+          button.classList.toggle("has-unread", hasUnread);
+          button.setAttribute("aria-label", hasUnread ? "Open group chat, unread messages" : "Open group chat");
+          button.title = hasUnread ? "Unread group messages" : "Open Group Chat";
+        });
+      } catch (error) {
+        console.warn("U9 Message: Could not refresh group unread indicators.", error);
+      }
+
+      const hasAnyUnread = friendHasUnread || groupHasUnread;
+      ["U9-page-container-tool-message", "U9-page-container-tool-menu"].forEach(function (id) {
+        const button = document.getElementById(id);
+        if (!button) return;
+        button.classList.toggle("has-unread", hasAnyUnread);
+        const baseLabel = id.endsWith("menu") ? "Menu" : "Messages";
+        button.setAttribute("aria-label", hasAnyUnread ? `${baseLabel}, unread messages` : baseLabel);
       });
-    } catch (error) {
-      // Keep the last known state when the API is temporarily unavailable.
-      console.warn("U9 Message: Could not refresh unread indicators.", error);
     } finally {
       unreadRefreshInFlight = false;
     }
@@ -1063,7 +1077,8 @@
             ""
           ),
           role: String(membership.role || "member"),
-          status: String(membership.status || "active")
+          status: String(membership.status || "active"),
+          unread_count: Number(membership.unread_count || 0)
         };
       })
       .filter(Boolean);
@@ -1295,6 +1310,8 @@
         const groups = normalizeHomeGroups(result.groups);
 
         renderHomeGroups(groups);
+        // Apply current per-group unread dots immediately after the list is rendered.
+        refreshMessageUnreadIndicators();
 
         console.log(
           "U9 Message Home: Groups loaded.",
