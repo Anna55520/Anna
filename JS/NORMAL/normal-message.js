@@ -16,6 +16,11 @@
 (function () {
   "use strict";
 
+  // Protect against duplicate script inclusion; this module owns global
+  // navigation, visibility listeners, and unread polling for the page.
+  if (window.__U9MessageNormalModuleLoaded) return;
+  window.__U9MessageNormalModuleLoaded = true;
+
   /* =================================================
      CONFIGURATION
   ================================================= */
@@ -536,8 +541,15 @@
       }
 
       try {
-        const result = await callGroupAPI("list_my_groups");
-        const groups = normalizeHomeGroups(result.groups);
+        let groups;
+        // Reuse the in-flight home-list response on first modal open instead
+        // of issuing a duplicate list_my_groups request.
+        if (isMessageModalOpen() && homeGroupsRequest) {
+          groups = await homeGroupsRequest;
+        } else {
+          const result = await callGroupAPI("list_my_groups");
+          groups = normalizeHomeGroups(result.groups);
+        }
         unreadByGroup = {};
         groups.forEach(function (group) {
           unreadByGroup[String(group.id)] = Number(group.unread_count || 0);
@@ -1071,7 +1083,6 @@
      * list_friends request unless an explicit refresh is requested.
      */
     if (homeFriendsLoaded && !force) {
-      refreshMessageUnreadIndicators();
       return Promise.resolve(homeFriends);
     }
 
@@ -1102,7 +1113,6 @@
 
         renderHomeFriends(friends);
         homeFriendsLoaded = true;
-        refreshMessageUnreadIndicators();
 
         console.log(
           "U9 Message Home: Friends loaded.",
@@ -1405,7 +1415,6 @@
 
     // Reuse the group list for the lifetime of this page session.
     if (homeGroupsLoaded && !force) {
-      refreshMessageUnreadIndicators();
       return Promise.resolve(homeGroups);
     }
 
@@ -1439,8 +1448,6 @@
 
         renderHomeGroups(groups);
         homeGroupsLoaded = true;
-        // Apply current per-group unread dots immediately after the list is rendered.
-        refreshMessageUnreadIndicators();
 
         console.log(
           "U9 Message Home: Groups loaded.",
@@ -1776,6 +1783,11 @@
      MESSAGE HOME
   ================================================= */
 
+  function isMessageModalOpen() {
+    const modal = getMessageModal();
+    return Boolean(modal && modal.classList.contains("modal-open"));
+  }
+
   function showMessageHome() {
     const content = getMessageModalContent();
 
@@ -1807,11 +1819,14 @@
     hideAllMessagePages();
 
     /*
-     * Refresh both friends and joined groups whenever
-     * the user opens or returns to Message home.
+     * Navigation is initialized while the modal is closed. Do not load lists
+     * until the user actually opens Message; the global unread poller handles
+     * the header indicators independently.
      */
-    loadHomeFriends();
-    loadHomeGroups();
+    if (isMessageModalOpen()) {
+      loadHomeFriends();
+      loadHomeGroups();
+    }
 
     return true;
   }
@@ -2273,10 +2288,14 @@
     }
 
     modal.classList.remove("modal-closing");
+    modal.classList.add("modal-open");
 
     showMessageHome();
-
-    modal.classList.add("modal-open");
+    // Refresh unread dots once when opened; the 15-second global poll continues
+    // to keep the header indicators updated while the modal is closed.
+    if (isAuthenticatedUser() && !document.hidden) {
+      void refreshMessageUnreadIndicators();
+    }
 
     return true;
   }
