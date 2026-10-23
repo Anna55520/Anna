@@ -586,46 +586,16 @@
     }
   }
 
-  const UNREAD_REFRESH_INTERVAL_MS = 15000;
-
-  function scheduleUnreadMessagePolling() {
-    if (unreadRefreshTimer !== null) {
-      window.clearTimeout(unreadRefreshTimer);
-      unreadRefreshTimer = null;
-    }
-
-    // The global red-dot check should not keep running in a hidden tab.
-    if (document.hidden) return;
-
-    unreadRefreshTimer = window.setTimeout(async function () {
-      unreadRefreshTimer = null;
-      if (document.hidden) return;
-
-      try {
-        await refreshMessageUnreadIndicators();
-      } catch (error) {
-        console.warn("U9 Message: unread indicator refresh failed.", error);
-      } finally {
-        scheduleUnreadMessagePolling();
-      }
-    }, UNREAD_REFRESH_INTERVAL_MS);
-  }
-
   function startUnreadMessagePolling() {
     if (unreadRefreshTimer !== null) {
-      window.clearTimeout(unreadRefreshTimer);
-      unreadRefreshTimer = null;
+      window.clearInterval(unreadRefreshTimer);
     }
 
-    if (document.hidden) return;
-
-    Promise.resolve(refreshMessageUnreadIndicators())
-      .catch(function (error) {
-        console.warn("U9 Message: unread indicator refresh failed.", error);
-      })
-      .finally(function () {
-        scheduleUnreadMessagePolling();
-      });
+    refreshMessageUnreadIndicators();
+    unreadRefreshTimer = window.setInterval(
+      refreshMessageUnreadIndicators,
+      5000
+    );
   }
 
   /* =================================================
@@ -1785,15 +1755,11 @@
     hideAllMessagePages();
 
     /*
-     * Load home-page lists only while the Message modal is actually open.
-     * initializeMessageNavigation() also renders this view during startup;
-     * that initial render must not trigger network requests by itself.
+     * Refresh both friends and joined groups whenever
+     * the user opens or returns to Message home.
      */
-    const messageModal = getMessageModal();
-    if (messageModal && messageModal.classList.contains("modal-open")) {
-      loadHomeFriends();
-      loadHomeGroups();
-    }
+    loadHomeFriends();
+    loadHomeGroups();
 
     return true;
   }
@@ -2256,9 +2222,9 @@
 
     modal.classList.remove("modal-closing");
 
-    // Mark the modal open before showing home so its lists load on demand.
-    modal.classList.add("modal-open");
     showMessageHome();
+
+    modal.classList.add("modal-open");
 
     return true;
   }
@@ -2487,20 +2453,7 @@
     startUnreadMessagePolling();
 
     document.addEventListener("visibilitychange", function () {
-      if (document.hidden) {
-        if (unreadRefreshTimer !== null) {
-          window.clearTimeout(unreadRefreshTimer);
-          unreadRefreshTimer = null;
-        }
-        return;
-      }
-
-      // On returning to the tab, refresh immediately and restart the 15s cycle.
-      if (unreadRefreshTimer !== null) {
-        window.clearTimeout(unreadRefreshTimer);
-        unreadRefreshTimer = null;
-      }
-      startUnreadMessagePolling();
+      if (!document.hidden) refreshMessageUnreadIndicators();
     });
     registerMessageWindowManager();
 
