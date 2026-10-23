@@ -16,6 +16,33 @@ const menuButton =
 
 
 /* =========================
+   INITIAL MESSAGE UNREAD DOT
+========================= */
+
+// Do one unread refresh after page scripts are available, so the toolbar dot
+// is correct after a reload even when the Message modal stays closed.
+function refreshContainerToolUnreadOnce() {
+  if (
+    window.U9User &&
+    typeof window.U9User.isLoggedIn === "function" &&
+    !window.U9User.isLoggedIn()
+  ) {
+    return;
+  }
+
+  if (typeof window.refreshMessageUnreadIndicators === "function") {
+    void window.refreshMessageUnreadIndicators({ allowClosedModal: true });
+  }
+}
+
+if (document.readyState === "complete") {
+  refreshContainerToolUnreadOnce();
+} else {
+  window.addEventListener("load", refreshContainerToolUnreadOnce, { once: true });
+}
+
+
+/* =========================
    HEADER TOOL TOGGLE
 ========================= */
 
