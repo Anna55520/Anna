@@ -8,7 +8,7 @@
    - Group chat
    - Customer-service chat
    - Load and send text messages
-   - Refresh messages every 4 seconds
+   - Refresh messages every 4 seconds without rebuilding unchanged message DOM
    - Auto-resizing multiline chat input
    - Mobile virtual-keyboard viewport adjustment
    - Centered loading and empty-state messages
@@ -114,6 +114,12 @@
 
   // In-memory only: survives navigation within this page, resets on reload.
   const conversationMessageCache = new Map();
+
+  // Avoid repeating read-state writes while an API response still returns
+  // stale unread flags for messages that have already been marked read.
+  const successfullyMarkedFriendUnreadKeys = new Map();
+  const successfullyMarkedCustomerServiceUnreadKeys = new Map();
+  const lastMarkedGroupMessageIds = new Map();
 
   function getConversationCacheKey(type, id) {
     const accountId = currentUserId ? String(currentUserId) : "anonymous";
@@ -1061,6 +1067,10 @@
           : "U9-chat-message-other"
       );
 
+    if (message.id !== undefined && message.id !== null) {
+      row.dataset.messageId = String(message.id);
+    }
+
     const bubble = document.createElement("div");
 
     bubble.className =
@@ -1235,20 +1245,24 @@
   ================================================= */
 
   function getMessagesSignature(messages) {
-    return messages.map(function (message) {
-      return [
-        message.id || "",
-        message.sender_id || "",
-        message.sender_type || "",
-        message.message_type || "text",
-        message.content || "",
-        message.media_path || "",
-        message.created_at || "",
-        message.edited_at || "",
-        message.deleted_at || "",
-        message.read_at || ""
-      ].join(":");
-    }).join("|");
+    return messages.map(getSingleMessageSignature).join("|");
+  }
+
+  function getSingleMessageSignature(message) {
+    return [
+      message.id || "",
+      message.sender_id || "",
+      message.sender_type || "",
+      message.message_type || "text",
+      message.content || "",
+      message.media_path || "",
+      message.created_at || "",
+      message.edited_at || "",
+      message.deleted_at || "",
+      message.read_at || "",
+      message.sender_username || "",
+      message.sender_name || ""
+    ].join(":");
   }
 
   function renderMessages(
@@ -1261,16 +1275,10 @@
       ? messages
       : [];
 
-    const signature = getMessagesSignature(
-      nextMessages
-    );
+    const signature = getMessagesSignature(nextMessages);
 
-    if (
-      !force &&
-      signature === lastRenderedSignature
-    ) {
+    if (!force && signature === lastRenderedSignature) {
       removeTemporaryNotice();
-
       return;
     }
 
@@ -1278,39 +1286,77 @@
       chatMessages.scrollHeight -
       chatMessages.scrollTop -
       chatMessages.clientHeight < 100;
-
     const oldScrollTop = chatMessages.scrollTop;
 
-    chatMessages.innerHTML = "";
+    let list = chatMessages.querySelector(
+      ".U9-chat-message-list"
+    );
 
-    const list = document.createElement("div");
-
-    list.className = "U9-chat-message-list";
+    if (!list || force) {
+      chatMessages.innerHTML = "";
+      list = document.createElement("div");
+      list.className = "U9-chat-message-list";
+      chatMessages.appendChild(list);
+    }
 
     if (nextMessages.length === 0) {
+      list.innerHTML = "";
       const empty = document.createElement("div");
-
       empty.className = "U9-chat-empty";
-
-      empty.textContent =
-        "No messages yet. Say hello!";
-
+      empty.textContent = "No messages yet. Say hello!";
       list.appendChild(empty);
     } else {
-      nextMessages.forEach(function (message) {
-        list.appendChild(
-          createMessageElement(message)
-        );
+      const existingByKey = new Map();
+      Array.from(list.children).forEach(function (element) {
+        const key = element.dataset.messageKey;
+        if (key) existingByKey.set(key, element);
+      });
+
+      const desiredKeys = new Set();
+      let cursor = list.firstElementChild;
+
+      nextMessages.forEach(function (message, index) {
+        const key = message.id !== undefined && message.id !== null
+          ? "id:" + String(message.id)
+          : "index:" + String(index);
+        const itemSignature = getSingleMessageSignature(message);
+        desiredKeys.add(key);
+
+        let row = existingByKey.get(key);
+        if (!row || row.dataset.messageSignature !== itemSignature) {
+          const replacement = createMessageElement(message);
+          replacement.dataset.messageKey = key;
+          replacement.dataset.messageSignature = itemSignature;
+          if (row && row.parentNode === list) {
+            const replacedCursor = row === cursor;
+            list.replaceChild(replacement, row);
+            if (replacedCursor) cursor = replacement;
+          }
+          row = replacement;
+          existingByKey.set(key, row);
+        } else {
+          row.dataset.messageKey = key;
+        }
+
+        // Keep existing DOM nodes in place whenever possible. This avoids
+        // rebuilding every bubble when only one message changes.
+        if (row !== cursor) {
+          list.insertBefore(row, cursor);
+        }
+        cursor = row.nextElementSibling;
+      });
+
+      Array.from(list.children).forEach(function (element) {
+        const key = element.dataset.messageKey;
+        if (!key || !desiredKeys.has(key)) element.remove();
       });
     }
 
-    chatMessages.appendChild(list);
-
     lastRenderedSignature = signature;
+    removeTemporaryNotice();
 
     if (wasNearBottom) {
-      chatMessages.scrollTop =
-        chatMessages.scrollHeight;
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     } else {
       chatMessages.scrollTop = oldScrollTop;
     }
@@ -1382,22 +1428,33 @@
       return [];
     }
 
+    const requestVersion = currentRequestVersion;
+    const targetId = String(currentChatUser.id);
+    const targetType = String(currentChatUser.type || "friend");
+
     /*
-     * Prevent overlapping message-list requests.
-     * The polling scheduler will try again afterwards.
+     * Coalesce ordinary overlapping loads. A send-success refresh is different:
+     * if a poll started before the send completed, wait for it and then perform
+     * one fresh read so the just-sent message is not delayed until the next poll.
      */
     if (isLoadingMessages) {
-      return activeMessageLoadPromise || [];
+      const inFlightRequest = activeMessageLoadPromise;
+      if (options.forceRefresh && inFlightRequest) {
+        await inFlightRequest.catch(function () { return []; });
+        if (
+          !isChatActive ||
+          requestVersion !== currentRequestVersion ||
+          String(currentChatUser?.id) !== targetId ||
+          String(currentChatUser?.type || "friend") !== targetType
+        ) {
+          return [];
+        }
+        return loadChatMessages({ silent, forceRefresh: false });
+      }
+      return inFlightRequest || [];
     }
 
     isLoadingMessages = true;
-
-    const requestVersion = currentRequestVersion;
-    const targetId = String(currentChatUser.id);
-
-    const targetType = String(
-      currentChatUser.type || "friend"
-    );
 
     const requestPromise = (async function () {
       try {
@@ -1460,43 +1517,59 @@
         cacheConversationMessages(targetType, targetId, messages);
         renderMessages(messages);
 
-        // A group is marked read only after its latest messages were fetched
-        // successfully and rendered into the currently open chat.
+        // Mark a group read only when its latest message advances. This avoids
+        // repeating the same write and unread refresh on every polling cycle.
         if (targetType === "group") {
-          try {
-            const lastSeenGroupMessage = messages.length ? messages[messages.length - 1] : null;
-            if (lastSeenGroupMessage && lastSeenGroupMessage.id) {
+          const lastSeenGroupMessage = messages.length
+            ? messages[messages.length - 1]
+            : null;
+          const latestMessageId = lastSeenGroupMessage?.id != null
+            ? String(lastSeenGroupMessage.id)
+            : "";
+          const groupReadKey = getConversationCacheKey(targetType, targetId);
+
+          if (latestMessageId && lastMarkedGroupMessageIds.get(groupReadKey) !== latestMessageId) {
+            try {
               await callGroupAPI("mark_group_messages_read", {
                 group_id: String(currentChatUser.group_id || targetId),
-                last_seen_message_id: String(lastSeenGroupMessage.id)
+                last_seen_message_id: latestMessageId
               });
+              lastMarkedGroupMessageIds.set(groupReadKey, latestMessageId);
+              if (typeof window.refreshMessageUnreadIndicators === "function") {
+                await window.refreshMessageUnreadIndicators();
+              }
+            } catch (readError) {
+              console.warn("U9 Chat: Could not update group-message read status.", readError);
             }
-            if (typeof window.refreshMessageUnreadIndicators === "function") {
-              await window.refreshMessageUnreadIndicators();
-            }
-          } catch (readError) {
-            console.warn("U9 Chat: Could not update group-message read status.", readError);
           }
         }
 
         // Only mark one-to-one friend messages as read after this
         // conversation has loaded and rendered successfully. Image and
         // text messages use the same read_at state.
-        const hasUnreadFriendMessages =
-          targetType === "friend" &&
-          messages.some(function (message) {
-            return (
-              String(message.sender_id) === targetId &&
-              !message.read_at &&
-              !message.deleted_at
-            );
-          });
+        const friendReadKey = getConversationCacheKey(targetType, targetId);
+        const alreadyMarkedKeys = successfullyMarkedFriendUnreadKeys.get(friendReadKey) || new Set();
+        const unreadFriendMessages = targetType === "friend"
+          ? messages.filter(function (message) {
+              return (
+                String(message.sender_id) === targetId &&
+                !message.read_at &&
+                !message.deleted_at &&
+                message.id != null &&
+                !alreadyMarkedKeys.has(String(message.id))
+              );
+            })
+          : [];
 
-        if (hasUnreadFriendMessages) {
+        if (unreadFriendMessages.length) {
           try {
             await callMessageAPI("mark_messages_read", {
               other_user_id: targetId
             });
+            unreadFriendMessages.forEach(function (message) {
+              alreadyMarkedKeys.add(String(message.id));
+            });
+            successfullyMarkedFriendUnreadKeys.set(friendReadKey, alreadyMarkedKeys);
             if (typeof window.refreshMessageUnreadIndicators === "function") {
               await window.refreshMessageUnreadIndicators();
             }
@@ -1544,26 +1617,33 @@
               ? "customer"
               : "agent";
 
-          const hasUnreadIncoming =
-            messages.some(function (message) {
-              return (
-                message.sender_type === incomingType &&
-                !message.read_at &&
-                !message.deleted_at
-              );
-            });
+          const customerServiceReadKey = getConversationCacheKey(targetType, targetId);
+          const alreadyMarkedCustomerServiceKeys =
+            successfullyMarkedCustomerServiceUnreadKeys.get(customerServiceReadKey) || new Set();
+          const unreadIncomingMessages = messages.filter(function (message) {
+            return (
+              message.sender_type === incomingType &&
+              !message.read_at &&
+              !message.deleted_at &&
+              message.id != null &&
+              !alreadyMarkedCustomerServiceKeys.has(String(message.id))
+            );
+          });
 
-          if (hasUnreadIncoming) {
+          if (unreadIncomingMessages.length) {
             try {
               await callCustomerServiceAPI(
                 "mark_read",
-                {
-                  conversation_id:
-                    getCustomerServiceConversationId()
-                }
+                { conversation_id: getCustomerServiceConversationId() }
               );
-              // Refresh customer-service row and global red dots only after the
-              // API confirms the incoming messages were marked as read.
+              unreadIncomingMessages.forEach(function (message) {
+                alreadyMarkedCustomerServiceKeys.add(String(message.id));
+              });
+              successfullyMarkedCustomerServiceUnreadKeys.set(
+                customerServiceReadKey,
+                alreadyMarkedCustomerServiceKeys
+              );
+              // Refresh customer-service row only after the API confirms read.
               window.dispatchEvent(new CustomEvent("u9:customer-service:conversation-updated", {
                 detail: { conversation_id: getCustomerServiceConversationId(), read: true }
               }));
@@ -1785,7 +1865,7 @@
 
       resizeChatInput();
 
-      await loadChatMessages();
+      await loadChatMessages({ forceRefresh: true, silent: true });
 
       if (
         targetType === "customer_service"
@@ -2219,8 +2299,7 @@
         String(currentChatUser?.type || "friend") === targetType
       ) {
         removeTemporaryNotice();
-        lastRenderedSignature = null;
-        await loadChatMessages({ silent: true });
+        await loadChatMessages({ silent: true, forceRefresh: true });
       }
     } finally {
       isSendingMessage = false;
