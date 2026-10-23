@@ -26,14 +26,12 @@
   const CUSTOMER_SERVICE_API_URL = "/api/customer-service-api";
   const ROOT_ID = "Message-model-customer-service-root";
   const PAGE_ID = "Message-model-customer-service-page";
-  const REFRESH_INTERVAL_MS = 15000;
   const MAX_MESSAGE_LENGTH = 5000;
 
   const state = {
     shellRendered: false,
     eventsBound: false,
     loading: false,
-    refreshTimer: null,
     refreshPromise: null,
     myConversations: [],
     agentConversations: [],
@@ -563,26 +561,14 @@
           button.disabled = false;
           button.textContent = "Refresh";
         }
-        scheduleRefresh();
       }
     })();
 
     return state.refreshPromise;
   }
 
-  function scheduleRefresh() {
-    if (state.refreshTimer !== null) {
-      clearTimeout(state.refreshTimer);
-      state.refreshTimer = null;
-    }
-    if (!isPageActive()) return;
-
-    state.refreshTimer = setTimeout(async function () {
-      state.refreshTimer = null;
-      if (!isPageActive()) return;
-      await refreshPage({ silent: true });
-    }, REFRESH_INTERVAL_MS);
-  }
+  // The customer-service list is refreshed on page open or explicit refresh.
+  // Live messages in an opened chat are handled by chat.js polling.
 
   function openChat(conversation, side) {
     if (!conversation || !conversation.id) {
@@ -722,7 +708,6 @@
     if (!state.shellRendered && !renderShell()) return false;
     bindEvents();
     await refreshPage({ silent: false });
-    scheduleRefresh();
     return true;
   }
 
