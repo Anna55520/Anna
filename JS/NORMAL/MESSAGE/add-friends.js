@@ -2074,7 +2074,18 @@
      LOAD FRIENDS + REQUESTS
   ======================================================= */
 
+  function isAuthenticatedUser() {
+    return Boolean(
+      window.U9User &&
+      typeof window.U9User.isLoggedIn === "function" &&
+      window.U9User.isLoggedIn()
+    );
+  }
+
   async function loadRelationships() {
+    if (!isAuthenticatedUser()) {
+      return [];
+    }
 
     if (
       relationshipLoading
@@ -2331,25 +2342,23 @@
 
 
   /*
-   * Load:
-   * - friends
-   * - sent requests
-   * - received requests
-   */
-  loadRelationships();
-
-
-  /*
    * Global page initializer expected by normal-message.js.
    * The page shell and event handlers are created once when this
    * module loads; navigating back to Add Friend refreshes the
    * relationship lists without rebuilding the form or losing state.
    */
   window.initializeAddFriendsPage = async function initializeAddFriendsPage() {
+    if (!isAuthenticatedUser()) {
+      showResultsStatus("Sign in to view friend requests and relationships.");
+      return [];
+    }
+
     try {
       await callMessageAPI("mark_friend_requests_read");
     } catch (error) {
-      console.warn("U9 Add Friend: could not mark requests as read.", error);
+      if (error?.status !== 401) {
+        console.warn("U9 Add Friend: could not mark requests as read.", error);
+      }
     }
     return loadRelationships();
   };
