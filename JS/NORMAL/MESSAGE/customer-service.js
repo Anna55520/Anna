@@ -53,9 +53,19 @@
     return document.getElementById(PAGE_ID);
   }
 
+  function isMessageModalOpen() {
+    const modal = document.getElementById("U9-message-normal-modal");
+    return Boolean(modal && modal.classList.contains("modal-open"));
+  }
+
   function isPageActive() {
     const page = getPage();
-    return Boolean(page && !page.hidden && page.getAttribute("aria-hidden") !== "true");
+    return Boolean(
+      isMessageModalOpen() &&
+      page &&
+      !page.hidden &&
+      page.getAttribute("aria-hidden") !== "true"
+    );
   }
 
   function escapeHTML(value) {
@@ -138,6 +148,7 @@
   // polling lightweight, only inspect conversations whose last activity is
   // newer than the customer's/agent's last-read timestamp (or has never been read).
   async function getUnreadCounts(conversations, incomingSenderType) {
+    if (!isMessageModalOpen()) return {};
     const rows = Array.isArray(conversations) ? conversations : [];
     const counts = {};
     const candidates = rows.filter(function (conversation) {
@@ -157,7 +168,7 @@
     // create a burst of requests against the existing Edge Function.
     let nextIndex = 0;
     const workers = Array.from({ length: Math.min(4, candidates.length) }, async function () {
-      while (nextIndex < candidates.length) {
+      while (nextIndex < candidates.length && isMessageModalOpen()) {
         const conversation = candidates[nextIndex++];
         const id = String(conversation.id);
         try {
@@ -181,6 +192,10 @@
   }
 
   async function loadUnreadSummary(force) {
+    // Global unread summaries must not trigger background requests while closed.
+    if (!isMessageModalOpen()) {
+      return state.unreadSummaryCache || { has_unread: false, unread_by_conversation: {} };
+    }
     const now = Date.now();
     if (!force && state.unreadSummaryCache && now - state.unreadCacheAt < 10000) {
       return state.unreadSummaryCache;
@@ -189,8 +204,10 @@
 
     state.unreadSummaryPromise = (async function () {
       const mineResult = await callCustomerServiceAPI("list_my_conversations", { limit: 100 });
+      if (!isMessageModalOpen()) return state.unreadSummaryCache;
       const mine = Array.isArray(mineResult.conversations) ? mineResult.conversations : [];
       const customerUnread = await getUnreadCounts(mine, "agent");
+      if (!isMessageModalOpen()) return state.unreadSummaryCache;
       let agentUnread = {};
       try {
         const agentStatus = await callCustomerServiceAPI("get_my_agent_status", {});
@@ -484,6 +501,14 @@
 
   async function refreshPage(options) {
     const config = options || {};
+    // Do not load conversation lists/messages unless the modal and CS page are visible.
+    if (!isMessageModalOpen() || !isPageActive()) {
+      if (state.refreshTimer !== null) {
+        clearTimeout(state.refreshTimer);
+        state.refreshTimer = null;
+      }
+      return false;
+    }
     if (!getRoot()) return;
     if (state.refreshPromise) return state.refreshPromise;
 
@@ -502,8 +527,10 @@
     state.refreshPromise = (async function () {
       try {
         const mine = await callCustomerServiceAPI("list_my_conversations", { limit: 100 });
+        if (!isPageActive()) return false;
         state.myConversations = Array.isArray(mine.conversations) ? mine.conversations : [];
         const customerUnreadCounts = await getUnreadCounts(state.myConversations, "agent");
+        if (!isPageActive()) return false;
         state.myConversations = state.myConversations.map(function (conversation) {
           return { ...conversation, unread_count: Number(customerUnreadCounts[String(conversation.id)] || 0) };
         });
@@ -515,6 +542,7 @@
         // an expected-but-noisy 403 in the browser console.
         try {
           const agentStatus = await callCustomerServiceAPI("get_my_agent_status", {});
+          if (!isPageActive()) return false;
           state.isAgent = agentStatus.is_agent === true;
 
           if (state.isAgent) {
@@ -523,8 +551,10 @@
                 status: "active",
                 limit: 100
               });
+              if (!isPageActive()) return false;
               state.agentConversations = Array.isArray(agentResult.conversations) ? agentResult.conversations : [];
               const agentUnreadCounts = await getUnreadCounts(state.agentConversations, "customer");
+              if (!isPageActive()) return false;
               state.agentConversations = state.agentConversations.map(function (conversation) {
                 return { ...conversation, unread_count: Number(agentUnreadCounts[String(conversation.id)] || 0) };
               });
@@ -715,6 +745,7 @@
   }
 
   async function initializeCustomerServicePage() {
+    if (!isMessageModalOpen()) return false;
     if (!getRoot()) {
       console.warn("U9 Customer Service: #" + ROOT_ID + " is missing.");
       return false;
