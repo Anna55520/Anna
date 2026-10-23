@@ -35,7 +35,7 @@
 
   const DEFAULT_AVATAR = "/SSVG/avatar/profile.svg";
 
-  const POLL_INTERVAL_MS = 5000;
+  const POLL_INTERVAL_MS = 4000;
   const MAX_MESSAGE_LENGTH = 5000;
   const CHAT_INPUT_MAX_HEIGHT = 132;
 
