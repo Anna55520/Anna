@@ -103,6 +103,11 @@
     return document.getElementById(id);
   }
 
+  function isMessageModalOpen() {
+    const modal = getElement("U9-message-normal-modal");
+    return Boolean(modal && modal.classList.contains("modal-open"));
+  }
+
   function getMessagePageElements() {
     const elements = {};
 
@@ -512,6 +517,8 @@
   ================================================= */
 
   async function refreshMessageUnreadIndicators() {
+    // Do not request message data while the Message modal is closed.
+    if (!isMessageModalOpen()) return;
     if (!isAuthenticatedUser()) {
       renderAnonymousMessageState();
       return;
@@ -525,6 +532,7 @@
 
       try {
         const result = await callMessageAPI("get_unread_messages");
+        if (!isMessageModalOpen()) return;
         unreadBySender = result.unread_by_sender && typeof result.unread_by_sender === "object"
           ? result.unread_by_sender : {};
         friendHasUnread = Boolean(result.has_unread) || Object.values(unreadBySender).some((count) => Number(count) > 0);
@@ -541,15 +549,9 @@
       }
 
       try {
-        let groups;
-        // Reuse the in-flight home-list response on first modal open instead
-        // of issuing a duplicate list_my_groups request.
-        if (isMessageModalOpen() && homeGroupsRequest) {
-          groups = await homeGroupsRequest;
-        } else {
-          const result = await callGroupAPI("list_my_groups");
-          groups = normalizeHomeGroups(result.groups);
-        }
+        const result = await callGroupAPI("list_my_groups");
+        if (!isMessageModalOpen()) return;
+        const groups = normalizeHomeGroups(result.groups);
         unreadByGroup = {};
         groups.forEach(function (group) {
           unreadByGroup[String(group.id)] = Number(group.unread_count || 0);
@@ -570,6 +572,7 @@
       let friendRequestsHaveUnread = false;
       try {
         const requestSummary = await callMessageAPI("get_unread_friend_requests");
+        if (!isMessageModalOpen()) return;
         friendRequestsHaveUnread = requestSummary?.has_unread === true || Number(requestSummary?.unread_count || 0) > 0;
       } catch (error) {
         console.warn("U9 Message: Could not refresh friend-request unread indicator.", error);
@@ -578,6 +581,7 @@
       let groupRequestsHaveUnread = false;
       try {
         const requestSummary = await callGroupAPI("get_unread_group_join_requests");
+        if (!isMessageModalOpen()) return;
         groupRequestsHaveUnread = requestSummary?.has_unread === true || Number(requestSummary?.unread_count || 0) > 0;
       } catch (error) {
         console.warn("U9 Message: Could not refresh group-request unread indicator.", error);
@@ -638,6 +642,8 @@
   function startUnreadMessagePolling() {
     stopUnreadMessagePolling();
 
+    // Poll only while the Message modal is open.
+    if (!isMessageModalOpen()) return;
     // Anonymous users should not trigger protected API requests.
     if (!isAuthenticatedUser() || document.hidden) {
       renderAnonymousMessageState();
@@ -1083,6 +1089,7 @@
      * list_friends request unless an explicit refresh is requested.
      */
     if (homeFriendsLoaded && !force) {
+      refreshMessageUnreadIndicators();
       return Promise.resolve(homeFriends);
     }
 
@@ -1113,6 +1120,7 @@
 
         renderHomeFriends(friends);
         homeFriendsLoaded = true;
+        refreshMessageUnreadIndicators();
 
         console.log(
           "U9 Message Home: Friends loaded.",
@@ -1415,6 +1423,7 @@
 
     // Reuse the group list for the lifetime of this page session.
     if (homeGroupsLoaded && !force) {
+      refreshMessageUnreadIndicators();
       return Promise.resolve(homeGroups);
     }
 
@@ -1448,6 +1457,8 @@
 
         renderHomeGroups(groups);
         homeGroupsLoaded = true;
+        // Apply current per-group unread dots immediately after the list is rendered.
+        refreshMessageUnreadIndicators();
 
         console.log(
           "U9 Message Home: Groups loaded.",
@@ -1783,11 +1794,6 @@
      MESSAGE HOME
   ================================================= */
 
-  function isMessageModalOpen() {
-    const modal = getMessageModal();
-    return Boolean(modal && modal.classList.contains("modal-open"));
-  }
-
   function showMessageHome() {
     const content = getMessageModalContent();
 
@@ -1819,14 +1825,11 @@
     hideAllMessagePages();
 
     /*
-     * Navigation is initialized while the modal is closed. Do not load lists
-     * until the user actually opens Message; the global unread poller handles
-     * the header indicators independently.
+     * Refresh both friends and joined groups whenever
+     * the user opens or returns to Message home.
      */
-    if (isMessageModalOpen()) {
-      loadHomeFriends();
-      loadHomeGroups();
-    }
+    loadHomeFriends();
+    loadHomeGroups();
 
     return true;
   }
@@ -2288,13 +2291,13 @@
     }
 
     modal.classList.remove("modal-closing");
-    modal.classList.add("modal-open");
 
     showMessageHome();
-    // Refresh unread dots once when opened; the 15-second global poll continues
-    // to keep the header indicators updated while the modal is closed.
+
+    modal.classList.add("modal-open");
+
     if (isAuthenticatedUser() && !document.hidden) {
-      void refreshMessageUnreadIndicators();
+      startUnreadMessagePolling();
     }
 
     return true;
@@ -2322,6 +2325,8 @@
 
     modal.classList.remove("modal-open");
 
+    // Stop unread polling immediately when the modal starts closing.
+    stopUnreadMessagePolling();
     modal.classList.add("modal-closing");
 
     if (closeAnimationTimer !== null) {
@@ -2522,13 +2527,13 @@
     bindGroupChatEvents();
     initializeMessageNavigation();
 
-    // Header authentication resolves asynchronously. Start protected polling
-    // only after the canonical user state confirms an authenticated session.
-    startUnreadMessagePolling();
+    // Authentication can resolve asynchronously, but polling starts only if
+    // the modal is already open. openMessageModal() starts it on demand.
     if (window.U9User && typeof window.U9User.subscribe === "function") {
       window.U9User.subscribe(function () {
         if (isAuthenticatedUser()) {
-          startUnreadMessagePolling();
+          if (isMessageModalOpen() && !document.hidden) startUnreadMessagePolling();
+          else stopUnreadMessagePolling();
         } else {
           stopUnreadMessagePolling();
           renderAnonymousMessageState();
@@ -2539,7 +2544,7 @@
     document.addEventListener("visibilitychange", function () {
       if (document.hidden) {
         stopUnreadMessagePolling();
-      } else if (isAuthenticatedUser()) {
+      } else if (isAuthenticatedUser() && isMessageModalOpen()) {
         startUnreadMessagePolling();
       }
     });
