@@ -42,7 +42,8 @@
     lastError: "",
     unreadCacheAt: 0,
     unreadSummaryPromise: null,
-    unreadSummaryCache: { has_unread: false, unread_by_conversation: {} }
+    unreadSummaryCache: { has_unread: false, unread_by_conversation: {} },
+    pageDataLoaded: false
   };
 
   function getRoot() {
@@ -134,56 +135,8 @@
     return result;
   }
 
-  // Read the existing message read_at state through the current API. To keep
-  // polling lightweight, only inspect conversations whose last activity is
-  // newer than the customer's/agent's last-read timestamp (or has never been read).
-  async function getUnreadCounts(conversations, incomingSenderType) {
-    const rows = Array.isArray(conversations) ? conversations : [];
-    const counts = {};
-    const candidates = rows.filter(function (conversation) {
-      const id = String(conversation?.id || "");
-      if (!id) return false;
-      const readAt = incomingSenderType === "agent"
-        ? conversation.customer_last_read_at
-        : conversation.agent_last_read_at;
-      const lastActivity = conversation.last_message_at || conversation.updated_at;
-      if (readAt && lastActivity) {
-        return new Date(lastActivity).getTime() > new Date(readAt).getTime();
-      }
-      return true;
-    });
-
-    // Bound concurrency so a user with many historical conversations does not
-    // create a burst of requests against the existing Edge Function.
-    let nextIndex = 0;
-    const workers = Array.from({ length: Math.min(4, candidates.length) }, async function () {
-      while (nextIndex < candidates.length) {
-        const conversation = candidates[nextIndex++];
-        const id = String(conversation.id);
-        try {
-          const result = await callCustomerServiceAPI("list_messages", {
-            conversation_id: id,
-            limit: 200
-          });
-          const messages = Array.isArray(result.messages) ? result.messages : [];
-          const unread = messages.filter(function (message) {
-            return message.sender_type === incomingSenderType && !message.read_at && !message.deleted_at;
-          }).length;
-          if (unread > 0) counts[id] = unread;
-        } catch (error) {
-          // Keep the indicator conservative if an individual conversation fails.
-          console.warn("U9 Customer Service: Could not inspect unread messages for conversation.", id, error);
-        }
-      }
-    });
-    await Promise.all(workers);
-    return counts;
-  }
-
-  // The global navigation badge only needs to know whether any conversation
-  // is likely unread. Do not fetch up to 200 messages for every conversation
-  // on every 15-second poll; the visible Customer Service page still uses the
-  // detailed getUnreadCounts() path when rendering individual rows.
+  // Use conversation activity/read timestamps for lightweight unread flags.
+  // Never fetch each conversation's message history just to paint unread badges.
   function getUnreadConversationFlags(conversations, incomingSenderType) {
     const flags = {};
     (Array.isArray(conversations) ? conversations : []).forEach(function (conversation) {
@@ -206,7 +159,9 @@
   async function loadUnreadSummary(force) {
     const now = Date.now();
     // Share the result with other callers in the same polling cycle.
-    if (!force && state.unreadSummaryCache && now - state.unreadCacheAt < 14000) {
+    // The global message poll runs every 15 seconds. Keep this cache longer
+    // than that interval so it does not independently trigger another API burst.
+    if (!force && state.unreadSummaryCache && now - state.unreadCacheAt < 25000) {
       return state.unreadSummaryCache;
     }
     if (state.unreadSummaryPromise) return state.unreadSummaryPromise;
@@ -218,20 +173,39 @@
     }
 
     state.unreadSummaryPromise = (async function () {
-      const mineResult = await callCustomerServiceAPI("list_my_conversations", { limit: 100 });
-      const mine = Array.isArray(mineResult.conversations) ? mineResult.conversations : [];
-      const customerUnread = getUnreadConversationFlags(mine, "agent");
-      let agentUnread = {};
-      try {
-        const agentStatus = await callCustomerServiceAPI("get_my_agent_status", {});
-        if (agentStatus.is_agent === true) {
-          const agentResult = await callCustomerServiceAPI("list_agent_conversations", { status: "active", limit: 100 });
-          const agentRows = Array.isArray(agentResult.conversations) ? agentResult.conversations : [];
-          agentUnread = getUnreadConversationFlags(agentRows, "customer");
+      let mine;
+      let agentRows = [];
+
+      // If the Customer Service page has already loaded its lists, reuse them
+      // rather than repeating the same API calls for the global badge.
+      if (isPageActive() && state.pageDataLoaded) {
+        mine = state.myConversations;
+        agentRows = state.isAgent ? state.agentConversations : [];
+      } else {
+        // If a page refresh is already underway, wait for it and reuse its data.
+        if (isPageActive() && state.refreshPromise) {
+          await state.refreshPromise;
         }
-      } catch (error) {
-        // A normal customer is not allowed to load the agent queue; that is expected.
+        if (isPageActive() && state.pageDataLoaded) {
+          mine = state.myConversations;
+          agentRows = state.isAgent ? state.agentConversations : [];
+        } else {
+          const mineResult = await callCustomerServiceAPI("list_my_conversations", { limit: 100 });
+          mine = Array.isArray(mineResult.conversations) ? mineResult.conversations : [];
+          try {
+            const agentStatus = await callCustomerServiceAPI("get_my_agent_status", {});
+            if (agentStatus.is_agent === true) {
+              const agentResult = await callCustomerServiceAPI("list_agent_conversations", { status: "active", limit: 100 });
+              agentRows = Array.isArray(agentResult.conversations) ? agentResult.conversations : [];
+            }
+          } catch (error) {
+            // A normal customer is not allowed to load the agent queue; that is expected.
+          }
+        }
       }
+
+      const customerUnread = getUnreadConversationFlags(mine, "agent");
+      const agentUnread = getUnreadConversationFlags(agentRows, "customer");
       const combined = { ...customerUnread, ...agentUnread };
       const summary = {
         has_unread: Object.values(combined).some(function (count) { return Number(count) > 0; }),
@@ -533,7 +507,7 @@
       try {
         const mine = await callCustomerServiceAPI("list_my_conversations", { limit: 100 });
         state.myConversations = Array.isArray(mine.conversations) ? mine.conversations : [];
-        const customerUnreadCounts = await getUnreadCounts(state.myConversations, "agent");
+        const customerUnreadCounts = getUnreadConversationFlags(state.myConversations, "agent");
         state.myConversations = state.myConversations.map(function (conversation) {
           return { ...conversation, unread_count: Number(customerUnreadCounts[String(conversation.id)] || 0) };
         });
@@ -554,7 +528,7 @@
                 limit: 100
               });
               state.agentConversations = Array.isArray(agentResult.conversations) ? agentResult.conversations : [];
-              const agentUnreadCounts = await getUnreadCounts(state.agentConversations, "customer");
+              const agentUnreadCounts = getUnreadConversationFlags(state.agentConversations, "customer");
               state.agentConversations = state.agentConversations.map(function (conversation) {
                 return { ...conversation, unread_count: Number(agentUnreadCounts[String(conversation.id)] || 0) };
               });
@@ -576,6 +550,17 @@
         }
 
         updateAllViews();
+        state.pageDataLoaded = true;
+        // Prime the global badge cache from the data already fetched by this refresh.
+        const cachedCombined = {
+          ...getUnreadConversationFlags(state.myConversations, "agent"),
+          ...(state.isAgent ? getUnreadConversationFlags(state.agentConversations, "customer") : {})
+        };
+        state.unreadSummaryCache = {
+          has_unread: Object.values(cachedCombined).some(function (count) { return Number(count) > 0; }),
+          unread_by_conversation: cachedCombined
+        };
+        state.unreadCacheAt = Date.now();
         return true;
       } catch (error) {
         console.error("U9 Customer Service: Could not load conversations.", error);
