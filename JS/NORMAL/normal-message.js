@@ -516,9 +516,11 @@
      UNREAD MESSAGE INDICATORS (ONE-TO-ONE FRIEND CHAT)
   ================================================= */
 
-  async function refreshMessageUnreadIndicators() {
-    // Do not request message data while the Message modal is closed.
-    if (!isMessageModalOpen()) return;
+  async function refreshMessageUnreadIndicators(options) {
+    // Normally fetch only while the Message modal is open. Container Tool may
+    // request one initial refresh on page load so its unread dot is correct.
+    const allowClosedModal = Boolean(options && options.allowClosedModal === true);
+    if (!allowClosedModal && !isMessageModalOpen()) return;
     if (!isAuthenticatedUser()) {
       renderAnonymousMessageState();
       return;
@@ -532,7 +534,7 @@
 
       try {
         const result = await callMessageAPI("get_unread_messages");
-        if (!isMessageModalOpen()) return;
+        if (!allowClosedModal && !isMessageModalOpen()) return;
         unreadBySender = result.unread_by_sender && typeof result.unread_by_sender === "object"
           ? result.unread_by_sender : {};
         friendHasUnread = Boolean(result.has_unread) || Object.values(unreadBySender).some((count) => Number(count) > 0);
@@ -550,7 +552,7 @@
 
       try {
         const result = await callGroupAPI("list_my_groups");
-        if (!isMessageModalOpen()) return;
+        if (!allowClosedModal && !isMessageModalOpen()) return;
         const groups = normalizeHomeGroups(result.groups);
         unreadByGroup = {};
         groups.forEach(function (group) {
@@ -572,7 +574,7 @@
       let friendRequestsHaveUnread = false;
       try {
         const requestSummary = await callMessageAPI("get_unread_friend_requests");
-        if (!isMessageModalOpen()) return;
+        if (!allowClosedModal && !isMessageModalOpen()) return;
         friendRequestsHaveUnread = requestSummary?.has_unread === true || Number(requestSummary?.unread_count || 0) > 0;
       } catch (error) {
         console.warn("U9 Message: Could not refresh friend-request unread indicator.", error);
@@ -581,7 +583,7 @@
       let groupRequestsHaveUnread = false;
       try {
         const requestSummary = await callGroupAPI("get_unread_group_join_requests");
-        if (!isMessageModalOpen()) return;
+        if (!allowClosedModal && !isMessageModalOpen()) return;
         groupRequestsHaveUnread = requestSummary?.has_unread === true || Number(requestSummary?.unread_count || 0) > 0;
       } catch (error) {
         console.warn("U9 Message: Could not refresh group-request unread indicator.", error);
