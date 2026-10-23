@@ -477,11 +477,41 @@
   }
 
   /* =================================================
+     AUTH STATE
+
+     Protected message APIs should only run for an authenticated user.
+     U9User is initialized by header.js and exposes the canonical state.
+  ================================================= */
+
+  function isAuthenticatedUser() {
+    return Boolean(
+      window.U9User &&
+      typeof window.U9User.isLoggedIn === "function" &&
+      window.U9User.isLoggedIn()
+    );
+  }
+
+  function renderAnonymousMessageState() {
+    const friendsContainer = getHomeFriendsList();
+    const groupsContainer = getHomeGroupsList();
+    if (friendsContainer && !homeFriendsLoaded) {
+      renderHomeFriendsMessage("Sign in to view your friends.", "empty");
+    }
+    if (groupsContainer && !homeGroupsLoaded) {
+      renderHomeGroupsMessage("Sign in to view your groups.", "empty");
+    }
+  }
+
+  /* =================================================
      UNREAD MESSAGE INDICATORS (ONE-TO-ONE FRIEND CHAT)
   ================================================= */
 
   async function refreshMessageUnreadIndicators() {
-    if (unreadRefreshInFlight) return;
+    if (!isAuthenticatedUser()) {
+      renderAnonymousMessageState();
+      return;
+    }
+    if (document.hidden || unreadRefreshInFlight) return;
     unreadRefreshInFlight = true;
 
     try {
@@ -586,16 +616,28 @@
     }
   }
 
-  function startUnreadMessagePolling() {
+  function stopUnreadMessagePolling() {
     if (unreadRefreshTimer !== null) {
       window.clearInterval(unreadRefreshTimer);
+      unreadRefreshTimer = null;
+    }
+  }
+
+  function startUnreadMessagePolling() {
+    stopUnreadMessagePolling();
+
+    // Anonymous users should not trigger protected API requests.
+    if (!isAuthenticatedUser() || document.hidden) {
+      renderAnonymousMessageState();
+      return;
     }
 
-    refreshMessageUnreadIndicators();
-    unreadRefreshTimer = window.setInterval(
-      refreshMessageUnreadIndicators,
-      5000
-    );
+    void refreshMessageUnreadIndicators();
+    unreadRefreshTimer = window.setInterval(function () {
+      if (isAuthenticatedUser() && !document.hidden) {
+        void refreshMessageUnreadIndicators();
+      }
+    }, 15000);
   }
 
   /* =================================================
@@ -1016,6 +1058,11 @@
       return Promise.resolve([]);
     }
 
+    if (!isAuthenticatedUser()) {
+      renderAnonymousMessageState();
+      return Promise.resolve([]);
+    }
+
     const force = options.force === true;
 
     /*
@@ -1346,6 +1393,11 @@
     const container = getHomeGroupsList();
 
     if (!container) {
+      return Promise.resolve([]);
+    }
+
+    if (!isAuthenticatedUser()) {
+      renderAnonymousMessageState();
       return Promise.resolve([]);
     }
 
@@ -2450,10 +2502,27 @@
     bindHomeFriendsEvents();
     bindGroupChatEvents();
     initializeMessageNavigation();
+
+    // Header authentication resolves asynchronously. Start protected polling
+    // only after the canonical user state confirms an authenticated session.
     startUnreadMessagePolling();
+    if (window.U9User && typeof window.U9User.subscribe === "function") {
+      window.U9User.subscribe(function () {
+        if (isAuthenticatedUser()) {
+          startUnreadMessagePolling();
+        } else {
+          stopUnreadMessagePolling();
+          renderAnonymousMessageState();
+        }
+      });
+    }
 
     document.addEventListener("visibilitychange", function () {
-      if (!document.hidden) refreshMessageUnreadIndicators();
+      if (document.hidden) {
+        stopUnreadMessagePolling();
+      } else if (isAuthenticatedUser()) {
+        startUnreadMessagePolling();
+      }
     });
     registerMessageWindowManager();
 
