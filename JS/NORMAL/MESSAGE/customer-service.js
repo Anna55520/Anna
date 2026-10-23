@@ -180,24 +180,54 @@
     return counts;
   }
 
+  // The global navigation badge only needs to know whether any conversation
+  // is likely unread. Do not fetch up to 200 messages for every conversation
+  // on every 15-second poll; the visible Customer Service page still uses the
+  // detailed getUnreadCounts() path when rendering individual rows.
+  function getUnreadConversationFlags(conversations, incomingSenderType) {
+    const flags = {};
+    (Array.isArray(conversations) ? conversations : []).forEach(function (conversation) {
+      const id = String(conversation?.id || "");
+      if (!id) return;
+      const readAt = incomingSenderType === "agent"
+        ? conversation.customer_last_read_at
+        : conversation.agent_last_read_at;
+      const lastActivity = conversation.last_message_at || conversation.updated_at;
+      if (!lastActivity) return;
+      const activityTime = new Date(lastActivity).getTime();
+      const readTime = readAt ? new Date(readAt).getTime() : NaN;
+      if (Number.isFinite(activityTime) && (!Number.isFinite(readTime) || activityTime > readTime)) {
+        flags[id] = 1;
+      }
+    });
+    return flags;
+  }
+
   async function loadUnreadSummary(force) {
     const now = Date.now();
-    if (!force && state.unreadSummaryCache && now - state.unreadCacheAt < 10000) {
+    // Share the result with other callers in the same polling cycle.
+    if (!force && state.unreadSummaryCache && now - state.unreadCacheAt < 14000) {
       return state.unreadSummaryCache;
     }
     if (state.unreadSummaryPromise) return state.unreadSummaryPromise;
 
+    // Avoid starting protected summary requests after the canonical auth state
+    // explicitly says the visitor is signed out.
+    if (window.U9User && typeof window.U9User.isLoggedIn === "function" && !window.U9User.isLoggedIn()) {
+      return { has_unread: false, unread_by_conversation: {} };
+    }
+
     state.unreadSummaryPromise = (async function () {
       const mineResult = await callCustomerServiceAPI("list_my_conversations", { limit: 100 });
       const mine = Array.isArray(mineResult.conversations) ? mineResult.conversations : [];
-      const customerUnread = await getUnreadCounts(mine, "agent");
+      const customerUnread = getUnreadConversationFlags(mine, "agent");
       let agentUnread = {};
       try {
         const agentStatus = await callCustomerServiceAPI("get_my_agent_status", {});
         if (agentStatus.is_agent === true) {
           const agentResult = await callCustomerServiceAPI("list_agent_conversations", { status: "active", limit: 100 });
           const agentRows = Array.isArray(agentResult.conversations) ? agentResult.conversations : [];
-          agentUnread = await getUnreadCounts(agentRows, "customer");
+          agentUnread = getUnreadConversationFlags(agentRows, "customer");
         }
       } catch (error) {
         // A normal customer is not allowed to load the agent queue; that is expected.
@@ -575,11 +605,11 @@
       clearTimeout(state.refreshTimer);
       state.refreshTimer = null;
     }
-    if (!isPageActive()) return;
+    if (!isPageActive() || document.hidden) return;
 
     state.refreshTimer = setTimeout(async function () {
       state.refreshTimer = null;
-      if (!isPageActive()) return;
+      if (!isPageActive() || document.hidden) return;
       await refreshPage({ silent: true });
     }, REFRESH_INTERVAL_MS);
   }
@@ -710,7 +740,18 @@
 
     window.addEventListener("u9:customer-service:conversation-updated", function () {
       invalidateUnreadSummary();
-      if (isPageActive()) refreshPage({ silent: true });
+      if (isPageActive() && !document.hidden) refreshPage({ silent: true });
+    });
+
+    document.addEventListener("visibilitychange", function () {
+      if (document.hidden) {
+        if (state.refreshTimer !== null) {
+          clearTimeout(state.refreshTimer);
+          state.refreshTimer = null;
+        }
+      } else if (isPageActive()) {
+        void refreshPage({ silent: true });
+      }
     });
   }
 
@@ -721,6 +762,7 @@
     }
     if (!state.shellRendered && !renderShell()) return false;
     bindEvents();
+    if (document.hidden) return true;
     await refreshPage({ silent: false });
     scheduleRefresh();
     return true;
