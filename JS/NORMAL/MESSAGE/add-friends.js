@@ -2250,6 +2250,7 @@
         );
       }
 
+      return true;
 
     } catch (error) {
 
@@ -2283,6 +2284,8 @@
 
       sentStatus.hidden =
         false;
+
+      return false;
 
     } finally {
 
@@ -2330,13 +2333,8 @@
   );
 
 
-  /*
-   * Load:
-   * - friends
-   * - sent requests
-   * - received requests
-   */
-  loadRelationships();
+  // Relationships are fetched when the user opens the Add Friend page,
+  // not when this script is loaded during application startup.
 
 
   /*
@@ -2346,12 +2344,15 @@
    * relationship lists without rebuilding the form or losing state.
    */
   window.initializeAddFriendsPage = async function initializeAddFriendsPage() {
-    try {
-      await callMessageAPI("mark_friend_requests_read");
-    } catch (error) {
-      console.warn("U9 Add Friend: could not mark requests as read.", error);
+    const loaded = await loadRelationships();
+    if (loaded) {
+      try {
+        await callMessageAPI("mark_friend_requests_read");
+      } catch (error) {
+        console.warn("U9 Add Friend: could not mark requests as read.", error);
+      }
     }
-    return loadRelationships();
+    return loaded;
   };
 
   /* Optional global refresh hook used by other Message components. */
