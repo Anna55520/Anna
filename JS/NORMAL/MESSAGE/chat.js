@@ -1954,44 +1954,9 @@
   }
 
   function scheduleMessagePolling() {
+    // Real-time is intentionally not used. Do not periodically reload chat
+    // messages; opening a conversation and explicit message actions load data.
     stopMessagePolling();
-
-    if (
-      !isChatActive ||
-      !currentChatUser?.id
-    ) {
-      return;
-    }
-
-    const scheduledVersion =
-      currentRequestVersion;
-
-    pollTimer = setTimeout(
-      async function () {
-        pollTimer = null;
-
-        if (
-          !isChatActive ||
-          scheduledVersion !== currentRequestVersion
-        ) {
-          return;
-        }
-
-        try {
-          await loadChatMessages({
-            silent: true
-          });
-        } finally {
-          if (
-            isChatActive &&
-            scheduledVersion === currentRequestVersion
-          ) {
-            scheduleMessagePolling();
-          }
-        }
-      },
-      POLL_INTERVAL_MS
-    );
   }
 
   /* =================================================
