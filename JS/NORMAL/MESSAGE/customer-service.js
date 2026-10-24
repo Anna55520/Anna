@@ -601,17 +601,12 @@
   }
 
   function scheduleRefresh() {
+    // No background polling. Customer-service data is refreshed only by an
+    // explicit page/open action or the user's Refresh button.
     if (state.refreshTimer !== null) {
       clearTimeout(state.refreshTimer);
       state.refreshTimer = null;
     }
-    if (!isPageActive()) return;
-
-    state.refreshTimer = setTimeout(async function () {
-      state.refreshTimer = null;
-      if (!isPageActive()) return;
-      await refreshPage({ silent: true });
-    }, REFRESH_INTERVAL_MS);
   }
 
   function openChat(conversation, side) {
