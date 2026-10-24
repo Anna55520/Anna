@@ -642,22 +642,16 @@
   }
 
   function startUnreadMessagePolling() {
+    // Deliberately no polling: fetch the unread summary only when the Message
+    // modal is explicitly opened (or another explicit user action requests it).
     stopUnreadMessagePolling();
-
-    // Poll only while the Message modal is open.
     if (!isMessageModalOpen()) return;
-    // Anonymous users should not trigger protected API requests.
-    if (!isAuthenticatedUser() || document.hidden) {
+    if (!isAuthenticatedUser()) {
       renderAnonymousMessageState();
       return;
     }
-
+    if (document.hidden) return;
     void refreshMessageUnreadIndicators();
-    unreadRefreshTimer = window.setInterval(function () {
-      if (isAuthenticatedUser() && !document.hidden) {
-        void refreshMessageUnreadIndicators();
-      }
-    }, 15000);
   }
 
   /* =================================================
@@ -2547,7 +2541,7 @@
       if (document.hidden) {
         stopUnreadMessagePolling();
       } else if (isAuthenticatedUser() && isMessageModalOpen()) {
-        startUnreadMessagePolling();
+        // Visibility changes alone must not trigger API requests.
       }
     });
     registerMessageWindowManager();
