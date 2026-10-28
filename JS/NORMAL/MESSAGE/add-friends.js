@@ -1,391 +1,372 @@
 
-/* =========================================================
-   U9 MESSAGE - ADD FRIEND PAGE
-   File: JS/NORMAL/MESSAGE/add-friends.js
+/* =================================================
+   U9 MESSAGE CHAT
+   File: JS/NORMAL/MESSAGE/chat.js
 
-   Uses existing Supabase Edge Function:
-   message-api
+   Features:
+   - One-to-one chat
+   - Group chat
+   - Customer-service chat
+   - Load and send text messages
+   - Load messages on conversation open and explicit user actions (no polling)
+   - Auto-resizing multiline chat input
+   - Mobile virtual-keyboard viewport adjustment
+   - Centered loading and empty-state messages
+   - Customer-service read / close support
+   - Send image messages in one-to-one chats
+   - Stop refreshing after leaving Chat
+================================================= */
 
-   Supported actions:
-   - search_users
-   - send_friend_request
-   - list_friends
-   - list_friend_requests
-   - respond_friend_request
-
-   Avatar handling aligned with the working Friends page:
-   - uploaded/custom avatar URLs
-   - free avatars resolved from /api/avatar-free
-   - avatar frame URL/type/ID compatibility
-
-   This file only manages Add Friend page content.
-   It does not manage:
-   - Message modal
-   - navigation
-   - header
-   - friends.js
-   - chat.js
-   ========================================================= */
-
-(() => {
+(function () {
   "use strict";
 
-  /*
-   * Prevent duplicate module initialization.
-   */
-  if (window.U9AddFriendsModuleLoaded) {
-    return;
-  }
+  if (window.__U9ChatPageInitialized) return;
+  window.__U9ChatPageInitialized = true;
 
-  window.U9AddFriendsModuleLoaded = true;
+  /* =================================================
+     CONFIGURATION
+  ================================================= */
 
   const MESSAGE_API_URL = "/api/message-api";
+  const GROUP_API_URL = "/api/group-api";
+  const CUSTOMER_SERVICE_API_URL =
+    "/api/customer-service-api";
+  const ME_API_URL = "/api/me";
 
-  const DEFAULT_AVATAR =
-    "/SSVG/avatar/profile.svg";
+  const DEFAULT_AVATAR = "/SSVG/avatar/profile.svg";
 
-  const DEFAULT_AVATAR_FRAME =
-    "/SSVG/avatar/ordinary.svg";
+  const MAX_MESSAGE_LENGTH = 5000;
+  const CHAT_INPUT_MAX_HEIGHT = 132;
 
-  const ROOT_ID =
-    "Message-model-add-friends-root";
+  /* =================================================
+     DOM ELEMENTS
+  ================================================= */
 
-  const root = document.getElementById(ROOT_ID);
+  const chatPage = document.getElementById(
+    "Message-model-chat-page"
+  );
 
-  if (!root) {
-    console.warn(
-      "U9 Add Friend: page root was not found."
-    );
-    return;
+  const chatBackButton = document.getElementById(
+    "Message-model-chat-back"
+  );
+
+  const chatAvatar = document.getElementById(
+    "Message-model-chat-avatar"
+  );
+
+  const chatName = document.getElementById(
+    "Message-model-chat-name"
+  );
+
+  const chatStatus = document.getElementById(
+    "Message-model-chat-status"
+  );
+
+  const chatMoreButton = document.getElementById(
+    "Message-model-chat-more"
+  );
+
+  const chatMessages = document.getElementById(
+    "Message-model-chat-messages"
+  );
+
+  const chatForm = document.getElementById(
+    "Message-model-chat-form"
+  );
+
+  const chatInput = document.getElementById(
+    "Message-model-chat-input"
+  );
+
+  const chatSendButton = document.getElementById(
+    "Message-model-chat-send"
+  );
+
+  const chatAttachmentButton = document.getElementById(
+    "U9-message-chat-add-button"
+  );
+
+  let chatImageFileInput = null;
+
+  /* =================================================
+     STATE
+  ================================================= */
+
+  let currentChatUser = null;
+  let currentUserId = null;
+
+  let currentUserLookupAttempted = false;
+  let currentUserLookupPromise = null;
+
+  let isChatActive = false;
+  let isLoadingMessages = false;
+  let isSendingMessage = false;
+
+  let pollTimer = null;
+  let lastRenderedSignature = null;
+
+  let currentRequestVersion = 0;
+  let chatEventsBound = false;
+  let viewportEventsBound = false;
+
+  let activeMessageLoadPromise = null;
+
+  // In-memory only: survives navigation within this page, resets on reload.
+  const conversationMessageCache = new Map();
+
+  // Avoid repeating read-state writes while an API response still returns
+  // stale unread flags for messages that have already been marked read.
+  const successfullyMarkedFriendUnreadKeys = new Map();
+  const successfullyMarkedCustomerServiceUnreadKeys = new Map();
+  const lastMarkedGroupMessageIds = new Map();
+
+  function getConversationCacheKey(type, id) {
+    const accountId = currentUserId ? String(currentUserId) : "anonymous";
+    return accountId + ":" + String(type || "friend") + ":" + String(id || "");
   }
 
-  /* =======================================================
-     STATE
-  ======================================================= */
-
-  const friendIds = new Set();
-
-  /*
-   * IDs of users that currently have an outgoing
-   * pending friend request.
-   */
-  const pendingRequestIds = new Set();
-
-  /*
-   * Received pending requests.
-   *
-   * Key:
-   *   sender user id
-   *
-   * Value:
-   *   complete request object
-   */
-  const receivedRequests = new Map();
-
-  let displayedUsers = [];
-
-  let isSearching = false;
-  let requestBusy = false;
-  let relationshipLoading = false;
-
-  /* =======================================================
-     PAGE CONTENT
-  ======================================================= */
-
-  root.innerHTML = `
-    <div class="u9-af-container">
-
-      <header class="u9-af-header">
-        <h2 class="u9-af-heading">
-          Add Friend
-        </h2>
-
-        <p class="u9-af-subtitle">
-          Find people on U9 and send them a friend request.
-        </p>
-      </header>
-
-
-      <!-- =================================================
-           SEARCH
-      ================================================== -->
-
-      <section class="u9-af-panel">
-
-        <form id="u9-af-search-form">
-
-          <label
-            class="u9-af-label"
-            for="u9-af-search-input"
-          >
-            Account
-          </label>
-
-          <div class="u9-af-search-row">
-
-            <input
-              id="u9-af-search-input"
-              class="u9-af-input"
-              type="search"
-              name="search"
-              maxlength="100"
-              autocomplete="off"
-              placeholder="Enter the full account (e.g. A1B2C3)"
-              aria-label="Search by account only"
-              required
-            >
-
-            <button
-              id="u9-af-search-button"
-              class="u9-af-button"
-              type="submit"
-            >
-              Search
-            </button>
-
-          </div>
-
-
-          <div style="height: 17px"></div>
-
-
-          <label
-            class="u9-af-label"
-            for="u9-af-initial-message"
-          >
-            Introduction (Optional)
-          </label>
-
-          <textarea
-            id="u9-af-initial-message"
-            class="u9-af-input u9-af-textarea"
-            maxlength="1000"
-            placeholder="Write a short message with your request..."
-          ></textarea>
-
-          <div
-            id="u9-af-message-counter"
-            class="u9-af-counter"
-          >
-            0 / 1000
-          </div>
-
-
-          <div
-            id="u9-af-feedback"
-            class="u9-af-feedback"
-            role="status"
-            aria-live="polite"
-          ></div>
-
-        </form>
-
-      </section>
-
-
-      <!-- =================================================
-           SEARCH RESULTS
-      ================================================== -->
-
-      <section class="u9-af-results-section">
-
-        <h3 class="u9-af-results-heading">
-          Search Results
-        </h3>
-
-        <p
-          id="u9-af-results-status"
-          class="u9-af-results-status"
-          aria-live="polite"
-        >
-          Search by exact account to find someone.
-        </p>
-
-        <div
-          id="u9-af-results"
-          class="u9-af-results"
-        ></div>
-
-      </section>
-
-
-      <!-- =================================================
-           RECEIVED REQUESTS
-      ================================================== -->
-
-      <section
-        class="u9-af-requests-section"
-        aria-labelledby="u9-af-received-heading"
-      >
-
-        <div class="u9-af-requests-header">
-
-          <h3
-            id="u9-af-received-heading"
-            class="u9-af-results-heading"
-          >
-            Received Requests
-          </h3>
-
-          <span
-            id="u9-af-received-count"
-            class="u9-af-count"
-          >
-            0
-          </span>
-
-        </div>
-
-
-        <p
-          id="u9-af-received-status"
-          class="u9-af-results-status"
-          aria-live="polite"
-        >
-          Loading friend requests...
-        </p>
-
-
-        <div
-          id="u9-af-received"
-          class="u9-af-request-list"
-        ></div>
-
-      </section>
-
-
-      <!-- =================================================
-           SENT REQUESTS
-      ================================================== -->
-
-      <section
-        class="u9-af-requests-section"
-        aria-labelledby="u9-af-sent-heading"
-      >
-
-        <div class="u9-af-requests-header">
-
-          <h3
-            id="u9-af-sent-heading"
-            class="u9-af-results-heading"
-          >
-            Sent Requests
-          </h3>
-
-          <span
-            id="u9-af-sent-count"
-            class="u9-af-count"
-          >
-            0
-          </span>
-
-        </div>
-
-
-        <p
-          id="u9-af-sent-status"
-          class="u9-af-results-status"
-          aria-live="polite"
-        >
-          Loading friend requests...
-        </p>
-
-
-        <div
-          id="u9-af-sent"
-          class="u9-af-request-list"
-        ></div>
-
-      </section>
-
-    </div>
-  `;
-
-
-  /* =======================================================
-     ELEMENTS
-  ======================================================= */
-
-  const searchForm =
-    root.querySelector("#u9-af-search-form");
-
-  const searchInput =
-    root.querySelector("#u9-af-search-input");
-
-  const searchButton =
-    root.querySelector("#u9-af-search-button");
-
-  const initialMessageInput =
-    root.querySelector("#u9-af-initial-message");
-
-  const messageCounter =
-    root.querySelector("#u9-af-message-counter");
-
-  const feedback =
-    root.querySelector("#u9-af-feedback");
-
-  const resultsStatus =
-    root.querySelector("#u9-af-results-status");
-
-  const resultsContainer =
-    root.querySelector("#u9-af-results");
-
-  const receivedContainer =
-    root.querySelector("#u9-af-received");
-
-  const receivedStatus =
-    root.querySelector("#u9-af-received-status");
-
-  const receivedCount =
-    root.querySelector("#u9-af-received-count");
-
-  const sentContainer =
-    root.querySelector("#u9-af-sent");
-
-  const sentStatus =
-    root.querySelector("#u9-af-sent-status");
-
-  const sentCount =
-    root.querySelector("#u9-af-sent-count");
-
-
-  /* =======================================================
-     AUTHENTICATION
-  ======================================================= */
-
-  function getAuthToken() {
-    const possibleKeys = [
+  function getCachedConversationMessages(type, id) {
+    const key = getConversationCacheKey(type, id);
+    return conversationMessageCache.has(key)
+      ? conversationMessageCache.get(key)
+      : null;
+  }
+
+  function cacheConversationMessages(type, id, messages) {
+    if (!Array.isArray(messages)) return;
+    const key = getConversationCacheKey(type, id);
+    // Keep a shallow copy so callers cannot accidentally mutate the cache array.
+    conversationMessageCache.set(key, messages.slice());
+  }
+
+  /* =================================================
+     IMAGE URL
+  ================================================= */
+  
+  function normalizeImageURL(value, fallback) {
+    if (typeof value !== "string") {
+      return fallback;
+    }
+
+    const url = value.trim();
+
+    if (!url) return fallback;
+
+    // Route signed Supabase Storage URLs through Vercel.
+    try {
+      const parsed = new URL(url);
+
+      if (
+        parsed.protocol === "https:" &&
+        parsed.hostname ===
+          "vjlpowhxmflpkjlukkfy.supabase.co" &&
+        parsed.pathname.startsWith(
+          "/storage/v1/object/sign/"
+        )
+      ) {
+        const storagePath = parsed.pathname.slice(
+          "/storage/v1/object/sign/".length
+        );
+
+        // Preserve the signed URL query string, including token.
+        return (
+          "/chat-storage/" +
+          storagePath +
+          parsed.search
+        );
+      }
+    } catch (error) {
+      // Continue with normal URL validation.
+    }
+
+    if (/^https?:\/\//i.test(url)) {
+      return url;
+    }
+
+    if (url.startsWith("/") && !url.startsWith("//")) {
+      return url;
+    }
+
+    if (
+      /^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(
+        url
+      )
+    ) {
+      return url;
+    }
+
+    return fallback;
+  }
+
+
+  /* =================================================
+     SESSION TOKEN
+  ================================================= */
+
+  function getSessionToken() {
+    const keys = [
       "u9_token",
-      "u9_session",
-      "session_token",
-      "access_token"
+      "u9_access_token",
+      "access_token",
+      "authToken",
+      "token"
     ];
 
-    for (const key of possibleKeys) {
+    for (const key of keys) {
       try {
-        const value =
-          localStorage.getItem(key);
+        const value = localStorage.getItem(key);
 
-        if (
-          typeof value === "string" &&
-          value.trim()
-        ) {
+        if (value && value.trim()) {
           return value.trim();
         }
-      } catch (_) {
-        // Continue.
+      } catch (error) {
+        console.warn(
+          "U9 Chat: Cannot read session storage."
+        );
+
+        return "";
       }
     }
 
     return "";
   }
 
+  function getRequestHeaders() {
+    const headers = {
+      "Content-Type": "application/json"
+    };
 
-  /* =======================================================
-     MESSAGE API
-  ======================================================= */
+    const token = getSessionToken();
+
+    if (token) {
+      headers.Authorization = "Bearer " + token;
+    }
+
+    return headers;
+  }
+
+  /* =================================================
+     SHARED API RESPONSE HANDLING
+  ================================================= */
+
+  async function parseAPIResponse(response, serverName) {
+    let result;
+
+    try {
+      result = await response.json();
+    } catch (error) {
+      const invalidResponse = new Error(
+        `${serverName} returned an invalid response (${response.status}).`
+      );
+
+      invalidResponse.status = response.status;
+
+      throw invalidResponse;
+    }
+
+    if (
+      !response.ok ||
+      !result ||
+      result.success !== true
+    ) {
+      const apiError = new Error(
+        result?.error ||
+        result?.message ||
+        `${serverName} request failed.`
+      );
+
+      apiError.status = response.status;
+
+      throw apiError;
+    }
+
+    return result;
+  }
+
+  /* =================================================
+     CALL MESSAGE API
+  ================================================= */
 
   async function callMessageAPI(
+    action,
+    payload = {}
+  ) {
+    let response;
+
+    try {
+      response = await fetch(MESSAGE_API_URL, {
+        method: "POST",
+        headers: getRequestHeaders(),
+        credentials: "include",
+        cache: "no-store",
+        body: JSON.stringify({
+          action,
+          ...payload
+        })
+      });
+    } catch (error) {
+      console.error(
+        "U9 Chat: Cannot reach message-api.",
+        error
+      );
+
+      const networkError = new Error(
+        "Could not connect to the messaging server. Check the message-api deployment and CORS settings."
+      );
+
+      networkError.cause = error;
+
+      throw networkError;
+    }
+
+    return parseAPIResponse(
+      response,
+      "The messaging server"
+    );
+  }
+
+  /* =================================================
+     GROUP SESSION TOKEN
+  ================================================= */
+
+  function getGroupSessionToken() {
+    for (const key of [
+      "u9_token",
+      "u9_session",
+      "session_token",
+      "access_token"
+    ]) {
+      try {
+        const value = localStorage.getItem(key);
+
+        if (value && value.trim()) {
+          return value.trim();
+        }
+      } catch (error) {
+        // Try the session cookie below.
+      }
+    }
+
+    try {
+      const match = document.cookie.match(
+        /(?:^|;\s*)u9_session=([^;]+)/
+      );
+
+      if (match?.[1]) {
+        return decodeURIComponent(match[1]);
+      }
+    } catch (error) {
+      // group-api will report authentication errors.
+    }
+
+    return "";
+  }
+
+  /* =================================================
+     CALL GROUP API
+  ================================================= */
+
+  async function callGroupAPI(
     action,
     payload = {}
   ) {
@@ -393,18 +374,64 @@
       "Content-Type": "application/json"
     };
 
-    const token = getAuthToken();
+    const token = getGroupSessionToken();
 
     if (token) {
-      headers.Authorization =
-        `Bearer ${token}`;
+      headers.Authorization = "Bearer " + token;
+    }
+
+    let response;
+
+    try {
+      response = await fetch(GROUP_API_URL, {
+        method: "POST",
+        headers,
+        credentials: "include",
+        cache: "no-store",
+        body: JSON.stringify({
+          action,
+          ...payload
+        })
+      });
+    } catch (error) {
+      const networkError = new Error(
+        "Could not connect to the group messaging server. Check the group-api deployment and CORS settings."
+      );
+
+      networkError.cause = error;
+
+      throw networkError;
+    }
+
+    return parseAPIResponse(
+      response,
+      "The group server"
+    );
+  }
+
+  /* =================================================
+     CALL CUSTOMER SERVICE API
+  ================================================= */
+
+  async function callCustomerServiceAPI(
+    action,
+    payload = {}
+  ) {
+    const headers = {
+      "Content-Type": "application/json"
+    };
+
+    const token = getGroupSessionToken();
+
+    if (token) {
+      headers.Authorization = "Bearer " + token;
     }
 
     let response;
 
     try {
       response = await fetch(
-        MESSAGE_API_URL,
+        CUSTOMER_SERVICE_API_URL,
         {
           method: "POST",
           headers,
@@ -417,1958 +444,2226 @@
         }
       );
     } catch (error) {
+      const networkError = new Error(
+        "Could not connect to customer service. Check the customer-service-api deployment and CORS settings."
+      );
 
-      console.error(
-        "U9 Add Friend: Message API connection failed.",
+      networkError.cause = error;
+
+      throw networkError;
+    }
+
+    return parseAPIResponse(
+      response,
+      "The customer service server"
+    );
+  }
+
+  /* =================================================
+     CUSTOMER SERVICE CONVERSATION
+  ================================================= */
+
+  function getCustomerServiceConversationId() {
+    return String(
+      currentChatUser?.conversationId ||
+      currentChatUser?.conversation_id ||
+      currentChatUser?.id ||
+      ""
+    );
+  }
+
+  function updateCustomerServiceComposer(
+    statusOverride
+  ) {
+    if (
+      currentChatUser?.type !== "customer_service"
+    ) {
+      if (chatInput) {
+        chatInput.disabled = false;
+
+        if (
+          /^(This conversation is closed|Message customer service\.\.\.|Reply to customer\.\.\.)$/.test(
+            chatInput.placeholder || ""
+          )
+        ) {
+          chatInput.placeholder = "Type a message...";
+        }
+      }
+
+      if (chatMoreButton) {
+        chatMoreButton.disabled = false;
+
+        chatMoreButton.setAttribute(
+          "aria-label",
+          "More chat options"
+        );
+
+        chatMoreButton.removeAttribute("title");
+      }
+
+      if (chatSendButton && !isSendingMessage) {
+        chatSendButton.disabled = false;
+      }
+
+      return;
+    }
+
+    if (
+      !currentChatUser.metadata ||
+      typeof currentChatUser.metadata !== "object"
+    ) {
+      currentChatUser.metadata = {};
+    }
+
+    const status = String(
+      statusOverride ||
+      currentChatUser.metadata.conversation_status ||
+      "open"
+    ).toLowerCase();
+
+    currentChatUser.metadata.conversation_status =
+      status;
+
+    const closed = status === "closed";
+
+    if (chatInput) {
+      chatInput.disabled = closed;
+
+      chatInput.placeholder = closed
+        ? "This conversation is closed"
+        : (
+            currentChatUser.metadata.service_side ===
+            "agent"
+              ? "Reply to customer..."
+              : "Message customer service..."
+          );
+
+      resizeChatInput();
+    }
+
+    if (chatSendButton) {
+      chatSendButton.disabled =
+        closed || isSendingMessage;
+    }
+
+    if (chatMoreButton) {
+      chatMoreButton.setAttribute(
+        "aria-label",
+        closed
+          ? "Conversation closed"
+          : "Close customer service conversation"
+      );
+
+      chatMoreButton.title = closed
+        ? "Conversation closed"
+        : "Close conversation";
+
+      chatMoreButton.disabled = closed;
+    }
+
+    if (chatStatus) {
+      chatStatus.textContent = closed
+        ? "Closed · view only"
+        : (
+            status === "assigned"
+              ? "Support agent connected"
+              : "Waiting for support agent"
+          );
+    }
+  }
+
+  /* =================================================
+     USER ID: READ EXISTING USER STATE
+  ================================================= */
+
+  function readCurrentUserId() {
+    const userObjects = [];
+
+    try {
+      if (
+        window.U9User &&
+        typeof window.U9User.get === "function"
+      ) {
+        userObjects.push(window.U9User.get());
+      }
+    } catch (error) {
+      console.warn(
+        "U9 Chat: Could not read U9User.",
         error
       );
-
-      throw new Error(
-        "Could not connect to the Message API. Please check your connection and try again."
-      );
     }
 
+    userObjects.push(
+      window.currentUser,
+      window.currentUserData,
+      window.U9_CURRENT_USER
+    );
 
-    let data;
-
-    try {
-      data = await response.json();
-    } catch (_) {
-
-      throw new Error(
-        `The Message API returned an invalid response (${response.status}).`
-      );
+    if (window.currentUserUUID) {
+      return String(window.currentUserUUID);
     }
 
-
-    if (
-      !response.ok ||
-      data?.success === false
-    ) {
-
-      throw new Error(
-        data?.error ||
-        `Request failed (${response.status}).`
-      );
+    if (window.currentUserId) {
+      return String(window.currentUserId);
     }
 
-
-    return data;
-  }
-
-
-  /* =======================================================
-     FEEDBACK
-  ======================================================= */
-
-  function showFeedback(
-    message,
-    type = "info"
-  ) {
-    feedback.textContent =
-      message;
-
-    feedback.className =
-      "u9-af-feedback is-visible is-" +
-      type;
-  }
-
-
-  function clearFeedback() {
-    feedback.textContent = "";
-
-    feedback.className =
-      "u9-af-feedback";
-  }
-
-
-  function showResultsStatus(
-    message
-  ) {
-    resultsStatus.textContent =
-      message;
-
-    resultsStatus.hidden =
-      false;
-  }
-
-
-  function hideResultsStatus() {
-    resultsStatus.textContent = "";
-
-    resultsStatus.hidden =
-      true;
-  }
-
-
-  /* =======================================================
-     HELPERS
-  ======================================================= */
-
-  function normalizeId(id) {
-    return String(
-      id || ""
-    ).toLowerCase();
-  }
-
-
-  function formatDate(value) {
-    if (!value) {
-      return "";
-    }
-
-    const date =
-      new Date(value);
-
-    if (
-      Number.isNaN(
-        date.getTime()
-      )
-    ) {
-      return "";
-    }
-
-    return date.toLocaleString();
-  }
-
-
-  function getSafeImageUrl(
-    value,
-    fallback
-  ) {
-    if (
-      typeof value !== "string"
-    ) {
-      return fallback;
-    }
-
-    const url =
-      value.trim();
-
-    if (!url) {
-      return fallback;
-    }
-
-    if (
-      /^https?:\/\//i.test(url) ||
-      (
-        url.startsWith("/") &&
-        !url.startsWith("//")
-      ) ||
-      /^data:image\//i.test(url)
-    ) {
-      return url;
-    }
-
-    return fallback;
-  }
-
-
-  /* =======================================================
-     AVATAR RESOLUTION
-     Mirrors the working Friends page:
-     - uploaded/custom avatar URLs
-     - free avatars resolved by avatar ID through /api/avatar-free
-     - snake_case and camelCase fields
-     - raw SVG, data URLs, local paths, and public Supabase Storage URLs
-     - selected avatar frames and independent image fallbacks
-  ======================================================= */
-
-  const FREE_AVATAR_API_URL = "/api/avatar-free";
-  let freeAvatarMapPromise = null;
-
-  const SUPABASE_STORAGE_HOSTS = new Map([
-    ["tvtakmswbzawaweytimx.supabase.co", "/storage/"],
-    ["vjlpowhxmflpkjlukkfy.supabase.co", "/storage-2/"]
-  ]);
-
-  function normalizeImageURL(value) {
-    if (typeof value !== "string") return "";
-    const source = value.trim();
-    if (!source) return "";
-
-    if (/^<svg\b/i.test(source) || /^<\?xml[\s\S]*?<svg\b/i.test(source)) {
-      return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(source);
-    }
-
-    if (/^data:image\/[a-z0-9.+-]+(?:;[^,]*)?,/i.test(source)) {
-      return source;
-    }
-
-    if (source.startsWith("/") && !source.startsWith("//")) {
-      return source;
-    }
-
-    let parsed;
-    try {
-      parsed = new URL(source, window.location.origin);
-    } catch (_) {
-      return "";
-    }
-
-    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
-      return "";
-    }
-
-    const proxyPrefix = SUPABASE_STORAGE_HOSTS.get(parsed.hostname.toLowerCase());
-    const publicStoragePrefix = "/storage/v1/object/public/";
-
-    if (proxyPrefix && parsed.pathname.startsWith(publicStoragePrefix)) {
-      const storagePath = parsed.pathname.slice(publicStoragePrefix.length);
-      return proxyPrefix + storagePath + parsed.search + parsed.hash;
-    }
-
-    return parsed.href;
-  }
-
-  function firstImageValue(...values) {
-    for (const value of values) {
-      if (typeof value === "string" && value.trim()) return value.trim();
-      if (value && typeof value === "object") {
-        const nested = value.url || value.custom_url || value.image_url ||
-          value.avatar_url || value.svg || value.image || value.src;
-        if (typeof nested === "string" && nested.trim()) return nested.trim();
+    for (const user of userObjects) {
+      if (
+        user &&
+        typeof user === "object" &&
+        user.id
+      ) {
+        return String(user.id);
       }
     }
-    return "";
+
+    try {
+      const keys = [
+        "u9_user_id",
+        "currentUserUUID",
+        "currentUserId"
+      ];
+
+      for (const key of keys) {
+        const value = localStorage.getItem(key);
+
+        if (value && value.trim()) {
+          return value.trim();
+        }
+      }
+
+      const jsonKeys = [
+        "u9_user",
+        "currentUser"
+      ];
+
+      for (const key of jsonKeys) {
+        const value = localStorage.getItem(key);
+
+        if (!value) continue;
+
+        try {
+          const parsed = JSON.parse(value);
+
+          const id =
+            parsed?.id ||
+            parsed?.uuid ||
+            parsed?.user?.id ||
+            parsed?.user?.uuid;
+
+          if (id) {
+            return String(id);
+          }
+        } catch (error) {
+          // Ignore non-JSON storage values.
+        }
+      }
+    } catch (error) {
+      console.warn(
+        "U9 Chat: Could not read cached user ID.",
+        error
+      );
+    }
+
+    return null;
   }
 
-  function getRawAvatarValue(profile = {}) {
-    return firstImageValue(
-      profile.resolved_avatar_url,
-      profile.avatar_url,
-      profile.avatarUrl,
-      profile.custom_avatar_url,
-      profile.customAvatarUrl,
-      profile.uploaded_avatar_url,
-      profile.uploadedAvatarUrl,
-      profile.profile_image,
-      profile.profileImage,
-      profile.photo_url,
-      profile.photoUrl,
-      profile.avatar
-    );
-  }
+  /* =================================================
+     USER ID: FALL BACK TO /ME
+  ================================================= */
 
-  function getRawFrameValue(profile = {}) {
-    return firstImageValue(
-      profile.avatar_frame_url,
-      profile.avatarFrameUrl,
-      profile.custom_avatar_frame_url,
-      profile.customAvatarFrameUrl,
-      profile.frame_url,
-      profile.frameUrl,
-      profile.avatar_frame,
-      profile.avatarFrame,
-      profile.frame
-    );
-  }
+  async function resolveCurrentUserId() {
+    const cachedId = readCurrentUserId();
 
-  async function loadFreeAvatarMap() {
-    if (!freeAvatarMapPromise) {
-      freeAvatarMapPromise = (async () => {
-        const headers = { Accept: "application/json" };
-        const token = getAuthToken();
-        if (token) headers.Authorization = `Bearer ${token}`;
+    if (cachedId) {
+      currentUserId = cachedId;
 
-        const response = await fetch(FREE_AVATAR_API_URL, {
+      return currentUserId;
+    }
+
+    if (currentUserId) {
+      return currentUserId;
+    }
+
+    if (currentUserLookupPromise) {
+      return currentUserLookupPromise;
+    }
+
+    if (currentUserLookupAttempted) {
+      return null;
+    }
+
+    currentUserLookupAttempted = true;
+
+    currentUserLookupPromise = (async function () {
+      try {
+        const response = await fetch(ME_API_URL, {
           method: "GET",
-          headers,
+          headers: getRequestHeaders(),
           credentials: "include",
           cache: "no-store"
         });
 
-        let result;
-        try {
-          result = await response.json();
-        } catch (_) {
-          throw new Error("Invalid response from the free-avatar service.");
-        }
+        const result = await response.json().catch(
+          function () {
+            return {};
+          }
+        );
 
-        if (!response.ok || result?.success === false) {
-          throw new Error(
-            result?.error || result?.message ||
-            `Could not load free avatars (${response.status}).`
+        if (!response.ok) {
+          console.warn(
+            "U9 Chat: /me user lookup failed.",
+            response.status,
+            result?.message
           );
+
+          return null;
         }
-
-        const avatars = Array.isArray(result?.avatars) ? result.avatars :
-          Array.isArray(result?.data?.avatars) ? result.data.avatars :
-          Array.isArray(result?.data) ? result.data : [];
-
-        const map = new Map();
-        avatars.forEach((item) => {
-          if (!item || item.id === undefined || item.id === null) return;
-          const source = normalizeImageURL(firstImageValue(
-            item.svg, item.image, item.image_url, item.avatar_url, item.url
-          ));
-          if (source) map.set(String(item.id), source);
-        });
-        return map;
-      })().catch((error) => {
-        freeAvatarMapPromise = null;
-        throw error;
-      });
-    }
-    return freeAvatarMapPromise;
-  }
-
-  async function resolveAvatarURL(profile = {}) {
-    const type = String(
-      profile.avatar_type || profile.avatarType || profile.avatar_type_name || "default"
-    ).trim().toLowerCase();
-    const avatarId = profile.avatar_id ?? profile.avatarId ?? null;
-    const directURL = normalizeImageURL(getRawAvatarValue(profile));
-
-    // A custom/uploaded URL always takes priority for custom avatars.
-    if (type === "custom" || type === "uploaded" || type === "upload") {
-      if (directURL) return directURL;
-    }
-
-    // Free avatars are selected by ID on the working Friends page.
-    if ((type === "free" || (!directURL && avatarId !== null && avatarId !== "")) &&
-        avatarId !== null && avatarId !== "") {
-      try {
-        const map = await loadFreeAvatarMap();
-        const selected = map.get(String(avatarId));
-        if (selected) return selected;
-      } catch (error) {
-        console.warn("U9 Add Friend: Free-avatar catalogue unavailable; trying saved URL.", error);
-      }
-    }
-
-    if (directURL) return directURL;
-    return DEFAULT_AVATAR;
-  }
-
-  function resolveAvatarFrameURL(profile = {}) {
-    const frameType = String(
-      profile.avatar_frame_type || profile.avatarFrameType || "default"
-    ).trim().toLowerCase();
-
-    const frameId = profile.avatar_frame_id ?? profile.avatarFrameId ?? null;
-    const rawURL = normalizeImageURL(getRawFrameValue(profile));
-
-    // Default frame should use the platform's normal frame asset.
-    if (frameType === "default" || frameType === "ordinary" || frameType === "") {
-      return rawURL || DEFAULT_AVATAR_FRAME;
-    }
-
-    // Custom/uploaded frames are expected to carry a URL or SVG in the API response.
-    if (rawURL) return rawURL;
-
-    if (frameId !== null && frameId !== "") {
-      console.warn(
-        "U9 Add Friend: A frame ID was returned without its frame URL.",
-        { userId: profile.id, frameId, frameType }
-      );
-    }
-    return DEFAULT_AVATAR_FRAME;
-  }
-
-  function createAvatar(profile = {}) {
-    const wrapper = document.createElement("div");
-    wrapper.className = "u9-af-avatar-wrap";
-    wrapper.style.position = "relative";
-    wrapper.style.overflow = "visible";
-    wrapper.style.background = "transparent";
-
-    const avatar = document.createElement("img");
-    avatar.className = "u9-af-avatar";
-    avatar.alt = "";
-    avatar.loading = "lazy";
-    avatar.decoding = "async";
-    avatar.referrerPolicy = "no-referrer";
-    avatar.draggable = false;
-    avatar.style.position = "absolute";
-    avatar.style.inset = "5px";
-    avatar.style.zIndex = "1";
-    avatar.style.display = "block";
-    avatar.style.width = "calc(100% - 10px)";
-    avatar.style.height = "calc(100% - 10px)";
-    avatar.style.objectFit = "cover";
-    avatar.style.objectPosition = "center";
-    avatar.style.borderRadius = "50%";
-    avatar.src = DEFAULT_AVATAR;
-
-    avatar.addEventListener("error", () => {
-      if (avatar.dataset.fallbackApplied !== "true") {
-        avatar.dataset.fallbackApplied = "true";
-        avatar.src = DEFAULT_AVATAR;
-      }
-    });
-
-    const frame = document.createElement("img");
-    frame.className = "u9-af-frame";
-    frame.alt = "";
-    frame.setAttribute("aria-hidden", "true");
-    frame.loading = "lazy";
-    frame.decoding = "async";
-    frame.draggable = false;
-    frame.style.position = "absolute";
-    frame.style.inset = "0";
-    frame.style.zIndex = "2";
-    frame.style.display = "block";
-    frame.style.width = "100%";
-    frame.style.height = "100%";
-    frame.style.objectFit = "contain";
-    frame.style.objectPosition = "center";
-    frame.style.border = "0";
-    frame.style.pointerEvents = "none";
-    frame.src = DEFAULT_AVATAR_FRAME;
-
-    frame.addEventListener("error", () => {
-      if (frame.dataset.fallbackApplied !== "true") {
-        frame.dataset.fallbackApplied = "true";
-        frame.src = DEFAULT_AVATAR_FRAME;
-      }
-    });
-
-    wrapper.append(avatar, frame);
-
-    // Resolve asynchronously so free-avatar IDs can be mapped to their actual images.
-    Promise.all([
-      resolveAvatarURL(profile),
-      Promise.resolve(resolveAvatarFrameURL(profile))
-    ]).then(([avatarURL, frameURL]) => {
-      if (avatarURL && avatar.src !== avatarURL) {
-        avatar.dataset.fallbackApplied = "";
-        avatar.src = avatarURL;
-      }
-      if (frameURL && frame.src !== frameURL) {
-        frame.dataset.fallbackApplied = "";
-        frame.src = frameURL;
-      }
-    }).catch((error) => {
-      console.warn("U9 Add Friend: Could not resolve profile avatar.", error);
-    });
-
-    return wrapper;
-  }
-
-
-  /* =======================================================
-     REQUEST STATE
-  ======================================================= */
-
-  function getRequestButtonState(
-    profile
-  ) {
-
-    const id =
-      normalizeId(profile?.id);
-
-
-    if (
-      friendIds.has(id)
-    ) {
-
-      return {
-        label: "Already Friends",
-        disabled: true,
-        complete: true
-      };
-    }
-
-
-    if (
-      pendingRequestIds.has(id)
-    ) {
-
-      return {
-        label: "Request Sent",
-        disabled: true,
-        complete: true
-      };
-    }
-
-
-    /*
-     * If this person has already sent us a request,
-     * do not create another request.
-     */
-    if (
-      receivedRequests.has(id)
-    ) {
-
-      return {
-        label: "Request Received",
-        disabled: true,
-        complete: true
-      };
-    }
-
-
-    if (!profile?.account) {
-
-      return {
-        label: "Unavailable",
-        disabled: true,
-        complete: true
-      };
-    }
-
-
-    return {
-      label: "Add Friend",
-      disabled: false,
-      complete: false
-    };
-  }
-
-
-  /* =======================================================
-     SEARCH RESULT CARD
-  ======================================================= */
-
-  function createUserCard(
-    profile
-  ) {
-
-    const card =
-      document.createElement("article");
-
-    card.className =
-      "u9-af-user-card";
-
-
-    card.appendChild(
-      createAvatar(profile)
-    );
-
-
-    const details =
-      document.createElement("div");
-
-    details.className =
-      "u9-af-user-details";
-
-
-    const username =
-      document.createElement("p");
-
-    username.className =
-      "u9-af-username";
-
-    username.textContent =
-      profile.username ||
-      "User";
-
-
-    const account =
-      document.createElement("p");
-
-    account.className =
-      "u9-af-account";
-
-    account.textContent =
-      "Account: " +
-      (
-        profile.account ||
-        "Unavailable"
-      );
-
-
-    details.append(
-      username,
-      account
-    );
-
-
-    const actionWrapper =
-      document.createElement("div");
-
-    actionWrapper.className =
-      "u9-af-user-action";
-
-
-    const button =
-      document.createElement("button");
-
-    button.type =
-      "button";
-
-    button.className =
-      "u9-af-button u9-af-request-button";
-
-
-    const state =
-      getRequestButtonState(profile);
-
-
-    button.textContent =
-      state.label;
-
-    button.disabled =
-      state.disabled;
-
-
-    if (state.complete) {
-      button.classList.add(
-        "is-complete"
-      );
-    }
-
-
-    if (!state.complete) {
-
-      button.addEventListener(
-        "click",
-        () => {
-          sendFriendRequest(
-            profile,
-            button
-          );
-        }
-      );
-    }
-
-
-    actionWrapper.appendChild(
-      button
-    );
-
-    card.append(
-      details,
-      actionWrapper
-    );
-
-
-    return card;
-  }
-
-
-  function renderUsers(
-    users
-  ) {
-
-    displayedUsers =
-      Array.isArray(users)
-        ? users
-        : [];
-
-
-    resultsContainer.replaceChildren();
-
-
-    if (
-      displayedUsers.length === 0
-    ) {
-
-      showResultsStatus(
-        "No user found for that account. Check the full account and try again."
-      );
-
-      return;
-    }
-
-
-    hideResultsStatus();
-
-
-    const fragment =
-      document.createDocumentFragment();
-
-
-    displayedUsers.forEach(
-      (profile) => {
-
-        fragment.appendChild(
-          createUserCard(
-            profile
-          )
-        );
-      }
-    );
-
-
-    resultsContainer.appendChild(
-      fragment
-    );
-  }
-
-
-  /* =======================================================
-     SEARCH USERS
-  ======================================================= */
-
-  async function searchUsers() {
-
-    if (isSearching) {
-      return;
-    }
-
-
-    const q =
-      searchInput.value.trim();
-
-
-    if (!/^[A-Z][A-Z0-9]{5}$/i.test(q)) {
-
-      showFeedback(
-        "Enter the complete 6-character account (starts with a letter).",
-        "error"
-      );
-
-      searchInput.focus();
-
-      return;
-    }
-
-
-    isSearching =
-      true;
-
-    searchButton.disabled =
-      true;
-
-    searchButton.textContent =
-      "Searching...";
-
-
-    clearFeedback();
-
-    resultsContainer.replaceChildren();
-
-    showResultsStatus(
-      "Searching for users..."
-    );
-
-
-    try {
-
-      const data =
-        await callMessageAPI(
-          "search_users",
-          { q }
-        );
-
-
-      const users =
-        Array.isArray(data?.users)
-          ? data.users
-          : [];
-
-
-      renderUsers(users);
-
-
-      if (
-        users.length > 0
-      ) {
-
-        showFeedback(
-          `Found ${users.length} user(s).`,
-          "success"
-        );
-      }
-
-    } catch (error) {
-
-      console.error(
-        "U9 Add Friend: search failed.",
-        error
-      );
-
-
-      showResultsStatus(
-        "Could not load search results."
-      );
-
-
-      showFeedback(
-        error.message ||
-        "Could not search for users.",
-        "error"
-      );
-
-    } finally {
-
-      isSearching =
-        false;
-
-      searchButton.disabled =
-        false;
-
-      searchButton.textContent =
-        "Search";
-    }
-  }
-
-
-  /* =======================================================
-     SEND FRIEND REQUEST
-  ======================================================= */
-
-  async function sendFriendRequest(
-    profile,
-    button
-  ) {
-
-    const id =
-      normalizeId(profile?.id);
-
-
-    if (
-      friendIds.has(id)
-    ) {
-
-      button.textContent =
-        "Already Friends";
-
-      button.disabled =
-        true;
-
-      return;
-    }
-
-
-    if (
-      pendingRequestIds.has(id)
-    ) {
-
-      button.textContent =
-        "Request Sent";
-
-      button.disabled =
-        true;
-
-      return;
-    }
-
-
-    if (
-      receivedRequests.has(id)
-    ) {
-
-      button.textContent =
-        "Request Received";
-
-      button.disabled =
-        true;
-
-      return;
-    }
-
-
-    if (!profile?.account) {
-
-      showFeedback(
-        "This user's account is unavailable.",
-        "error"
-      );
-
-      return;
-    }
-
-
-    if (requestBusy) {
-      return;
-    }
-
-
-    requestBusy =
-      true;
-
-
-    const oldLabel =
-      button.textContent;
-
-
-    button.disabled =
-      true;
-
-    button.textContent =
-      "Sending...";
-
-
-    try {
-
-      const initialMessage =
-        initialMessageInput.value.trim();
-
-
-      await callMessageAPI(
-        "send_friend_request",
-        {
-          receiver_account:
-            profile.account,
-
-          initial_message:
-            initialMessage
-        }
-      );
-
-
-      /*
-       * Update local state immediately.
-       */
-      pendingRequestIds.add(
-        id
-      );
-
-
-      button.textContent =
-        "Request Sent";
-
-      button.classList.add(
-        "is-complete"
-      );
-
-
-      showFeedback(
-        `Friend request sent to ${
-          profile.username ||
-          profile.account
-        }.`,
-        "success"
-      );
-
-
-      /*
-       * Refresh relationships so
-       * Sent Requests stays synchronized.
-       */
-      await loadRelationships();
-
-    } catch (error) {
-
-      const message =
-        error.message ||
-        "Could not send friend request.";
-
-
-      const normalizedMessage =
-        message.toLowerCase();
-
-
-      if (
-        normalizedMessage.includes(
-          "already friends"
-        )
-      ) {
-
-        friendIds.add(id);
-
-        button.textContent =
-          "Already Friends";
-
-        button.classList.add(
-          "is-complete"
-        );
-
-      } else if (
-        normalizedMessage.includes(
-          "pending friend request already exists"
-        )
-      ) {
-
-        pendingRequestIds.add(id);
-
-        button.textContent =
-          "Request Sent";
-
-        button.classList.add(
-          "is-complete"
-        );
-
-      } else {
-
-        button.textContent =
-          oldLabel;
-      }
-
-
-      showFeedback(
-        message,
-        "error"
-      );
-
-
-      console.error(
-        "U9 Add Friend: sending request failed.",
-        error
-      );
-
-    } finally {
-
-      requestBusy =
-        false;
-
-      button.disabled =
-        friendIds.has(id) ||
-        pendingRequestIds.has(id) ||
-        receivedRequests.has(id) ||
-        !profile?.account;
-    }
-  }
-
-
-  /* =======================================================
-     RECEIVED REQUEST CARD
-  ======================================================= */
-
-  function createReceivedRequestCard(
-    request
-  ) {
-
-    const profile =
-      request?.sender || {};
-
-
-    const card =
-      document.createElement("article");
-
-    card.className =
-      "u9-af-user-card u9-af-request-card";
-
-
-    card.appendChild(
-      createAvatar(profile)
-    );
-
-
-    const details =
-      document.createElement("div");
-
-    details.className =
-      "u9-af-user-details";
-
-
-    const username =
-      document.createElement("p");
-
-    username.className =
-      "u9-af-username";
-
-    username.textContent =
-      profile.username ||
-      "User";
-
-
-    const account =
-      document.createElement("p");
-
-    account.className =
-      "u9-af-account";
-
-    account.textContent =
-      "Account: " +
-      (
-        profile.account ||
-        "Unavailable"
-      );
-
-
-    details.append(
-      username,
-      account
-    );
-
-
-    /*
-     * Initial message.
-     */
-    if (
-      request?.initial_message
-    ) {
-
-      const message =
-        document.createElement("p");
-
-      message.className =
-        "u9-af-intro";
-
-      message.textContent =
-        request.initial_message;
-
-      details.appendChild(
-        message
-      );
-    }
-
-
-    /*
-     * Optional request time.
-     */
-    const createdAt =
-      request?.created_at ||
-      request?.createdAt;
-
-
-    const formattedDate =
-      formatDate(createdAt);
-
-
-    if (formattedDate) {
-
-      const date =
-        document.createElement("p");
-
-      date.className =
-        "u9-af-request-date";
-
-      date.textContent =
-        formattedDate;
-
-      details.appendChild(
-        date
-      );
-    }
-
-
-    /*
-     * Actions.
-     */
-    const actions =
-      document.createElement("div");
-
-    actions.className =
-      "u9-af-user-action u9-af-request-actions";
-
-
-    const acceptButton =
-      document.createElement("button");
-
-    acceptButton.type =
-      "button";
-
-    acceptButton.className =
-      "u9-af-button u9-af-button-primary";
-
-    acceptButton.textContent =
-      "Accept";
-
-
-    const rejectButton =
-      document.createElement("button");
-
-    rejectButton.type =
-      "button";
-
-    rejectButton.className =
-      "u9-af-button u9-af-button-danger";
-
-    rejectButton.textContent =
-      "Reject";
-
-
-    acceptButton.addEventListener(
-      "click",
-      () => {
-
-        respondToFriendRequest(
-          request,
-          "accept",
-          acceptButton,
-          rejectButton
-        );
-      }
-    );
-
-
-    rejectButton.addEventListener(
-      "click",
-      () => {
-
-        respondToFriendRequest(
-          request,
-          "reject",
-          rejectButton,
-          acceptButton
-        );
-      }
-    );
-
-
-    actions.append(
-      acceptButton,
-      rejectButton
-    );
-
-
-    card.append(
-      details,
-      actions
-    );
-
-
-    return card;
-  }
-
-
-  /* =======================================================
-     RENDER RECEIVED REQUESTS
-  ======================================================= */
-
-  function renderReceivedRequests(
-    requests
-  ) {
-
-    const list =
-      Array.isArray(requests)
-        ? requests
-        : [];
-
-
-    receivedContainer.replaceChildren();
-
-
-    /*
-     * Keep only pending received requests
-     * in the active request count.
-     */
-    const pending =
-      list.filter(
-        (request) =>
-          String(
-            request?.status ||
-            "pending"
-          ).toLowerCase() ===
-          "pending"
-      );
-
-
-    receivedCount.textContent =
-      String(pending.length);
-
-
-    /*
-     * Refresh lookup map.
-     */
-    receivedRequests.clear();
-
-
-    for (
-      const request of pending
-    ) {
-
-      const sender =
-        request?.sender || {};
-
-      const senderId =
-        normalizeId(
-          sender.id ||
-          request?.sender_id
-        );
-
-
-      if (senderId) {
-
-        receivedRequests.set(
-          senderId,
-          request
-        );
-      }
-    }
-
-
-    if (
-      pending.length === 0
-    ) {
-
-      receivedStatus.textContent =
-        "You don't have any pending friend requests.";
-
-      receivedStatus.hidden =
-        false;
-
-      return;
-    }
-
-
-    receivedStatus.textContent =
-      "";
-
-
-    receivedStatus.hidden =
-      true;
-
-
-    const fragment =
-      document.createDocumentFragment();
-
-
-    pending.forEach(
-      (request) => {
-
-        fragment.appendChild(
-          createReceivedRequestCard(
-            request
-          )
-        );
-      }
-    );
-
-
-    receivedContainer.appendChild(
-      fragment
-    );
-
-
-    /*
-     * Search result buttons may need
-     * to change to "Request Received".
-     */
-    if (
-      displayedUsers.length > 0
-    ) {
-
-      renderUsers(
-        displayedUsers
-      );
-    }
-  }
-
-
-  /* =======================================================
-     SENT REQUEST CARD
-  ======================================================= */
-
-  function createSentRequestCard(
-    request
-  ) {
-
-    const profile =
-      request?.receiver || {};
-
-
-    const card =
-      document.createElement("article");
-
-    card.className =
-      "u9-af-user-card u9-af-request-card";
-
-
-    card.appendChild(
-      createAvatar(profile)
-    );
-
-
-    const details =
-      document.createElement("div");
-
-    details.className =
-      "u9-af-user-details";
-
-
-    const username =
-      document.createElement("p");
-
-    username.className =
-      "u9-af-username";
-
-    username.textContent =
-      profile.username ||
-      "User";
-
-
-    const account =
-      document.createElement("p");
-
-    account.className =
-      "u9-af-account";
-
-    account.textContent =
-      "Account: " +
-      (
-        profile.account ||
-        "Unavailable"
-      );
-
-
-    details.append(
-      username,
-      account
-    );
-
-
-    if (
-      request?.initial_message
-    ) {
-
-      const message =
-        document.createElement("p");
-
-      message.className =
-        "u9-af-intro";
-
-      message.textContent =
-        request.initial_message;
-
-      details.appendChild(
-        message
-      );
-    }
-
-
-    const status =
-      document.createElement("span");
-
-    status.className =
-      "u9-af-status";
-
-
-    const requestStatus =
-      String(
-        request?.status ||
-        "pending"
-      ).toLowerCase();
-
-
-    status.textContent =
-      requestStatus
-        .charAt(0)
-        .toUpperCase() +
-      requestStatus.slice(1);
-
-
-    if (
-      requestStatus ===
-      "pending"
-    ) {
-
-      status.classList.add(
-        "is-pending"
-      );
-
-    } else if (
-      requestStatus ===
-      "accepted"
-    ) {
-
-      status.classList.add(
-        "is-accepted"
-      );
-
-    } else if (
-      requestStatus ===
-      "rejected"
-    ) {
-
-      status.classList.add(
-        "is-rejected"
-      );
-
-    } else if (
-      requestStatus ===
-      "cancelled"
-    ) {
-
-      status.classList.add(
-        "is-cancelled"
-      );
-    }
-
-
-    const actionWrapper =
-      document.createElement("div");
-
-    actionWrapper.className =
-      "u9-af-user-action";
-
-
-    actionWrapper.appendChild(
-      status
-    );
-
-
-    card.append(
-      details,
-      actionWrapper
-    );
-
-
-    return card;
-  }
-
-
-  /* =======================================================
-     RENDER SENT REQUESTS
-  ======================================================= */
-
-  function renderSentRequests(
-    requests
-  ) {
-
-    const list =
-      Array.isArray(requests)
-        ? requests
-        : [];
-
-
-    sentContainer.replaceChildren();
-
-
-    const pending =
-      list.filter(
-        (request) =>
-          String(
-            request?.status ||
-            ""
-          ).toLowerCase() ===
-          "pending"
-      );
-
-
-    sentCount.textContent =
-      String(pending.length);
-
-
-    if (
-      list.length === 0
-    ) {
-
-      sentStatus.textContent =
-        "You haven't sent any friend requests yet.";
-
-      sentStatus.hidden =
-        false;
-
-      return;
-    }
-
-
-    sentStatus.textContent =
-      "";
-
-    sentStatus.hidden =
-      true;
-
-
-    const fragment =
-      document.createDocumentFragment();
-
-
-    list.forEach(
-      (request) => {
-
-        fragment.appendChild(
-          createSentRequestCard(
-            request
-          )
-        );
-      }
-    );
-
-
-    sentContainer.appendChild(
-      fragment
-    );
-  }
-
-
-  /* =======================================================
-     ACCEPT / REJECT REQUEST
-  ======================================================= */
-
-  async function respondToFriendRequest(
-    request,
-    decision,
-    activeButton,
-    otherButton
-  ) {
-
-    if (
-      requestBusy
-    ) {
-      return;
-    }
-
-
-    const requestId =
-      request?.id;
-
-
-    if (!requestId) {
-
-      showFeedback(
-        "This friend request is missing its request ID.",
-        "error"
-      );
-
-      return;
-    }
-
-
-    requestBusy =
-      true;
-
-
-    activeButton.disabled =
-      true;
-
-    otherButton.disabled =
-      true;
-
-
-    activeButton.textContent =
-      decision === "accept"
-        ? "Accepting..."
-        : "Rejecting...";
-
-
-    try {
-
-      await callMessageAPI(
-        "respond_friend_request",
-        {
-          request_id:
-            requestId,
-
-          decision
-        }
-      );
-
-
-      showFeedback(
-        decision === "accept"
-          ? "Friend request accepted."
-          : "Friend request rejected.",
-        "success"
-      );
-
-
-      /*
-       * Reload all relationship data.
-       */
-      await loadRelationships();
-
-
-    } catch (error) {
-
-      console.error(
-        "U9 Add Friend: responding to request failed.",
-        error
-      );
-
-
-      showFeedback(
-        error.message ||
-        "Could not update the friend request.",
-        "error"
-      );
-
-
-      activeButton.disabled =
-        false;
-
-      otherButton.disabled =
-        false;
-
-      activeButton.textContent =
-        decision === "accept"
-          ? "Accept"
-          : "Reject";
-
-
-    } finally {
-
-      requestBusy =
-        false;
-    }
-  }
-
-
-  /* =======================================================
-     LOAD FRIENDS + REQUESTS
-  ======================================================= */
-
-  function isAuthenticatedUser() {
-    return Boolean(
-      window.U9User &&
-      typeof window.U9User.isLoggedIn === "function" &&
-      window.U9User.isLoggedIn()
-    );
-  }
-
-  async function loadRelationships() {
-    if (!isAuthenticatedUser()) {
-      return [];
-    }
-
-    if (
-      relationshipLoading
-    ) {
-      return;
-    }
-
-
-    relationshipLoading =
-      true;
-
-
-    receivedStatus.textContent =
-      "Loading friend requests...";
-
-    receivedStatus.hidden =
-      false;
-
-
-    sentStatus.textContent =
-      "Loading friend requests...";
-
-    sentStatus.hidden =
-      false;
-
-
-    try {
-
-      /*
-       * We deliberately request both endpoints.
-       */
-      const [
-        friendsData,
-        requestsData
-      ] = await Promise.all([
-
-        callMessageAPI(
-          "list_friends"
-        ),
-
-        callMessageAPI(
-          "list_friend_requests"
-        )
-
-      ]);
-
-
-      /* -----------------------------------------------
-         FRIENDS
-      ------------------------------------------------ */
-
-      friendIds.clear();
-
-
-      const friends =
-        Array.isArray(
-          friendsData?.friends
-        )
-          ? friendsData.friends
-          : [];
-
-
-      for (
-        const item of friends
-      ) {
-
-        const friend =
-          item?.friend ||
-          item;
-
 
         const id =
-          normalizeId(
-            friend?.id
-          );
-
+          result?.user?.id ||
+          result?.user?.uuid ||
+          result?.id ||
+          result?.uuid ||
+          null;
 
         if (id) {
-          friendIds.add(id);
-        }
-      }
-
-
-      /* -----------------------------------------------
-         SENT
-      ------------------------------------------------ */
-
-      pendingRequestIds.clear();
-
-
-      const sent =
-        Array.isArray(
-          requestsData?.sent
-        )
-          ? requestsData.sent
-          : [];
-
-
-      for (
-        const request of sent
-      ) {
-
-        if (
-          String(
-            request?.status ||
-            ""
-          ).toLowerCase() !==
-          "pending"
-        ) {
-          continue;
+          currentUserId = String(id);
         }
 
-
-        const receiver =
-          request?.receiver ||
-          {};
-
-
-        const receiverId =
-          normalizeId(
-            receiver.id ||
-            request?.receiver_id
-          );
-
-
-        if (
-          receiverId
-        ) {
-
-          pendingRequestIds.add(
-            receiverId
-          );
-        }
-      }
-
-
-      /* -----------------------------------------------
-         RECEIVED
-      ------------------------------------------------ */
-
-      const received =
-        Array.isArray(
-          requestsData?.received
-        )
-          ? requestsData.received
-          : [];
-
-
-      renderReceivedRequests(
-        received
-      );
-
-
-      /* -----------------------------------------------
-         SENT UI
-      ------------------------------------------------ */
-
-      renderSentRequests(
-        sent
-      );
-
-
-      /* -----------------------------------------------
-         SEARCH RESULT STATE
-      ------------------------------------------------ */
-
-      if (
-        displayedUsers.length > 0
-      ) {
-
-        renderUsers(
-          displayedUsers
+        return currentUserId;
+      } catch (error) {
+        console.warn(
+          "U9 Chat: Could not resolve current user ID.",
+          error
         );
+
+        return null;
+      } finally {
+        currentUserLookupPromise = null;
       }
+    })();
 
+    return currentUserLookupPromise;
+  }
 
-    } catch (error) {
+  /* =================================================
+     CHAT HEADER
+  ================================================= */
 
-      console.warn(
-        "U9 Add Friend: relationship status could not be refreshed.",
-        error
+  function updateChatHeader(user) {
+    if (chatName) {
+      chatName.textContent =
+        user?.name ||
+        user?.username ||
+        user?.title ||
+        "Chat";
+    }
+
+    if (chatStatus) {
+      chatStatus.textContent =
+        user?.status ||
+        (
+          user?.type === "group"
+            ? "Group"
+            : (
+                user?.type === "customer_service"
+                  ? "Customer service"
+                  : "Friend"
+              )
+        );
+    }
+
+    if (chatAvatar) {
+      chatAvatar.onerror = null;
+
+      chatAvatar.dataset.fallbackStage = "0";
+
+      chatAvatar.src = normalizeImageURL(
+        user?.avatar_url ||
+        user?.avatar ||
+        user?.avatarUrl ||
+        user?.image_url,
+        DEFAULT_AVATAR
       );
 
+      chatAvatar.onerror = function () {
+        if (
+          chatAvatar.dataset.fallbackStage === "0"
+        ) {
+          chatAvatar.dataset.fallbackStage = "1";
 
-      receivedContainer.replaceChildren();
+          if (
+            chatAvatar.getAttribute("src") ===
+            DEFAULT_AVATAR
+          ) {
+            chatAvatar.onerror = null;
 
-      receivedCount.textContent =
-        "0";
+            return;
+          }
 
-      receivedStatus.textContent =
-        "Could not load received friend requests.";
+          chatAvatar.src = DEFAULT_AVATAR;
 
+          return;
+        }
 
-      receivedStatus.hidden =
-        false;
-
-
-      sentContainer.replaceChildren();
-
-      sentCount.textContent =
-        "0";
-
-      sentStatus.textContent =
-        "Could not load sent friend requests.";
-
-
-      sentStatus.hidden =
-        false;
-
-    } finally {
-
-      relationshipLoading =
-        false;
+        chatAvatar.onerror = null;
+      };
     }
   }
 
+  /* =================================================
+     AUTO-RESIZING TEXTAREA
+  ================================================= */
 
-  /* =======================================================
-     FORM EVENTS
-  ======================================================= */
+  function resizeChatInput() {
+    if (!chatInput) return;
 
-  searchForm.addEventListener(
-    "submit",
-    (event) => {
-
-      event.preventDefault();
-
-      searchUsers();
+    if (
+      chatInput.tagName.toLowerCase() !==
+      "textarea"
+    ) {
+      return;
     }
-  );
 
+    chatInput.style.height = "auto";
 
-  /* =======================================================
-     MESSAGE COUNTER
-  ======================================================= */
+    const computedStyle = window.getComputedStyle(
+      chatInput
+    );
 
-  initialMessageInput.addEventListener(
-    "input",
-    () => {
+    const borderTop =
+      parseFloat(computedStyle.borderTopWidth) || 0;
 
-      messageCounter.textContent =
-        `${initialMessageInput.value.length} / 1000`;
+    const borderBottom =
+      parseFloat(computedStyle.borderBottomWidth) || 0;
+
+    const maxHeight = CHAT_INPUT_MAX_HEIGHT;
+
+    const nextHeight = Math.min(
+      chatInput.scrollHeight +
+        borderTop +
+        borderBottom,
+      maxHeight
+    );
+
+    chatInput.style.height =
+      nextHeight + "px";
+
+    chatInput.style.overflowY =
+      chatInput.scrollHeight > maxHeight
+        ? "auto"
+        : "hidden";
+  }
+
+  /* =================================================
+     MOBILE KEYBOARD / VIEWPORT
+  ================================================= */
+
+  function updateChatViewport() {
+    if (!chatPage) return;
+
+    const viewport = window.visualViewport;
+
+    if (
+      !viewport ||
+      !chatPage.classList.contains("is-active")
+    ) {
+      return;
     }
-  );
 
+    const rect = chatPage.getBoundingClientRect();
 
-  /* =======================================================
-     INITIALIZE
-  ======================================================= */
+    const visibleBottom =
+      viewport.offsetTop + viewport.height;
 
-  showResultsStatus(
-    "Search by exact account to find someone."
-  );
+    const availableHeight = Math.max(
+      0,
+      visibleBottom - Math.max(0, rect.top)
+    );
 
+    if (availableHeight > 0) {
+      chatPage.style.setProperty(
+        "--u9-chat-viewport-height",
+        availableHeight + "px"
+      );
+    }
+  }
 
-  /*
-   * Global page initializer expected by normal-message.js.
-   * The page shell and event handlers are created once when this
-   * module loads; navigating back to Add Friend refreshes the
-   * relationship lists without rebuilding the form or losing state.
-   */
-  window.initializeAddFriendsPage = async function initializeAddFriendsPage() {
-    if (!isAuthenticatedUser()) {
-      showResultsStatus("Sign in to view friend requests and relationships.");
+  function bindChatViewportEvents() {
+    if (viewportEventsBound) return;
+
+    viewportEventsBound = true;
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener(
+        "resize",
+        updateChatViewport
+      );
+
+      window.visualViewport.addEventListener(
+        "scroll",
+        updateChatViewport
+      );
+    }
+
+    window.addEventListener(
+      "resize",
+      updateChatViewport
+    );
+
+    window.addEventListener(
+      "orientationchange",
+      updateChatViewport
+    );
+
+    if (chatInput) {
+      chatInput.addEventListener(
+        "focus",
+        function () {
+          requestAnimationFrame(
+            updateChatViewport
+          );
+
+          setTimeout(
+            updateChatViewport,
+            100
+          );
+
+          setTimeout(
+            updateChatViewport,
+            300
+          );
+        }
+      );
+
+      chatInput.addEventListener(
+        "blur",
+        function () {
+          setTimeout(
+            updateChatViewport,
+            100
+          );
+        }
+      );
+    }
+  }
+
+  /* =================================================
+     STATUS MESSAGE
+  ================================================= */
+
+  function createNotice(
+    message,
+    type = "info"
+  ) {
+    const notice = document.createElement("div");
+
+    notice.className =
+      "U9-chat-system-message " +
+      "U9-chat-system-message-" +
+      type;
+
+    notice.textContent = message;
+
+    notice.setAttribute("role", "status");
+
+    return notice;
+  }
+
+  function showChatNotice(
+    message,
+    type = "info"
+  ) {
+    if (!chatMessages) return;
+
+    chatMessages.innerHTML = "";
+
+    chatMessages.appendChild(
+      createNotice(message, type)
+    );
+  }
+
+  function appendChatNotice(
+    message,
+    type = "error"
+  ) {
+    if (!chatMessages) return;
+
+    const noticeHost = chatPage || chatMessages;
+    const existing = noticeHost.querySelector(
+      ".U9-chat-temporary-notice"
+    );
+
+    if (existing) {
+      existing.remove();
+    }
+
+    const notice = createNotice(
+      message,
+      type
+    );
+
+    notice.classList.add(
+      "U9-chat-temporary-notice"
+    );
+
+    // Keep temporary upload/status notices outside the scrollable messages
+    // viewport so they sit above the composer instead of being clipped behind it.
+    noticeHost.appendChild(notice);
+  }
+
+  function removeTemporaryNotice() {
+    const noticeHost = chatPage || chatMessages;
+    if (!noticeHost) return;
+
+    noticeHost
+      .querySelectorAll(
+        ".U9-chat-temporary-notice"
+      )
+      .forEach(function (notice) {
+        notice.remove();
+      });
+  }
+
+  /* =================================================
+     TIME FORMAT
+  ================================================= */
+
+  function formatMessageTime(value) {
+    if (!value) return "";
+
+    const date = new Date(value);
+
+    if (!Number.isFinite(date.getTime())) {
+      return "";
+    }
+
+    return date.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+  }
+
+  /* =================================================
+     MESSAGE BUBBLE
+  ================================================= */
+
+  function createMessageElement(message) {
+    const isOwnMessage = Boolean(
+      currentUserId &&
+      String(message.sender_id) ===
+        String(currentUserId)
+    );
+
+    const row = document.createElement("div");
+
+    row.className =
+      "U9-chat-message-row " +
+      (
+        isOwnMessage
+          ? "U9-chat-message-own"
+          : "U9-chat-message-other"
+      );
+
+    if (message.id !== undefined && message.id !== null) {
+      row.dataset.messageId = String(message.id);
+    }
+
+    const bubble = document.createElement("div");
+
+    bubble.className =
+      "U9-chat-message-bubble " +
+      (
+        isOwnMessage
+          ? "U9-chat-bubble-own"
+          : "U9-chat-bubble-other"
+      );
+
+    if (message.deleted_at) {
+      const deleted = document.createElement("div");
+
+      deleted.textContent =
+        "This message was deleted.";
+
+      deleted.className = "U9-chat-message-deleted";
+
+      bubble.appendChild(deleted);
+    } else if (
+      message.message_type === "image"
+    ) {
+      const mediaURL = normalizeImageURL(
+        message.media_url || message.media_path,
+        ""
+      );
+
+      if (mediaURL) {
+        const imageWrap = document.createElement("div");
+        imageWrap.className = "U9-chat-image-wrap is-loading";
+
+        const loader = document.createElement("img");
+        loader.className = "U9-chat-image-loader";
+        loader.src = "/SSVG/logo/loading.svg";
+        loader.alt = "Loading image";
+        loader.setAttribute("aria-hidden", "true");
+
+        const image = document.createElement("img");
+        image.className = "U9-chat-message-image";
+        image.alt = "Image message";
+        // Do not lazy-load chat images while CSS hides them behind the loader.
+        // Some browsers defer hidden lazy images indefinitely, leaving the spinner visible.
+        image.loading = "eager";
+        image.decoding = "async";
+
+        const errorState = document.createElement("div");
+        errorState.className = "U9-chat-image-error";
+        errorState.textContent = "Image could not be loaded.";
+        errorState.hidden = true;
+
+        const retryButton = document.createElement("button");
+        retryButton.type = "button";
+        retryButton.className = "U9-chat-image-retry";
+        retryButton.textContent = "Retry";
+        retryButton.hidden = true;
+
+        function showImageError() {
+          imageWrap.classList.remove("is-loading", "is-loaded");
+          imageWrap.classList.add("has-error");
+          loader.hidden = true;
+          image.hidden = true;
+          errorState.hidden = false;
+          retryButton.hidden = false;
+        }
+
+        function showLoadedImage() {
+          imageWrap.classList.remove("is-loading", "has-error");
+          imageWrap.classList.add("is-loaded");
+          loader.hidden = true;
+          image.hidden = false;
+          errorState.hidden = true;
+          retryButton.hidden = true;
+        }
+
+        image.addEventListener("load", showLoadedImage);
+        image.addEventListener("error", showImageError);
+        retryButton.addEventListener("click", function () {
+          imageWrap.classList.remove("has-error", "is-loaded");
+          imageWrap.classList.add("is-loading");
+          loader.hidden = false;
+          errorState.hidden = true;
+          retryButton.hidden = true;
+          image.hidden = true;
+          // Reassigning the same URL lets the browser retry its request.
+          image.src = mediaURL;
+        });
+
+        imageWrap.append(loader, image, errorState, retryButton);
+        bubble.appendChild(imageWrap);
+        image.src = mediaURL;
+
+        // Cached images can complete before the load handler is observed.
+        if (image.complete && image.naturalWidth > 0) {
+          showLoadedImage();
+        }
+      } else {
+        const imageLabel =
+          document.createElement("div");
+
+        imageLabel.textContent = "Image message";
+
+        bubble.appendChild(imageLabel);
+      }
+
+      if (
+        message.content &&
+        message.content !== "[image]"
+      ) {
+        const caption =
+          document.createElement("div");
+
+        caption.className = "U9-chat-message-caption";
+        caption.textContent = message.content;
+
+        bubble.appendChild(caption);
+      }
+    } else {
+      const text = document.createElement("div");
+
+      text.className = "U9-chat-message-text";
+
+      text.textContent = message.content || "";
+
+      bubble.appendChild(text);
+    }
+
+    const time = document.createElement("div");
+
+    time.className = "U9-chat-message-time";
+
+    time.textContent = formatMessageTime(
+      message.created_at
+    );
+
+    bubble.appendChild(time);
+
+    if (
+      currentChatUser?.type === "group" &&
+      !isOwnMessage
+    ) {
+      const content =
+        document.createElement("div");
+
+      content.className =
+        "U9-chat-message-content";
+
+      const sender =
+        document.createElement("div");
+
+      sender.className =
+        "U9-chat-message-sender";
+
+      sender.textContent = String(
+        message.sender_username ||
+        message.sender_name ||
+        "Group member"
+      );
+
+      content.appendChild(sender);
+      content.appendChild(bubble);
+
+      row.appendChild(content);
+    } else {
+      row.appendChild(bubble);
+    }
+
+    return row;
+  }
+
+  /* =================================================
+     RENDER MESSAGES
+  ================================================= */
+
+  function getMessagesSignature(messages) {
+    return messages.map(getSingleMessageSignature).join("|");
+  }
+
+  function getSingleMessageSignature(message) {
+    return [
+      message.id || "",
+      message.sender_id || "",
+      message.sender_type || "",
+      message.message_type || "text",
+      message.content || "",
+      message.media_path || "",
+      message.created_at || "",
+      message.edited_at || "",
+      message.deleted_at || "",
+      message.read_at || "",
+      message.sender_username || "",
+      message.sender_name || ""
+    ].join(":");
+  }
+
+  function renderMessages(
+    messages,
+    force = false
+  ) {
+    if (!chatMessages) return;
+
+    const nextMessages = Array.isArray(messages)
+      ? messages
+      : [];
+
+    const signature = getMessagesSignature(nextMessages);
+
+    if (!force && signature === lastRenderedSignature) {
+      removeTemporaryNotice();
+      return;
+    }
+
+    const wasNearBottom =
+      chatMessages.scrollHeight -
+      chatMessages.scrollTop -
+      chatMessages.clientHeight < 100;
+    const oldScrollTop = chatMessages.scrollTop;
+
+    let list = chatMessages.querySelector(
+      ".U9-chat-message-list"
+    );
+
+    if (!list || force) {
+      chatMessages.innerHTML = "";
+      list = document.createElement("div");
+      list.className = "U9-chat-message-list";
+      chatMessages.appendChild(list);
+    }
+
+    if (nextMessages.length === 0) {
+      list.innerHTML = "";
+      const empty = document.createElement("div");
+      empty.className = "U9-chat-empty";
+      empty.textContent = "No messages yet. Say hello!";
+      list.appendChild(empty);
+    } else {
+      const existingByKey = new Map();
+      Array.from(list.children).forEach(function (element) {
+        const key = element.dataset.messageKey;
+        if (key) existingByKey.set(key, element);
+      });
+
+      const desiredKeys = new Set();
+      let cursor = list.firstElementChild;
+
+      nextMessages.forEach(function (message, index) {
+        const key = message.id !== undefined && message.id !== null
+          ? "id:" + String(message.id)
+          : "index:" + String(index);
+        const itemSignature = getSingleMessageSignature(message);
+        desiredKeys.add(key);
+
+        let row = existingByKey.get(key);
+        if (!row || row.dataset.messageSignature !== itemSignature) {
+          const replacement = createMessageElement(message);
+          replacement.dataset.messageKey = key;
+          replacement.dataset.messageSignature = itemSignature;
+          if (row && row.parentNode === list) {
+            const replacedCursor = row === cursor;
+            list.replaceChild(replacement, row);
+            if (replacedCursor) cursor = replacement;
+          }
+          row = replacement;
+          existingByKey.set(key, row);
+        } else {
+          row.dataset.messageKey = key;
+        }
+
+        // Keep existing DOM nodes in place whenever possible. This avoids
+        // rebuilding every bubble when only one message changes.
+        if (row !== cursor) {
+          list.insertBefore(row, cursor);
+        }
+        cursor = row.nextElementSibling;
+      });
+
+      Array.from(list.children).forEach(function (element) {
+        const key = element.dataset.messageKey;
+        if (!key || !desiredKeys.has(key)) element.remove();
+      });
+    }
+
+    lastRenderedSignature = signature;
+    removeTemporaryNotice();
+
+    if (wasNearBottom) {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    } else {
+      chatMessages.scrollTop = oldScrollTop;
+    }
+  }
+
+  /* =================================================
+     API ERROR TEXT
+  ================================================= */
+
+  function getReadableError(error) {
+    const message = String(
+      error?.message || ""
+    );
+
+    if (
+      error?.status === 401 ||
+      /authentication required|invalid session|session expired|unauthorized/i.test(
+        message
+      )
+    ) {
+      return "Your login session has expired. Please sign in again.";
+    }
+
+    if (
+      error?.status === 403 &&
+      /friend/i.test(message)
+    ) {
+      return "You must be friends before chatting.";
+    }
+
+    if (
+      error?.status === 403 &&
+      /origin/i.test(message)
+    ) {
+      if (
+        currentChatUser?.type === "group"
+      ) {
+        return "This website is not authorized by group-api. Check the group-api CORS origin list.";
+      }
+
+      if (
+        currentChatUser?.type ===
+        "customer_service"
+      ) {
+        return "This website is not authorized by customer-service-api. Check its ALLOWED_ORIGINS setting.";
+      }
+
+      return "This website is not authorized by message-api. Check the message-api CORS origin list.";
+    }
+
+    return message ||
+      "Could not load messages. Please try again.";
+  }
+
+  /* =================================================
+     LOAD CHAT MESSAGES
+  ================================================= */
+
+  async function loadChatMessages(
+    options = {}
+  ) {
+    const silent = options.silent === true;
+
+    if (
+      !isChatActive ||
+      !currentChatUser?.id ||
+      !chatMessages
+    ) {
       return [];
     }
 
+    const requestVersion = currentRequestVersion;
+    const targetId = String(currentChatUser.id);
+    const targetType = String(currentChatUser.type || "friend");
+
+    /*
+     * Coalesce ordinary overlapping loads. A send-success refresh is different:
+     * if a poll started before the send completed, wait for it and then perform
+     * one fresh read so the just-sent message is not delayed until the next poll.
+     */
+    if (isLoadingMessages) {
+      const inFlightRequest = activeMessageLoadPromise;
+      if (options.forceRefresh && inFlightRequest) {
+        await inFlightRequest.catch(function () { return []; });
+        if (
+          !isChatActive ||
+          requestVersion !== currentRequestVersion ||
+          String(currentChatUser?.id) !== targetId ||
+          String(currentChatUser?.type || "friend") !== targetType
+        ) {
+          return [];
+        }
+        return loadChatMessages({ silent, forceRefresh: false });
+      }
+      return inFlightRequest || [];
+    }
+
+    isLoadingMessages = true;
+
+    const requestPromise = (async function () {
+      try {
+        await resolveCurrentUserId();
+
+        let result;
+
+        if (targetType === "group") {
+          result = await callGroupAPI(
+            "list_group_messages",
+            {
+              group_id: String(
+                currentChatUser.group_id ||
+                targetId
+              ),
+              limit: 100
+            }
+          );
+        } else if (
+          targetType === "customer_service"
+        ) {
+          result = await callCustomerServiceAPI(
+            "list_messages",
+            {
+              conversation_id:
+                getCustomerServiceConversationId(),
+              limit: 100
+            }
+          );
+        } else {
+          result = await callMessageAPI(
+            "list_messages",
+            {
+              other_user_id: targetId,
+              limit: 100
+            }
+          );
+        }
+
+        /*
+         * Discard responses belonging to a previous chat.
+         */
+        if (
+          !isChatActive ||
+          requestVersion !== currentRequestVersion ||
+          String(currentChatUser?.id) !== targetId ||
+          String(
+            currentChatUser?.type || "friend"
+          ) !== targetType
+        ) {
+          return [];
+        }
+
+        const messages = Array.isArray(
+          result.messages
+        )
+          ? result.messages
+          : [];
+
+        cacheConversationMessages(targetType, targetId, messages);
+        renderMessages(messages);
+
+        // Mark a group read only when its latest message advances. This avoids
+        // repeating the same write and unread refresh on every polling cycle.
+        if (targetType === "group") {
+          const lastSeenGroupMessage = messages.length
+            ? messages[messages.length - 1]
+            : null;
+          const latestMessageId = lastSeenGroupMessage?.id != null
+            ? String(lastSeenGroupMessage.id)
+            : "";
+          const groupReadKey = getConversationCacheKey(targetType, targetId);
+
+          if (latestMessageId && lastMarkedGroupMessageIds.get(groupReadKey) !== latestMessageId) {
+            try {
+              await callGroupAPI("mark_group_messages_read", {
+                group_id: String(currentChatUser.group_id || targetId),
+                last_seen_message_id: latestMessageId
+              });
+              lastMarkedGroupMessageIds.set(groupReadKey, latestMessageId);
+              if (typeof window.updateU9UnreadState === "function") {
+                window.updateU9UnreadState("group_messages", false, targetId);
+              }
+            } catch (readError) {
+              console.warn("U9 Chat: Could not update group-message read status.", readError);
+            }
+          }
+        }
+
+        // Only mark one-to-one friend messages as read after this
+        // conversation has loaded and rendered successfully. Image and
+        // text messages use the same read_at state.
+        const friendReadKey = getConversationCacheKey(targetType, targetId);
+        const alreadyMarkedKeys = successfullyMarkedFriendUnreadKeys.get(friendReadKey) || new Set();
+        const unreadFriendMessages = targetType === "friend"
+          ? messages.filter(function (message) {
+              return (
+                String(message.sender_id) === targetId &&
+                !message.read_at &&
+                !message.deleted_at &&
+                message.id != null &&
+                !alreadyMarkedKeys.has(String(message.id))
+              );
+            })
+          : [];
+
+        if (unreadFriendMessages.length) {
+          try {
+            await callMessageAPI("mark_messages_read", {
+              other_user_id: targetId
+            });
+            unreadFriendMessages.forEach(function (message) {
+              alreadyMarkedKeys.add(String(message.id));
+            });
+            successfullyMarkedFriendUnreadKeys.set(friendReadKey, alreadyMarkedKeys);
+            if (typeof window.updateU9UnreadState === "function") {
+              window.updateU9UnreadState("friend_messages", false, targetId);
+            }
+          } catch (readError) {
+            console.warn(
+              "U9 Chat: Could not update friend-message read status.",
+              readError
+            );
+          }
+        }
+
+        // An async mark-read call above can finish after the user has closed
+        // or switched conversations. Stop here before touching the cleared user.
+        if (
+          !isChatActive ||
+          requestVersion !== currentRequestVersion ||
+          !currentChatUser ||
+          String(currentChatUser.id) !== targetId ||
+          String(currentChatUser.type || "friend") !== targetType
+        ) {
+          return messages;
+        }
+
+        if (
+          targetType === "customer_service"
+        ) {
+          const conversationStatus =
+            result?.conversation?.status ||
+            currentChatUser.metadata
+              ?.conversation_status ||
+            "open";
+
+          updateCustomerServiceComposer(
+            conversationStatus
+          );
+
+          const side =
+            currentChatUser.metadata
+              ?.service_side === "agent"
+              ? "agent"
+              : "customer";
+
+          const incomingType =
+            side === "agent"
+              ? "customer"
+              : "agent";
+
+          const customerServiceReadKey = getConversationCacheKey(targetType, targetId);
+          const alreadyMarkedCustomerServiceKeys =
+            successfullyMarkedCustomerServiceUnreadKeys.get(customerServiceReadKey) || new Set();
+          const unreadIncomingMessages = messages.filter(function (message) {
+            return (
+              message.sender_type === incomingType &&
+              !message.read_at &&
+              !message.deleted_at &&
+              message.id != null &&
+              !alreadyMarkedCustomerServiceKeys.has(String(message.id))
+            );
+          });
+
+          if (unreadIncomingMessages.length) {
+            try {
+              await callCustomerServiceAPI(
+                "mark_read",
+                { conversation_id: getCustomerServiceConversationId() }
+              );
+              unreadIncomingMessages.forEach(function (message) {
+                alreadyMarkedCustomerServiceKeys.add(String(message.id));
+              });
+              successfullyMarkedCustomerServiceUnreadKeys.set(
+                customerServiceReadKey,
+                alreadyMarkedCustomerServiceKeys
+              );
+              // Update known unread state locally after the API confirms read.
+              window.dispatchEvent(new CustomEvent("u9:customer-service:conversation-updated", {
+                detail: { conversation_id: getCustomerServiceConversationId(), read: true }
+              }));
+              if (typeof window.updateU9UnreadState === "function") {
+                window.updateU9UnreadState("customer_service", false, getCustomerServiceConversationId());
+              }
+            } catch (readError) {
+              console.warn(
+                "U9 Chat: Could not update customer-service read status.",
+                readError
+              );
+            }
+          }
+        } else if (chatStatus) {
+          // The chat may have been closed while an async read-status request
+          // was in flight. Never dereference the cleared currentChatUser.
+          chatStatus.textContent =
+            currentChatUser?.status ||
+            (
+              targetType === "group"
+                ? "Group"
+                : "Friend"
+            );
+        }
+
+        return messages;
+      } catch (error) {
+        console.error(
+          "U9 Chat: Failed to load messages.",
+          error
+        );
+
+        if (
+          !isChatActive ||
+          requestVersion !== currentRequestVersion
+        ) {
+          return [];
+        }
+
+        const errorMessage =
+          getReadableError(error);
+
+        if (lastRenderedSignature !== null) {
+          // Keep cached/previous messages visible if a background refresh fails.
+          // appendChatNotice replaces the prior temporary notice to avoid duplicates.
+          appendChatNotice(
+            errorMessage,
+            "error"
+          );
+        } else {
+          showChatNotice(
+            errorMessage,
+            "error"
+          );
+        }
+
+        return [];
+      } finally {
+        if (
+          requestVersion === currentRequestVersion
+        ) {
+          isLoadingMessages = false;
+        }
+      }
+    })();
+
+    activeMessageLoadPromise = requestPromise;
+
     try {
-      await callMessageAPI("mark_friend_requests_read");
-    } catch (error) {
-      if (error?.status !== 401) {
-        console.warn("U9 Add Friend: could not mark requests as read.", error);
+      return await requestPromise;
+    } finally {
+      if (
+        activeMessageLoadPromise === requestPromise
+      ) {
+        activeMessageLoadPromise = null;
+      }
+
+      /*
+       * A previous conversation may have finished after
+       * the user switched to another conversation.
+       */
+      if (
+        requestVersion !== currentRequestVersion
+      ) {
+        isLoadingMessages = false;
       }
     }
-    return loadRelationships();
-  };
+  }
 
-  /* Optional global refresh hook used by other Message components. */
-  window.refreshAddFriendsPage = loadRelationships;
+  /* =================================================
+     SEND CHAT MESSAGE
+  ================================================= */
 
+  async function sendChatMessage(event) {
+    if (event) {
+      event.preventDefault();
+    }
 
-  console.log(
-    "U9 Add Friend page initialized."
-  );
+    if (
+      !isChatActive ||
+      !currentChatUser?.id ||
+      !chatInput
+    ) {
+      return;
+    }
 
+    if (isSendingMessage) return;
+
+    const content = chatInput.value.trim();
+
+    if (!content) {
+      chatInput.focus();
+
+      return;
+    }
+
+    if (
+      content.length > MAX_MESSAGE_LENGTH
+    ) {
+      appendChatNotice(
+        `Messages cannot exceed ${MAX_MESSAGE_LENGTH} characters.`,
+        "error"
+      );
+
+      return;
+    }
+
+    if (
+      currentChatUser.type ===
+        "customer_service" &&
+      String(
+        currentChatUser.metadata
+          ?.conversation_status || "open"
+      ).toLowerCase() === "closed"
+    ) {
+      appendChatNotice(
+        "This conversation is closed.",
+        "error"
+      );
+
+      return;
+    }
+
+    const targetId = String(
+      currentChatUser.id
+    );
+
+    const targetType = String(
+      currentChatUser.type || "friend"
+    );
+
+    const requestVersion = currentRequestVersion;
+
+    isSendingMessage = true;
+
+    if (chatSendButton) {
+      chatSendButton.disabled = true;
+
+      chatSendButton.setAttribute(
+        "aria-busy",
+        "true"
+      );
+    }
+
+    try {
+      if (
+        targetType === "customer_service"
+      ) {
+        await callCustomerServiceAPI(
+          "send_message",
+          {
+            conversation_id:
+              getCustomerServiceConversationId(),
+            message_type: "text",
+            content
+          }
+        );
+      } else if (
+        targetType === "group"
+      ) {
+        await callGroupAPI(
+          "send_group_message",
+          {
+            group_id: String(
+              currentChatUser.group_id ||
+              targetId
+            ),
+            message_type: "text",
+            content
+          }
+        );
+      } else {
+        await callMessageAPI(
+          "send_message",
+          {
+            receiver_id: targetId,
+            message_type: "text",
+            content
+          }
+        );
+      }
+
+      /*
+       * Do not clear or refresh another conversation
+       * if the user switched chats during the request.
+       */
+      if (
+        !isChatActive ||
+        requestVersion !== currentRequestVersion ||
+        String(currentChatUser?.id) !== targetId ||
+        String(
+          currentChatUser?.type || "friend"
+        ) !== targetType
+      ) {
+        return;
+      }
+
+      /*
+       * Clear only after the API confirms success.
+       */
+      chatInput.value = "";
+
+      resizeChatInput();
+
+      await loadChatMessages({ forceRefresh: true, silent: true });
+
+      if (
+        targetType === "customer_service"
+      ) {
+        window.dispatchEvent(
+          new CustomEvent(
+            "u9:customer-service:conversation-updated",
+            {
+              detail: {
+                conversation_id:
+                  currentChatUser?.conversationId ||
+                  currentChatUser?.conversation_id ||
+                  currentChatUser?.id ||
+                  ""
+              }
+            }
+          )
+        );
+      }
+
+      if (
+        chatInput &&
+        !chatInput.disabled &&
+        isChatActive &&
+        requestVersion === currentRequestVersion
+      ) {
+        const isTouchDevice =
+          window.matchMedia(
+            "(pointer: coarse)"
+          ).matches;
+
+        if (!isTouchDevice) {
+          chatInput.focus({
+            preventScroll: true
+          });
+        }
+
+        requestAnimationFrame(
+          updateChatViewport
+        );
+      }
+    } catch (error) {
+      console.error(
+        "U9 Chat: Failed to send message.",
+        error
+      );
+
+      if (
+        requestVersion === currentRequestVersion
+      ) {
+        appendChatNotice(
+          getReadableError(error),
+          "error"
+        );
+      }
+    } finally {
+      isSendingMessage = false;
+
+      if (chatSendButton) {
+        chatSendButton.removeAttribute(
+          "aria-busy"
+        );
+
+        if (
+          currentChatUser?.type ===
+          "customer_service"
+        ) {
+          updateCustomerServiceComposer();
+        } else {
+          chatSendButton.disabled = false;
+        }
+      }
+    }
+  }
+
+  /* =================================================
+     POLLING
+  ================================================= */
+
+  function stopMessagePolling() {
+    if (pollTimer !== null) {
+      clearTimeout(pollTimer);
+
+      pollTimer = null;
+    }
+  }
+
+  function scheduleMessagePolling() {
+    // Compatibility shim: automatic chat polling is disabled by design.
+    stopMessagePolling();
+  }
+
+  /* =================================================
+     BACK BUTTON
+  ================================================= */
+
+  function handleChatBack() {
+    if (
+      typeof window.closeMessageChat ===
+      "function"
+    ) {
+      window.closeMessageChat();
+
+      return;
+    }
+
+    closeChatPage();
+
+    if (
+      typeof window.showMessageHome ===
+      "function"
+    ) {
+      window.showMessageHome();
+    }
+  }
+
+  /* =================================================
+     CLOSE CUSTOMER SERVICE CONVERSATION
+  ================================================= */
+
+  async function handleChatMoreClick() {
+    if (
+      currentChatUser?.type !==
+      "customer_service"
+    ) {
+      /*
+       * Friend/group More button is not implemented.
+       * The attachment button remains separate.
+       */
+      console.info(
+        "U9 Chat: More options are not implemented yet."
+      );
+
+      return;
+    }
+
+    const status = String(
+      currentChatUser.metadata
+        ?.conversation_status || "open"
+    ).toLowerCase();
+
+    if (status === "closed") return;
+
+    const requestVersion =
+      currentRequestVersion;
+
+    const conversationId =
+      getCustomerServiceConversationId();
+
+    const confirmText =
+      currentChatUser.metadata?.service_side ===
+      "agent"
+        ? "Close this customer support conversation? The customer will no longer be able to reply in this conversation."
+        : "Close this customer support conversation? You can start a new one later.";
+
+    if (!window.confirm(confirmText)) {
+      return;
+    }
+
+    if (chatMoreButton) {
+      chatMoreButton.disabled = true;
+    }
+
+    try {
+      const result =
+        await callCustomerServiceAPI(
+          "close_conversation",
+          {
+            conversation_id: conversationId
+          }
+        );
+
+      if (
+        requestVersion !== currentRequestVersion ||
+        currentChatUser?.type !==
+          "customer_service" ||
+        getCustomerServiceConversationId() !==
+          conversationId
+      ) {
+        return;
+      }
+
+      const nextStatus =
+        result?.conversation?.status ||
+        "closed";
+
+      if (
+        !currentChatUser.metadata ||
+        typeof currentChatUser.metadata !==
+          "object"
+      ) {
+        currentChatUser.metadata = {};
+      }
+
+      currentChatUser.metadata
+        .conversation_status = nextStatus;
+
+      updateCustomerServiceComposer(
+        nextStatus
+      );
+
+      appendChatNotice(
+        "This customer service conversation is now closed.",
+        "info"
+      );
+
+      window.dispatchEvent(
+        new CustomEvent(
+          "u9:customer-service:conversation-updated",
+          {
+            detail: {
+              conversation_id: conversationId
+            }
+          }
+        )
+      );
+    } catch (error) {
+      console.error(
+        "U9 Chat: Could not close customer service conversation.",
+        error
+      );
+
+      if (
+        requestVersion === currentRequestVersion
+      ) {
+        appendChatNotice(
+          getReadableError(error),
+          "error"
+        );
+
+        if (chatMoreButton) {
+          chatMoreButton.disabled = false;
+        }
+      }
+    }
+  }
+
+  /* =================================================
+     ONE-TO-ONE IMAGE MESSAGES
+  ================================================= */
+
+  function bindImageAttachment() {
+    if (!chatAttachmentButton || chatImageFileInput) return;
+
+    chatImageFileInput = document.createElement("input");
+    chatImageFileInput.type = "file";
+    chatImageFileInput.accept = "image/*";
+    chatImageFileInput.hidden = true;
+    chatImageFileInput.setAttribute("aria-label", "Choose an image");
+    document.body.appendChild(chatImageFileInput);
+
+    chatAttachmentButton.addEventListener("click", function () {
+      if (isSendingMessage) return;
+
+      if (!currentChatUser || !["friend", "group"].includes(String(currentChatUser.type || "friend"))) {
+        appendChatNotice("Image sending is not available in this conversation.", "error");
+        return;
+      }
+
+      chatImageFileInput.value = "";
+      chatImageFileInput.click();
+    });
+
+    chatImageFileInput.addEventListener("change", async function () {
+      const file = chatImageFileInput.files && chatImageFileInput.files[0];
+      if (!file) return;
+
+      if (!file.type || !file.type.startsWith("image/")) {
+        appendChatNotice("Please choose an image file.", "error");
+        return;
+      }
+
+      if (file.size > 12 * 1024 * 1024) {
+        appendChatNotice("The image must be smaller than 12 MB.", "error");
+        return;
+      }
+
+      try {
+        await sendImageMessage(file);
+      } catch (error) {
+        console.error("U9 Chat: Could not send image.", error);
+        appendChatNotice(getReadableError(error), "error");
+      }
+    });
+  }
+
+  async function compressImageToBase64(file) {
+    const sourceURL = await new Promise(function (resolve, reject) {
+      const reader = new FileReader();
+      reader.onload = function () { resolve(String(reader.result || "")); };
+      reader.onerror = function () { reject(new Error("Could not read the selected image.")); };
+      reader.readAsDataURL(file);
+    });
+
+    const image = await new Promise(function (resolve, reject) {
+      const img = new Image();
+      img.onload = function () { resolve(img); };
+      img.onerror = function () { reject(new Error("This image could not be opened.")); };
+      img.src = sourceURL;
+    });
+
+    const maxSide = 1600;
+    const scale = Math.min(1, maxSide / Math.max(image.naturalWidth, image.naturalHeight));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+    canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("Image processing is not supported by this browser.");
+
+    // Flatten transparent pixels onto white before converting to JPEG.
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+    let quality = 0.82;
+    let dataURL = canvas.toDataURL("image/jpeg", quality);
+    while (dataURL.length > 2_300_000 && quality > 0.48) {
+      quality -= 0.08;
+      dataURL = canvas.toDataURL("image/jpeg", quality);
+    }
+
+    const base64 = dataURL.split(",")[1] || "";
+    if (!base64 || base64.length > 2_300_000) {
+      throw new Error("The compressed image is too large. Please choose a smaller image.");
+    }
+
+    return base64;
+  }
+
+  async function sendImageMessage(file) {
+    if (!currentChatUser || !["friend", "group"].includes(String(currentChatUser.type || "friend"))) return;
+
+    const targetId = String(currentChatUser.id);
+    const requestVersion = currentRequestVersion;
+    const targetType = String(currentChatUser.type || "friend");
+
+    isSendingMessage = true;
+    if (chatSendButton) chatSendButton.disabled = true;
+    if (chatAttachmentButton) chatAttachmentButton.disabled = true;
+
+    appendChatNotice("Preparing image…", "info");
+
+    try {
+      await resolveCurrentUserId();
+      const fileBase64 = await compressImageToBase64(file);
+
+      if (
+        !isChatActive ||
+        requestVersion !== currentRequestVersion ||
+        String(currentChatUser?.id) !== targetId ||
+        String(currentChatUser?.type || "friend") !== targetType
+      ) {
+        return;
+      }
+
+      appendChatNotice("Uploading image…", "info");
+      let uploadResult;
+      if (targetType === "group") {
+        const groupId = String(currentChatUser.group_id || targetId);
+        uploadResult = await callGroupAPI("upload_group_image", {
+          group_id: groupId,
+          content_type: "image/jpeg",
+          file_base64: fileBase64
+        });
+        if (!uploadResult.media_path) {
+          throw new Error("The image uploaded, but no storage path was returned.");
+        }
+        await callGroupAPI("send_group_message", {
+          group_id: groupId,
+          message_type: "image",
+          media_path: uploadResult.media_path
+        });
+      } else {
+        uploadResult = await callMessageAPI("upload_image", {
+          receiver_id: targetId,
+          content_type: "image/jpeg",
+          file_base64: fileBase64
+        });
+        if (!uploadResult.media_path) {
+          throw new Error("The image uploaded, but no storage path was returned.");
+        }
+        await callMessageAPI("send_message", {
+          receiver_id: targetId,
+          message_type: "image",
+          content: "[image]",
+          media_path: uploadResult.media_path
+        });
+      }
+
+      if (
+        isChatActive &&
+        requestVersion === currentRequestVersion &&
+        String(currentChatUser?.id) === targetId &&
+        String(currentChatUser?.type || "friend") === targetType
+      ) {
+        removeTemporaryNotice();
+        await loadChatMessages({ silent: true, forceRefresh: true });
+      }
+    } finally {
+      isSendingMessage = false;
+      if (chatSendButton) chatSendButton.disabled = false;
+      if (chatAttachmentButton) chatAttachmentButton.disabled = false;
+    }
+  }
+
+  /* =================================================
+     BIND UI EVENTS ONCE
+  ================================================= */
+
+  function bindChatEvents() {
+    if (chatEventsBound) return;
+
+    chatEventsBound = true;
+
+    if (chatForm) {
+      chatForm.addEventListener(
+        "submit",
+        sendChatMessage
+      );
+    }
+
+    if (chatBackButton) {
+      chatBackButton.addEventListener(
+        "click",
+        handleChatBack
+      );
+    }
+
+    if (chatInput) {
+      chatInput.addEventListener(
+        "input",
+        function () {
+          if (
+            chatInput.value.length >
+            MAX_MESSAGE_LENGTH
+          ) {
+            chatInput.value =
+              chatInput.value.slice(
+                0,
+                MAX_MESSAGE_LENGTH
+              );
+          }
+
+          resizeChatInput();
+        }
+      );
+
+      /*
+       * Enter and Shift+Enter both create new lines.
+       * Sending is handled by the send button/form.
+       */
+      chatInput.addEventListener(
+        "keydown",
+        function (event) {
+          if (
+            event.key === "Enter" &&
+            !event.shiftKey
+          ) {
+            // Intentionally allow the newline.
+          }
+        }
+      );
+    }
+
+    if (chatAvatar) {
+      chatAvatar.onerror = function () {
+        if (
+          chatAvatar.getAttribute("src") !==
+          DEFAULT_AVATAR
+        ) {
+          chatAvatar.src = DEFAULT_AVATAR;
+        } else {
+          chatAvatar.onerror = null;
+        }
+      };
+    }
+
+    if (chatMoreButton) {
+      chatMoreButton.addEventListener(
+        "click",
+        handleChatMoreClick
+      );
+    }
+
+    bindImageAttachment();
+  }
+
+  /* =================================================
+     INITIALIZE CHAT PAGE
+     Called by normal-message.js:
+       initializeChatPage(user)
+  ================================================= */
+
+  async function initializeChatPage(user) {
+    if (
+      !chatPage ||
+      !chatMessages ||
+      !chatForm ||
+      !chatInput
+    ) {
+      console.error(
+        "U9 Chat: Required chat HTML elements are missing."
+      );
+
+      return false;
+    }
+
+    if (
+      !user ||
+      !(
+        user.id ||
+        user.user_id ||
+        user.group_id ||
+        user.groupId ||
+        user.conversation_id ||
+        user.conversationId
+      )
+    ) {
+      console.error(
+        "U9 Chat: A valid chat target ID is required.",
+        user
+      );
+
+      return false;
+    }
+
+    bindChatEvents();
+    bindChatViewportEvents();
+
+    const nextUserId = String(
+      user.id ||
+      user.user_id ||
+      user.group_id ||
+      user.groupId ||
+      user.conversation_id ||
+      user.conversationId
+    );
+
+    const nextChatType = String(
+      user.type ||
+      (
+        user.group_id || user.groupId
+          ? "group"
+          : (
+              user.conversation_id ||
+              user.conversationId
+                ? "customer_service"
+                : "friend"
+            )
+      )
+    );
+
+    const changedConversation =
+      !currentChatUser ||
+      String(currentChatUser.id) !==
+        nextUserId ||
+      String(
+        currentChatUser.type || "friend"
+      ) !== nextChatType;
+
+    if (changedConversation) {
+      currentRequestVersion++;
+
+      stopMessagePolling();
+
+      isLoadingMessages = false;
+      activeMessageLoadPromise = null;
+
+      lastRenderedSignature = null;
+    }
+
+    currentChatUser = {
+      ...user,
+      id: nextUserId,
+      type: nextChatType,
+
+      group_id:
+        nextChatType === "group"
+          ? String(
+              user.group_id ||
+              user.groupId ||
+              nextUserId
+            )
+          : (user.group_id || null),
+
+      metadata:
+        user.metadata &&
+        typeof user.metadata === "object"
+          ? { ...user.metadata }
+          : {}
+    };
+
+    isChatActive = true;
+
+    chatPage.hidden = false;
+
+    chatPage.classList.add(
+      "active",
+      "is-active"
+    );
+
+    chatPage.setAttribute(
+      "aria-hidden",
+      "false"
+    );
+
+    updateChatHeader(currentChatUser);
+
+    updateCustomerServiceComposer();
+
+    resizeChatInput();
+
+    if (changedConversation) {
+      const cachedMessages = getCachedConversationMessages(
+        nextChatType,
+        nextUserId
+      );
+
+      if (cachedMessages !== null) {
+        // Render cached messages immediately; loadChatMessages below refreshes them.
+        renderMessages(cachedMessages, true);
+      } else {
+        showChatNotice(
+          "Loading conversation...",
+          "info"
+        );
+      }
+    }
+
+    requestAnimationFrame(function () {
+      updateChatViewport();
+      resizeChatInput();
+    });
+
+    await loadChatMessages();
+
+    if (
+      isChatActive &&
+      currentChatUser &&
+      String(currentChatUser.id) ===
+        nextUserId &&
+      String(
+        currentChatUser.type || "friend"
+      ) === nextChatType
+    ) {
+      /*
+       * Avoid automatically opening the mobile keyboard
+       * every time a conversation is opened.
+       */
+      const isTouchDevice =
+        window.matchMedia(
+          "(pointer: coarse)"
+        ).matches;
+
+      if (
+        !isTouchDevice &&
+        document.activeElement !== chatInput &&
+        !chatInput.value &&
+        !chatInput.disabled
+      ) {
+        chatInput.focus({
+          preventScroll: true
+        });
+      }
+
+      requestAnimationFrame(
+        updateChatViewport
+      );
+    }
+
+    console.log(
+      "U9 Chat Page initialized.",
+      {
+        chatType: nextChatType,
+        targetId: nextUserId,
+        targetName:
+          currentChatUser?.name ||
+          currentChatUser?.username ||
+          "User"
+      }
+    );
+
+    return true;
+  }
+
+  /* =================================================
+     CLOSE CHAT PAGE
+     Called by normal-message.js when leaving Chat.
+  ================================================= */
+
+  function closeChatPage() {
+    isChatActive = false;
+
+    currentRequestVersion++;
+
+    stopMessagePolling();
+
+    currentChatUser = null;
+
+    isLoadingMessages = false;
+    isSendingMessage = false;
+
+    activeMessageLoadPromise = null;
+    lastRenderedSignature = null;
+
+    if (chatPage) {
+      chatPage.classList.remove(
+        "active",
+        "is-active"
+      );
+
+      chatPage.hidden = true;
+
+      chatPage.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+      chatPage.style.removeProperty(
+        "--u9-chat-viewport-height"
+      );
+    }
+
+    if (chatSendButton) {
+      chatSendButton.disabled = false;
+
+      chatSendButton.removeAttribute(
+        "aria-busy"
+      );
+    }
+
+    if (chatInput) {
+      chatInput.disabled = false;
+
+      chatInput.placeholder =
+        "Type a message...";
+
+      chatInput.value = "";
+
+      resizeChatInput();
+    }
+
+    if (chatMoreButton) {
+      chatMoreButton.disabled = false;
+
+      chatMoreButton.setAttribute(
+        "aria-label",
+        "More chat options"
+      );
+
+      chatMoreButton.removeAttribute("title");
+    }
+
+    console.log("U9 Chat Page closed.");
+  }
+
+  /* =================================================
+     PUBLIC API
+  ================================================= */
+
+  window.initializeChatPage =
+    initializeChatPage;
+
+  window.closeChatPage =
+    closeChatPage;
+
+  window.loadChatMessages =
+    loadChatMessages;
+
+  window.sendChatMessage =
+    sendChatMessage;
+
+  /* =================================================
+     INITIALIZE
+  ================================================= */
+
+  function initializeChatModule() {
+    bindChatEvents();
+
+    bindChatViewportEvents();
+
+    resizeChatInput();
+
+    console.log(
+      "U9 Chat module ready. Waiting for a conversation."
+    );
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      initializeChatModule,
+      { once: true }
+    );
+  } else {
+    initializeChatModule();
+  }
 })();
