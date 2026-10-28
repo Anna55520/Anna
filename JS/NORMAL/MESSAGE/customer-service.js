@@ -147,8 +147,8 @@
   // Read the existing message read_at state through the current API. To keep
   // polling lightweight, only inspect conversations whose last activity is
   // newer than the customer's/agent's last-read timestamp (or has never been read).
-  async function getUnreadCounts(conversations, incomingSenderType) {
-    if (!isMessageModalOpen()) return {};
+  async function getUnreadCounts(conversations, incomingSenderType, allowClosedModal) {
+    if (!allowClosedModal && !isMessageModalOpen()) return {};
     const rows = Array.isArray(conversations) ? conversations : [];
     const counts = {};
     const candidates = rows.filter(function (conversation) {
@@ -168,7 +168,7 @@
     // create a burst of requests against the existing Edge Function.
     let nextIndex = 0;
     const workers = Array.from({ length: Math.min(4, candidates.length) }, async function () {
-      while (nextIndex < candidates.length && isMessageModalOpen()) {
+      while (nextIndex < candidates.length && (allowClosedModal || isMessageModalOpen())) {
         const conversation = candidates[nextIndex++];
         const id = String(conversation.id);
         try {
@@ -191,9 +191,11 @@
     return counts;
   }
 
-  async function loadUnreadSummary(force) {
-    // Global unread summaries must not trigger background requests while closed.
-    if (!isMessageModalOpen()) {
+  async function loadUnreadSummary(force, options) {
+    // Only perform a closed-modal summary when a caller explicitly requests it
+    // (initial toolbar state / login change). No timer or background polling.
+    const allowClosedModal = Boolean(options && options.allowClosedModal === true);
+    if (!allowClosedModal && !isMessageModalOpen()) {
       return state.unreadSummaryCache || { has_unread: false, unread_by_conversation: {} };
     }
     const now = Date.now();
@@ -204,9 +206,9 @@
 
     state.unreadSummaryPromise = (async function () {
       const mineResult = await callCustomerServiceAPI("list_my_conversations", { limit: 100 });
-      if (!isMessageModalOpen()) return state.unreadSummaryCache;
+      if (!allowClosedModal && !isMessageModalOpen()) return state.unreadSummaryCache;
       const mine = Array.isArray(mineResult.conversations) ? mineResult.conversations : [];
-      const customerUnread = await getUnreadCounts(mine, "agent");
+      const customerUnread = await getUnreadCounts(mine, "agent", allowClosedModal);
       if (!allowClosedModal && !isMessageModalOpen()) return state.unreadSummaryCache;
       let agentUnread = {};
       try {
@@ -214,7 +216,7 @@
         if (agentStatus.is_agent === true) {
           const agentResult = await callCustomerServiceAPI("list_agent_conversations", { status: "active", limit: 100 });
           const agentRows = Array.isArray(agentResult.conversations) ? agentResult.conversations : [];
-          agentUnread = await getUnreadCounts(agentRows, "customer");
+          agentUnread = await getUnreadCounts(agentRows, "customer", allowClosedModal);
         }
       } catch (error) {
         // A normal customer is not allowed to load the agent queue; that is expected.
@@ -240,6 +242,7 @@
   window.getCustomerServiceUnreadSummary = function (force, options) {
     return loadUnreadSummary(force === true, options || {});
   };
+  window.dispatchEvent(new CustomEvent("u9:customer-service-unread-ready"));
 
   function invalidateUnreadSummary() {
     state.unreadCacheAt = 0;
