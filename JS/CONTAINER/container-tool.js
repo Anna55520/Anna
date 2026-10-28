@@ -19,27 +19,58 @@ const menuButton =
    INITIAL MESSAGE UNREAD DOT
 ========================= */
 
-// Do one unread refresh after page scripts are available, so the toolbar dot
-// is correct after a reload even when the Message modal stays closed.
-function refreshContainerToolUnreadOnce() {
-  if (
-    window.U9User &&
-    typeof window.U9User.isLoggedIn === "function" &&
-    !window.U9User.isLoggedIn()
-  ) {
+// Unread status is checked once after initial page load and after a confirmed
+// login/user-state change. No timer or background polling is used.
+let containerUnreadRefreshStarted = false;
+let containerUnreadRefreshUserKey = "";
+
+function refreshContainerToolUnreadOnce(force) {
+  if (window.U9User && typeof window.U9User.isLoggedIn === "function") {
+    if (!window.U9User.isLoggedIn()) return;
+    const user = typeof window.U9User.get === "function" ? window.U9User.get() : null;
+    const userKey = String(user?.id || user?.user_id || user?.account || "logged-in");
+    if (!force && containerUnreadRefreshStarted && containerUnreadRefreshUserKey === userKey) return;
+    containerUnreadRefreshStarted = true;
+    containerUnreadRefreshUserKey = userKey;
+  } else if (containerUnreadRefreshStarted && !force) {
     return;
+  } else {
+    containerUnreadRefreshStarted = true;
   }
 
-  if (typeof window.refreshMessageUnreadIndicators === "function") {
-    void window.refreshMessageUnreadIndicators({ allowClosedModal: true });
+  const run = () => {
+    if (typeof window.refreshMessageUnreadIndicators === "function") {
+      void window.refreshMessageUnreadIndicators({ allowClosedModal: true });
+      return true;
+    }
+    return false;
+  };
+
+  // normal-message.js may load after this script; retry only on script readiness,
+  // not on a timer or repeated API polling.
+  if (!run()) {
+    window.addEventListener("load", run, { once: true });
   }
 }
 
 if (document.readyState === "complete") {
-  refreshContainerToolUnreadOnce();
+  refreshContainerToolUnreadOnce(false);
 } else {
-  window.addEventListener("load", refreshContainerToolUnreadOnce, { once: true });
+  window.addEventListener("load", () => refreshContainerToolUnreadOnce(false), { once: true });
 }
+
+if (window.U9User && typeof window.U9User.subscribe === "function") {
+  window.U9User.subscribe(function (user, state) {
+    const loggedIn = Boolean(user) && String(state || "").toUpperCase() !== "UNAUTHENTICATED";
+    if (loggedIn) refreshContainerToolUnreadOnce(false);
+    else {
+      containerUnreadRefreshStarted = false;
+      containerUnreadRefreshUserKey = "";
+    }
+  });
+}
+window.addEventListener("u9:auth:changed", () => refreshContainerToolUnreadOnce(true));
+window.addEventListener("u9:login", () => refreshContainerToolUnreadOnce(true));
 
 
 /* =========================
