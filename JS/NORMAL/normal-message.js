@@ -2611,6 +2611,7 @@
 
   window.refreshMessageUnreadIndicators = refreshMessageUnreadIndicators;
   window.updateU9UnreadState = updateU9UnreadState;
+  window.dispatchEvent(new CustomEvent("u9:message-unread-ready"));
 
   window.refreshMessageHomeGroups = function () {
     return loadHomeGroups({ force: true });
