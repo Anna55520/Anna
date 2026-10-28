@@ -86,8 +86,9 @@
   let homeFriends = [];
   let homeFriendsLoaded = false;
   let homeFriendsById = new Map();
-  let unreadRefreshTimer = null;
   let unreadRefreshInFlight = false;
+  let unreadRefreshPromise = null;
+  let unreadSummaryCacheAt = 0;
   let unreadBySender = {};
   let unreadByGroup = {};
 
@@ -525,9 +526,17 @@
       renderAnonymousMessageState();
       return;
     }
-    if (document.hidden || unreadRefreshInFlight) return;
+    if (document.hidden) return;
+    // Reuse a recent summary when the toolbar just fetched it; an explicit
+    // force option can be used for a deliberate refresh.
+    const force = Boolean(options && options.force === true);
+    if (!force && unreadSummaryCacheAt && Date.now() - unreadSummaryCacheAt < 10000) {
+      applyCachedUnreadIndicators();
+      return;
+    }
+    if (unreadRefreshInFlight && unreadRefreshPromise) return unreadRefreshPromise;
     unreadRefreshInFlight = true;
-
+    unreadRefreshPromise = (async function () {
     try {
       let friendHasUnread = Object.values(unreadBySender).some((count) => Number(count) > 0);
       let groupHasUnread = Object.values(unreadByGroup).some((count) => Number(count) > 0);
@@ -606,7 +615,7 @@
       let customerServiceHasUnread = false;
       try {
         if (typeof window.getCustomerServiceUnreadSummary === "function") {
-          const customerServiceSummary = await window.getCustomerServiceUnreadSummary(false);
+          const customerServiceSummary = await window.getCustomerServiceUnreadSummary(false, { allowClosedModal });
           customerServiceHasUnread = customerServiceSummary?.has_unread === true;
         }
       } catch (error) {
@@ -615,6 +624,13 @@
       }
 
       const hasAnyUnread = friendHasUnread || groupHasUnread || customerServiceHasUnread || friendRequestsHaveUnread || groupRequestsHaveUnread;
+      window.__U9UnreadFlags = {
+        friend_messages: friendHasUnread,
+        group_messages: groupHasUnread,
+        customer_service: customerServiceHasUnread,
+        friend_requests: friendRequestsHaveUnread,
+        group_requests: groupRequestsHaveUnread
+      };
       const customerServiceButton = document.getElementById("Message-model-customer-service-button");
       if (customerServiceButton) {
         customerServiceButton.classList.toggle("has-unread", customerServiceHasUnread);
@@ -630,28 +646,91 @@
         button.setAttribute("aria-label", hasAnyUnread ? `${baseLabel}, unread messages` : baseLabel);
       });
     } finally {
+      unreadSummaryCacheAt = Date.now();
       unreadRefreshInFlight = false;
+      unreadRefreshPromise = null;
     }
+    })();
+    return unreadRefreshPromise;
+  }
+
+  function applyCachedUnreadIndicators() {
+    const friendHasUnread = Object.values(unreadBySender).some((count) => Number(count) > 0);
+    const groupHasUnread = Object.values(unreadByGroup).some((count) => Number(count) > 0);
+    const hasAnyUnread = friendHasUnread || groupHasUnread ||
+      Boolean(window.__U9UnreadFlags?.customer_service) ||
+      Boolean(window.__U9UnreadFlags?.friend_requests) ||
+      Boolean(window.__U9UnreadFlags?.group_requests);
+    ["U9-page-container-tool-message", "U9-page-container-tool-menu"].forEach(function (id) {
+      const button = document.getElementById(id);
+      if (!button) return;
+      button.classList.toggle("has-unread", hasAnyUnread);
+      const baseLabel = id.endsWith("menu") ? "Menu" : "Messages";
+      button.setAttribute("aria-label", hasAnyUnread ? `${baseLabel}, unread messages` : baseLabel);
+    });
+  }
+
+  function updateU9UnreadState(category, hasUnread, targetId) {
+    const value = Boolean(hasUnread);
+    window.__U9UnreadFlags = window.__U9UnreadFlags || {};
+
+    if (category === "friend_messages") {
+      if (targetId != null) unreadBySender[String(targetId)] = value ? Math.max(1, Number(unreadBySender[String(targetId)] || 0)) : 0;
+      window.__U9UnreadFlags.friend_messages = Object.values(unreadBySender).some((count) => Number(count) > 0);
+      document.querySelectorAll("#Message-model-friends-list [data-home-chat-friend-id]").forEach(function (button) {
+        if (targetId != null && String(button.dataset.homeChatFriendId || "") === String(targetId)) {
+          button.classList.toggle("has-unread", value);
+        }
+      });
+    } else if (category === "group_messages") {
+      if (targetId != null) unreadByGroup[String(targetId)] = value ? Math.max(1, Number(unreadByGroup[String(targetId)] || 0)) : 0;
+      window.__U9UnreadFlags.group_messages = Object.values(unreadByGroup).some((count) => Number(count) > 0);
+    } else if (category === "customer_service") {
+      const customerUnread = window.__U9CustomerServiceUnreadByConversation || {};
+      if (targetId != null) customerUnread[String(targetId)] = value ? Math.max(1, Number(customerUnread[String(targetId)] || 0)) : 0;
+      window.__U9CustomerServiceUnreadByConversation = customerUnread;
+      window.__U9UnreadFlags.customer_service = Object.values(customerUnread).some((count) => Number(count) > 0) || (targetId == null && value);
+    } else if (category === "friend_requests") {
+      window.__U9UnreadFlags.friend_requests = value;
+    } else if (category === "group_requests") {
+      window.__U9UnreadFlags.group_requests = value;
+    }
+
+    const flags = window.__U9UnreadFlags;
+    const hasAnyUnread = Boolean(
+      flags.friend_messages || flags.group_messages || flags.customer_service ||
+      flags.friend_requests || flags.group_requests
+    );
+    ["U9-page-container-tool-message", "U9-page-container-tool-menu"].forEach(function (id) {
+      const button = document.getElementById(id);
+      if (!button) return;
+      button.classList.toggle("has-unread", hasAnyUnread);
+      const baseLabel = id.endsWith("menu") ? "Menu" : "Messages";
+      button.setAttribute("aria-label", hasAnyUnread ? `${baseLabel}, unread messages` : baseLabel);
+    });
+
+    const categoryButtons = {
+      customer_service: "Message-model-customer-service-button",
+      friend_requests: "Message-model-add-friends-button",
+      group_requests: "Message-model-group-button"
+    };
+    Object.keys(categoryButtons).forEach(function (key) {
+      const button = document.getElementById(categoryButtons[key]);
+      if (!button) return;
+      const unread = Boolean(flags[key]);
+      button.classList.toggle("has-unread", unread);
+    });
   }
 
   function stopUnreadMessagePolling() {
-    if (unreadRefreshTimer !== null) {
-      window.clearInterval(unreadRefreshTimer);
-      unreadRefreshTimer = null;
-    }
+    // Kept as a compatibility function for existing navigation code.
+    // Unread polling is intentionally disabled.
   }
 
   function startUnreadMessagePolling() {
-    // Deliberately no polling: fetch the unread summary only when the Message
-    // modal is explicitly opened (or another explicit user action requests it).
-    stopUnreadMessagePolling();
-    if (!isMessageModalOpen()) return;
-    if (!isAuthenticatedUser()) {
-      renderAnonymousMessageState();
-      return;
-    }
-    if (document.hidden) return;
-    void refreshMessageUnreadIndicators();
+    // One on-demand summary refresh per modal opening; no interval polling.
+    if (!isMessageModalOpen() || !isAuthenticatedUser() || document.hidden) return;
+    return refreshMessageUnreadIndicators({ force: true });
   }
 
   /* =================================================
@@ -1790,7 +1869,7 @@
      MESSAGE HOME
   ================================================= */
 
-  function showMessageHome() {
+  function showMessageHome(options) {
     const content = getMessageModalContent();
 
     if (!content) {
@@ -1824,8 +1903,10 @@
      * Refresh both friends and joined groups whenever
      * the user opens or returns to Message home.
      */
-    loadHomeFriends();
-    loadHomeGroups();
+    if (!(options && options.deferData === true)) {
+      loadHomeFriends();
+      loadHomeGroups();
+    }
 
     return true;
   }
@@ -2288,12 +2369,18 @@
 
     modal.classList.remove("modal-closing");
 
-    showMessageHome();
-
+    showMessageHome({ deferData: true });
     modal.classList.add("modal-open");
 
     if (isAuthenticatedUser() && !document.hidden) {
-      startUnreadMessagePolling();
+      Promise.resolve(startUnreadMessagePolling()).finally(function () {
+        if (isMessageModalOpen() && currentMessagePage === null) {
+          loadHomeFriends();
+          loadHomeGroups();
+        }
+      });
+    } else {
+      renderAnonymousMessageState();
     }
 
     return true;
@@ -2316,7 +2403,7 @@
     }
 
     if (currentMessagePage === "chat") {
-      showMessageHome();
+      showMessageHome({ deferData: true });
     }
 
     modal.classList.remove("modal-open");
@@ -2429,7 +2516,8 @@
       );
     }
 
-    showMessageHome();
+    // Do not preload friends/groups while the modal is closed.
+    showMessageHome({ deferData: true });
 
     return true;
   }
@@ -2493,6 +2581,7 @@
   };
 
   window.refreshMessageUnreadIndicators = refreshMessageUnreadIndicators;
+  window.updateU9UnreadState = updateU9UnreadState;
 
   window.refreshMessageHomeGroups = function () {
     return loadHomeGroups({ force: true });
@@ -2541,7 +2630,7 @@
       if (document.hidden) {
         stopUnreadMessagePolling();
       } else if (isAuthenticatedUser() && isMessageModalOpen()) {
-        // Visibility changes alone must not trigger API requests.
+        startUnreadMessagePolling();
       }
     });
     registerMessageWindowManager();
