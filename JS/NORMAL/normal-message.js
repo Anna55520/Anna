@@ -17,7 +17,7 @@
   "use strict";
 
   // Protect against duplicate script inclusion; this module owns global
-  // navigation, visibility listeners, and unread polling for the page.
+  // navigation, visibility listeners, and on-demand unread refreshes.
   if (window.__U9MessageNormalModuleLoaded) return;
   window.__U9MessageNormalModuleLoaded = true;
 
@@ -91,6 +91,8 @@
   let unreadSummaryCacheAt = 0;
   let unreadBySender = {};
   let unreadByGroup = {};
+  let unreadGroupListCache = null;
+  let unreadGroupListCacheAt = 0;
 
   let homeGroupsRequest = null;
   let homeGroups = [];
@@ -518,8 +520,8 @@
   ================================================= */
 
   async function refreshMessageUnreadIndicators(options) {
-    // Normally fetch only while the Message modal is open. Container Tool may
-    // request one initial refresh on page load so its unread dot is correct.
+    // Refresh the three requested chat unread indicators first. The home
+    // friend/group lists are loaded only after this priority pass completes.
     const allowClosedModal = Boolean(options && options.allowClosedModal === true);
     if (!allowClosedModal && !isMessageModalOpen()) return;
     if (!isAuthenticatedUser()) {
@@ -527,131 +529,153 @@
       return;
     }
     if (document.hidden) return;
-    // Reuse a recent summary when the toolbar just fetched it; an explicit
-    // force option can be used for a deliberate refresh.
+
     const force = Boolean(options && options.force === true);
     if (!force && unreadSummaryCacheAt && Date.now() - unreadSummaryCacheAt < 10000) {
       applyCachedUnreadIndicators();
+      applyChatUnreadIndicators();
       return;
     }
     if (unreadRefreshInFlight && unreadRefreshPromise) return unreadRefreshPromise;
+
     unreadRefreshInFlight = true;
     unreadRefreshPromise = (async function () {
-    try {
-      let friendHasUnread = Object.values(unreadBySender).some((count) => Number(count) > 0);
-      let groupHasUnread = Object.values(unreadByGroup).some((count) => Number(count) > 0);
-
       try {
-        const result = await callMessageAPI("get_unread_messages");
+        // Priority requests: friend unread summary, group unread data, and
+        // customer-service unread summary. Run together so red dots appear ASAP.
+        const priorityResults = await Promise.allSettled([
+          callMessageAPI("get_unread_messages"),
+          callGroupAPI("list_my_groups"),
+          typeof window.getCustomerServiceUnreadSummary === "function"
+            ? window.getCustomerServiceUnreadSummary(false, { allowClosedModal })
+            : Promise.resolve({ has_unread: false })
+        ]);
+
         if (!allowClosedModal && !isMessageModalOpen()) return;
-        unreadBySender = result.unread_by_sender && typeof result.unread_by_sender === "object"
-          ? result.unread_by_sender : {};
-        friendHasUnread = Boolean(result.has_unread) || Object.values(unreadBySender).some((count) => Number(count) > 0);
 
-        document.querySelectorAll("#Message-model-friends-list [data-home-chat-friend-id]").forEach(function (button) {
-          const friendId = String(button.dataset.homeChatFriendId || "");
-          const hasUnread = Number(unreadBySender[friendId] || 0) > 0;
-          button.classList.toggle("has-unread", hasUnread);
-          button.setAttribute("aria-label", hasUnread ? "Open chat, unread messages" : "Open chat");
-          button.title = hasUnread ? "Unread messages" : "Chat";
-        });
-      } catch (error) {
-        console.warn("U9 Message: Could not refresh friend unread indicators.", error);
-      }
+        let friendHasUnread = Boolean(window.__U9UnreadFlags?.friend_messages);
+        let groupHasUnread = Boolean(window.__U9UnreadFlags?.group_messages);
+        let customerServiceHasUnread = Boolean(window.__U9UnreadFlags?.customer_service);
 
-      try {
-        const result = await callGroupAPI("list_my_groups");
-        if (!allowClosedModal && !isMessageModalOpen()) return;
-        const groups = normalizeHomeGroups(result.groups);
-        unreadByGroup = {};
-        groups.forEach(function (group) {
-          unreadByGroup[String(group.id)] = Number(group.unread_count || 0);
-        });
-        groupHasUnread = Object.values(unreadByGroup).some((count) => Number(count) > 0);
-
-        document.querySelectorAll("#Message-model-groups-list [data-home-chat-group-id]").forEach(function (button) {
-          const groupId = String(button.dataset.homeChatGroupId || "");
-          const hasUnread = Number(unreadByGroup[groupId] || 0) > 0;
-          button.classList.toggle("has-unread", hasUnread);
-          button.setAttribute("aria-label", hasUnread ? "Open group chat, unread messages" : "Open group chat");
-          button.title = hasUnread ? "Unread group messages" : "Open Group Chat";
-        });
-      } catch (error) {
-        console.warn("U9 Message: Could not refresh group unread indicators.", error);
-      }
-
-      let friendRequestsHaveUnread = false;
-      try {
-        const requestSummary = await callMessageAPI("get_unread_friend_requests");
-        if (!allowClosedModal && !isMessageModalOpen()) return;
-        friendRequestsHaveUnread = requestSummary?.has_unread === true || Number(requestSummary?.unread_count || 0) > 0;
-      } catch (error) {
-        console.warn("U9 Message: Could not refresh friend-request unread indicator.", error);
-      }
-
-      let groupRequestsHaveUnread = false;
-      try {
-        const requestSummary = await callGroupAPI("get_unread_group_join_requests");
-        if (!allowClosedModal && !isMessageModalOpen()) return;
-        groupRequestsHaveUnread = requestSummary?.has_unread === true || Number(requestSummary?.unread_count || 0) > 0;
-      } catch (error) {
-        console.warn("U9 Message: Could not refresh group-request unread indicator.", error);
-      }
-
-      const addFriendsButton = document.getElementById("Message-model-add-friends-button");
-      if (addFriendsButton) {
-        addFriendsButton.classList.toggle("has-unread", friendRequestsHaveUnread);
-        addFriendsButton.setAttribute("aria-label", friendRequestsHaveUnread ? "Add Friend, unread friend requests" : "Add Friend");
-        addFriendsButton.title = friendRequestsHaveUnread ? "Unread friend requests" : "Add Friend";
-      }
-
-      const groupButton = document.getElementById("Message-model-group-button");
-      if (groupButton) {
-        groupButton.classList.toggle("has-unread", groupRequestsHaveUnread);
-        groupButton.setAttribute("aria-label", groupRequestsHaveUnread ? "Group, unread join requests" : "Group");
-        groupButton.title = groupRequestsHaveUnread ? "Unread group join requests" : "Group";
-      }
-
-      let customerServiceHasUnread = false;
-      try {
-        if (typeof window.getCustomerServiceUnreadSummary === "function") {
-          const customerServiceSummary = await window.getCustomerServiceUnreadSummary(false, { allowClosedModal });
-          customerServiceHasUnread = customerServiceSummary?.has_unread === true;
+        const friendResult = priorityResults[0];
+        if (friendResult.status === "fulfilled") {
+          const result = friendResult.value || {};
+          unreadBySender = result.unread_by_sender && typeof result.unread_by_sender === "object"
+            ? result.unread_by_sender
+            : {};
+          friendHasUnread = Boolean(result.has_unread) ||
+            Object.values(unreadBySender).some((count) => Number(count) > 0);
+        } else {
+          console.warn("U9 Message: Could not refresh friend unread indicators.", friendResult.reason);
         }
-      } catch (error) {
-        // Do not break friend/group unread indicators if customer-service polling fails.
-        console.warn("U9 Message: Could not refresh customer service unread indicator.", error);
-      }
 
-      const hasAnyUnread = friendHasUnread || groupHasUnread || customerServiceHasUnread || friendRequestsHaveUnread || groupRequestsHaveUnread;
-      window.__U9UnreadFlags = {
-        friend_messages: friendHasUnread,
-        group_messages: groupHasUnread,
-        customer_service: customerServiceHasUnread,
-        friend_requests: friendRequestsHaveUnread,
-        group_requests: groupRequestsHaveUnread
-      };
-      const customerServiceButton = document.getElementById("Message-model-customer-service-button");
-      if (customerServiceButton) {
-        customerServiceButton.classList.toggle("has-unread", customerServiceHasUnread);
-        customerServiceButton.setAttribute("aria-label", customerServiceHasUnread ? "Customer Service, unread messages" : "Customer Service");
-        customerServiceButton.title = customerServiceHasUnread ? "Unread customer service messages" : "Customer Service";
-      }
+        const groupResult = priorityResults[1];
+        if (groupResult.status === "fulfilled") {
+          unreadGroupListCache = groupResult.value || { groups: [] };
+          unreadGroupListCacheAt = Date.now();
+          const groups = normalizeHomeGroups(unreadGroupListCache.groups);
+          unreadByGroup = {};
+          groups.forEach(function (group) {
+            unreadByGroup[String(group.id)] = Number(group.unread_count || 0);
+          });
+          groupHasUnread = groups.some((group) => Number(group.unread_count || 0) > 0);
+        } else {
+          console.warn("U9 Message: Could not refresh group unread indicators.", groupResult.reason);
+        }
 
-      ["U9-page-container-tool-message", "U9-page-container-tool-menu"].forEach(function (id) {
-        const button = document.getElementById(id);
-        if (!button) return;
-        button.classList.toggle("has-unread", hasAnyUnread);
-        const baseLabel = id.endsWith("menu") ? "Menu" : "Messages";
-        button.setAttribute("aria-label", hasAnyUnread ? `${baseLabel}, unread messages` : baseLabel);
-      });
-    } finally {
-      unreadSummaryCacheAt = Date.now();
-      unreadRefreshInFlight = false;
-      unreadRefreshPromise = null;
-    }
+        const customerResult = priorityResults[2];
+        if (customerResult.status === "fulfilled") {
+          customerServiceHasUnread = customerResult.value?.has_unread === true;
+        } else {
+          console.warn("U9 Message: Could not refresh customer-service unread indicator.", customerResult.reason);
+        }
+
+        window.__U9UnreadFlags = window.__U9UnreadFlags || {};
+        window.__U9UnreadFlags.friend_messages = friendHasUnread;
+        window.__U9UnreadFlags.group_messages = groupHasUnread;
+        window.__U9UnreadFlags.customer_service = customerServiceHasUnread;
+
+        // Apply these dots before loading/rendering the rest of the modal data.
+        applyChatUnreadIndicators();
+        const customerServiceButton = getElement("Message-model-customer-service-button");
+        if (customerServiceButton) {
+          customerServiceButton.classList.toggle("has-unread", customerServiceHasUnread);
+          customerServiceButton.setAttribute("aria-label", customerServiceHasUnread ? "Customer Service, unread messages" : "Customer Service");
+          customerServiceButton.title = customerServiceHasUnread ? "Unread customer service messages" : "Customer Service";
+        }
+
+        // Keep the existing friend-request and group-request indicator behavior,
+        // but run it after the three priority dots have already been applied.
+        void (async function refreshRequestIndicatorsInBackground() {
+          let friendRequestsHaveUnread = Boolean(window.__U9UnreadFlags?.friend_requests);
+          try {
+            const requestSummary = await callMessageAPI("get_unread_friend_requests");
+            friendRequestsHaveUnread = requestSummary?.has_unread === true || Number(requestSummary?.unread_count || 0) > 0;
+          } catch (error) {
+            console.warn("U9 Message: Could not refresh friend-request unread indicator.", error);
+          }
+
+          let groupRequestsHaveUnread = Boolean(window.__U9UnreadFlags?.group_requests);
+          try {
+            const requestSummary = await callGroupAPI("get_unread_group_join_requests");
+            groupRequestsHaveUnread = requestSummary?.has_unread === true || Number(requestSummary?.unread_count || 0) > 0;
+          } catch (error) {
+            console.warn("U9 Message: Could not refresh group-request unread indicator.", error);
+          }
+
+          window.__U9UnreadFlags = window.__U9UnreadFlags || {};
+          window.__U9UnreadFlags.friend_requests = friendRequestsHaveUnread;
+          window.__U9UnreadFlags.group_requests = groupRequestsHaveUnread;
+
+          const addFriendsButton = getElement("Message-model-add-friends-button");
+          if (addFriendsButton) {
+            addFriendsButton.classList.toggle("has-unread", friendRequestsHaveUnread);
+            addFriendsButton.setAttribute("aria-label", friendRequestsHaveUnread ? "Add Friend, unread friend requests" : "Add Friend");
+            addFriendsButton.title = friendRequestsHaveUnread ? "Unread friend requests" : "Add Friend";
+          }
+
+          const groupButton = getElement("Message-model-group-button");
+          if (groupButton) {
+            groupButton.classList.toggle("has-unread", groupRequestsHaveUnread);
+            groupButton.setAttribute("aria-label", groupRequestsHaveUnread ? "Group, unread join requests" : "Group");
+            groupButton.title = groupRequestsHaveUnread ? "Unread join requests" : "Group";
+          }
+
+          const flags = window.__U9UnreadFlags;
+          const hasAnyUnread = Boolean(flags.friend_messages || flags.group_messages || flags.customer_service || flags.friend_requests || flags.group_requests);
+          ["U9-page-container-tool-message", "U9-page-container-tool-menu"].forEach(function (id) {
+            const button = getElement(id);
+            if (!button) return;
+            button.classList.toggle("has-unread", hasAnyUnread);
+            const baseLabel = id.endsWith("menu") ? "Menu" : "Messages";
+            button.setAttribute("aria-label", hasAnyUnread ? `${baseLabel}, unread messages` : baseLabel);
+          });
+        })();
+      } finally {
+        unreadSummaryCacheAt = Date.now();
+        unreadRefreshInFlight = false;
+        unreadRefreshPromise = null;
+      }
     })();
     return unreadRefreshPromise;
+  }
+
+  function applyChatUnreadIndicators() {
+    document.querySelectorAll("#Message-model-friends-list .Message-model-contact-chat[data-home-chat-friend-id]").forEach(function (button) {
+      const friendId = String(button.dataset.homeChatFriendId || "");
+      const hasUnread = Number(unreadBySender[friendId] || 0) > 0;
+      button.classList.toggle("has-unread", hasUnread);
+      button.setAttribute("aria-label", hasUnread ? "Open chat, unread messages" : "Open chat");
+      button.title = hasUnread ? "Unread messages" : "Chat";
+    });
+
+    document.querySelectorAll("#Message-model-groups-list .Message-model-home-group-chat[data-home-chat-group-id]").forEach(function (button) {
+      const groupId = String(button.dataset.homeChatGroupId || "");
+      const hasUnread = Number(unreadByGroup[groupId] || 0) > 0;
+      button.classList.toggle("has-unread", hasUnread);
+      button.setAttribute("aria-label", hasUnread ? "Open group chat, unread messages" : "Open group chat");
+      button.title = hasUnread ? "Unread group messages" : "Open Group Chat";
+    });
   }
 
   function applyCachedUnreadIndicators() {
@@ -894,7 +918,7 @@
         </div>
 
         <button
-          class="Message-model-contact-chat"
+          class="Message-model-contact-chat${Number(unreadBySender[String(friend.id)] || 0) > 0 ? " has-unread" : ""}"
           type="button"
           data-home-chat-friend-id="${escapeHTML(friend.id)}"
           aria-label="Open chat with ${escapeHTML(friend.username)}"
@@ -1195,7 +1219,7 @@
 
         renderHomeFriends(friends);
         homeFriendsLoaded = true;
-        refreshMessageUnreadIndicators();
+        applyChatUnreadIndicators();
 
         console.log(
           "U9 Message Home: Friends loaded.",
@@ -1368,7 +1392,7 @@
         </div>
 
         <button
-          class="Message-model-home-group-chat"
+          class="Message-model-home-group-chat${Number(unreadByGroup[String(group.id)] || 0) > 0 ? " has-unread" : ""}"
           type="button"
           data-home-chat-group-id="${escapeHTML(group.id)}"
           aria-label="Open group chat with ${escapeHTML(group.name)}"
@@ -1527,13 +1551,18 @@
 
     homeGroupsRequest = (async function () {
       try {
-        const result = await callGroupAPI("list_my_groups");
+        let result;
+        if (unreadGroupListCache && Date.now() - unreadGroupListCacheAt < 30000) {
+          result = unreadGroupListCache;
+        } else {
+          result = await callGroupAPI("list_my_groups");
+        }
         const groups = normalizeHomeGroups(result.groups);
 
         renderHomeGroups(groups);
         homeGroupsLoaded = true;
-        // Apply current per-group unread dots immediately after the list is rendered.
-        refreshMessageUnreadIndicators();
+        // Apply the unread summary fetched before the list was rendered.
+        applyChatUnreadIndicators();
 
         console.log(
           "U9 Message Home: Groups loaded.",
@@ -2612,8 +2641,8 @@
     bindGroupChatEvents();
     initializeMessageNavigation();
 
-    // Authentication can resolve asynchronously, but polling starts only if
-    // the modal is already open. openMessageModal() starts it on demand.
+    // Authentication can resolve asynchronously; unread summaries are fetched
+    // only when the modal is opened or an explicit refresh is requested.
     if (window.U9User && typeof window.U9User.subscribe === "function") {
       window.U9User.subscribe(function () {
         if (isAuthenticatedUser()) {
