@@ -46,10 +46,11 @@ function refreshContainerToolUnreadOnce(force) {
     return false;
   };
 
-  // normal-message.js may load after this script; retry only on script readiness,
-  // not on a timer or repeated API polling.
+  // Wait for the unread API to become available without timers or polling.
   if (!run()) {
-    window.addEventListener("load", run, { once: true });
+    window.addEventListener("u9:message-unread-ready", () => {
+      refreshContainerToolUnreadOnce(true);
+    }, { once: true });
   }
 }
 
@@ -71,6 +72,7 @@ if (window.U9User && typeof window.U9User.subscribe === "function") {
 }
 window.addEventListener("u9:auth:changed", () => refreshContainerToolUnreadOnce(true));
 window.addEventListener("u9:login", () => refreshContainerToolUnreadOnce(true));
+window.addEventListener("u9:customer-service-unread-ready", () => refreshContainerToolUnreadOnce(true));
 
 
 /* =========================
