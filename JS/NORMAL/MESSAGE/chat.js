@@ -8,7 +8,7 @@
    - Group chat
    - Customer-service chat
    - Load and send text messages
-   - Refresh messages every 4 seconds without rebuilding unchanged message DOM
+   - Load messages on conversation open and explicit user actions (no polling)
    - Auto-resizing multiline chat input
    - Mobile virtual-keyboard viewport adjustment
    - Centered loading and empty-state messages
@@ -35,7 +35,6 @@
 
   const DEFAULT_AVATAR = "/SSVG/avatar/profile.svg";
 
-  const POLL_INTERVAL_MS = 4000;
   const MAX_MESSAGE_LENGTH = 5000;
   const CHAT_INPUT_MAX_HEIGHT = 132;
 
@@ -1535,8 +1534,8 @@
                 last_seen_message_id: latestMessageId
               });
               lastMarkedGroupMessageIds.set(groupReadKey, latestMessageId);
-              if (typeof window.refreshMessageUnreadIndicators === "function") {
-                await window.refreshMessageUnreadIndicators();
+              if (typeof window.updateU9UnreadState === "function") {
+                window.updateU9UnreadState("group_messages", false, targetId);
               }
             } catch (readError) {
               console.warn("U9 Chat: Could not update group-message read status.", readError);
@@ -1570,8 +1569,8 @@
               alreadyMarkedKeys.add(String(message.id));
             });
             successfullyMarkedFriendUnreadKeys.set(friendReadKey, alreadyMarkedKeys);
-            if (typeof window.refreshMessageUnreadIndicators === "function") {
-              await window.refreshMessageUnreadIndicators();
+            if (typeof window.updateU9UnreadState === "function") {
+              window.updateU9UnreadState("friend_messages", false, targetId);
             }
           } catch (readError) {
             console.warn(
@@ -1643,10 +1642,13 @@
                 customerServiceReadKey,
                 alreadyMarkedCustomerServiceKeys
               );
-              // Refresh customer-service row only after the API confirms read.
+              // Update known unread state locally after the API confirms read.
               window.dispatchEvent(new CustomEvent("u9:customer-service:conversation-updated", {
                 detail: { conversation_id: getCustomerServiceConversationId(), read: true }
               }));
+              if (typeof window.updateU9UnreadState === "function") {
+                window.updateU9UnreadState("customer_service", false, getCustomerServiceConversationId());
+              }
             } catch (readError) {
               console.warn(
                 "U9 Chat: Could not update customer-service read status.",
@@ -1954,8 +1956,7 @@
   }
 
   function scheduleMessagePolling() {
-    // Real-time is intentionally not used. Do not periodically reload chat
-    // messages; opening a conversation and explicit message actions load data.
+    // Compatibility shim: automatic chat polling is disabled by design.
     stopMessagePolling();
   }
 
@@ -2513,8 +2514,6 @@
         currentChatUser.type || "friend"
       ) === nextChatType
     ) {
-      scheduleMessagePolling();
-
       /*
        * Avoid automatically opening the mobile keyboard
        * every time a conversation is opened.
