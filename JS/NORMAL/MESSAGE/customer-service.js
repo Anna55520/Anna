@@ -26,7 +26,7 @@
   const CUSTOMER_SERVICE_API_URL = "/api/customer-service-api";
   const ROOT_ID = "Message-model-customer-service-root";
   const PAGE_ID = "Message-model-customer-service-page";
-  const REFRESH_INTERVAL_MS = 15000;
+  // Automatic refresh is disabled; refreshes happen only on page open or user action.
   const MAX_MESSAGE_LENGTH = 5000;
 
   const state = {
@@ -207,7 +207,7 @@
       if (!isMessageModalOpen()) return state.unreadSummaryCache;
       const mine = Array.isArray(mineResult.conversations) ? mineResult.conversations : [];
       const customerUnread = await getUnreadCounts(mine, "agent");
-      if (!isMessageModalOpen()) return state.unreadSummaryCache;
+      if (!allowClosedModal && !isMessageModalOpen()) return state.unreadSummaryCache;
       let agentUnread = {};
       try {
         const agentStatus = await callCustomerServiceAPI("get_my_agent_status", {});
@@ -224,6 +224,7 @@
         has_unread: Object.values(combined).some(function (count) { return Number(count) > 0; }),
         unread_by_conversation: combined
       };
+      window.__U9CustomerServiceUnreadByConversation = { ...combined };
       state.unreadSummaryCache = summary;
       state.unreadCacheAt = Date.now();
       return summary;
@@ -236,8 +237,8 @@
     }
   }
 
-  window.getCustomerServiceUnreadSummary = function (force) {
-    return loadUnreadSummary(force === true);
+  window.getCustomerServiceUnreadSummary = function (force, options) {
+    return loadUnreadSummary(force === true, options || {});
   };
 
   function invalidateUnreadSummary() {
@@ -601,8 +602,8 @@
   }
 
   function scheduleRefresh() {
-    // No background polling. Customer-service data is refreshed only by an
-    // explicit page/open action or the user's Refresh button.
+    // Automatic refresh is intentionally disabled. Page open and the Refresh
+    // button remain explicit ways to request fresh data.
     if (state.refreshTimer !== null) {
       clearTimeout(state.refreshTimer);
       state.refreshTimer = null;
@@ -733,9 +734,25 @@
       }
     });
 
-    window.addEventListener("u9:customer-service:conversation-updated", function () {
+    window.addEventListener("u9:customer-service:conversation-updated", function (event) {
       invalidateUnreadSummary();
-      if (isPageActive()) refreshPage({ silent: true });
+      const detail = event && event.detail ? event.detail : {};
+      // Message send/read events must not reload every conversation from the API.
+      // The current chat already knows which operation succeeded; keep the local
+      // page state and let the next explicit page open/Refresh fetch fresh data.
+      if (detail.read === true) {
+        const id = String(detail.conversation_id || "");
+        if (id) {
+          state.myConversations = state.myConversations.map(function (conversation) {
+            return String(conversation.id) === id ? { ...conversation, unread_count: 0 } : conversation;
+          });
+          state.agentConversations = state.agentConversations.map(function (conversation) {
+            return String(conversation.id) === id ? { ...conversation, unread_count: 0 } : conversation;
+          });
+          updateAllViews();
+        }
+        return;
+      }
     });
   }
 
