@@ -1,4 +1,3 @@
-/* U9 message optimization: data should load on page entry or explicit user actions; avoid adding background polling. */
 /* =================================================
    U9 MESSAGE - FRIENDS PAGE
    File: JS/NORMAL/MESSAGE/friends.js
