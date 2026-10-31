@@ -1,4 +1,3 @@
-
 /* =========================================================
  * U9 ORDER HISTORY PAGE
  * File: JS/NORMAL/HISTORY/order-page.js
@@ -9,7 +8,7 @@
  * Pagination ID: U9-history-order-pagination
  * Token:         localStorage["u9_token"]
  * API Proxy:     /api/u9-order-history
- * Image Proxy:   /storage-2/
+ * Image Proxy:   /storage-2/U9/
  * ========================================================= */
 
 (function () {
@@ -57,6 +56,7 @@
 
   /* =======================================================
      IMAGE URL PROXY
+     STORE 2: U9 BUCKET
   ======================================================= */
 
   function getSafeImageURL(value) {
@@ -71,20 +71,50 @@
         return "";
       }
 
-      // Project B: public product images use the Vercel proxy.
+      // Project B:
+      // vjlpowhxmflpkjlukkfy.supabase.co
+      // Always use Store 2 -> U9 bucket.
       if (
         url.hostname === "vjlpowhxmflpkjlukkfy.supabase.co" &&
         url.pathname.startsWith("/storage/v1/object/public/")
       ) {
-        const storagePath = url.pathname.replace(
+        let storagePath = url.pathname.replace(
           "/storage/v1/object/public/",
           ""
         );
 
+        // Replace U9-TEST with U9.
+        if (storagePath === "U9-TEST") {
+          storagePath = "U9";
+        } else if (storagePath.startsWith("U9-TEST/")) {
+          storagePath = "U9/" + storagePath.slice("U9-TEST/".length);
+        }
+
         return "/storage-2/" + storagePath + url.search + url.hash;
       }
 
-      // Project A: keep the existing same-origin storage proxy.
+      // Already using the Store 2 proxy.
+      // Normalize U9-TEST to U9.
+      if (
+        url.origin === window.location.origin &&
+        url.pathname.startsWith("/storage-2/")
+      ) {
+        let storagePath = url.pathname.replace(
+          "/storage-2/",
+          ""
+        );
+
+        if (storagePath === "U9-TEST") {
+          storagePath = "U9";
+        } else if (storagePath.startsWith("U9-TEST/")) {
+          storagePath = "U9/" + storagePath.slice("U9-TEST/".length);
+        }
+
+        return "/storage-2/" + storagePath + url.search + url.hash;
+      }
+
+      // Project A:
+      // Keep the existing same-origin storage proxy.
       if (
         url.hostname === "tvtakmswbzawaweytimx.supabase.co" &&
         url.pathname.startsWith("/storage/v1/object/public/")
@@ -99,6 +129,7 @@
 
       // Preserve other valid HTTP(S) image URLs.
       return url.href;
+
     } catch (error) {
       console.warn(
         "[U9 Order History] Invalid image URL:",
