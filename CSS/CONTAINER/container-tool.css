@@ -914,7 +914,7 @@ button:not(#U9-page-container-tool-search-button):hover {
 
   white-space: nowrap;
 
-  display: flex;
+  display: none;
   align-items: center;
   justify-content: center;
 
