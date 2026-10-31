@@ -433,6 +433,25 @@
     try {
       const url = new URL(value, window.location.origin);
 
+      // Project A
+      if (
+        url.hostname === "tvtakmswbzawaweytimx.supabase.co" &&
+        url.pathname.startsWith("/storage/v1/object/public/")
+      ) {
+        const storagePath = url.pathname.replace(
+          "/storage/v1/object/public/",
+          ""
+        );
+
+        return (
+          "/storage/" +
+          storagePath +
+          url.search +
+          url.hash
+        );
+      }
+
+      // Project B
       if (
         url.hostname === "vjlpowhxmflpkjlukkfy.supabase.co" &&
         url.pathname.startsWith("/storage/v1/object/public/")
@@ -444,6 +463,24 @@
 
         return (
           "/storage-2/" +
+          storagePath +
+          url.search +
+          url.hash
+        );
+      }
+
+      // Project C
+      if (
+        url.hostname === "uiwttxqdoplttyrfqcbb.supabase.co" &&
+        url.pathname.startsWith("/storage/v1/object/public/")
+      ) {
+        const storagePath = url.pathname.replace(
+          "/storage/v1/object/public/",
+          ""
+        );
+
+        return (
+          "/storage-3/" +
           storagePath +
           url.search +
           url.hash
