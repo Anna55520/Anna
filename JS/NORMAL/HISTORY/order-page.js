@@ -1,3 +1,4 @@
+
 /* =========================================================
  * U9 ORDER HISTORY PAGE
  * File: JS/NORMAL/HISTORY/order-page.js
@@ -8,8 +9,12 @@
  * Pagination ID: U9-history-order-pagination
  * Token:         localStorage["u9_token"]
  * API Proxy:     /api/u9-order-history
- * Image Proxy:   /storage-2/
- * Store 2 Buckets: U9 and U9-TEST
+ *
+ * Storage Proxies:
+ * Project A:     /storage/
+ * Project B:     /storage-2/
+ * Project C:     /storage-3/
+ *
  * ========================================================= */
 
 (function () {
@@ -57,12 +62,21 @@
 
   /* =======================================================
      IMAGE URL PROXY
+     
+     Project A:
+     tvtakmswbzawaweytimx.supabase.co
+     -> /storage/
 
-     Store 2 supports BOTH:
-       /storage-2/U9/...
-       /storage-2/U9-TEST/...
+     Project B:
+     vjlpowhxmflpkjlukkfy.supabase.co
+     -> /storage-2/
 
-     Do not rename either bucket.
+     Project C:
+     uiwttxqdoplttyrfqcbb.supabase.co
+     -> /storage-3/
+
+     Original bucket names are preserved.
+     U9 and U9-TEST are both supported.
   ======================================================= */
 
   function getSafeImageURL(value) {
@@ -71,55 +85,102 @@
     }
 
     try {
-      const url = new URL(value.trim(), window.location.origin);
+      const url = new URL(
+        value.trim(),
+        window.location.origin
+      );
 
-      if (url.protocol !== "https:" && url.protocol !== "http:") {
+      if (
+        url.protocol !== "https:" &&
+        url.protocol !== "http:"
+      ) {
         return "";
       }
 
-      // Project B / Store 2:
-      // Keep the original bucket name (U9 or U9-TEST).
-      if (
-        url.hostname === "vjlpowhxmflpkjlukkfy.supabase.co" &&
-        url.pathname.startsWith("/storage/v1/object/public/")
-      ) {
-        const storagePath = url.pathname.replace(
-          "/storage/v1/object/public/",
-          ""
+      const publicStoragePrefix =
+        "/storage/v1/object/public/";
+
+      // Only process public Supabase Storage URLs.
+      if (url.pathname.startsWith(publicStoragePrefix)) {
+
+        const storagePath = url.pathname.slice(
+          publicStoragePrefix.length
         );
 
-        return "/storage-2/" + storagePath + url.search + url.hash;
+        // Project A
+        if (
+          url.hostname ===
+          "tvtakmswbzawaweytimx.supabase.co"
+        ) {
+          return (
+            "/storage/" +
+            storagePath +
+            url.search +
+            url.hash
+          );
+        }
+
+        // Project B
+        if (
+          url.hostname ===
+          "vjlpowhxmflpkjlukkfy.supabase.co"
+        ) {
+          return (
+            "/storage-2/" +
+            storagePath +
+            url.search +
+            url.hash
+          );
+        }
+
+        // Project C
+        if (
+          url.hostname ===
+          "uiwttxqdoplttyrfqcbb.supabase.co"
+        ) {
+          return (
+            "/storage-3/" +
+            storagePath +
+            url.search +
+            url.hash
+          );
+        }
       }
 
-      // Already using the Store 2 proxy.
-      // Preserve both U9 and U9-TEST paths.
-      if (
-        url.origin === window.location.origin &&
-        url.pathname.startsWith("/storage-2/")
-      ) {
-        return url.pathname + url.search + url.hash;
-      }
-
-      // Project A:
-      // Keep the existing same-origin storage proxy.
-      if (
-        url.hostname === "tvtakmswbzawaweytimx.supabase.co" &&
-        url.pathname.startsWith("/storage/v1/object/public/")
-      ) {
-        const storagePath = url.pathname.replace(
-          "/storage/v1/object/public/",
-          ""
-        );
-
-        return "/storage/" + storagePath + url.search + url.hash;
-      }
-
-      // Already using Project A's proxy.
+      // Already using Project A proxy.
       if (
         url.origin === window.location.origin &&
         url.pathname.startsWith("/storage/")
       ) {
-        return url.pathname + url.search + url.hash;
+        return (
+          url.pathname +
+          url.search +
+          url.hash
+        );
+      }
+
+      // Already using Project B proxy.
+      if (
+        url.origin === window.location.origin &&
+        url.pathname.startsWith("/storage-2/")
+      ) {
+        return (
+          url.pathname +
+          url.search +
+          url.hash
+        );
+      }
+
+      // Already using Project C proxy.
+      if (
+        url.origin === window.location.origin &&
+        url.pathname.startsWith("/storage-3/")
+      ) {
+        return (
+          url.pathname +
+          url.search +
+          url.hash
+        );
       }
 
       // Preserve other valid HTTP(S) image URLs.
@@ -134,6 +195,10 @@
       return "";
     }
   }
+
+  /* =======================================================
+     FORMAT HELPERS
+  ======================================================= */
 
   function formatMoney(value) {
     const number = Number(value);
@@ -161,7 +226,9 @@
   }
 
   function getStatusInfo(status) {
-    const value = String(status || "unknown").toLowerCase();
+    const value = String(
+      status || "unknown"
+    ).toLowerCase();
 
     const knownStatuses = {
       completed: {
@@ -294,7 +361,9 @@
       return false;
     }
 
-    if (page.dataset.orderHistoryRendered === "true") {
+    if (
+      page.dataset.orderHistoryRendered === "true"
+    ) {
       return true;
     }
 
@@ -340,6 +409,7 @@
           aria-label="Loading"
         >
           <g fill="#2F73EF">
+
             <circle cx="20" cy="20" r="5">
               <animate
                 attributeName="r"
@@ -390,6 +460,7 @@
                 repeatCount="indefinite"
               />
             </circle>
+
           </g>
         </svg>
 
@@ -404,6 +475,7 @@
         >
           Try again
         </button>
+
       </div>
 
       <div id="U9-history-order-list"></div>
@@ -412,54 +484,59 @@
     page.dataset.orderHistoryRendered = "true";
 
     // Refresh button
-    page.querySelector("#U9-history-order-refresh")
-      ?.addEventListener("click", function () {
-        loadOrderHistory(true);
-      });
+    page.querySelector(
+      "#U9-history-order-refresh"
+    )?.addEventListener("click", function () {
+      loadOrderHistory(true);
+    });
 
     // Retry button
-    page.querySelector("#U9-history-order-retry")
-      ?.addEventListener("click", function () {
-        loadOrderHistory(true);
-      });
+    page.querySelector(
+      "#U9-history-order-retry"
+    )?.addEventListener("click", function () {
+      loadOrderHistory(true);
+    });
 
     // Pagination buttons
-    page.querySelector("#U9-history-order-pagination")
-      ?.addEventListener("click", function (event) {
-        const target = event.target;
+    page.querySelector(
+      "#U9-history-order-pagination"
+    )?.addEventListener("click", function (event) {
+      const target = event.target;
 
-        if (!(target instanceof Element)) {
-          return;
-        }
+      if (!(target instanceof Element)) {
+        return;
+      }
 
-        const button = target.closest(
-          "button[data-page-action], button[data-page-number]"
+      const button = target.closest(
+        "button[data-page-action], button[data-page-number]"
+      );
+
+      if (!button || button.disabled) {
+        return;
+      }
+
+      const action = button.dataset.pageAction;
+
+      if (action === "previous") {
+        changePage(currentPage - 1);
+        return;
+      }
+
+      if (action === "next") {
+        changePage(currentPage + 1);
+        return;
+      }
+
+      if (button.dataset.pageNumber) {
+        const pageNumber = Number(
+          button.dataset.pageNumber
         );
 
-        if (!button || button.disabled) {
-          return;
+        if (Number.isInteger(pageNumber)) {
+          changePage(pageNumber);
         }
-
-        const action = button.dataset.pageAction;
-
-        if (action === "previous") {
-          changePage(currentPage - 1);
-          return;
-        }
-
-        if (action === "next") {
-          changePage(currentPage + 1);
-          return;
-        }
-
-        if (button.dataset.pageNumber) {
-          const pageNumber = Number(button.dataset.pageNumber);
-
-          if (Number.isInteger(pageNumber)) {
-            changePage(pageNumber);
-          }
-        }
-      });
+      }
+    });
 
     return true;
   }
@@ -490,7 +567,8 @@
       startPage = Math.max(
         1,
         Math.min(
-          currentPage - Math.floor(VISIBLE_PAGE_BUTTONS / 2),
+          currentPage -
+            Math.floor(VISIBLE_PAGE_BUTTONS / 2),
           totalPages - VISIBLE_PAGE_BUTTONS + 1
         )
       );
@@ -514,7 +592,8 @@
       const pageNumber = startPage + slot;
 
       if (pageNumber <= totalPages) {
-        const isActive = pageNumber === currentPage;
+        const isActive =
+          pageNumber === currentPage;
 
         html += `
           <button
@@ -582,13 +661,17 @@
 
     list.innerHTML = `
       <div class="U9-history-order-empty">
-        <div class="U9-history-order-empty-icon">📦</div>
+
+        <div class="U9-history-order-empty-icon">
+          📦
+        </div>
 
         <h3>No orders yet</h3>
 
         <p>
           Your completed and pending orders will appear here.
         </p>
+
       </div>
     `;
   }
@@ -629,123 +712,149 @@
       return;
     }
 
-    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const startIndex =
+      (currentPage - 1) * PAGE_SIZE;
 
     const visibleOrders = allOrders.slice(
       startIndex,
       startIndex + PAGE_SIZE
     );
 
-    list.innerHTML = visibleOrders.map(function (order) {
-      const orderId = escapeHTML(order.id || "—");
+    list.innerHTML = visibleOrders.map(
+      function (order) {
+        const orderId = escapeHTML(
+          order.id || "—"
+        );
 
-      const productName = escapeHTML(
-        order.product_name || "Product"
-      );
+        const productName = escapeHTML(
+          order.product_name || "Product"
+        );
 
-      const statusInfo = getStatusInfo(order.status);
+        const statusInfo = getStatusInfo(
+          order.status
+        );
 
-      const statusLabel = escapeHTML(statusInfo.label);
+        const statusLabel = escapeHTML(
+          statusInfo.label
+        );
 
-      const statusClass = statusInfo.className
-        ? ` ${statusInfo.className}`
-        : "";
+        const statusClass = statusInfo.className
+          ? ` ${statusInfo.className}`
+          : "";
 
-      const quantityNumber = Number(order.quantity);
+        const quantityNumber = Number(
+          order.quantity
+        );
 
-      const quantity =
-        Number.isFinite(quantityNumber) && quantityNumber > 0
-          ? quantityNumber
-          : 1;
+        const quantity =
+          Number.isFinite(quantityNumber) &&
+          quantityNumber > 0
+            ? quantityNumber
+            : 1;
 
-      const imageURL = getSafeImageURL(order.image_url);
+        const imageURL = getSafeImageURL(
+          order.image_url
+        );
 
-      const imageHTML = imageURL
-        ? `
-          <img
-            class="U9-history-order-image"
-            src="${escapeHTML(imageURL)}"
-            alt="${productName}"
-            loading="lazy"
-            referrerpolicy="no-referrer"
-          >
-        `
-        : `
-          <div class="U9-history-order-image-placeholder">
-            No image available
-          </div>
+        const imageHTML = imageURL
+          ? `
+            <img
+              class="U9-history-order-image"
+              src="${escapeHTML(imageURL)}"
+              alt="${productName}"
+              loading="lazy"
+              referrerpolicy="no-referrer"
+            >
+          `
+          : `
+            <div class="U9-history-order-image-placeholder">
+              No image available
+            </div>
+          `;
+
+        return `
+          <article class="U9-history-order-card">
+
+            <div class="U9-history-order-card-top">
+
+              <div class="U9-history-order-date">
+                ${escapeHTML(
+                  formatDate(order.created_at)
+                )}
+              </div>
+
+              <span class="U9-history-order-status${statusClass}">
+                ${statusLabel}
+              </span>
+
+            </div>
+
+            <div class="U9-history-order-product">
+
+              ${imageHTML}
+
+              <div class="U9-history-order-product-info">
+
+                <h3>${productName}</h3>
+
+                <p>
+                  Quantity:
+                  <strong>${quantity}</strong>
+                </p>
+
+                <p>
+                  Total Price:
+                  <strong>${formatMoney(
+                    order.total_price
+                  )}</strong>
+                </p>
+
+                <p>
+                  Profit:
+                  <strong>${formatMoney(
+                    order.profit
+                  )}</strong>
+                </p>
+
+              </div>
+
+            </div>
+
+            <div class="U9-history-order-card-bottom">
+
+              <span>Order ID</span>
+
+              <span class="U9-history-order-id">
+                ${orderId}
+              </span>
+
+            </div>
+
+          </article>
         `;
-
-      return `
-        <article class="U9-history-order-card">
-
-          <div class="U9-history-order-card-top">
-
-            <div class="U9-history-order-date">
-              ${escapeHTML(formatDate(order.created_at))}
-            </div>
-
-            <span class="U9-history-order-status${statusClass}">
-              ${statusLabel}
-            </span>
-
-          </div>
-
-          <div class="U9-history-order-product">
-
-            ${imageHTML}
-
-            <div class="U9-history-order-product-info">
-
-              <h3>${productName}</h3>
-
-              <p>
-                Quantity:
-                <strong>${quantity}</strong>
-              </p>
-
-              <p>
-                Total Price:
-                <strong>${formatMoney(order.total_price)}</strong>
-              </p>
-
-              <p>
-                Profit:
-                <strong>${formatMoney(order.profit)}</strong>
-              </p>
-
-            </div>
-
-          </div>
-
-          <div class="U9-history-order-card-bottom">
-
-            <span>Order ID</span>
-
-            <span class="U9-history-order-id">
-              ${orderId}
-            </span>
-
-          </div>
-
-        </article>
-      `;
-    }).join("");
+      }
+    ).join("");
 
     // Replace failed images with a placeholder.
     list.querySelectorAll(
       ".U9-history-order-image"
     ).forEach(function (image) {
-      image.addEventListener("error", function () {
-        const placeholder = document.createElement("div");
+      image.addEventListener(
+        "error",
+        function () {
+          const placeholder =
+            document.createElement("div");
 
-        placeholder.className =
-          "U9-history-order-image-placeholder";
+          placeholder.className =
+            "U9-history-order-image-placeholder";
 
-        placeholder.textContent = "Image unavailable";
+          placeholder.textContent =
+            "Image unavailable";
 
-        image.replaceWith(placeholder);
-      }, { once: true });
+          image.replaceWith(placeholder);
+        },
+        { once: true }
+      );
     });
   }
 
@@ -893,12 +1002,16 @@
 
     renderPage();
 
-    const navButton = document.getElementById(BUTTON_ID);
+    const navButton =
+      document.getElementById(BUTTON_ID);
 
     if (navButton) {
-      navButton.addEventListener("click", function () {
-        loadOrderHistory(false);
-      });
+      navButton.addEventListener(
+        "click",
+        function () {
+          loadOrderHistory(false);
+        }
+      );
     } else {
       console.warn(
         "[U9 Order History] Navigation button not found:",
@@ -906,19 +1019,24 @@
       );
     }
 
-    document.addEventListener("click", function (event) {
-      const target = event.target;
+    document.addEventListener(
+      "click",
+      function (event) {
+        const target = event.target;
 
-      if (!(target instanceof Element)) {
-        return;
+        if (!(target instanceof Element)) {
+          return;
+        }
+
+        if (target.closest("#U9-auction-tool-3")) {
+          loadOrderHistory(false);
+        }
       }
+    );
 
-      if (target.closest("#U9-auction-tool-3")) {
-        loadOrderHistory(false);
-      }
-    });
-
-    console.log("[U9 Order History] Page initialized.");
+    console.log(
+      "[U9 Order History] Page initialized."
+    );
   }
 
   /* =======================================================
