@@ -1,4 +1,3 @@
-
 /* =========================================================
  * U9 ORDER HISTORY PAGE
  * File: JS/NORMAL/HISTORY/order-page.js
@@ -10,6 +9,7 @@
  * Token:         localStorage["u9_token"]
  * API Proxy:     /api/u9-order-history
  * Image Proxy:   /storage-2/
+ * Store 2 Buckets: U9 and U9-TEST
  * ========================================================= */
 
 (function () {
@@ -57,6 +57,12 @@
 
   /* =======================================================
      IMAGE URL PROXY
+
+     Store 2 supports BOTH:
+       /storage-2/U9/...
+       /storage-2/U9-TEST/...
+
+     Do not rename either bucket.
   ======================================================= */
 
   function getSafeImageURL(value) {
@@ -71,7 +77,8 @@
         return "";
       }
 
-      // Project B: public product images use the Vercel proxy.
+      // Project B / Store 2:
+      // Keep the original bucket name (U9 or U9-TEST).
       if (
         url.hostname === "vjlpowhxmflpkjlukkfy.supabase.co" &&
         url.pathname.startsWith("/storage/v1/object/public/")
@@ -84,7 +91,17 @@
         return "/storage-2/" + storagePath + url.search + url.hash;
       }
 
-      // Project A: keep the existing same-origin storage proxy.
+      // Already using the Store 2 proxy.
+      // Preserve both U9 and U9-TEST paths.
+      if (
+        url.origin === window.location.origin &&
+        url.pathname.startsWith("/storage-2/")
+      ) {
+        return url.pathname + url.search + url.hash;
+      }
+
+      // Project A:
+      // Keep the existing same-origin storage proxy.
       if (
         url.hostname === "tvtakmswbzawaweytimx.supabase.co" &&
         url.pathname.startsWith("/storage/v1/object/public/")
@@ -97,8 +114,17 @@
         return "/storage/" + storagePath + url.search + url.hash;
       }
 
+      // Already using Project A's proxy.
+      if (
+        url.origin === window.location.origin &&
+        url.pathname.startsWith("/storage/")
+      ) {
+        return url.pathname + url.search + url.hash;
+      }
+
       // Preserve other valid HTTP(S) image URLs.
       return url.href;
+
     } catch (error) {
       console.warn(
         "[U9 Order History] Invalid image URL:",
