@@ -1,12 +1,12 @@
 /* =========================================================
-   U9 HOME PAGE - PREMIUM BANNER CAROUSEL
+   U9 HOME PAGE - PREMIUM STATIC BANNER CAROUSEL
    File: CSS/PAGE/HOME/banners.css
 ========================================================= */
 
 #U9-home-banners {
-  --u9-banner-radius: 16px;
-  --u9-banner-control-bg: rgba(15, 23, 42, 0.48);
-  --u9-banner-control-hover: rgba(15, 23, 42, 0.72);
+  --u9-banner-radius: 14px;
+  --u9-banner-control-bg: rgba(12, 18, 29, 0.48);
+  --u9-banner-control-hover: rgba(12, 18, 29, 0.76);
 
   position: relative;
   display: block;
@@ -14,9 +14,10 @@
   margin: 0 auto;
   padding: 0;
   overflow: hidden;
-  border-radius: var(--u9-banner-radius);
-  background: #f1f3f5;
   isolation: isolate;
+  border-radius: var(--u9-banner-radius);
+  background: #eef0f3;
+  -webkit-tap-highlight-color: transparent;
 }
 
 #U9-home-banners[hidden] {
@@ -28,19 +29,21 @@
   width: 100%;
   aspect-ratio: 1200 / 250;
   overflow: hidden;
-  background: #eef0f2;
+  background: #eef0f3;
+  touch-action: pan-y;
 }
 
 #U9-home-banners .U9-home-banner-slide {
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transition:
-    opacity 650ms ease,
-    visibility 650ms ease;
+    opacity 600ms ease,
+    visibility 600ms ease;
 }
 
 #U9-home-banners .U9-home-banner-slide.is-active {
@@ -59,38 +62,38 @@
 
 #U9-home-banners .U9-home-banner-link {
   outline-offset: -3px;
+  cursor: pointer;
 }
 
 #U9-home-banners .U9-home-banner-image {
   display: block;
   width: 100%;
   height: 100%;
+  border: 0;
   object-fit: cover;
   object-position: center;
-  border: 0;
   user-select: none;
   -webkit-user-drag: none;
 }
 
 #U9-home-banners .U9-home-banner-slide.is-image-error {
-  background: #eef0f2;
+  background: #eef0f3;
 }
 
 #U9-home-banners .U9-home-banner-arrow {
   position: absolute;
   top: 50%;
-  z-index: 3;
+  z-index: 4;
   display: grid;
   width: 42px;
   height: 42px;
   padding: 0;
   place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.34);
   border-radius: 50%;
   color: #fff;
   background: var(--u9-banner-control-bg);
-  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.14);
-  font: inherit;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.16);
   cursor: pointer;
   opacity: 0;
   transform: translateY(-50%);
@@ -98,7 +101,6 @@
     opacity 180ms ease,
     background-color 180ms ease,
     transform 180ms ease;
-  -webkit-tap-highlight-color: transparent;
 }
 
 #U9-home-banners .U9-home-banner-arrow span {
@@ -127,8 +129,13 @@
   background: var(--u9-banner-control-hover);
 }
 
+#U9-home-banners .U9-home-banner-arrow:active {
+  transform: translateY(-50%) scale(0.96);
+}
+
 #U9-home-banners .U9-home-banner-arrow:focus-visible,
-#U9-home-banners .U9-home-banner-dot:focus-visible {
+#U9-home-banners .U9-home-banner-dot:focus-visible,
+#U9-home-banners .U9-home-banner-link:focus-visible {
   outline: 2px solid #fff;
   outline-offset: 3px;
 }
@@ -138,7 +145,7 @@
   right: 0;
   bottom: 12px;
   left: 0;
-  z-index: 3;
+  z-index: 4;
   display: flex;
   justify-content: center;
   pointer-events: none;
@@ -149,13 +156,14 @@
   align-items: center;
   justify-content: center;
   gap: 7px;
-  min-height: 22px;
-  padding: 4px 9px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
+  min-height: 24px;
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.34);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(12, 18, 29, 0.36);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
   pointer-events: auto;
 }
 
@@ -166,7 +174,7 @@
   padding: 0;
   border: 0;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.62);
+  background: rgba(255, 255, 255, 0.64);
   cursor: pointer;
   transition:
     width 220ms ease,
@@ -187,7 +195,7 @@
 @media (max-width: 767px) {
   #U9-home-banners {
     width: 100%;
-    border-radius: 12px;
+    border-radius: 11px;
   }
 
   #U9-home-banners .U9-home-banner-viewport {
@@ -195,13 +203,13 @@
   }
 
   #U9-home-banners .U9-home-banner-arrow {
-    width: 34px;
-    height: 34px;
-    opacity: 0.9;
+    width: 35px;
+    height: 35px;
+    opacity: 0.92;
   }
 
   #U9-home-banners .U9-home-banner-arrow span {
-    font-size: 28px;
+    font-size: 29px;
   }
 
   #U9-home-banners .U9-home-banner-previous {
