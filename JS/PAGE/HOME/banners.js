@@ -30,7 +30,7 @@
     },
     {
       pc: "https://vjlpowhxmflpkjlukkfy.supabase.co/storage/v1/object/public/U9/Banners/PC/PC3.png",
-      mobile: "https://vjlpowhxmflpkjlukkfy.supabase.co/storage/v1/object/public/U9/Banners/Mobile/Mobile1.png",
+      mobile: "https://vjlpowhxmflpkjlukkfy.supabase.co/storage/v1/object/public/U9/Banners/Mobile/Mobile3.png",
       link: ""
     }
   ]);
