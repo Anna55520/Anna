@@ -30,7 +30,7 @@
   width: calc(100% - 32px);
   max-width: 1200px;
 
-  /* 上方留白 40px */
+  /* TOP SPACING */
   margin: 40px auto 24px;
 
   overflow: hidden;
@@ -80,7 +80,7 @@
 }
 
 /* =========================
-   MOBILE
+   TABLET & MOBILE
 ========================= */
 
 @media (max-width: 768px) {
@@ -90,8 +90,8 @@
 
     max-width: none;
 
-    /* 手机端上方留白 40px */
-    margin: 40px auto 16px;
+    /* TOP SPACING */
+    margin: 24px auto 16px;
 
     border-radius: 10px;
   }
