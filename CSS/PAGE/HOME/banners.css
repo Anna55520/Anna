@@ -9,17 +9,20 @@
   --u9-banner-control-bg: rgba(12, 18, 29, 0.48);
   --u9-banner-control-hover: rgba(12, 18, 29, 0.76);
 
+  /* Banner 外边距：上 右 下 左 */
+  margin: 15px 2.5% 15px 2.5%;
+
   position: relative;
   display: block;
-  width: 95%;
+  width: 100%;
   max-width: 1200px;
-  margin: 0 auto;
   padding: 0;
   overflow: hidden;
   isolation: isolate;
   border-radius: var(--u9-banner-radius);
   background: #eef0f3;
   -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
 }
 
 #U9-home-banners[hidden] {
@@ -196,7 +199,8 @@
 
 @media (max-width: 767px) {
   #U9-home-banners {
-    width: 95%;
+    margin: 12px 2.5% 12px 2.5%;
+    width: 100%;
     border-radius: 11px;
   }
 
