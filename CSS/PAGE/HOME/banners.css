@@ -1,3 +1,4 @@
+
 /* =========================================================
    U9 HOME PAGE - PREMIUM STATIC BANNER CAROUSEL
    File: CSS/PAGE/HOME/banners.css
@@ -10,7 +11,7 @@
 
   position: relative;
   display: block;
-  width: min(100%, 1200px);
+  width: 80%;
   margin: 0 auto;
   padding: 0;
   overflow: hidden;
@@ -80,65 +81,9 @@
   background: #eef0f3;
 }
 
-#U9-home-banners .U9-home-banner-arrow {
-  position: absolute;
-  top: 50%;
-  z-index: 4;
-  display: grid;
-  width: 42px;
-  height: 42px;
-  padding: 0;
-  place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.34);
-  border-radius: 50%;
-  color: #fff;
-  background: var(--u9-banner-control-bg);
-  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.16);
-  cursor: pointer;
-  opacity: 0;
-  transform: translateY(-50%);
-  transition:
-    opacity 180ms ease,
-    background-color 180ms ease,
-    transform 180ms ease;
-}
-
-#U9-home-banners .U9-home-banner-arrow span {
-  display: block;
-  margin-top: -4px;
-  font-family: Arial, sans-serif;
-  font-size: 34px;
-  font-weight: 300;
-  line-height: 1;
-}
-
-#U9-home-banners .U9-home-banner-previous {
-  left: 14px;
-}
-
-#U9-home-banners .U9-home-banner-next {
-  right: 14px;
-}
-
-#U9-home-banners:hover .U9-home-banner-arrow,
-#U9-home-banners:focus-within .U9-home-banner-arrow {
-  opacity: 1;
-}
-
-#U9-home-banners .U9-home-banner-arrow:hover {
-  background: var(--u9-banner-control-hover);
-}
-
-#U9-home-banners .U9-home-banner-arrow:active {
-  transform: translateY(-50%) scale(0.96);
-}
-
-#U9-home-banners .U9-home-banner-arrow:focus-visible,
-#U9-home-banners .U9-home-banner-dot:focus-visible,
-#U9-home-banners .U9-home-banner-link:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 3px;
-}
+/* =========================================================
+   BOTTOM CONTROLS - ARROW + DOTS + ARROW
+========================================================= */
 
 #U9-home-banners .U9-home-banner-controls {
   position: absolute;
@@ -147,9 +92,62 @@
   left: 0;
   z-index: 4;
   display: flex;
+  align-items: center;
   justify-content: center;
+  gap: 12px;
   pointer-events: none;
 }
+
+/* Previous / Next buttons */
+
+#U9-home-banners .U9-home-banner-arrow {
+  position: relative;
+  display: grid;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  border-radius: 50%;
+  color: #fff;
+  background: var(--u9-banner-control-bg);
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.16);
+  cursor: pointer;
+  opacity: 0.92;
+  transition:
+    background-color 180ms ease,
+    transform 180ms ease;
+  pointer-events: auto;
+}
+
+#U9-home-banners .U9-home-banner-arrow span {
+  display: block;
+  margin-top: -3px;
+  font-family: Arial, sans-serif;
+  font-size: 27px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+#U9-home-banners .U9-home-banner-previous,
+#U9-home-banners .U9-home-banner-next {
+  left: auto;
+  right: auto;
+  top: auto;
+  transform: none;
+}
+
+#U9-home-banners .U9-home-banner-arrow:hover {
+  background: var(--u9-banner-control-hover);
+  opacity: 1;
+}
+
+#U9-home-banners .U9-home-banner-arrow:active {
+  transform: scale(0.94);
+}
+
+/* Dots container */
 
 #U9-home-banners .U9-home-banner-dots {
   display: flex;
@@ -186,15 +184,35 @@
   background: #fff;
 }
 
+/* Keyboard focus */
+
+#U9-home-banners .U9-home-banner-arrow:focus-visible,
+#U9-home-banners .U9-home-banner-dot:focus-visible,
+#U9-home-banners .U9-home-banner-link:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+/* Desktop hover */
+
 @media (hover: hover) and (pointer: fine) {
-  #U9-home-banners:hover .U9-home-banner-arrow {
+  #U9-home-banners .U9-home-banner-arrow {
+    opacity: 0.65;
+  }
+
+  #U9-home-banners .U9-home-banner-arrow:hover {
     opacity: 1;
   }
 }
 
+/* =========================================================
+   MOBILE
+   Width remains 80%, same as PC
+========================================================= */
+
 @media (max-width: 767px) {
   #U9-home-banners {
-    width: 100%;
+    width: 80%;
     border-radius: 11px;
   }
 
@@ -202,28 +220,40 @@
     aspect-ratio: var(--u9-home-banner-mobile-ratio, 3 / 4);
   }
 
+  #U9-home-banners .U9-home-banner-controls {
+    bottom: 9px;
+    gap: 8px;
+  }
+
   #U9-home-banners .U9-home-banner-arrow {
-    width: 35px;
-    height: 35px;
-    opacity: 0.92;
+    flex-basis: 30px;
+    width: 30px;
+    height: 30px;
   }
 
   #U9-home-banners .U9-home-banner-arrow span {
-    font-size: 29px;
+    font-size: 24px;
   }
 
-  #U9-home-banners .U9-home-banner-previous {
-    left: 9px;
+  #U9-home-banners .U9-home-banner-dots {
+    gap: 6px;
+    min-height: 22px;
+    padding: 4px 8px;
   }
 
-  #U9-home-banners .U9-home-banner-next {
-    right: 9px;
+  #U9-home-banners .U9-home-banner-dot {
+    width: 6px;
+    height: 6px;
   }
 
-  #U9-home-banners .U9-home-banner-controls {
-    bottom: 9px;
+  #U9-home-banners .U9-home-banner-dot.is-active {
+    width: 18px;
   }
 }
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
 
 @media (prefers-reduced-motion: reduce) {
   #U9-home-banners .U9-home-banner-slide,
