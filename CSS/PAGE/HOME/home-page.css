@@ -17,6 +17,59 @@
 }
 
 /* =========================
+   HOME BANNER
+========================= */
+
+#U9-home-banner {
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: calc(100% - 32px);
+  max-width: 1200px;
+
+  margin: 24px auto;
+
+  overflow: hidden;
+
+  border-radius: 12px;
+
+  background: transparent;
+
+  box-sizing: border-box;
+}
+
+/* =========================
+   HOME BANNER IMAGE
+========================= */
+
+#U9-home-banner-image {
+  display: block;
+
+  width: 100%;
+  height: auto;
+
+  max-height: 420px;
+
+  object-fit: contain;
+
+  opacity: 1;
+
+  transition:
+    opacity 0.6s ease;
+}
+
+/* =========================
+   BANNER FADE
+========================= */
+
+#U9-home-banner-image.U9-banner-fade {
+  opacity: 0;
+}
+
+/* =========================
    TOOLBAR COLLAPSED
 ========================= */
 
@@ -29,7 +82,30 @@
    MOBILE
 ========================= */
 
+@media (max-width: 768px) {
+
+  #U9-home-banner {
+    width: calc(100% - 28px);
+
+    max-width: none;
+
+    margin: 16px auto;
+
+    border-radius: 10px;
+  }
+
+  #U9-home-banner-image {
+    max-height: none;
+  }
+
+}
+
+/* =========================
+   MOBILE HOME PAGE
+========================= */
+
 @media (max-width: 480px) {
+
   #U9-page-home {
     width: 100%;
     min-height: calc(100vh - 115px);
@@ -40,6 +116,7 @@
     margin-top: 60px;
     min-height: calc(100vh - 60px);
   }
+
 }
 
 /* =========================
@@ -47,7 +124,13 @@
 ========================= */
 
 @media (prefers-reduced-motion: reduce) {
+
   #U9-page-home {
     transition: none;
   }
+
+  #U9-home-banner-image {
+    transition: none;
+  }
+
 }
