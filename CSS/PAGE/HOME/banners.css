@@ -1,3 +1,4 @@
+
 /* =========================================================
    U9 HOME PAGE - PREMIUM STATIC BANNER CAROUSEL
    File: CSS/PAGE/HOME/banners.css
@@ -10,7 +11,8 @@
 
   position: relative;
   display: block;
-  width: min(100%, 1200px);
+  width: 95%;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0;
   overflow: hidden;
@@ -194,7 +196,7 @@
 
 @media (max-width: 767px) {
   #U9-home-banners {
-    width: 100%;
+    width: 95%;
     border-radius: 11px;
   }
 
