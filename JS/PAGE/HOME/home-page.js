@@ -37,33 +37,36 @@
 
   /* =========================
      HOME BANNER CONFIG
+     STORE 2 PROXY
   ========================= */
 
   const HOME_BANNER_CONFIG = {
 
     mobile: [
 
-      "https://vjlpowhxmflpkjlukkfy.supabase.co/storage/v1/object/public/U9/Banners/Mobile/Mobile1.jpg",
+      "/storage-2/U9/Banners/Mobile/Mobile1.jpg",
 
-      "https://vjlpowhxmflpkjlukkfy.supabase.co/storage/v1/object/public/U9/Banners/Mobile/Mobile2.png",
+      "/storage-2/U9/Banners/Mobile/Mobile2.png",
 
-      "https://vjlpowhxmflpkjlukkfy.supabase.co/storage/v1/object/public/U9/Banners/Mobile/Mobile3.png"
+      "/storage-2/U9/Banners/Mobile/Mobile3.png"
 
     ],
 
     desktop: [
 
-      "https://vjlpowhxmflpkjlukkfy.supabase.co/storage/v1/object/public/U9/Banners/PC/PC1.jpg",
+      "/storage-2/U9/Banners/PC/PC1.jpg",
 
-      "https://vjlpowhxmflpkjlukkfy.supabase.co/storage/v1/object/public/U9/Banners/PC/PC.png",
+      "/storage-2/U9/Banners/PC/PC.png",
 
-      "https://vjlpowhxmflpkjlukkfy.supabase.co/storage/v1/object/public/U9/Banners/PC/PC3.png"
+      "/storage-2/U9/Banners/PC/PC3.png"
 
     ],
 
     interval: 5000,
 
-    breakpoint: 768
+    breakpoint: 768,
+
+    fadeDuration: 600
 
   };
 
@@ -78,11 +81,15 @@
 
   let bannerTimer = null;
 
+  let bannerResizeTimer = null;
+
   let bannerIndex = 0;
 
   let bannerImages = [];
 
   let bannerInitialized = false;
+
+  let bannerLoadToken = 0;
 
 
   /* =========================
@@ -102,102 +109,18 @@
 
 
   /* =========================
-     CREATE BANNER CSS
+     PRELOAD BANNER IMAGES
   ========================= */
 
-  function createHomeBannerStyle() {
+  function preloadHomeBannerImages(images) {
 
-    if (
-      document.getElementById(
-        "U9-home-banner-style"
-      )
-    ) {
+    images.forEach(function (url) {
 
-      return;
+      const img = new Image();
 
-    }
+      img.src = url;
 
-    const style =
-      document.createElement("style");
-
-    style.id =
-      "U9-home-banner-style";
-
-    style.textContent = `
-
-      #U9-home-banner {
-
-        width: calc(100% - 32px);
-
-        max-width: 1200px;
-
-        margin: 24px auto;
-
-        position: relative;
-
-        overflow: hidden;
-
-        display: flex;
-
-        justify-content: center;
-
-        align-items: center;
-
-        border-radius: 12px;
-
-        background: transparent;
-
-      }
-
-      #U9-home-banner-image {
-
-        display: block;
-
-        width: 100%;
-
-        height: auto;
-
-        max-height: 420px;
-
-        object-fit: contain;
-
-        opacity: 1;
-
-        transition: opacity 0.6s ease;
-
-      }
-
-      #U9-home-banner-image.U9-banner-fade {
-
-        opacity: 0;
-
-      }
-
-      @media (max-width: 768px) {
-
-        #U9-home-banner {
-
-          width: calc(100% - 28px);
-
-          max-width: none;
-
-          margin: 16px auto;
-
-          border-radius: 10px;
-
-        }
-
-        #U9-home-banner-image {
-
-          max-height: none;
-
-        }
-
-      }
-
-    `;
-
-    document.head.appendChild(style);
+    });
 
   }
 
@@ -216,8 +139,6 @@
       return;
 
     }
-
-    createHomeBannerStyle();
 
     bannerContainer =
       document.createElement("div");
@@ -240,13 +161,16 @@
     bannerImage.decoding =
       "async";
 
+    bannerImage.draggable =
+      false;
+
     bannerContainer.appendChild(
       bannerImage
     );
 
     /*
-      插入 Home Page 最顶部
-      不修改原有 HTML
+      INSERT BANNER
+      HOME PAGE TOP
     */
 
     homePage.insertBefore(
@@ -276,12 +200,23 @@
 
     }
 
+    const loadToken =
+      ++bannerLoadToken;
+
     const preload =
       new Image();
 
     preload.onload = function () {
 
-      if (!bannerImage) {
+      /*
+        Prevent old image requests
+        from replacing newer images
+      */
+
+      if (
+        loadToken !== bannerLoadToken ||
+        !bannerImage
+      ) {
 
         return;
 
@@ -298,18 +233,22 @@
 
     preload.onerror = function () {
 
+      if (
+        loadToken !== bannerLoadToken
+      ) {
+
+        return;
+
+      }
+
       console.warn(
         "[U9 HOME] Banner load failed:",
         imageUrl
       );
 
-      if (bannerImage) {
-
-        bannerImage.classList.remove(
-          "U9-banner-fade"
-        );
-
-      }
+      bannerImage.classList.remove(
+        "U9-banner-fade"
+      );
 
     };
 
@@ -355,11 +294,20 @@
 
     }
 
+    /*
+      FADE OUT
+    */
+
     bannerImage.classList.add(
       "U9-banner-fade"
     );
 
+    /*
+      LOAD NEXT IMAGE
+    */
+
     setTimeout(
+
       function () {
 
         loadHomeBannerImage(
@@ -367,7 +315,9 @@
         );
 
       },
-      600
+
+      HOME_BANNER_CONFIG.fadeDuration
+
     );
 
   }
@@ -401,7 +351,7 @@
     }
 
     /*
-      第一次显示第一张
+      FIRST IMAGE
     */
 
     bannerIndex = 0;
@@ -411,7 +361,15 @@
     );
 
     /*
-      每 5 秒切换
+      PRELOAD ALL IMAGES
+    */
+
+    preloadHomeBannerImages(
+      bannerImages
+    );
+
+    /*
+      CLEAR OLD TIMER
     */
 
     if (
@@ -424,10 +382,17 @@
 
     }
 
+    /*
+      AUTO SWITCH EVERY 5 SECONDS
+    */
+
     bannerTimer =
       setInterval(
+
         switchHomeBanner,
+
         HOME_BANNER_CONFIG.interval
+
       );
 
   }
@@ -437,8 +402,6 @@
      RESPONSIVE BANNER
   ========================= */
 
-  let bannerResizeTimer = null;
-
   function handleHomeBannerResize() {
 
     clearTimeout(
@@ -447,35 +410,53 @@
 
     bannerResizeTimer =
       setTimeout(
+
         function () {
 
           const newImages =
             getHomeBannerImages();
 
           if (
-            JSON.stringify(
-              newImages
-            ) ===
-            JSON.stringify(
-              bannerImages
-            )
+
+            JSON.stringify(newImages) ===
+
+            JSON.stringify(bannerImages)
+
           ) {
 
             return;
 
           }
 
+          /*
+            UPDATE IMAGE LIST
+          */
+
           bannerImages =
             newImages;
 
           bannerIndex = 0;
+
+          /*
+            PRELOAD NEW DEVICE IMAGES
+          */
+
+          preloadHomeBannerImages(
+            bannerImages
+          );
+
+          /*
+            SHOW FIRST IMAGE
+          */
 
           loadHomeBannerImage(
             bannerImages[bannerIndex]
           );
 
         },
+
         200
+
       );
 
   }
