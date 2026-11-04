@@ -9,7 +9,7 @@
   min-height: calc(100vh - 115px);
   box-sizing: border-box;
   margin-top: 115px;
-  background-color: #f575c8;
+  background-color: #eff1f2;
 
   transition:
     margin-top 0.35s ease,
