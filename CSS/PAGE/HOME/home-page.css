@@ -30,7 +30,8 @@
   width: calc(100% - 32px);
   max-width: 1200px;
 
-  margin: 24px auto;
+  /* 上方留白 40px */
+  margin: 40px auto 24px;
 
   overflow: hidden;
 
@@ -89,7 +90,8 @@
 
     max-width: none;
 
-    margin: 16px auto;
+    /* 手机端上方留白 40px */
+    margin: 40px auto 16px;
 
     border-radius: 10px;
   }
