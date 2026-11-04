@@ -1,12 +1,11 @@
-
 /* =========================================================
    U9 HOME PAGE - PREMIUM STATIC BANNER CAROUSEL
    File: CSS/PAGE/HOME/banners.css
 
-   Layout responsibility:
-   - Home page margin: home-page.css
-   - Banner width: 100%
-   - Banner image width: 100%
+   Layout:
+   - Banner container is centered in Home Page
+   - Banner image is centered inside each slide
+   - Edit the four margin values on .U9-home-banner-image
 ========================================================= */
 
 #U9-home-banners {
@@ -54,6 +53,9 @@
   position: absolute;
   inset: 0;
   z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
   opacity: 0;
   visibility: hidden;
@@ -76,7 +78,9 @@
 
 #U9-home-banners .U9-home-banner-link,
 #U9-home-banners .U9-home-banner-picture {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
 }
@@ -90,7 +94,12 @@
   display: block;
   width: 100%;
   height: 100%;
+
+  /* Edit margin in this order: top right bottom left */
+  margin: 0px 0px 0px 0px;
+
   border: 0;
+  box-sizing: border-box;
   object-fit: cover;
   object-position: center;
   user-select: none;
