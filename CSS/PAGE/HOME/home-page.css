@@ -99,7 +99,7 @@
 @media (max-width: 768px) {
 
   #U9-page-home {
-    padding-top: 0px;
+    padding-top: 15px;
   }
 
   #U9-home-banner {
@@ -131,7 +131,7 @@
 
     margin-top: 115px;
 
-    padding-top: 24px;
+    padding-top: 15px;
   }
 
   #U9-page-home.home-toolbar-collapsed {
