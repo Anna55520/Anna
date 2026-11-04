@@ -40,7 +40,7 @@
 
     desktop: [
       "/storage-2/U9/Banners/PC/PC1.jpg",
-      "/storage-2/U9/Banners/PC/PC.png",
+      "/storage-2/U9/Banners/PC/PC2.png",
       "/storage-2/U9/Banners/PC/PC3.png"
     ],
 
