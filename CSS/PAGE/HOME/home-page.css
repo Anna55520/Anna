@@ -25,6 +25,7 @@
     min-height 0.35s ease;
 }
 
+
 /* =========================
    HOME BANNER
 ========================= */
@@ -32,16 +33,13 @@
 #U9-home-banner {
   position: relative;
 
-  display: flex;
-
-  justify-content: center;
-  align-items: center;
+  display: block;
 
   width: calc(100% - 32px);
 
   max-width: 1200px;
 
-  /* TOP SPACING CONTROLLED BY HOME PAGE */
+  /* TOP SPACING */
   margin: 0 auto 24px !important;
 
   overflow: hidden;
@@ -53,11 +51,13 @@
   box-sizing: border-box;
 }
 
+
 /* =========================
-   HOME BANNER IMAGE
+   HOME BANNER IMAGES
 ========================= */
 
-#U9-home-banner-image {
+#U9-home-banner-image,
+#U9-home-banner-next {
   display: block;
 
   width: 100%;
@@ -68,19 +68,43 @@
 
   object-fit: contain;
 
-  opacity: 1;
+  flex-shrink: 0;
 
-  transition:
-    opacity 0.6s ease;
+  user-select: none;
+
+  -webkit-user-drag: none;
 }
+
 
 /* =========================
-   BANNER FADE
+   CURRENT IMAGE
 ========================= */
 
-#U9-home-banner-image.U9-banner-fade {
-  opacity: 0;
+#U9-home-banner-image {
+  position: relative;
+
+  z-index: 1;
+
+  transform: translateX(0);
 }
+
+
+/* =========================
+   NEXT IMAGE
+========================= */
+
+#U9-home-banner-next {
+  position: absolute;
+
+  top: 0;
+
+  left: 0;
+
+  z-index: 2;
+
+  transform: translateX(100%);
+}
+
 
 /* =========================
    TOOLBAR COLLAPSED
@@ -91,6 +115,7 @@
 
   min-height: calc(100vh - 60px);
 }
+
 
 /* =========================
    TABLET & MOBILE
@@ -112,11 +137,13 @@
     border-radius: 10px;
   }
 
-  #U9-home-banner-image {
+  #U9-home-banner-image,
+  #U9-home-banner-next {
     max-height: none;
   }
 
 }
+
 
 /* =========================
    MOBILE HOME PAGE
@@ -142,6 +169,7 @@
 
 }
 
+
 /* =========================
    REDUCED MOTION
 ========================= */
@@ -152,8 +180,9 @@
     transition: none;
   }
 
-  #U9-home-banner-image {
-    transition: none;
+  #U9-home-banner-image,
+  #U9-home-banner-next {
+    transition: none !important;
   }
 
 }
