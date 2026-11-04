@@ -1,1 +1,226 @@
+/* =========================================================
+   U9 HOME PAGE - PREMIUM BANNER CAROUSEL
+   File: CSS/PAGE/HOME/banners.css
+========================================================= */
 
+#U9-home-banners {
+  --u9-banner-radius: 16px;
+  --u9-banner-control-bg: rgba(15, 23, 42, 0.48);
+  --u9-banner-control-hover: rgba(15, 23, 42, 0.72);
+
+  position: relative;
+  display: block;
+  width: min(100%, 1200px);
+  margin: 0 auto;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--u9-banner-radius);
+  background: #f1f3f5;
+  isolation: isolate;
+}
+
+#U9-home-banners[hidden] {
+  display: none !important;
+}
+
+#U9-home-banners .U9-home-banner-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1200 / 250;
+  overflow: hidden;
+  background: #eef0f2;
+}
+
+#U9-home-banners .U9-home-banner-slide {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 650ms ease,
+    visibility 650ms ease;
+}
+
+#U9-home-banners .U9-home-banner-slide.is-active {
+  z-index: 1;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+#U9-home-banners .U9-home-banner-link,
+#U9-home-banners .U9-home-banner-picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+#U9-home-banners .U9-home-banner-link {
+  outline-offset: -3px;
+}
+
+#U9-home-banners .U9-home-banner-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+#U9-home-banners .U9-home-banner-slide.is-image-error {
+  background: #eef0f2;
+}
+
+#U9-home-banners .U9-home-banner-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  color: #fff;
+  background: var(--u9-banner-control-bg);
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.14);
+  font: inherit;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-50%);
+  transition:
+    opacity 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#U9-home-banners .U9-home-banner-arrow span {
+  display: block;
+  margin-top: -4px;
+  font-family: Arial, sans-serif;
+  font-size: 34px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+#U9-home-banners .U9-home-banner-previous {
+  left: 14px;
+}
+
+#U9-home-banners .U9-home-banner-next {
+  right: 14px;
+}
+
+#U9-home-banners:hover .U9-home-banner-arrow,
+#U9-home-banners:focus-within .U9-home-banner-arrow {
+  opacity: 1;
+}
+
+#U9-home-banners .U9-home-banner-arrow:hover {
+  background: var(--u9-banner-control-hover);
+}
+
+#U9-home-banners .U9-home-banner-arrow:focus-visible,
+#U9-home-banners .U9-home-banner-dot:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}
+
+#U9-home-banners .U9-home-banner-controls {
+  position: absolute;
+  right: 0;
+  bottom: 12px;
+  left: 0;
+  z-index: 3;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+#U9-home-banners .U9-home-banner-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 22px;
+  padding: 4px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.34);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+#U9-home-banners .U9-home-banner-dot {
+  display: block;
+  width: 7px;
+  height: 7px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.62);
+  cursor: pointer;
+  transition:
+    width 220ms ease,
+    background-color 220ms ease;
+}
+
+#U9-home-banners .U9-home-banner-dot.is-active {
+  width: 22px;
+  background: #fff;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #U9-home-banners:hover .U9-home-banner-arrow {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 767px) {
+  #U9-home-banners {
+    width: 100%;
+    border-radius: 12px;
+  }
+
+  #U9-home-banners .U9-home-banner-viewport {
+    aspect-ratio: var(--u9-home-banner-mobile-ratio, 3 / 4);
+  }
+
+  #U9-home-banners .U9-home-banner-arrow {
+    width: 34px;
+    height: 34px;
+    opacity: 0.9;
+  }
+
+  #U9-home-banners .U9-home-banner-arrow span {
+    font-size: 28px;
+  }
+
+  #U9-home-banners .U9-home-banner-previous {
+    left: 9px;
+  }
+
+  #U9-home-banners .U9-home-banner-next {
+    right: 9px;
+  }
+
+  #U9-home-banners .U9-home-banner-controls {
+    bottom: 9px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #U9-home-banners .U9-home-banner-slide,
+  #U9-home-banners .U9-home-banner-arrow,
+  #U9-home-banners .U9-home-banner-dot {
+    transition: none;
+  }
+}
