@@ -10,29 +10,19 @@
   ========================= */
 
   const homePage =
-    document.getElementById(
-      "U9-page-home"
-    );
+    document.getElementById("U9-page-home");
 
   const shopPage =
-    document.getElementById(
-      "U9-page-shop"
-    );
+    document.getElementById("U9-page-shop");
 
   const auctionPage =
-    document.getElementById(
-      "U9-page-auction"
-    );
+    document.getElementById("U9-page-auction");
 
   const test1Page =
-    document.getElementById(
-      "U9-page-test1"
-    );
+    document.getElementById("U9-page-test1");
 
   const test2Page =
-    document.getElementById(
-      "U9-page-test2"
-    );
+    document.getElementById("U9-page-test2");
 
 
   /* =========================
@@ -43,30 +33,22 @@
   const HOME_BANNER_CONFIG = {
 
     mobile: [
-
       "/storage-2/U9/Banners/Mobile/Mobile1.jpg",
-
       "/storage-2/U9/Banners/Mobile/Mobile2.png",
-
       "/storage-2/U9/Banners/Mobile/Mobile3.png"
-
     ],
 
     desktop: [
-
       "/storage-2/U9/Banners/PC/PC1.jpg",
-
       "/storage-2/U9/Banners/PC/PC.png",
-
       "/storage-2/U9/Banners/PC/PC3.png"
-
     ],
 
     interval: 5000,
 
     breakpoint: 768,
 
-    fadeDuration: 600
+    slideDuration: 600
 
   };
 
@@ -79,9 +61,13 @@
 
   let bannerImage = null;
 
+  let bannerNextImage = null;
+
   let bannerTimer = null;
 
   let bannerResizeTimer = null;
+
+  let bannerSlideTimer = null;
 
   let bannerIndex = 0;
 
@@ -90,6 +76,8 @@
   let bannerInitialized = false;
 
   let bannerLoadToken = 0;
+
+  let isSliding = false;
 
 
   /* =========================
@@ -135,9 +123,7 @@
       !homePage ||
       bannerInitialized
     ) {
-
       return;
-
     }
 
     bannerContainer =
@@ -145,6 +131,9 @@
 
     bannerContainer.id =
       "U9-home-banner";
+
+
+    /* CURRENT IMAGE */
 
     bannerImage =
       document.createElement("img");
@@ -164,14 +153,34 @@
     bannerImage.draggable =
       false;
 
+
+    /* NEXT IMAGE */
+
+    bannerNextImage =
+      document.createElement("img");
+
+    bannerNextImage.id =
+      "U9-home-banner-next";
+
+    bannerNextImage.alt =
+      "U9 Banner";
+
+    bannerNextImage.draggable =
+      false;
+
+
+    /* APPEND IMAGES */
+
     bannerContainer.appendChild(
       bannerImage
     );
 
-    /*
-      INSERT BANNER
-      HOME PAGE TOP
-    */
+    bannerContainer.appendChild(
+      bannerNextImage
+    );
+
+
+    /* INSERT INTO HOME PAGE */
 
     homePage.insertBefore(
       bannerContainer,
@@ -184,20 +193,40 @@
 
 
   /* =========================
-     LOAD BANNER IMAGE
+     RESET SLIDE POSITION
   ========================= */
 
-  function loadHomeBannerImage(
-    imageUrl
-  ) {
+  function resetBannerPosition() {
+
+    if (!bannerImage || !bannerNextImage) {
+      return;
+    }
+
+    bannerImage.style.transition = "none";
+
+    bannerImage.style.transform =
+      "translateX(0)";
+
+    bannerNextImage.style.transition = "none";
+
+    bannerNextImage.style.transform =
+      "translateX(100%)";
+
+  }
+
+
+  /* =========================
+     LOAD FIRST BANNER IMAGE
+  ========================= */
+
+  function loadHomeBannerImage(imageUrl) {
 
     if (
       !bannerImage ||
+      !bannerNextImage ||
       !imageUrl
     ) {
-
       return;
-
     }
 
     const loadToken =
@@ -208,37 +237,27 @@
 
     preload.onload = function () {
 
-      /*
-        Prevent old image requests
-        from replacing newer images
-      */
-
       if (
         loadToken !== bannerLoadToken ||
         !bannerImage
       ) {
-
         return;
-
       }
 
-      bannerImage.src =
-        imageUrl;
+      bannerImage.src = imageUrl;
 
-      bannerImage.classList.remove(
-        "U9-banner-fade"
-      );
+      bannerNextImage.removeAttribute("src");
+
+      resetBannerPosition();
+
+      isSliding = false;
 
     };
 
     preload.onerror = function () {
 
-      if (
-        loadToken !== bannerLoadToken
-      ) {
-
+      if (loadToken !== bannerLoadToken) {
         return;
-
       }
 
       console.warn(
@@ -246,79 +265,149 @@
         imageUrl
       );
 
-      bannerImage.classList.remove(
-        "U9-banner-fade"
-      );
-
     };
 
-    preload.src =
-      imageUrl;
+    preload.src = imageUrl;
 
   }
 
 
   /* =========================
      SWITCH BANNER
+     RIGHT TO LEFT
   ========================= */
 
   function switchHomeBanner() {
 
     if (
-      !bannerImage
-    ) {
-
-      return;
-
-    }
-
-    bannerImages =
-      getHomeBannerImages();
-
-    if (
+      !bannerImage ||
+      !bannerNextImage ||
+      isSliding ||
       !bannerImages.length
     ) {
-
       return;
-
     }
 
-    bannerIndex++;
+    const nextIndex =
+      (bannerIndex + 1) % bannerImages.length;
 
-    if (
-      bannerIndex >=
-      bannerImages.length
-    ) {
+    const nextUrl =
+      bannerImages[nextIndex];
 
-      bannerIndex = 0;
+    const loadToken =
+      ++bannerLoadToken;
 
-    }
+    const preload =
+      new Image();
 
-    /*
-      FADE OUT
-    */
 
-    bannerImage.classList.add(
-      "U9-banner-fade"
-    );
+    /* PRELOAD NEXT IMAGE */
 
-    /*
-      LOAD NEXT IMAGE
-    */
+    preload.onload = function () {
 
-    setTimeout(
+      if (
+        loadToken !== bannerLoadToken ||
+        !bannerImage ||
+        !bannerNextImage
+      ) {
+        return;
+      }
 
-      function () {
+      isSliding = true;
 
-        loadHomeBannerImage(
-          bannerImages[bannerIndex]
-        );
+      bannerNextImage.src = nextUrl;
 
-      },
 
-      HOME_BANNER_CONFIG.fadeDuration
+      /* POSITION NEXT IMAGE ON RIGHT */
 
-    );
+      bannerNextImage.style.transition = "none";
+
+      bannerNextImage.style.transform =
+        "translateX(100%)";
+
+      bannerImage.style.transition = "none";
+
+      bannerImage.style.transform =
+        "translateX(0)";
+
+
+      /* FORCE REFLOW */
+
+      bannerNextImage.offsetWidth;
+
+
+      /* START SLIDE ANIMATION */
+
+      requestAnimationFrame(function () {
+
+        if (loadToken !== bannerLoadToken) {
+          return;
+        }
+
+        const duration =
+          HOME_BANNER_CONFIG.slideDuration;
+
+        bannerImage.style.transition =
+          `transform ${duration}ms ease`;
+
+        bannerNextImage.style.transition =
+          `transform ${duration}ms ease`;
+
+        bannerImage.style.transform =
+          "translateX(-100%)";
+
+        bannerNextImage.style.transform =
+          "translateX(0)";
+
+      });
+
+
+      /* FINISH SLIDE */
+
+      clearTimeout(bannerSlideTimer);
+
+      bannerSlideTimer = setTimeout(function () {
+
+        if (
+          loadToken !== bannerLoadToken
+        ) {
+          return;
+        }
+
+        /* UPDATE CURRENT IMAGE */
+
+        bannerImage.src = nextUrl;
+
+        bannerIndex = nextIndex;
+
+
+        /* RESET IMAGE POSITIONS */
+
+        resetBannerPosition();
+
+        bannerNextImage.removeAttribute("src");
+
+        isSliding = false;
+
+      }, HOME_BANNER_CONFIG.slideDuration + 30);
+
+    };
+
+
+    preload.onerror = function () {
+
+      if (loadToken !== bannerLoadToken) {
+        return;
+      }
+
+      console.warn(
+        "[U9 HOME] Banner load failed:",
+        nextUrl
+      );
+
+    };
+
+    preload.src = nextUrl;
 
   }
 
@@ -329,12 +418,8 @@
 
   function startHomeBanner() {
 
-    if (
-      !homePage
-    ) {
-
+    if (!homePage) {
       return;
-
     }
 
     createHomeBanner();
@@ -342,58 +427,47 @@
     bannerImages =
       getHomeBannerImages();
 
-    if (
-      !bannerImages.length
-    ) {
-
+    if (!bannerImages.length) {
       return;
-
     }
 
-    /*
-      FIRST IMAGE
-    */
+
+    /* FIRST IMAGE */
 
     bannerIndex = 0;
+
+    isSliding = false;
 
     loadHomeBannerImage(
       bannerImages[bannerIndex]
     );
 
-    /*
-      PRELOAD ALL IMAGES
-    */
+
+    /* PRELOAD ALL IMAGES */
 
     preloadHomeBannerImages(
       bannerImages
     );
 
-    /*
-      CLEAR OLD TIMER
-    */
 
-    if (
-      bannerTimer
-    ) {
+    /* CLEAR OLD TIMER */
 
-      clearInterval(
-        bannerTimer
-      );
+    if (bannerTimer) {
+
+      clearInterval(bannerTimer);
 
     }
 
-    /*
-      AUTO SWITCH EVERY 5 SECONDS
-    */
 
-    bannerTimer =
-      setInterval(
+    /* AUTO SWITCH EVERY 5 SECONDS */
 
-        switchHomeBanner,
+    bannerTimer = setInterval(
 
-        HOME_BANNER_CONFIG.interval
+      switchHomeBanner,
 
-      );
+      HOME_BANNER_CONFIG.interval
+
+    );
 
   }
 
@@ -408,56 +482,49 @@
       bannerResizeTimer
     );
 
-    bannerResizeTimer =
-      setTimeout(
+    bannerResizeTimer = setTimeout(function () {
 
-        function () {
+      const newImages =
+        getHomeBannerImages();
 
-          const newImages =
-            getHomeBannerImages();
+      if (
+        JSON.stringify(newImages) ===
+        JSON.stringify(bannerImages)
+      ) {
+        return;
+      }
 
-          if (
 
-            JSON.stringify(newImages) ===
+      /* CANCEL OLD REQUESTS */
 
-            JSON.stringify(bannerImages)
+      bannerLoadToken++;
 
-          ) {
+      clearTimeout(bannerSlideTimer);
 
-            return;
+      isSliding = false;
 
-          }
 
-          /*
-            UPDATE IMAGE LIST
-          */
+      /* UPDATE IMAGE LIST */
 
-          bannerImages =
-            newImages;
+      bannerImages = newImages;
 
-          bannerIndex = 0;
+      bannerIndex = 0;
 
-          /*
-            PRELOAD NEW DEVICE IMAGES
-          */
 
-          preloadHomeBannerImages(
-            bannerImages
-          );
+      /* PRELOAD NEW DEVICE IMAGES */
 
-          /*
-            SHOW FIRST IMAGE
-          */
-
-          loadHomeBannerImage(
-            bannerImages[bannerIndex]
-          );
-
-        },
-
-        200
-
+      preloadHomeBannerImages(
+        bannerImages
       );
+
+
+      /* SHOW FIRST IMAGE */
+
+      loadHomeBannerImage(
+        bannerImages[0]
+      );
+
+    }, 200);
 
   }
 
@@ -473,52 +540,27 @@
 
   function openHomePage() {
 
-    if (
-      !homePage
-    ) {
-
+    if (!homePage) {
       return;
-
     }
 
-    if (
-      shopPage
-    ) {
-
-      shopPage.style.display =
-        "none";
-
+    if (shopPage) {
+      shopPage.style.display = "none";
     }
 
-    if (
-      auctionPage
-    ) {
-
-      auctionPage.style.display =
-        "none";
-
+    if (auctionPage) {
+      auctionPage.style.display = "none";
     }
 
-    if (
-      test1Page
-    ) {
-
-      test1Page.style.display =
-        "none";
-
+    if (test1Page) {
+      test1Page.style.display = "none";
     }
 
-    if (
-      test2Page
-    ) {
-
-      test2Page.style.display =
-        "none";
-
+    if (test2Page) {
+      test2Page.style.display = "none";
     }
 
-    homePage.style.display =
-      "block";
+    homePage.style.display = "block";
 
   }
 
@@ -529,12 +571,8 @@
 
   function initializeHomePage() {
 
-    if (
-      !homePage
-    ) {
-
+    if (!homePage) {
       return;
-
     }
 
     openHomePage();
@@ -557,6 +595,5 @@
   ========================= */
 
   initializeHomePage();
-
 
 })();
