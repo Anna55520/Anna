@@ -4,24 +4,12 @@
 ========================= */
 
 #U9-page-home {
-  /* HOME PAGE MARGIN CONTROLS */
-  --u9-home-margin-top: 115px;
-  --u9-home-margin-right: 0px;
-  --u9-home-margin-bottom: 0px;
-  --u9-home-margin-left: 0px;
-
   position: relative;
-  width: auto;
+  width: 100%;
   min-height: calc(100vh - 115px);
   box-sizing: border-box;
-
-  margin:
-    var(--u9-home-margin-top)
-    var(--u9-home-margin-right)
-    var(--u9-home-margin-bottom)
-    var(--u9-home-margin-left);
-
-  background-color: #eff1f2;
+  margin-top: 115px;
+  background-color: #f575c8;
 
   transition:
     margin-top 0.35s ease,
@@ -33,8 +21,7 @@
 ========================= */
 
 #U9-page-home.home-toolbar-collapsed {
-  --u9-home-margin-top: 60px;
-
+  margin-top: 60px;
   min-height: calc(100vh - 60px);
 }
 
@@ -44,10 +31,13 @@
 
 @media (max-width: 480px) {
   #U9-page-home {
+    width: 100%;
     min-height: calc(100vh - 115px);
+    margin-top: 115px;
   }
 
   #U9-page-home.home-toolbar-collapsed {
+    margin-top: 60px;
     min-height: calc(100vh - 60px);
   }
 }
