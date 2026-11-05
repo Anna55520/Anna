@@ -54,6 +54,57 @@
 
 
   /* =========================
+     BANNER ERROR SVG
+  ========================= */
+
+  const BANNER_ERROR_SVG = `
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 120 120"
+  width="120"
+  height="120"
+  fill="none"
+>
+  <circle
+    cx="60"
+    cy="60"
+    r="43"
+    stroke="#D1D5DB"
+    stroke-width="5"
+  />
+
+  <path
+    d="M60 35V65"
+    stroke="#9CA3AF"
+    stroke-width="6"
+    stroke-linecap="round"
+  />
+
+  <circle
+    cx="60"
+    cy="81"
+    r="3.5"
+    fill="#9CA3AF"
+  />
+
+  <path
+    d="M91 91L105 105"
+    stroke="#EF4444"
+    stroke-width="6"
+    stroke-linecap="round"
+  />
+
+  <path
+    d="M105 91L91 105"
+    stroke="#EF4444"
+    stroke-width="6"
+    stroke-linecap="round"
+  />
+</svg>
+`;
+
+
+  /* =========================
      BANNER STATE
   ========================= */
 
@@ -62,6 +113,8 @@
   let bannerImage = null;
 
   let bannerNextImage = null;
+
+  let bannerStatus = null;
 
   let bannerTimer = null;
 
@@ -109,6 +162,54 @@
       img.src = url;
 
     });
+
+  }
+
+
+  /* =========================
+     BANNER STATUS
+  ========================= */
+
+  function showBannerLoading() {
+
+    if (!bannerStatus) {
+      return;
+    }
+
+    bannerStatus.innerHTML = `
+      <img
+        src="/SSVG/logo/loading.svg"
+        alt="Loading"
+        draggable="false"
+      >
+    `;
+
+    bannerStatus.style.display = "flex";
+
+  }
+
+
+  function showBannerError() {
+
+    if (!bannerStatus) {
+      return;
+    }
+
+    bannerStatus.innerHTML =
+      BANNER_ERROR_SVG;
+
+    bannerStatus.style.display = "flex";
+
+  }
+
+
+  function hideBannerStatus() {
+
+    if (!bannerStatus) {
+      return;
+    }
+
+    bannerStatus.style.display = "none";
 
   }
 
@@ -169,6 +270,18 @@
       false;
 
 
+    /* STATUS ELEMENT */
+
+    bannerStatus =
+      document.createElement("div");
+
+    bannerStatus.id =
+      "U9-home-banner-status";
+
+    bannerStatus.style.display =
+      "none";
+
+
     /* APPEND IMAGES */
 
     bannerContainer.appendChild(
@@ -177,6 +290,10 @@
 
     bannerContainer.appendChild(
       bannerNextImage
+    );
+
+    bannerContainer.appendChild(
+      bannerStatus
     );
 
 
@@ -232,8 +349,17 @@
     const loadToken =
       ++bannerLoadToken;
 
+
+    /* SHOW LOADING */
+
+    showBannerLoading();
+
+
     const preload =
       new Image();
+
+
+    /* IMAGE LOAD SUCCESS */
 
     preload.onload = function () {
 
@@ -252,7 +378,14 @@
 
       isSliding = false;
 
+      /* HIDE LOADING */
+
+      hideBannerStatus();
+
     };
+
+
+    /* IMAGE LOAD FAILED */
 
     preload.onerror = function () {
 
@@ -265,7 +398,12 @@
         imageUrl
       );
 
+      /* SHOW ERROR SVG */
+
+      showBannerError();
+
     };
+
 
     preload.src = imageUrl;
 
@@ -393,6 +531,8 @@
 
     };
 
+
+    /* NEXT IMAGE LOAD FAILED */
 
     preload.onerror = function () {
 
