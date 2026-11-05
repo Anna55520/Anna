@@ -1,248 +1,276 @@
 
-/* =========================
-   HOME PAGE
-========================= */
+/* =================================================
+   U9 HOME PAGE
+================================================= */
 
 #U9-page-home {
   position: relative;
   display: flow-root;
-
   width: 100%;
-
   min-height: calc(100vh - 115px);
-
-  box-sizing: border-box;
-
   margin-top: 115px;
-
-  /* TOP SPACING */
   padding-top: 10px;
-
-  background-color: #eef2f4;
-
+  box-sizing: border-box;
+  background: #eef2f4;
   transition:
-    margin-top 0.35s ease,
-    min-height 0.35s ease;
+    margin-top 0.3s ease,
+    min-height 0.3s ease;
+}
+
+#U9-page-home-content {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 
-/* =========================
+/* =================================================
    HOME BANNER
-========================= */
+================================================= */
 
 #U9-home-banner {
   position: relative;
-
   display: block;
-
   width: calc(100% - 32px);
-
   max-width: 1200px;
-
-  /* TOP SPACING */
-  margin: 0 auto 24px !important;
-
+  aspect-ratio: 24 / 5;
+  margin: 0 auto 16px;
   overflow: hidden;
-
-  border-radius: 12px;
-
-  background: transparent;
-
   box-sizing: border-box;
+  border-radius: 12px;
+  background: #e5e7eb;
 }
 
-
-/* =========================
-   HOME BANNER IMAGES
-========================= */
+/* Current and next banner images */
 
 #U9-home-banner-image,
 #U9-home-banner-next {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: block;
-
   width: 100%;
-
-  height: auto;
-
-  max-height: 420px;
-
-  object-fit: contain;
-
-  flex-shrink: 0;
-
+  height: 100%;
+  max-height: none;
+  object-fit: cover;
+  object-position: center;
   user-select: none;
-
   -webkit-user-drag: none;
+  will-change: transform;
 }
 
-
-/* =========================
-   CURRENT IMAGE
-========================= */
+/* Current image */
 
 #U9-home-banner-image {
-  position: relative;
-
   z-index: 1;
-
+  visibility: hidden;
   transform: translateX(0);
 }
 
-
-/* =========================
-   NEXT IMAGE
-========================= */
+/* Next image */
 
 #U9-home-banner-next {
-  position: absolute;
-
-  top: 0;
-
-  left: 0;
-
   z-index: 2;
-
+  visibility: hidden;
   transform: translateX(100%);
 }
 
-
-/* =========================
-   BANNER STATUS
-   LOADING / ERROR
-========================= */
+/* Loading / Error status */
 
 #U9-home-banner-status {
   position: absolute;
-
   inset: 0;
-
   z-index: 10;
-
   display: none;
-
   align-items: center;
-
   justify-content: center;
-
-  background: transparent;
-
-  pointer-events: none;
-
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
+  background: #e5e7eb;
 }
-
-
-/* =========================
-   LOADING SVG
-========================= */
 
 #U9-home-banner-status img {
   display: block;
-
-  width: 80px;
-
-  height: 80px;
-
+  width: 64px;
+  height: 64px;
+  max-width: 20%;
+  max-height: 40%;
   object-fit: contain;
-
-  user-select: none;
-
-  -webkit-user-drag: none;
 }
-
-
-/* =========================
-   ERROR SVG
-========================= */
 
 #U9-home-banner-status svg {
   display: block;
-
-  width: 100px;
-
-  height: 100px;
-
-  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  max-width: 30%;
+  max-height: 60%;
 }
 
 
-/* =========================
+/* =================================================
+   HOME ANNOUNCEMENT
+================================================= */
+
+#U9-home-announcement {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: calc(100% - 32px);
+  max-width: 1200px;
+  height: 42px;
+  margin: 0 auto 20px;
+  overflow: hidden;
+  box-sizing: border-box;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+}
+
+/* Fixed speaker area */
+
+#U9-home-announcement-speaker {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex: 0 0 46px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+/* Speaker icon */
+
+#U9-home-announcement-speaker-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Text viewport */
+
+#U9-home-announcement-viewport {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* Moving track */
+
+#U9-home-announcement-track {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  width: max-content;
+  min-width: 100%;
+  height: 100%;
+  white-space: nowrap;
+  will-change: transform;
+  animation: U9-home-announcement-scroll 12s linear infinite;
+}
+
+/* Announcement text */
+
+#U9-home-announcement-text {
+  display: inline-block;
+  padding-right: 24px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/*
+  0%   : Text starts outside the right edge.
+  75%  : Text has moved completely outside the left edge.
+  75-100%: Wait for 3 seconds.
+*/
+
+@keyframes U9-home-announcement-scroll {
+  0% {
+    transform: translateX(100%);
+  }
+
+  75% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+
+/* =================================================
+   REDUCED MOTION
+================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  #U9-home-announcement-track {
+    animation: none;
+    transform: none;
+  }
+}
+
+
+/* =================================================
    TOOLBAR COLLAPSED
-========================= */
+================================================= */
 
-#U9-page-home.home-toolbar-collapsed {
+body.U9-toolbar-collapsed #U9-page-home {
   margin-top: 60px;
-
   min-height: calc(100vh - 60px);
 }
 
 
-/* =========================
-   TABLET & MOBILE
-========================= */
+/* =================================================
+   MOBILE
+================================================= */
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
 
   #U9-page-home {
-    padding-top: 10px;
+    min-height: calc(100vh - 115px);
   }
 
   #U9-home-banner {
-    width: calc(100% - 28px);
-
-    max-width: none;
-
-    margin: 0 auto 16px !important;
-
-    border-radius: 10px;
+    aspect-ratio: 12 / 5;
+    margin-bottom: 12px;
+    border-radius: 8px;
   }
 
-  #U9-home-banner-image,
-  #U9-home-banner-next {
-    max-height: none;
+  #U9-home-announcement {
+    height: 38px;
+    margin-bottom: 16px;
+    border-radius: 7px;
   }
 
-}
-
-
-/* =========================
-   MOBILE HOME PAGE
-========================= */
-
-@media (max-width: 480px) {
-
-  #U9-page-home {
-    width: 100%;
-
-    min-height: calc(100vh - 115px);
-
-    margin-top: 115px;
-
-    padding-top: 15px;
+  #U9-home-announcement-speaker {
+    flex-basis: 40px;
   }
 
-  #U9-page-home.home-toolbar-collapsed {
-    margin-top: 60px;
+  #U9-home-announcement-speaker-icon {
+    width: 20px;
+    height: 20px;
+  }
 
+  #U9-home-announcement-text {
+    font-size: 13px;
+  }
+
+  body.U9-toolbar-collapsed #U9-page-home {
     min-height: calc(100vh - 60px);
-  }
-
-}
-
-
-/* =========================
-   REDUCED MOTION
-========================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-  #U9-page-home {
-    transition: none;
-  }
-
-  #U9-home-banner-image,
-  #U9-home-banner-next {
-    transition: none !important;
   }
 
 }
