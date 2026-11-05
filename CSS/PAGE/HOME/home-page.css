@@ -42,14 +42,11 @@
   /* TOP SPACING */
   margin: 0 auto 24px !important;
 
-  /* MINIMUM HEIGHT */
-  min-height: 240px;
-
   overflow: hidden;
 
   border-radius: 12px;
 
-  background: #eef2f4;
+  background: transparent;
 
   box-sizing: border-box;
 }
@@ -127,7 +124,7 @@
 
   justify-content: center;
 
-  background: #eef2f4;
+  background: transparent;
 
   pointer-events: none;
 
@@ -145,10 +142,6 @@
   width: 80px;
 
   height: 80px;
-
-  max-width: 100%;
-
-  max-height: 100%;
 
   object-fit: contain;
 
@@ -168,10 +161,6 @@
   width: 100px;
 
   height: 100px;
-
-  max-width: 100%;
-
-  max-height: 100%;
 
   flex-shrink: 0;
 }
@@ -203,8 +192,6 @@
 
     max-width: none;
 
-    min-height: 180px;
-
     margin: 0 auto 16px !important;
 
     border-radius: 10px;
@@ -232,10 +219,6 @@
     margin-top: 115px;
 
     padding-top: 15px;
-  }
-
-  #U9-home-banner {
-    min-height: 180px;
   }
 
   #U9-page-home.home-toolbar-collapsed {
