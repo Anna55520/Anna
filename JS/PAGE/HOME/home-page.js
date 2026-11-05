@@ -7,7 +7,6 @@
 
   "use strict";
 
-
   /* =========================
      ELEMENTS
   ========================= */
@@ -29,8 +28,7 @@
 
 
   /* =========================
-     HOME BANNER CONFIG
-     STORE 2 PROXY
+     CONFIG
   ========================= */
 
   const HOME_BANNER_CONFIG = {
@@ -57,51 +55,53 @@
 
 
   /* =========================
+     ANNOUNCEMENT CONFIG
+  ========================= */
+
+  const HOME_ANNOUNCEMENT_CONFIG = {
+
+    icon: "/SSVG/logo/speaker.svg",
+
+    messages: [
+      "Unine 最新公告！欢迎来到 Unine。",
+      "欢迎浏览 Unine 最新商品与活动。"
+    ],
+
+    restartDelay: 3000
+
+  };
+
+
+  /* =========================
      BANNER ERROR SVG
   ========================= */
 
   const BANNER_ERROR_SVG = `
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 120 120"
-      width="120"
-      height="120"
+      viewBox="0 0 100 100"
       fill="none"
     >
       <circle
-        cx="60"
-        cy="60"
-        r="43"
-        stroke="#D1D5DB"
-        stroke-width="5"
+        cx="50"
+        cy="50"
+        r="38"
+        stroke="#EF4444"
+        stroke-width="6"
       />
 
       <path
-        d="M60 35V65"
-        stroke="#9CA3AF"
-        stroke-width="6"
+        d="M50 28V55"
+        stroke="#EF4444"
+        stroke-width="7"
         stroke-linecap="round"
       />
 
       <circle
-        cx="60"
-        cy="81"
-        r="3.5"
-        fill="#9CA3AF"
-      />
-
-      <path
-        d="M91 91L105 105"
-        stroke="#EF4444"
-        stroke-width="6"
-        stroke-linecap="round"
-      />
-
-      <path
-        d="M105 91L91 105"
-        stroke="#EF4444"
-        stroke-width="6"
-        stroke-linecap="round"
+        cx="50"
+        cy="70"
+        r="4"
+        fill="#EF4444"
       />
     </svg>
   `;
@@ -133,11 +133,32 @@
 
   let bannerLoadToken = 0;
 
-  let isSliding = false;
+  let bannerIsSliding = false;
 
-  let isLoading = false;
+  let bannerIsLoading = false;
 
   let bannerHasLoaded = false;
+
+
+  /* =========================
+     ANNOUNCEMENT STATE
+  ========================= */
+
+  let announcementContainer = null;
+
+  let announcementTrack = null;
+
+  let announcementText = null;
+
+  let announcementIndex = 0;
+
+  let announcementTimer = null;
+
+  let announcementResizeTimer = null;
+
+  let announcementInitialized = false;
+
+  let announcementAnimationToken = 0;
 
 
   /* =========================
@@ -146,11 +167,12 @@
 
   function getHomeBannerImages() {
 
-    return window.innerWidth <=
-      HOME_BANNER_CONFIG.breakpoint
+    const isMobile =
+      window.innerWidth <=
+      HOME_BANNER_CONFIG.breakpoint;
 
+    return isMobile
       ? HOME_BANNER_CONFIG.mobile
-
       : HOME_BANNER_CONFIG.desktop;
 
   }
@@ -187,53 +209,52 @@
 
 
   /* =========================
-     BANNER STATUS
+     BANNER LOADING
   ========================= */
 
   function showBannerLoading() {
 
-    if (!bannerStatus) {
-      return;
-    }
+    if (!bannerStatus) return;
 
-    // Loading 和广告图片不能同时显示
     hideBannerImages();
+
+    bannerStatus.style.display = "flex";
 
     bannerStatus.innerHTML = `
       <img
         src="/SSVG/logo/loading.svg"
         alt="Loading"
-        draggable="false"
       >
     `;
-
-    bannerStatus.style.display = "flex";
 
   }
 
 
+  /* =========================
+     BANNER ERROR
+  ========================= */
+
   function showBannerError() {
 
-    if (!bannerStatus) {
-      return;
-    }
+    if (!bannerStatus) return;
 
-    // Error 和广告图片不能同时显示
     hideBannerImages();
+
+    bannerStatus.style.display = "flex";
 
     bannerStatus.innerHTML =
       BANNER_ERROR_SVG;
 
-    bannerStatus.style.display = "flex";
-
   }
 
 
+  /* =========================
+     HIDE BANNER STATUS
+  ========================= */
+
   function hideBannerStatus() {
 
-    if (!bannerStatus) {
-      return;
-    }
+    if (!bannerStatus) return;
 
     bannerStatus.style.display = "none";
 
@@ -243,14 +264,12 @@
 
 
   /* =========================
-     CREATE BANNER ELEMENTS
+     CREATE HOME BANNER
   ========================= */
 
   function createHomeBanner() {
 
-    if (!homePage || bannerInitialized) {
-      return;
-    }
+    if (!homePage || bannerContainer) return;
 
     bannerContainer =
       document.createElement("div");
@@ -259,31 +278,16 @@
       "U9-home-banner";
 
 
-    /* CURRENT IMAGE */
-
     bannerImage =
       document.createElement("img");
 
     bannerImage.id =
       "U9-home-banner-image";
 
-    bannerImage.alt =
-      "U9 Banner";
+    bannerImage.alt = "Unine Banner";
 
-    bannerImage.loading =
-      "eager";
+    bannerImage.draggable = false;
 
-    bannerImage.decoding =
-      "async";
-
-    bannerImage.draggable =
-      false;
-
-    bannerImage.style.visibility =
-      "hidden";
-
-
-    /* NEXT IMAGE */
 
     bannerNextImage =
       document.createElement("img");
@@ -291,17 +295,10 @@
     bannerNextImage.id =
       "U9-home-banner-next";
 
-    bannerNextImage.alt =
-      "U9 Banner";
+    bannerNextImage.alt = "";
 
-    bannerNextImage.draggable =
-      false;
+    bannerNextImage.draggable = false;
 
-    bannerNextImage.style.visibility =
-      "hidden";
-
-
-    /* STATUS ELEMENT */
 
     bannerStatus =
       document.createElement("div");
@@ -309,11 +306,6 @@
     bannerStatus.id =
       "U9-home-banner-status";
 
-    bannerStatus.style.display =
-      "none";
-
-
-    /* APPEND ELEMENTS */
 
     bannerContainer.appendChild(
       bannerImage
@@ -328,20 +320,23 @@
     );
 
 
-    /* INSERT INTO HOME PAGE */
+    bannerImage.style.visibility =
+      "hidden";
+
+    bannerNextImage.style.visibility =
+      "hidden";
+
 
     homePage.insertBefore(
       bannerContainer,
       homePage.firstChild
     );
 
-    bannerInitialized = true;
-
   }
 
 
   /* =========================
-     RESET SLIDE POSITION
+     RESET BANNER POSITION
   ========================= */
 
   function resetBannerPosition() {
@@ -352,13 +347,15 @@
 
     bannerImage.style.transition = "none";
 
+    bannerNextImage.style.transition = "none";
+
     bannerImage.style.transform =
       "translateX(0)";
 
-    bannerNextImage.style.transition = "none";
-
     bannerNextImage.style.transform =
       "translateX(100%)";
+
+    void bannerImage.offsetWidth;
 
   }
 
@@ -369,478 +366,704 @@
 
   function cancelBannerAnimation() {
 
-    clearTimeout(bannerSlideTimer);
+    bannerIsSliding = false;
 
-    bannerSlideTimer = null;
+    if (bannerSlideTimer) {
 
-    isSliding = false;
+      clearTimeout(
+        bannerSlideTimer
+      );
+
+      bannerSlideTimer = null;
+
+    }
 
     resetBannerPosition();
-
-    if (bannerNextImage) {
-      bannerNextImage.removeAttribute("src");
-      bannerNextImage.style.visibility = "hidden";
-    }
 
   }
 
 
   /* =========================
-     LOAD FIRST BANNER IMAGE
+     LOAD BANNER IMAGE
   ========================= */
 
-  function loadHomeBannerImage(imageUrl) {
+  function loadHomeBannerImage(
+    imageUrl
+  ) {
 
-    if (
-      !bannerImage ||
-      !bannerNextImage ||
-      !imageUrl
-    ) {
-      return;
-    }
-
-    // 使之前尚未完成的请求失效
-    const loadToken =
+    const currentToken =
       ++bannerLoadToken;
 
-    isLoading = true;
-
-    isSliding = false;
-
-    bannerHasLoaded = false;
-
-    clearTimeout(bannerSlideTimer);
-
-    bannerSlideTimer = null;
-
-    resetBannerPosition();
-
-    bannerNextImage.removeAttribute("src");
+    bannerIsLoading = true;
 
     showBannerLoading();
 
-
-    const preload =
+    const preloadImage =
       new Image();
 
-
-    /* IMAGE LOAD SUCCESS */
-
-    preload.onload = function () {
+    preloadImage.onload = function () {
 
       if (
-        loadToken !== bannerLoadToken ||
-        !bannerImage
+        currentToken !==
+        bannerLoadToken
       ) {
         return;
       }
 
-      bannerImage.src = imageUrl;
+      bannerImage.src =
+        imageUrl;
 
-      bannerNextImage.removeAttribute("src");
+      bannerImage.style.visibility =
+        "visible";
 
-      resetBannerPosition();
-
-      bannerIndex =
-        Math.max(0, bannerImages.indexOf(imageUrl));
-
-      isLoading = false;
-
-      isSliding = false;
+      bannerNextImage.style.visibility =
+        "visible";
 
       bannerHasLoaded = true;
 
-      // 先显示图片，再关闭状态层
-      showBannerImages();
+      bannerIsLoading = false;
+
+      cancelBannerAnimation();
 
       hideBannerStatus();
 
     };
 
 
-    /* IMAGE LOAD FAILED */
+    preloadImage.onerror = function () {
 
-    preload.onerror = function () {
-
-      if (loadToken !== bannerLoadToken) {
+      if (
+        currentToken !==
+        bannerLoadToken
+      ) {
         return;
       }
 
-      console.warn(
-        "[U9 HOME] Banner load failed:",
-        imageUrl
-      );
-
-      isLoading = false;
-
-      isSliding = false;
+      bannerIsLoading = false;
 
       bannerHasLoaded = false;
-
-      cancelBannerAnimation();
 
       showBannerError();
 
     };
 
 
-    // 最后设置 src，确保事件监听已经绑定
-    preload.src = imageUrl;
+    preloadImage.src =
+      imageUrl;
 
   }
 
 
   /* =========================
      SWITCH BANNER
-     RIGHT TO LEFT
   ========================= */
 
   function switchHomeBanner() {
 
     if (
+      !bannerContainer ||
       !bannerImage ||
-      !bannerNextImage ||
-      !bannerImages.length ||
-      isLoading ||
-      isSliding
+      !bannerNextImage
     ) {
       return;
     }
 
-
-    /*
-      如果当前图片尚未成功加载，
-      定时器负责重新尝试当前图片。
-    */
-
-    if (!bannerHasLoaded) {
-
-      loadHomeBannerImage(
-        bannerImages[bannerIndex] ||
-        bannerImages[0]
-      );
-
-      return;
-
-    }
-
-
-    const nextIndex =
-      (bannerIndex + 1) % bannerImages.length;
-
-    const nextUrl =
-      bannerImages[nextIndex];
-
-
-    const loadToken =
-      ++bannerLoadToken;
-
-    isLoading = true;
-
-
-    const preload =
-      new Image();
-
-
-    /* =========================
-       NEXT IMAGE LOAD SUCCESS
-    ========================= */
-
-    preload.onload = function () {
-
-      if (
-        loadToken !== bannerLoadToken ||
-        !bannerImage ||
-        !bannerNextImage
-      ) {
-        return;
-      }
-
-      isLoading = false;
-
-
-      /*
-        如果当前处于 Error 状态，
-        不执行滑动动画，直接恢复图片。
-      */
-
-      if (
-        !bannerHasLoaded ||
-        bannerImage.style.visibility === "hidden"
-      ) {
-
-        bannerImage.src = nextUrl;
-
-        bannerIndex = nextIndex;
-
-        bannerHasLoaded = true;
-
-        resetBannerPosition();
-
-        bannerNextImage.removeAttribute("src");
-
-        showBannerImages();
-
-        hideBannerStatus();
-
-        return;
-
-      }
-
-
-      /* START SLIDE */
-
-      isSliding = true;
-
-      bannerNextImage.src = nextUrl;
-
-      bannerNextImage.style.visibility =
-        "visible";
-
-      bannerImage.style.visibility =
-        "visible";
-
-      bannerNextImage.style.transition = "none";
-
-      bannerNextImage.style.transform =
-        "translateX(100%)";
-
-      bannerImage.style.transition = "none";
-
-      bannerImage.style.transform =
-        "translateX(0)";
-
-
-      /* FORCE REFLOW */
-
-      bannerNextImage.offsetWidth;
-
-
-      /* START ANIMATION */
-
-      requestAnimationFrame(function () {
-
-        if (
-          loadToken !== bannerLoadToken ||
-          !isSliding
-        ) {
-          return;
-        }
-
-        const duration =
-          HOME_BANNER_CONFIG.slideDuration;
-
-        bannerImage.style.transition =
-          `transform ${duration}ms ease`;
-
-        bannerNextImage.style.transition =
-          `transform ${duration}ms ease`;
-
-        bannerImage.style.transform =
-          "translateX(-100%)";
-
-        bannerNextImage.style.transform =
-          "translateX(0)";
-
-      });
-
-
-      /* FINISH SLIDE */
-
-      clearTimeout(bannerSlideTimer);
-
-      bannerSlideTimer = setTimeout(function () {
-
-        if (
-          loadToken !== bannerLoadToken ||
-          !bannerImage ||
-          !bannerNextImage
-        ) {
-          return;
-        }
-
-        // 更新当前图片
-        bannerImage.src = nextUrl;
-
-        bannerIndex = nextIndex;
-
-        bannerHasLoaded = true;
-
-        // 重置位置
-        resetBannerPosition();
-
-        bannerNextImage.removeAttribute("src");
-
-        bannerNextImage.style.visibility =
-          "hidden";
-
-        bannerImage.style.visibility =
-          "visible";
-
-        isSliding = false;
-
-        hideBannerStatus();
-
-      }, HOME_BANNER_CONFIG.slideDuration + 30);
-
-    };
-
-
-    /* =========================
-       NEXT IMAGE LOAD FAILED
-    ========================= */
-
-    preload.onerror = function () {
-
-      if (loadToken !== bannerLoadToken) {
-        return;
-      }
-
-      console.warn(
-        "[U9 HOME] Banner load failed:",
-        nextUrl
-      );
-
-      isLoading = false;
-
-      isSliding = false;
-
-      bannerHasLoaded = false;
-
-      cancelBannerAnimation();
-
-      // 失败时只显示 Error，不保留旧广告图片
-      showBannerError();
-
-    };
-
-
-    // 最后设置 src
-    preload.src = nextUrl;
-
-  }
-
-
-  /* =========================
-     START BANNER
-  ========================= */
-
-  function startHomeBanner() {
-
-    if (!homePage) {
+    if (
+      bannerIsLoading ||
+      bannerIsSliding
+    ) {
       return;
     }
-
-    createHomeBanner();
-
-    bannerImages =
-      getHomeBannerImages();
 
     if (!bannerImages.length) {
       return;
     }
 
 
-    /* RESET STATE */
-
-    bannerIndex = 0;
-
-    isSliding = false;
-
-    isLoading = false;
-
-    bannerHasLoaded = false;
+    const nextIndex =
+      (
+        bannerIndex + 1
+      ) %
+      bannerImages.length;
 
 
-    /* LOAD FIRST IMAGE */
-
-    loadHomeBannerImage(
-      bannerImages[0]
-    );
+    const nextUrl =
+      bannerImages[nextIndex];
 
 
-    /* CLEAR OLD TIMER */
+    bannerIsLoading = true;
+
+
+    const preloadImage =
+      new Image();
+
+
+    preloadImage.onload = function () {
+
+      bannerIsLoading = false;
+
+
+      if (!bannerHasLoaded) {
+
+        bannerImage.src =
+          nextUrl;
+
+        bannerIndex =
+          nextIndex;
+
+        bannerHasLoaded = true;
+
+        showBannerImages();
+
+        hideBannerStatus();
+
+        resetBannerPosition();
+
+        return;
+
+      }
+
+
+      bannerNextImage.src =
+        nextUrl;
+
+
+      bannerIsSliding = true;
+
+
+      bannerImage.style.transition =
+        `transform ${
+          HOME_BANNER_CONFIG.slideDuration
+        }ms ease`;
+
+
+      bannerNextImage.style.transition =
+        `transform ${
+          HOME_BANNER_CONFIG.slideDuration
+        }ms ease`;
+
+
+      bannerImage.style.transform =
+        "translateX(-100%)";
+
+
+      bannerNextImage.style.transform =
+        "translateX(0)";
+
+
+      bannerSlideTimer =
+        setTimeout(function () {
+
+          bannerImage.src =
+            nextUrl;
+
+          bannerIndex =
+            nextIndex;
+
+          bannerIsSliding = false;
+
+          bannerSlideTimer = null;
+
+          resetBannerPosition();
+
+        },
+        HOME_BANNER_CONFIG.slideDuration
+      );
+
+    };
+
+
+    preloadImage.onerror =
+      function () {
+
+        bannerIsLoading = false;
+
+        bannerHasLoaded = false;
+
+        showBannerError();
+
+      };
+
+
+    preloadImage.src =
+      nextUrl;
+
+  }
+
+
+  /* =========================
+     START BANNER TIMER
+  ========================= */
+
+  function startHomeBanner() {
 
     if (bannerTimer) {
 
-      clearInterval(bannerTimer);
+      clearInterval(
+        bannerTimer
+      );
 
       bannerTimer = null;
 
     }
 
 
-    /* AUTO SWITCH */
+    bannerTimer =
+      setInterval(
+        switchHomeBanner,
+        HOME_BANNER_CONFIG.interval
+      );
 
-    bannerTimer = setInterval(
+  }
 
-      switchHomeBanner,
 
-      HOME_BANNER_CONFIG.interval
+  /* =========================
+     BANNER RESIZE
+  ========================= */
 
+  function handleHomeBannerResize() {
+
+    if (bannerResizeTimer) {
+
+      clearTimeout(
+        bannerResizeTimer
+      );
+
+    }
+
+
+    bannerResizeTimer =
+      setTimeout(function () {
+
+        const newImages =
+          getHomeBannerImages();
+
+
+        if (
+          JSON.stringify(newImages) ===
+          JSON.stringify(bannerImages)
+        ) {
+          return;
+        }
+
+
+        bannerImages =
+          newImages;
+
+
+        bannerIndex = 0;
+
+        bannerLoadToken++;
+
+        bannerIsLoading = false;
+
+        bannerHasLoaded = false;
+
+
+        cancelBannerAnimation();
+
+
+        loadHomeBannerImage(
+          bannerImages[0]
+        );
+
+      }, 200);
+
+  }
+
+
+  /* =========================
+     INITIALIZE BANNER
+  ========================= */
+
+  function initializeHomeBanner() {
+
+    if (
+      bannerInitialized ||
+      !homePage
+    ) {
+      return;
+    }
+
+
+    bannerInitialized = true;
+
+
+    createHomeBanner();
+
+
+    bannerImages =
+      getHomeBannerImages();
+
+
+    if (!bannerImages.length) {
+
+      showBannerError();
+
+      return;
+
+    }
+
+
+    loadHomeBannerImage(
+      bannerImages[0]
+    );
+
+
+    startHomeBanner();
+
+
+    window.addEventListener(
+      "resize",
+      handleHomeBannerResize
     );
 
   }
 
 
   /* =========================
-     RESPONSIVE BANNER
+     CREATE ANNOUNCEMENT
   ========================= */
 
-  function handleHomeBannerResize() {
+  function createHomeAnnouncement() {
 
-    clearTimeout(bannerResizeTimer);
+    if (
+      !homePage ||
+      announcementContainer
+    ) {
+      return;
+    }
 
-    bannerResizeTimer = setTimeout(function () {
 
-      const newImages =
-        getHomeBannerImages();
+    announcementContainer =
+      document.createElement("div");
+
+    announcementContainer.id =
+      "U9-home-announcement";
 
 
-      // 设备类型没有变化，不重新加载
+    /* ICON */
+
+    const iconContainer =
+      document.createElement("div");
+
+    iconContainer.id =
+      "U9-home-announcement-icon";
+
+
+    const iconImage =
+      document.createElement("img");
+
+    iconImage.src =
+      HOME_ANNOUNCEMENT_CONFIG.icon;
+
+    iconImage.alt =
+      "Announcement";
+
+    iconImage.draggable = false;
+
+
+    iconContainer.appendChild(
+      iconImage
+    );
+
+
+    /* TRACK */
+
+    announcementTrack =
+      document.createElement("div");
+
+    announcementTrack.id =
+      "U9-home-announcement-track";
+
+
+    /* TEXT */
+
+    announcementText =
+      document.createElement("div");
+
+    announcementText.id =
+      "U9-home-announcement-text";
+
+
+    announcementTrack.appendChild(
+      announcementText
+    );
+
+
+    /* APPEND */
+
+    announcementContainer.appendChild(
+      iconContainer
+    );
+
+    announcementContainer.appendChild(
+      announcementTrack
+    );
+
+
+    /* PLACE BELOW BANNER */
+
+    if (bannerContainer) {
+
+      bannerContainer.insertAdjacentElement(
+        "afterend",
+        announcementContainer
+      );
+
+    } else {
+
+      homePage.insertBefore(
+        announcementContainer,
+        homePage.firstChild
+      );
+
+    }
+
+  }
+
+
+  /* =========================
+     STOP ANNOUNCEMENT
+  ========================= */
+
+  function stopHomeAnnouncement() {
+
+    announcementAnimationToken++;
+
+
+    if (announcementTimer) {
+
+      clearTimeout(
+        announcementTimer
+      );
+
+      announcementTimer = null;
+
+    }
+
+
+    if (!announcementText) {
+      return;
+    }
+
+
+    announcementText.style.animation =
+      "none";
+
+    announcementText.style.transform =
+      "translateX(0)";
+
+  }
+
+
+  /* =========================
+     START ANNOUNCEMENT
+  ========================= */
+
+  function startHomeAnnouncement() {
+
+    if (
+      !announcementTrack ||
+      !announcementText
+    ) {
+      return;
+    }
+
+
+    stopHomeAnnouncement();
+
+
+    const messages =
+      HOME_ANNOUNCEMENT_CONFIG.messages;
+
+
+    if (!messages.length) {
+      announcementText.textContent = "";
+      return;
+    }
+
+
+    const currentToken =
+      announcementAnimationToken;
+
+
+    announcementText.textContent =
+      messages[
+        announcementIndex %
+        messages.length
+      ];
+
+
+    announcementText.style.animation =
+      "none";
+
+    announcementText.style.transform =
+      "translateX(0)";
+
+
+    requestAnimationFrame(function () {
+
       if (
-        JSON.stringify(newImages) ===
-        JSON.stringify(bannerImages)
+        currentToken !==
+        announcementAnimationToken
       ) {
         return;
       }
 
 
-      /* CANCEL OLD REQUESTS */
-
-      bannerLoadToken++;
-
-      isLoading = false;
-
-      isSliding = false;
-
-      bannerHasLoaded = false;
-
-      cancelBannerAnimation();
+      const trackWidth =
+        announcementTrack.clientWidth;
 
 
-      /* UPDATE IMAGE LIST */
-
-      bannerImages = newImages;
-
-      bannerIndex = 0;
+      const textWidth =
+        announcementText.scrollWidth;
 
 
-      /* LOAD NEW DEVICE IMAGE */
+      if (
+        trackWidth <= 0 ||
+        textWidth <= 0
+      ) {
+        return;
+      }
 
-      loadHomeBannerImage(
-        bannerImages[0]
+
+      const distance =
+        trackWidth + textWidth;
+
+
+      const duration =
+        Math.max(
+          8,
+          distance / 60
+        );
+
+
+      announcementText.style.setProperty(
+        "--U9-announcement-distance",
+        `${distance}px`
       );
 
-    }, 200);
+
+      announcementText.style.setProperty(
+        "--U9-announcement-duration",
+        `${duration}s`
+      );
+
+
+      announcementText.style.animation =
+        `U9-home-announcement-scroll ${
+          duration
+        }s linear forwards`;
+
+
+      announcementTimer =
+        setTimeout(function () {
+
+          if (
+            currentToken !==
+            announcementAnimationToken
+          ) {
+            return;
+          }
+
+
+          announcementText.style.animation =
+            "none";
+
+
+          announcementText.style.transform =
+            `translateX(${
+              -textWidth
+            }px)`;
+
+
+          announcementTimer =
+            setTimeout(function () {
+
+              if (
+                currentToken !==
+                announcementAnimationToken
+              ) {
+                return;
+              }
+
+
+              announcementIndex =
+                (
+                  announcementIndex + 1
+                ) %
+                messages.length;
+
+
+              startHomeAnnouncement();
+
+            },
+            HOME_ANNOUNCEMENT_CONFIG.restartDelay
+          );
+
+
+        }, duration * 1000);
+
+    });
 
   }
 
 
-  window.addEventListener(
-    "resize",
-    handleHomeBannerResize
-  );
+  /* =========================
+     ANNOUNCEMENT RESIZE
+  ========================= */
+
+  function handleHomeAnnouncementResize() {
+
+    if (announcementResizeTimer) {
+
+      clearTimeout(
+        announcementResizeTimer
+      );
+
+    }
+
+
+    announcementResizeTimer =
+      setTimeout(function () {
+
+        startHomeAnnouncement();
+
+      }, 200);
+
+  }
+
+
+  /* =========================
+     INITIALIZE ANNOUNCEMENT
+  ========================= */
+
+  function initializeHomeAnnouncement() {
+
+    if (
+      announcementInitialized ||
+      !homePage
+    ) {
+      return;
+    }
+
+
+    announcementInitialized = true;
+
+
+    createHomeAnnouncement();
+
+
+    startHomeAnnouncement();
+
+
+    window.addEventListener(
+      "resize",
+      handleHomeAnnouncementResize
+    );
+
+  }
 
 
   /* =========================
@@ -853,23 +1076,29 @@
       return;
     }
 
-    if (shopPage) {
-      shopPage.style.display = "none";
-    }
 
-    if (auctionPage) {
-      auctionPage.style.display = "none";
-    }
+    const pages = [
+      shopPage,
+      auctionPage,
+      test1Page,
+      test2Page
+    ];
 
-    if (test1Page) {
-      test1Page.style.display = "none";
-    }
 
-    if (test2Page) {
-      test2Page.style.display = "none";
-    }
+    pages.forEach(function (page) {
 
-    homePage.style.display = "block";
+      if (page) {
+
+        page.style.display =
+          "none";
+
+      }
+
+    });
+
+
+    homePage.style.display =
+      "block";
 
   }
 
@@ -884,15 +1113,16 @@
       return;
     }
 
-    openHomePage();
 
-    startHomeBanner();
+    initializeHomeBanner();
+
+    initializeHomeAnnouncement();
 
   }
 
 
   /* =========================
-     PUBLIC FUNCTION
+     GLOBAL
   ========================= */
 
   window.openHomePage =
@@ -900,9 +1130,10 @@
 
 
   /* =========================
-     START HOME PAGE
+     START
   ========================= */
 
   initializeHomePage();
+
 
 })();
