@@ -228,7 +228,12 @@
    TOOLBAR COLLAPSED
 ================================================= */
 
-body.U9-toolbar-collapsed #U9-page-home {
+/*
+  container-tool.js adds/removes
+  home-toolbar-collapsed on #U9-page-home.
+*/
+
+#U9-page-home.home-toolbar-collapsed {
   margin-top: 60px;
   min-height: calc(100vh - 60px);
 }
@@ -269,7 +274,7 @@ body.U9-toolbar-collapsed #U9-page-home {
     font-size: 13px;
   }
 
-  body.U9-toolbar-collapsed #U9-page-home {
+  #U9-page-home.home-toolbar-collapsed {
     min-height: calc(100vh - 60px);
   }
 
