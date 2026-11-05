@@ -42,11 +42,14 @@
   /* TOP SPACING */
   margin: 0 auto 24px !important;
 
+  /* MINIMUM HEIGHT */
+  min-height: 240px;
+
   overflow: hidden;
 
   border-radius: 12px;
 
-  background: transparent;
+  background: #eef2f4;
 
   box-sizing: border-box;
 }
@@ -107,6 +110,74 @@
 
 
 /* =========================
+   BANNER STATUS
+   LOADING / ERROR
+========================= */
+
+#U9-home-banner-status {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 10;
+
+  display: none;
+
+  align-items: center;
+
+  justify-content: center;
+
+  background: #eef2f4;
+
+  pointer-events: none;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================
+   LOADING SVG
+========================= */
+
+#U9-home-banner-status img {
+  display: block;
+
+  width: 80px;
+
+  height: 80px;
+
+  max-width: 100%;
+
+  max-height: 100%;
+
+  object-fit: contain;
+
+  user-select: none;
+
+  -webkit-user-drag: none;
+}
+
+
+/* =========================
+   ERROR SVG
+========================= */
+
+#U9-home-banner-status svg {
+  display: block;
+
+  width: 100px;
+
+  height: 100px;
+
+  max-width: 100%;
+
+  max-height: 100%;
+
+  flex-shrink: 0;
+}
+
+
+/* =========================
    TOOLBAR COLLAPSED
 ========================= */
 
@@ -131,6 +202,8 @@
     width: calc(100% - 28px);
 
     max-width: none;
+
+    min-height: 180px;
 
     margin: 0 auto 16px !important;
 
@@ -159,6 +232,10 @@
     margin-top: 115px;
 
     padding-top: 15px;
+  }
+
+  #U9-home-banner {
+    min-height: 180px;
   }
 
   #U9-page-home.home-toolbar-collapsed {
