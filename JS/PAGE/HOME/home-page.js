@@ -1,16 +1,16 @@
 
-/* =========================
-   HOME PAGE
-========================= */
+/* =================================================
+   U9 HOME PAGE
+================================================= */
 
 (function () {
 
   "use strict";
 
 
-  /* =========================
+  /* =================================================
      ELEMENTS
-  ========================= */
+  ================================================= */
 
   const homePage =
     document.getElementById("U9-page-home");
@@ -28,10 +28,10 @@
     document.getElementById("U9-page-test2");
 
 
-  /* =========================
+  /* =================================================
      HOME BANNER CONFIG
      STORE 2 PROXY
-  ========================= */
+  ================================================= */
 
   const HOME_BANNER_CONFIG = {
 
@@ -56,9 +56,9 @@
   };
 
 
-  /* =========================
+  /* =================================================
      BANNER ERROR SVG
-  ========================= */
+  ================================================= */
 
   const BANNER_ERROR_SVG = `
     <svg
@@ -107,9 +107,9 @@
   `;
 
 
-  /* =========================
+  /* =================================================
      BANNER STATE
-  ========================= */
+  ================================================= */
 
   let bannerContainer = null;
 
@@ -140,9 +140,9 @@
   let bannerHasLoaded = false;
 
 
-  /* =========================
+  /* =================================================
      GET BANNER IMAGES
-  ========================= */
+  ================================================= */
 
   function getHomeBannerImages() {
 
@@ -156,9 +156,65 @@
   }
 
 
-  /* =========================
+  /* =================================================
+     GET EXISTING BANNER ELEMENTS
+  ================================================= */
+
+  function createHomeBanner() {
+
+    if (!homePage || bannerInitialized) {
+      return;
+    }
+
+    /*
+      Banner elements are already written in HTML.
+      Do not create duplicate elements here.
+    */
+
+    bannerContainer =
+      document.getElementById("U9-home-banner");
+
+    bannerImage =
+      document.getElementById("U9-home-banner-image");
+
+    bannerNextImage =
+      document.getElementById("U9-home-banner-next");
+
+    bannerStatus =
+      document.getElementById("U9-home-banner-status");
+
+
+    if (
+      !bannerContainer ||
+      !bannerImage ||
+      !bannerNextImage ||
+      !bannerStatus ||
+      !homePage.contains(bannerContainer)
+    ) {
+
+      console.error(
+        "[U9 HOME] Banner HTML elements are missing."
+      );
+
+      return;
+
+    }
+
+
+    bannerImage.style.visibility = "hidden";
+
+    bannerNextImage.style.visibility = "hidden";
+
+    bannerStatus.style.display = "none";
+
+    bannerInitialized = true;
+
+  }
+
+
+  /* =================================================
      BANNER IMAGE VISIBILITY
-  ========================= */
+  ================================================= */
 
   function hideBannerImages() {
 
@@ -186,9 +242,9 @@
   }
 
 
-  /* =========================
+  /* =================================================
      BANNER STATUS
-  ========================= */
+  ================================================= */
 
   function showBannerLoading() {
 
@@ -196,7 +252,6 @@
       return;
     }
 
-    // Loading 和广告图片不能同时显示
     hideBannerImages();
 
     bannerStatus.innerHTML = `
@@ -218,7 +273,6 @@
       return;
     }
 
-    // Error 和广告图片不能同时显示
     hideBannerImages();
 
     bannerStatus.innerHTML =
@@ -242,107 +296,9 @@
   }
 
 
-  /* =========================
-     CREATE BANNER ELEMENTS
-  ========================= */
-
-  function createHomeBanner() {
-
-    if (!homePage || bannerInitialized) {
-      return;
-    }
-
-    bannerContainer =
-      document.createElement("div");
-
-    bannerContainer.id =
-      "U9-home-banner";
-
-
-    /* CURRENT IMAGE */
-
-    bannerImage =
-      document.createElement("img");
-
-    bannerImage.id =
-      "U9-home-banner-image";
-
-    bannerImage.alt =
-      "U9 Banner";
-
-    bannerImage.loading =
-      "eager";
-
-    bannerImage.decoding =
-      "async";
-
-    bannerImage.draggable =
-      false;
-
-    bannerImage.style.visibility =
-      "hidden";
-
-
-    /* NEXT IMAGE */
-
-    bannerNextImage =
-      document.createElement("img");
-
-    bannerNextImage.id =
-      "U9-home-banner-next";
-
-    bannerNextImage.alt =
-      "U9 Banner";
-
-    bannerNextImage.draggable =
-      false;
-
-    bannerNextImage.style.visibility =
-      "hidden";
-
-
-    /* STATUS ELEMENT */
-
-    bannerStatus =
-      document.createElement("div");
-
-    bannerStatus.id =
-      "U9-home-banner-status";
-
-    bannerStatus.style.display =
-      "none";
-
-
-    /* APPEND ELEMENTS */
-
-    bannerContainer.appendChild(
-      bannerImage
-    );
-
-    bannerContainer.appendChild(
-      bannerNextImage
-    );
-
-    bannerContainer.appendChild(
-      bannerStatus
-    );
-
-
-    /* INSERT INTO HOME PAGE */
-
-    homePage.insertBefore(
-      bannerContainer,
-      homePage.firstChild
-    );
-
-    bannerInitialized = true;
-
-  }
-
-
-  /* =========================
+  /* =================================================
      RESET SLIDE POSITION
-  ========================= */
+  ================================================= */
 
   function resetBannerPosition() {
 
@@ -363,9 +319,9 @@
   }
 
 
-  /* =========================
+  /* =================================================
      CANCEL BANNER ANIMATION
-  ========================= */
+  ================================================= */
 
   function cancelBannerAnimation() {
 
@@ -378,16 +334,19 @@
     resetBannerPosition();
 
     if (bannerNextImage) {
+
       bannerNextImage.removeAttribute("src");
+
       bannerNextImage.style.visibility = "hidden";
+
     }
 
   }
 
 
-  /* =========================
+  /* =================================================
      LOAD FIRST BANNER IMAGE
-  ========================= */
+  ================================================= */
 
   function loadHomeBannerImage(imageUrl) {
 
@@ -399,9 +358,12 @@
       return;
     }
 
-    // 使之前尚未完成的请求失效
+
+    // Invalidate previous requests
+
     const loadToken =
       ++bannerLoadToken;
+
 
     isLoading = true;
 
@@ -409,13 +371,16 @@
 
     bannerHasLoaded = false;
 
+
     clearTimeout(bannerSlideTimer);
 
     bannerSlideTimer = null;
 
+
     resetBannerPosition();
 
     bannerNextImage.removeAttribute("src");
+
 
     showBannerLoading();
 
@@ -435,14 +400,18 @@
         return;
       }
 
+
       bannerImage.src = imageUrl;
 
       bannerNextImage.removeAttribute("src");
 
+
       resetBannerPosition();
+
 
       bannerIndex =
         Math.max(0, bannerImages.indexOf(imageUrl));
+
 
       isLoading = false;
 
@@ -450,7 +419,7 @@
 
       bannerHasLoaded = true;
 
-      // 先显示图片，再关闭状态层
+
       showBannerImages();
 
       hideBannerStatus();
@@ -466,16 +435,19 @@
         return;
       }
 
+
       console.warn(
         "[U9 HOME] Banner load failed:",
         imageUrl
       );
+
 
       isLoading = false;
 
       isSliding = false;
 
       bannerHasLoaded = false;
+
 
       cancelBannerAnimation();
 
@@ -484,16 +456,17 @@
     };
 
 
-    // 最后设置 src，确保事件监听已经绑定
+    // Set src after event handlers
+
     preload.src = imageUrl;
 
   }
 
 
-  /* =========================
+  /* =================================================
      SWITCH BANNER
      RIGHT TO LEFT
-  ========================= */
+  ================================================= */
 
   function switchHomeBanner() {
 
@@ -509,8 +482,8 @@
 
 
     /*
-      如果当前图片尚未成功加载，
-      定时器负责重新尝试当前图片。
+      If current image has not loaded,
+      retry loading the current image.
     */
 
     if (!bannerHasLoaded) {
@@ -535,6 +508,7 @@
     const loadToken =
       ++bannerLoadToken;
 
+
     isLoading = true;
 
 
@@ -542,9 +516,7 @@
       new Image();
 
 
-    /* =========================
-       NEXT IMAGE LOAD SUCCESS
-    ========================= */
+    /* NEXT IMAGE LOAD SUCCESS */
 
     preload.onload = function () {
 
@@ -556,12 +528,13 @@
         return;
       }
 
+
       isLoading = false;
 
 
       /*
-        如果当前处于 Error 状态，
-        不执行滑动动画，直接恢复图片。
+        If current image is hidden,
+        restore next image directly.
       */
 
       if (
@@ -575,9 +548,11 @@
 
         bannerHasLoaded = true;
 
+
         resetBannerPosition();
 
         bannerNextImage.removeAttribute("src");
+
 
         showBannerImages();
 
@@ -592,6 +567,7 @@
 
       isSliding = true;
 
+
       bannerNextImage.src = nextUrl;
 
       bannerNextImage.style.visibility =
@@ -600,10 +576,12 @@
       bannerImage.style.visibility =
         "visible";
 
+
       bannerNextImage.style.transition = "none";
 
       bannerNextImage.style.transform =
         "translateX(100%)";
+
 
       bannerImage.style.transition = "none";
 
@@ -627,14 +605,17 @@
           return;
         }
 
+
         const duration =
           HOME_BANNER_CONFIG.slideDuration;
+
 
         bannerImage.style.transition =
           `transform ${duration}ms ease`;
 
         bannerNextImage.style.transition =
           `transform ${duration}ms ease`;
+
 
         bannerImage.style.transform =
           "translateX(-100%)";
@@ -649,6 +630,7 @@
 
       clearTimeout(bannerSlideTimer);
 
+
       bannerSlideTimer = setTimeout(function () {
 
         if (
@@ -659,14 +641,18 @@
           return;
         }
 
-        // 更新当前图片
+
+        // Update current image
+
         bannerImage.src = nextUrl;
 
         bannerIndex = nextIndex;
 
         bannerHasLoaded = true;
 
-        // 重置位置
+
+        // Reset positions
+
         resetBannerPosition();
 
         bannerNextImage.removeAttribute("src");
@@ -677,6 +663,7 @@
         bannerImage.style.visibility =
           "visible";
 
+
         isSliding = false;
 
         hideBannerStatus();
@@ -686,9 +673,7 @@
     };
 
 
-    /* =========================
-       NEXT IMAGE LOAD FAILED
-    ========================= */
+    /* NEXT IMAGE LOAD FAILED */
 
     preload.onerror = function () {
 
@@ -696,10 +681,12 @@
         return;
       }
 
+
       console.warn(
         "[U9 HOME] Banner load failed:",
         nextUrl
       );
+
 
       isLoading = false;
 
@@ -707,23 +694,24 @@
 
       bannerHasLoaded = false;
 
+
       cancelBannerAnimation();
 
-      // 失败时只显示 Error，不保留旧广告图片
       showBannerError();
 
     };
 
 
-    // 最后设置 src
+    // Set src after event handlers
+
     preload.src = nextUrl;
 
   }
 
 
-  /* =========================
+  /* =================================================
      START BANNER
-  ========================= */
+  ================================================= */
 
   function startHomeBanner() {
 
@@ -731,10 +719,18 @@
       return;
     }
 
+
     createHomeBanner();
+
+
+    if (!bannerInitialized) {
+      return;
+    }
+
 
     bannerImages =
       getHomeBannerImages();
+
 
     if (!bannerImages.length) {
       return;
@@ -783,13 +779,14 @@
   }
 
 
-  /* =========================
+  /* =================================================
      RESPONSIVE BANNER
-  ========================= */
+  ================================================= */
 
   function handleHomeBannerResize() {
 
     clearTimeout(bannerResizeTimer);
+
 
     bannerResizeTimer = setTimeout(function () {
 
@@ -797,7 +794,8 @@
         getHomeBannerImages();
 
 
-      // 设备类型没有变化，不重新加载
+      // Device type has not changed
+
       if (
         JSON.stringify(newImages) ===
         JSON.stringify(bannerImages)
@@ -815,6 +813,7 @@
       isSliding = false;
 
       bannerHasLoaded = false;
+
 
       cancelBannerAnimation();
 
@@ -843,15 +842,16 @@
   );
 
 
-  /* =========================
+  /* =================================================
      OPEN HOME PAGE
-  ========================= */
+  ================================================= */
 
   function openHomePage() {
 
     if (!homePage) {
       return;
     }
+
 
     if (shopPage) {
       shopPage.style.display = "none";
@@ -869,20 +869,22 @@
       test2Page.style.display = "none";
     }
 
+
     homePage.style.display = "block";
 
   }
 
 
-  /* =========================
+  /* =================================================
      INITIALIZE HOME PAGE
-  ========================= */
+  ================================================= */
 
   function initializeHomePage() {
 
     if (!homePage) {
       return;
     }
+
 
     openHomePage();
 
@@ -891,18 +893,19 @@
   }
 
 
-  /* =========================
+  /* =================================================
      PUBLIC FUNCTION
-  ========================= */
+  ================================================= */
 
   window.openHomePage =
     openHomePage;
 
 
-  /* =========================
+  /* =================================================
      START HOME PAGE
-  ========================= */
+  ================================================= */
 
   initializeHomePage();
+
 
 })();
