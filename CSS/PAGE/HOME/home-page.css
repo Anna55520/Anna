@@ -16,7 +16,7 @@
   margin-top: 115px;
 
   /* TOP SPACING */
-  padding-top: 15px;
+  padding-top: 10px;
 
   background-color: #eef2f4;
 
@@ -124,7 +124,7 @@
 @media (max-width: 768px) {
 
   #U9-page-home {
-    padding-top: 15px;
+    padding-top: 10px;
   }
 
   #U9-home-banner {
