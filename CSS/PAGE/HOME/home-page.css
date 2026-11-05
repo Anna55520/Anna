@@ -1,3 +1,4 @@
+
 /* =================================================
    U9 HOME PAGE
 ================================================= */
@@ -11,7 +12,6 @@
   padding-top: 10px;
   box-sizing: border-box;
   background: #eef2f4;
-
   transition:
     margin-top 0.3s ease,
     min-height 0.3s ease;
@@ -176,10 +176,7 @@
   height: 100%;
   white-space: nowrap;
   will-change: transform;
-
-  /* Animation controlled by JavaScript */
-  animation: none;
-  transform: translateX(0);
+  animation: U9-home-announcement-scroll 12s linear infinite;
 }
 
 /* Announcement text */
@@ -194,18 +191,36 @@
   white-space: nowrap;
 }
 
+/*
+  0%   : Text starts outside the right edge.
+  75%  : Text has moved completely outside the left edge.
+  75-100%: Wait for 3 seconds.
+*/
+
+@keyframes U9-home-announcement-scroll {
+  0% {
+    transform: translateX(100%);
+  }
+
+  75% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
 
 /* =================================================
    REDUCED MOTION
 ================================================= */
 
 @media (prefers-reduced-motion: reduce) {
-
   #U9-home-announcement-track {
     animation: none;
     transform: none;
   }
-
 }
 
 
@@ -213,15 +228,7 @@
    TOOLBAR COLLAPSED
 ================================================= */
 
-/*
-  When U9-page-container-tool-pages is closed,
-  the Home page moves upward.
-
-  The class home-toolbar-collapsed must be added
-  to the body or an ancestor of #U9-page-home.
-*/
-
-.home-toolbar-collapsed #U9-page-home {
+body.U9-toolbar-collapsed #U9-page-home {
   margin-top: 60px;
   min-height: calc(100vh - 60px);
 }
@@ -237,15 +244,11 @@
     min-height: calc(100vh - 115px);
   }
 
-  /* Mobile Banner: 1200 x 500 ratio */
-
   #U9-home-banner {
     aspect-ratio: 12 / 5;
     margin-bottom: 12px;
     border-radius: 8px;
   }
-
-  /* Mobile Announcement */
 
   #U9-home-announcement {
     height: 38px;
@@ -266,9 +269,7 @@
     font-size: 13px;
   }
 
-  /* Mobile Toolbar Collapsed */
-
-  .home-toolbar-collapsed #U9-page-home {
+  body.U9-toolbar-collapsed #U9-page-home {
     min-height: calc(100vh - 60px);
   }
 
