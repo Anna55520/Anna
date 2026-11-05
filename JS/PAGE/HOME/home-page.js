@@ -5,6 +5,9 @@
 
 (function () {
 
+  "use strict";
+
+
   /* =========================
      ELEMENTS
   ========================= */
@@ -58,50 +61,50 @@
   ========================= */
 
   const BANNER_ERROR_SVG = `
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 120 120"
-  width="120"
-  height="120"
-  fill="none"
->
-  <circle
-    cx="60"
-    cy="60"
-    r="43"
-    stroke="#D1D5DB"
-    stroke-width="5"
-  />
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 120 120"
+      width="120"
+      height="120"
+      fill="none"
+    >
+      <circle
+        cx="60"
+        cy="60"
+        r="43"
+        stroke="#D1D5DB"
+        stroke-width="5"
+      />
 
-  <path
-    d="M60 35V65"
-    stroke="#9CA3AF"
-    stroke-width="6"
-    stroke-linecap="round"
-  />
+      <path
+        d="M60 35V65"
+        stroke="#9CA3AF"
+        stroke-width="6"
+        stroke-linecap="round"
+      />
 
-  <circle
-    cx="60"
-    cy="81"
-    r="3.5"
-    fill="#9CA3AF"
-  />
+      <circle
+        cx="60"
+        cy="81"
+        r="3.5"
+        fill="#9CA3AF"
+      />
 
-  <path
-    d="M91 91L105 105"
-    stroke="#EF4444"
-    stroke-width="6"
-    stroke-linecap="round"
-  />
+      <path
+        d="M91 91L105 105"
+        stroke="#EF4444"
+        stroke-width="6"
+        stroke-linecap="round"
+      />
 
-  <path
-    d="M105 91L91 105"
-    stroke="#EF4444"
-    stroke-width="6"
-    stroke-linecap="round"
-  />
-</svg>
-`;
+      <path
+        d="M105 91L91 105"
+        stroke="#EF4444"
+        stroke-width="6"
+        stroke-linecap="round"
+      />
+    </svg>
+  `;
 
 
   /* =========================
@@ -132,6 +135,10 @@
 
   let isSliding = false;
 
+  let isLoading = false;
+
+  let bannerHasLoaded = false;
+
 
   /* =========================
      GET BANNER IMAGES
@@ -150,18 +157,31 @@
 
 
   /* =========================
-     PRELOAD BANNER IMAGES
+     BANNER IMAGE VISIBILITY
   ========================= */
 
-  function preloadHomeBannerImages(images) {
+  function hideBannerImages() {
 
-    images.forEach(function (url) {
+    if (bannerImage) {
+      bannerImage.style.visibility = "hidden";
+    }
 
-      const img = new Image();
+    if (bannerNextImage) {
+      bannerNextImage.style.visibility = "hidden";
+    }
 
-      img.src = url;
+  }
 
-    });
+
+  function showBannerImages() {
+
+    if (bannerImage) {
+      bannerImage.style.visibility = "visible";
+    }
+
+    if (bannerNextImage) {
+      bannerNextImage.style.visibility = "visible";
+    }
 
   }
 
@@ -175,6 +195,9 @@
     if (!bannerStatus) {
       return;
     }
+
+    // Loading 和广告图片不能同时显示
+    hideBannerImages();
 
     bannerStatus.innerHTML = `
       <img
@@ -195,6 +218,9 @@
       return;
     }
 
+    // Error 和广告图片不能同时显示
+    hideBannerImages();
+
     bannerStatus.innerHTML =
       BANNER_ERROR_SVG;
 
@@ -211,6 +237,8 @@
 
     bannerStatus.style.display = "none";
 
+    bannerStatus.innerHTML = "";
+
   }
 
 
@@ -220,10 +248,7 @@
 
   function createHomeBanner() {
 
-    if (
-      !homePage ||
-      bannerInitialized
-    ) {
+    if (!homePage || bannerInitialized) {
       return;
     }
 
@@ -254,6 +279,9 @@
     bannerImage.draggable =
       false;
 
+    bannerImage.style.visibility =
+      "hidden";
+
 
     /* NEXT IMAGE */
 
@@ -269,6 +297,9 @@
     bannerNextImage.draggable =
       false;
 
+    bannerNextImage.style.visibility =
+      "hidden";
+
 
     /* STATUS ELEMENT */
 
@@ -282,7 +313,7 @@
       "none";
 
 
-    /* APPEND IMAGES */
+    /* APPEND ELEMENTS */
 
     bannerContainer.appendChild(
       bannerImage
@@ -333,6 +364,28 @@
 
 
   /* =========================
+     CANCEL BANNER ANIMATION
+  ========================= */
+
+  function cancelBannerAnimation() {
+
+    clearTimeout(bannerSlideTimer);
+
+    bannerSlideTimer = null;
+
+    isSliding = false;
+
+    resetBannerPosition();
+
+    if (bannerNextImage) {
+      bannerNextImage.removeAttribute("src");
+      bannerNextImage.style.visibility = "hidden";
+    }
+
+  }
+
+
+  /* =========================
      LOAD FIRST BANNER IMAGE
   ========================= */
 
@@ -346,11 +399,23 @@
       return;
     }
 
+    // 使之前尚未完成的请求失效
     const loadToken =
       ++bannerLoadToken;
 
+    isLoading = true;
 
-    /* SHOW LOADING */
+    isSliding = false;
+
+    bannerHasLoaded = false;
+
+    clearTimeout(bannerSlideTimer);
+
+    bannerSlideTimer = null;
+
+    resetBannerPosition();
+
+    bannerNextImage.removeAttribute("src");
 
     showBannerLoading();
 
@@ -376,9 +441,17 @@
 
       resetBannerPosition();
 
+      bannerIndex =
+        Math.max(0, bannerImages.indexOf(imageUrl));
+
+      isLoading = false;
+
       isSliding = false;
 
-      /* HIDE LOADING */
+      bannerHasLoaded = true;
+
+      // 先显示图片，再关闭状态层
+      showBannerImages();
 
       hideBannerStatus();
 
@@ -398,13 +471,20 @@
         imageUrl
       );
 
-      /* SHOW ERROR SVG */
+      isLoading = false;
+
+      isSliding = false;
+
+      bannerHasLoaded = false;
+
+      cancelBannerAnimation();
 
       showBannerError();
 
     };
 
 
+    // 最后设置 src，确保事件监听已经绑定
     preload.src = imageUrl;
 
   }
@@ -420,11 +500,30 @@
     if (
       !bannerImage ||
       !bannerNextImage ||
-      isSliding ||
-      !bannerImages.length
+      !bannerImages.length ||
+      isLoading ||
+      isSliding
     ) {
       return;
     }
+
+
+    /*
+      如果当前图片尚未成功加载，
+      定时器负责重新尝试当前图片。
+    */
+
+    if (!bannerHasLoaded) {
+
+      loadHomeBannerImage(
+        bannerImages[bannerIndex] ||
+        bannerImages[0]
+      );
+
+      return;
+
+    }
+
 
     const nextIndex =
       (bannerIndex + 1) % bannerImages.length;
@@ -432,14 +531,20 @@
     const nextUrl =
       bannerImages[nextIndex];
 
+
     const loadToken =
       ++bannerLoadToken;
+
+    isLoading = true;
+
 
     const preload =
       new Image();
 
 
-    /* PRELOAD NEXT IMAGE */
+    /* =========================
+       NEXT IMAGE LOAD SUCCESS
+    ========================= */
 
     preload.onload = function () {
 
@@ -451,12 +556,49 @@
         return;
       }
 
+      isLoading = false;
+
+
+      /*
+        如果当前处于 Error 状态，
+        不执行滑动动画，直接恢复图片。
+      */
+
+      if (
+        !bannerHasLoaded ||
+        bannerImage.style.visibility === "hidden"
+      ) {
+
+        bannerImage.src = nextUrl;
+
+        bannerIndex = nextIndex;
+
+        bannerHasLoaded = true;
+
+        resetBannerPosition();
+
+        bannerNextImage.removeAttribute("src");
+
+        showBannerImages();
+
+        hideBannerStatus();
+
+        return;
+
+      }
+
+
+      /* START SLIDE */
+
       isSliding = true;
 
       bannerNextImage.src = nextUrl;
 
+      bannerNextImage.style.visibility =
+        "visible";
 
-      /* POSITION NEXT IMAGE ON RIGHT */
+      bannerImage.style.visibility =
+        "visible";
 
       bannerNextImage.style.transition = "none";
 
@@ -474,11 +616,14 @@
       bannerNextImage.offsetWidth;
 
 
-      /* START SLIDE ANIMATION */
+      /* START ANIMATION */
 
       requestAnimationFrame(function () {
 
-        if (loadToken !== bannerLoadToken) {
+        if (
+          loadToken !== bannerLoadToken ||
+          !isSliding
+        ) {
           return;
         }
 
@@ -507,32 +652,43 @@
       bannerSlideTimer = setTimeout(function () {
 
         if (
-          loadToken !== bannerLoadToken
+          loadToken !== bannerLoadToken ||
+          !bannerImage ||
+          !bannerNextImage
         ) {
           return;
         }
 
-        /* UPDATE CURRENT IMAGE */
-
+        // 更新当前图片
         bannerImage.src = nextUrl;
 
         bannerIndex = nextIndex;
 
+        bannerHasLoaded = true;
 
-        /* RESET IMAGE POSITIONS */
-
+        // 重置位置
         resetBannerPosition();
 
         bannerNextImage.removeAttribute("src");
 
+        bannerNextImage.style.visibility =
+          "hidden";
+
+        bannerImage.style.visibility =
+          "visible";
+
         isSliding = false;
+
+        hideBannerStatus();
 
       }, HOME_BANNER_CONFIG.slideDuration + 30);
 
     };
 
 
-    /* NEXT IMAGE LOAD FAILED */
+    /* =========================
+       NEXT IMAGE LOAD FAILED
+    ========================= */
 
     preload.onerror = function () {
 
@@ -545,8 +701,21 @@
         nextUrl
       );
 
+      isLoading = false;
+
+      isSliding = false;
+
+      bannerHasLoaded = false;
+
+      cancelBannerAnimation();
+
+      // 失败时只显示 Error，不保留旧广告图片
+      showBannerError();
+
     };
 
+
+    // 最后设置 src
     preload.src = nextUrl;
 
   }
@@ -572,21 +741,21 @@
     }
 
 
-    /* FIRST IMAGE */
+    /* RESET STATE */
 
     bannerIndex = 0;
 
     isSliding = false;
 
+    isLoading = false;
+
+    bannerHasLoaded = false;
+
+
+    /* LOAD FIRST IMAGE */
+
     loadHomeBannerImage(
-      bannerImages[bannerIndex]
-    );
-
-
-    /* PRELOAD ALL IMAGES */
-
-    preloadHomeBannerImages(
-      bannerImages
+      bannerImages[0]
     );
 
 
@@ -596,10 +765,12 @@
 
       clearInterval(bannerTimer);
 
+      bannerTimer = null;
+
     }
 
 
-    /* AUTO SWITCH EVERY 5 SECONDS */
+    /* AUTO SWITCH */
 
     bannerTimer = setInterval(
 
@@ -618,15 +789,15 @@
 
   function handleHomeBannerResize() {
 
-    clearTimeout(
-      bannerResizeTimer
-    );
+    clearTimeout(bannerResizeTimer);
 
     bannerResizeTimer = setTimeout(function () {
 
       const newImages =
         getHomeBannerImages();
 
+
+      // 设备类型没有变化，不重新加载
       if (
         JSON.stringify(newImages) ===
         JSON.stringify(bannerImages)
@@ -639,9 +810,13 @@
 
       bannerLoadToken++;
 
-      clearTimeout(bannerSlideTimer);
+      isLoading = false;
 
       isSliding = false;
+
+      bannerHasLoaded = false;
+
+      cancelBannerAnimation();
 
 
       /* UPDATE IMAGE LIST */
@@ -651,14 +826,7 @@
       bannerIndex = 0;
 
 
-      /* PRELOAD NEW DEVICE IMAGES */
-
-      preloadHomeBannerImages(
-        bannerImages
-      );
-
-
-      /* SHOW FIRST IMAGE */
+      /* LOAD NEW DEVICE IMAGE */
 
       loadHomeBannerImage(
         bannerImages[0]
@@ -667,6 +835,7 @@
     }, 200);
 
   }
+
 
   window.addEventListener(
     "resize",
