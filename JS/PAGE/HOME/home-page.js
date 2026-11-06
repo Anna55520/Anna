@@ -821,11 +821,11 @@
      PRODUCT DETAIL ELEMENTS
 ================================================= */
 
-  const homeProductDetail =
-    document.getElementById("U9-home-product-detail");
+  const homeProductModal =
+    document.getElementById("U9-home-product-modal");
 
-  const homeProductBack =
-    document.getElementById("U9-home-product-back");
+  const homeProductModalWindow =
+    document.getElementById("U9-home-product-modal-window");
 
   const homeProductDetailContent =
     document.getElementById("U9-home-product-detail-content");
@@ -845,7 +845,6 @@
 
   let homeProductsOffset = 0;
 
-  let homeProductsScrollPosition = 0;
 
   let currentHomeProduct = null;
 
@@ -1911,24 +1910,21 @@
 
 
   /* =================================================
-     OPEN PRODUCT DETAIL
+     OPEN PRODUCT DETAIL MODAL
 ================================================= */
 
-  function openHomeProductDetail(product) {
+  async function openHomeProductDetail(product) {
 
     if (
       !product ||
-      !homeProductsSection ||
-      !homeProductDetail ||
+      !homeProductModal ||
+      !homeProductModalWindow ||
       !homeProductDetailContent
     ) {
       return;
     }
 
     currentHomeProduct = product;
-
-    homeProductsScrollPosition =
-      window.scrollY;
 
     homeProductDetailContent.replaceChildren();
 
@@ -1953,45 +1949,42 @@
       layout
     );
 
-    homeProductsSection.hidden = true;
+    if (
+      window.U9WindowManager &&
+      typeof window.U9WindowManager.open === "function"
+    ) {
 
-    homeProductDetail.hidden = false;
+      await window.U9WindowManager.open(
+        "home-product-modal"
+      );
 
-    window.scrollTo({
-      top: 0,
-      behavior: "instant"
-    });
+    } else {
+
+      console.error(
+        "[U9 HOME] Window Manager is unavailable."
+      );
+
+    }
 
   }
 
 
   /* =================================================
-     CLOSE PRODUCT DETAIL
+     CLOSE PRODUCT DETAIL MODAL
 ================================================= */
 
-  function closeHomeProductDetail() {
+  async function closeHomeProductDetail() {
 
     if (
-      !homeProductsSection ||
-      !homeProductDetail
+      window.U9WindowManager &&
+      typeof window.U9WindowManager.close === "function"
     ) {
-      return;
+
+      await window.U9WindowManager.close(
+        "home-product-modal"
+      );
+
     }
-
-    currentHomeProduct = null;
-
-    homeProductDetail.hidden = true;
-
-    homeProductsSection.hidden = false;
-
-    window.requestAnimationFrame(function () {
-
-      window.scrollTo({
-        top: homeProductsScrollPosition,
-        behavior: "instant"
-      });
-
-    });
 
   }
 
@@ -2080,15 +2073,6 @@
       homeProductsError.addEventListener(
         "click",
         retryLoadHomeProducts
-      );
-
-    }
-
-    if (homeProductBack) {
-
-      homeProductBack.addEventListener(
-        "click",
-        closeHomeProductDetail
       );
 
     }
