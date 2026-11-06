@@ -107,6 +107,10 @@
     {
       "source": "/chat-storage/:path*",
       "destination": "https://vjlpowhxmflpkjlukkfy.supabase.co/storage/v1/object/sign/:path*"
+    },
+    {
+      "source": "/api/get-home-products",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/get-home-products"
     }
   ]
 }
