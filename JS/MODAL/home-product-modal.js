@@ -1,5 +1,6 @@
 /* =================================================
    U9 HOME PRODUCT MODAL
+   Focus-safe open / close handling
 ================================================= */
 
 (function () {
@@ -15,11 +16,37 @@
     return;
   }
 
+  let previousFocus = null;
+
+  function focusElement(element) {
+    if (!element || typeof element.focus !== "function") return false;
+
+    try {
+      element.focus({ preventScroll: true });
+    } catch (_) {
+      element.focus();
+    }
+
+    return document.activeElement === element;
+  }
+
   function openHomeProductModal() {
+    // Remember the product card/button that opened this modal.
+    if (!modal.classList.contains("modal-open")) {
+      previousFocus = document.activeElement;
+    }
+
+    // Make the modal available to assistive technology before moving focus into it.
+    modal.removeAttribute("inert");
+    modal.setAttribute("aria-hidden", "false");
     modal.classList.remove("modal-closing");
     modal.classList.add("modal-open");
-    modal.setAttribute("aria-hidden", "false");
-    modal.removeAttribute("inert");
+
+    // Keep keyboard focus inside the newly opened dialog.
+    if (!focusElement(modalWindow) && closeButton) {
+      focusElement(closeButton);
+    }
+
     return true;
   }
 
@@ -29,16 +56,39 @@
     modal.classList.remove("modal-open");
     modal.classList.add("modal-closing");
 
+    // IMPORTANT:
+    // Move focus out of the modal BEFORE applying aria-hidden/inert.
+    // Otherwise Chrome reports that a focused descendant is being hidden.
+    const focusTarget =
+      previousFocus &&
+      previousFocus.isConnected &&
+      !modal.contains(previousFocus)
+        ? previousFocus
+        : null;
+
+    if (!focusElement(focusTarget)) {
+      // Fallback: explicitly blur the focused modal control.
+      const activeElement = document.activeElement;
+      if (activeElement && modal.contains(activeElement) && typeof activeElement.blur === "function") {
+        activeElement.blur();
+      }
+    }
+
+    // It is now safe to hide and disable the dialog for accessibility/focus.
     modal.setAttribute("aria-hidden", "true");
     modal.setAttribute("inert", "");
 
+    previousFocus = null;
+
     let finished = false;
+
     function finishClose() {
       if (finished) return;
       finished = true;
       modal.classList.remove("modal-closing");
       modalWindow.removeEventListener("transitionend", onTransitionEnd);
     }
+
     function onTransitionEnd(event) {
       if (event.target === modalWindow && event.propertyName === "transform") {
         finishClose();
@@ -47,6 +97,7 @@
 
     modalWindow.addEventListener("transitionend", onTransitionEnd);
     window.setTimeout(finishClose, 500);
+
     return true;
   }
 
