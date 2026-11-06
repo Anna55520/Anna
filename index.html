@@ -464,7 +464,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
   <div id="U9-page-pages">
 
-
     <!-- =========================
         HOME
     ========================= -->
@@ -566,12 +565,120 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
         </section>
 
 
+        <!-- =========================
+            HOME PRODUCTS
+        ========================= -->
+
+        <section
+          id="U9-home-products"
+          aria-label="Home Products"
+        >
+
+          <!-- PRODUCTS GRID -->
+
+          <div
+            id="U9-home-products-grid"
+            aria-live="polite"
+          >
+
+            <!--
+              Product cards will be rendered here by JavaScript.
+            -->
+
+          </div>
+
+
+          <!-- PRODUCTS LOADING STATUS -->
+
+          <div
+            id="U9-home-products-status"
+            role="status"
+            aria-live="polite"
+          >
+
+            <img
+              src="/SSVG/logo/loading.svg"
+              alt="Loading"
+              draggable="false"
+            >
+
+          </div>
+
+
+          <!-- PRODUCTS ERROR STATUS -->
+
+          <div
+            id="U9-home-products-error"
+            role="alert"
+              hidden
+          >
+
+            Unable to load products. Please try again.
+
+          </div>
+
+
+          <!-- INFINITE SCROLL SENTINEL -->
+
+          <div
+            id="U9-home-products-sentinel"
+            aria-hidden="true"
+          ></div>
+
+        </section>
+
+
+        <!-- =========================
+            HOME PRODUCT DETAIL
+        ========================= -->
+
+        <section
+          id="U9-home-product-detail"
+          aria-label="Product Details"
+          hidden
+        >
+
+          <!-- BACK BUTTON -->
+
+          <button
+            id="U9-home-product-back"
+            type="button"
+          >
+
+            <span aria-hidden="true">←</span>
+            <span>Back</span>
+
+          </button>
+
+
+          <!-- PRODUCT DETAIL CONTENT -->
+
+          <div id="U9-home-product-detail-content">
+
+            <!--
+              Product detail will be rendered here by JavaScript.
+
+              Gallery:
+              - Main image
+              - Thumbnail images
+
+              Product information:
+              - Product name
+              - Original price
+              - Discount
+              - Final price
+              - Description
+              - Favorite button
+            -->
+
+          </div>
+
+        </section>
+
+
       </div>
 
     </div>
-
-
-
 
     <!-- SHOP -->
 
