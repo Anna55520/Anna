@@ -57,6 +57,30 @@
 
 
   /* =================================================
+     HOME PRODUCTS CONFIG
+     VERCEL PROXY
+  ================================================= */
+
+  const HOME_PRODUCTS_CONFIG = {
+
+    edgeFunctionUrl: "/api/get-home-products",
+
+    pageSize: 16,
+
+    maxImages: 5,
+
+    loadingImage: "/SSVG/logo/loading.svg",
+
+    currencySymbol: "$",
+
+    observerRootMargin: "300px 0px",
+
+    requestTimeout: 20000
+
+  };
+
+
+  /* =================================================
      BANNER ERROR SVG
   ================================================= */
 
@@ -102,6 +126,43 @@
         stroke="#EF4444"
         stroke-width="6"
         stroke-linecap="round"
+      />
+    </svg>
+  `;
+
+
+  /* =================================================
+     PRODUCT ERROR SVG
+  ================================================= */
+
+  const PRODUCT_ERROR_SVG = `
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 120 120"
+      width="100%"
+      height="100%"
+      fill="none"
+    >
+      <circle
+        cx="60"
+        cy="60"
+        r="43"
+        stroke="#D1D5DB"
+        stroke-width="5"
+      />
+
+      <path
+        d="M60 35V65"
+        stroke="#9CA3AF"
+        stroke-width="6"
+        stroke-linecap="round"
+      />
+
+      <circle
+        cx="60"
+        cy="81"
+        r="3.5"
+        fill="#9CA3AF"
       />
     </svg>
   `;
@@ -843,6 +904,1347 @@
 
 
   /* =================================================
+     HOME PRODUCTS ELEMENTS
+  ================================================= */
+
+  const homeProductsSection =
+    document.getElementById("U9-home-products");
+
+  const homeProductsGrid =
+    document.getElementById("U9-home-products-grid");
+
+  const homeProductsStatus =
+    document.getElementById("U9-home-products-status");
+
+  const homeProductsError =
+    document.getElementById("U9-home-products-error");
+
+  const homeProductsSentinel =
+    document.getElementById("U9-home-products-sentinel");
+
+
+  /* =================================================
+     PRODUCT DETAIL ELEMENTS
+  ================================================= */
+
+  const homeProductDetail =
+    document.getElementById("U9-home-product-detail");
+
+  const homeProductBack =
+    document.getElementById("U9-home-product-back");
+
+  const homeProductDetailContent =
+    document.getElementById("U9-home-product-detail-content");
+
+
+  /* =================================================
+     HOME PRODUCTS STATE
+  ================================================= */
+
+  let homeProductsInitialized = false;
+
+  let homeProductsObserver = null;
+
+  let homeProductsLoading = false;
+
+  let homeProductsHasMore = true;
+
+  let homeProductsOffset = 0;
+
+  let homeProductsScrollPosition = 0;
+
+  let currentHomeProduct = null;
+
+  let homeProductsRequestController = null;
+
+  const homeProducts = [];
+
+  const homeProductsById = new Map();
+
+
+  /* =================================================
+     PRODUCT HELPERS
+  ================================================= */
+
+  function createElement(tagName, className) {
+
+    const element =
+      document.createElement(tagName);
+
+    if (className) {
+      element.className = className;
+    }
+
+    return element;
+
+  }
+
+
+  function getProductId(product) {
+
+    return product &&
+      product.uuid != null
+
+      ? String(product.uuid)
+
+      : "";
+
+  }
+
+
+  function getProductImages(product) {
+
+    if (!product) {
+      return [];
+    }
+
+    const images = [];
+
+    for (
+      let i = 1;
+      i <= HOME_PRODUCTS_CONFIG.maxImages;
+      i++
+    ) {
+
+      const value =
+        product[`product_image_${i}`];
+
+      if (
+        typeof value === "string" &&
+        value.trim()
+      ) {
+        images.push(value.trim());
+      }
+
+    }
+
+    return images;
+
+  }
+
+
+  function getProductDiscountPrice(product) {
+
+    const price =
+      Number(product.product_price);
+
+    const discount =
+      Number(product.product_discount) || 0;
+
+    if (!Number.isFinite(price)) {
+      return 0;
+    }
+
+    return price * (1 - discount / 100);
+
+  }
+
+
+  function formatProductPrice(value) {
+
+    const number =
+      Number(value);
+
+    if (!Number.isFinite(number)) {
+      return HOME_PRODUCTS_CONFIG.currencySymbol + "0.00";
+    }
+
+    return HOME_PRODUCTS_CONFIG.currencySymbol +
+      number.toFixed(2);
+
+  }
+
+
+  function isValidActiveProduct(product) {
+
+    return Boolean(
+      product &&
+      product.is_active === true &&
+      getProductId(product) &&
+      typeof product.product_name === "string"
+    );
+
+  }
+
+
+  /* =================================================
+     PRODUCT STATUS
+  ================================================= */
+
+  function showProductsLoading() {
+
+    if (!homeProductsStatus) {
+      return;
+    }
+
+    homeProductsStatus.hidden = false;
+
+    homeProductsStatus.style.display = "flex";
+
+    homeProductsStatus.innerHTML = `
+      <img
+        src="${HOME_PRODUCTS_CONFIG.loadingImage}"
+        alt="Loading"
+        draggable="false"
+      >
+    `;
+
+  }
+
+
+  function hideProductsStatus() {
+
+    if (!homeProductsStatus) {
+      return;
+    }
+
+    homeProductsStatus.hidden = true;
+
+    homeProductsStatus.style.display = "none";
+
+    homeProductsStatus.innerHTML = "";
+
+  }
+
+
+  function showProductsError() {
+
+    if (!homeProductsError) {
+      return;
+    }
+
+    homeProductsError.hidden = false;
+
+    homeProductsError.style.display = "block";
+
+  }
+
+
+  function hideProductsError() {
+
+    if (!homeProductsError) {
+      return;
+    }
+
+    homeProductsError.hidden = true;
+
+    homeProductsError.style.display = "none";
+
+  }
+
+
+  /* =================================================
+     FETCH HOME PRODUCTS PAGE
+     VERCEL -> SUPABASE EDGE FUNCTION
+  ================================================= */
+
+  async function fetchHomeProductsPage(limit, offset) {
+
+    const requestUrl = new URL(
+      HOME_PRODUCTS_CONFIG.edgeFunctionUrl,
+      window.location.origin
+    );
+
+    requestUrl.searchParams.set(
+      "limit",
+      String(limit)
+    );
+
+    requestUrl.searchParams.set(
+      "offset",
+      String(offset)
+    );
+
+
+    const controller =
+      new AbortController();
+
+    homeProductsRequestController =
+      controller;
+
+
+    const timeoutId =
+      setTimeout(function () {
+
+        controller.abort();
+
+      }, HOME_PRODUCTS_CONFIG.requestTimeout);
+
+
+    try {
+
+      const response = await fetch(
+        requestUrl.toString(),
+        {
+          method: "GET",
+
+          headers: {
+            "Accept": "application/json"
+          },
+
+          credentials: "same-origin",
+
+          cache: "no-store",
+
+          signal: controller.signal
+        }
+      );
+
+
+      if (!response.ok) {
+
+        const errorText =
+          await response.text();
+
+        console.error(
+          "[U9 HOME PRODUCTS] API request failed:",
+          response.status,
+          errorText
+        );
+
+        throw new Error(
+          "Home Products request failed: " +
+          response.status
+        );
+
+      }
+
+
+      const result =
+        await response.json();
+
+
+      if (!Array.isArray(result)) {
+
+        console.error(
+          "[U9 HOME PRODUCTS] Invalid API response:",
+          result
+        );
+
+        throw new Error(
+          "Invalid Home Products response."
+        );
+
+      }
+
+
+      return result;
+
+    } finally {
+
+      clearTimeout(timeoutId);
+
+      if (
+        homeProductsRequestController === controller
+      ) {
+        homeProductsRequestController = null;
+      }
+
+    }
+
+  }
+
+
+  /* =================================================
+     PRODUCT IMAGE
+  ================================================= */
+
+  function createProductImage(
+    imageUrl,
+    className,
+    altText
+  ) {
+
+    const wrapper =
+      createElement("div", "U9-home-product-image-wrap");
+
+
+    const loadingImage =
+      createElement("img", "U9-home-product-loading-image");
+
+    loadingImage.src =
+      HOME_PRODUCTS_CONFIG.loadingImage;
+
+    loadingImage.alt = "Loading";
+
+    loadingImage.draggable = false;
+
+
+    wrapper.appendChild(loadingImage);
+
+
+    if (!imageUrl) {
+
+      wrapper.innerHTML =
+        PRODUCT_ERROR_SVG;
+
+      return wrapper;
+
+    }
+
+
+    const preload =
+      new Image();
+
+
+    preload.onload = function () {
+
+      const image =
+        createElement("img", className || "");
+
+      image.src = imageUrl;
+
+      image.alt = altText || "Product";
+
+      image.loading = "lazy";
+
+      image.decoding = "async";
+
+      image.draggable = false;
+
+
+      wrapper.replaceChildren(image);
+
+    };
+
+
+    preload.onerror = function () {
+
+      wrapper.innerHTML =
+        PRODUCT_ERROR_SVG;
+
+    };
+
+
+    preload.src = imageUrl;
+
+
+    return wrapper;
+
+  }
+
+
+  /* =================================================
+     PRODUCT FAVORITE BUTTON
+     VISUAL ONLY
+  ================================================= */
+
+  function createProductFavoriteButton() {
+
+    const button =
+      createElement(
+        "button",
+        "U9-home-product-favorite"
+      );
+
+    button.type = "button";
+
+    button.setAttribute(
+      "aria-label",
+      "Favorite product"
+    );
+
+    button.setAttribute(
+      "aria-pressed",
+      "false"
+    );
+
+    button.innerHTML = `
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="22"
+        height="22"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path
+          d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"
+        />
+      </svg>
+    `;
+
+
+    /*
+      Favorite is visual only.
+      No database operation is performed.
+    */
+
+    button.addEventListener("click", function (event) {
+
+      event.preventDefault();
+
+      event.stopPropagation();
+
+    });
+
+
+    return button;
+
+  }
+
+
+  /* =================================================
+     CREATE PRODUCT CARD
+  ================================================= */
+
+  function createHomeProductCard(product) {
+
+    const card =
+      createElement(
+        "article",
+        "U9-home-product-card"
+      );
+
+    card.tabIndex = 0;
+
+    card.setAttribute(
+      "role",
+      "button"
+    );
+
+    card.setAttribute(
+      "aria-label",
+      product.product_name
+    );
+
+
+    const images =
+      getProductImages(product);
+
+    const imageWrap =
+      createProductImage(
+        images[0] || "",
+        "U9-home-product-image",
+        product.product_name
+      );
+
+
+    const favoriteButton =
+      createProductFavoriteButton();
+
+
+    const info =
+      createElement(
+        "div",
+        "U9-home-product-info"
+      );
+
+
+    const name =
+      createElement(
+        "div",
+        "U9-home-product-name"
+      );
+
+    name.textContent =
+      product.product_name;
+
+
+    const prices =
+      createElement(
+        "div",
+        "U9-home-product-prices"
+      );
+
+
+    const price =
+      Number(product.product_price);
+
+    const discount =
+      Number(product.product_discount) || 0;
+
+
+    if (discount > 0) {
+
+      const discountPrice =
+        createElement(
+          "span",
+          "U9-home-product-discount-price"
+        );
+
+      discountPrice.textContent =
+        formatProductPrice(
+          getProductDiscountPrice(product)
+        );
+
+
+      const originalPrice =
+        createElement(
+          "span",
+          "U9-home-product-original-price"
+        );
+
+      originalPrice.textContent =
+        formatProductPrice(price);
+
+
+      prices.append(
+        discountPrice,
+        originalPrice
+      );
+
+    } else {
+
+      const normalPrice =
+        createElement(
+          "span",
+          "U9-home-product-price"
+        );
+
+      normalPrice.textContent =
+        formatProductPrice(price);
+
+      prices.appendChild(normalPrice);
+
+    }
+
+
+    info.append(
+      name,
+      prices
+    );
+
+
+    card.append(
+      imageWrap,
+      favoriteButton,
+      info
+    );
+
+
+    card.addEventListener("click", function () {
+
+      openHomeProductDetail(product);
+
+    });
+
+
+    card.addEventListener("keydown", function (event) {
+
+      if (
+        event.key === "Enter" ||
+        event.key === " "
+      ) {
+
+        event.preventDefault();
+
+        openHomeProductDetail(product);
+
+      }
+
+    });
+
+
+    return card;
+
+  }
+
+
+  /* =================================================
+     RENDER HOME PRODUCTS
+  ================================================= */
+
+  function renderHomeProducts(products) {
+
+    if (!homeProductsGrid) {
+      return;
+    }
+
+
+    const fragment =
+      document.createDocumentFragment();
+
+
+    products.forEach(function (product) {
+
+      if (!isValidActiveProduct(product)) {
+        return;
+      }
+
+
+      const productId =
+        getProductId(product);
+
+
+      if (homeProductsById.has(productId)) {
+        return;
+      }
+
+
+      homeProductsById.set(
+        productId,
+        product
+      );
+
+      homeProducts.push(product);
+
+
+      fragment.appendChild(
+        createHomeProductCard(product)
+      );
+
+    });
+
+
+    homeProductsGrid.appendChild(fragment);
+
+  }
+
+
+  /* =================================================
+     LOAD HOME PRODUCTS
+  ================================================= */
+
+  async function loadHomeProducts() {
+
+    if (
+      !homeProductsSection ||
+      !homeProductsGrid ||
+      homeProductsLoading ||
+      !homeProductsHasMore
+    ) {
+      return;
+    }
+
+
+    homeProductsLoading = true;
+
+    hideProductsError();
+
+    showProductsLoading();
+
+
+    const requestOffset =
+      homeProductsOffset;
+
+
+    try {
+
+      const products =
+        await fetchHomeProductsPage(
+          HOME_PRODUCTS_CONFIG.pageSize,
+          requestOffset
+        );
+
+
+      /*
+        Advance offset using the number of records
+        returned by the API, not the number rendered.
+      */
+
+      homeProductsOffset +=
+        products.length;
+
+
+      renderHomeProducts(products);
+
+
+      if (
+        products.length <
+        HOME_PRODUCTS_CONFIG.pageSize
+      ) {
+
+        homeProductsHasMore = false;
+
+      }
+
+
+      hideProductsStatus();
+
+
+      /*
+        If no products have been returned,
+        the grid remains empty.
+      */
+
+    } catch (error) {
+
+      console.error(
+        "[U9 HOME PRODUCTS] Load error:",
+        error
+      );
+
+
+      hideProductsStatus();
+
+      showProductsError();
+
+    } finally {
+
+      homeProductsLoading = false;
+
+    }
+
+  }
+
+
+  /* =================================================
+     RETRY HOME PRODUCTS
+  ================================================= */
+
+  function retryLoadHomeProducts() {
+
+    if (homeProductsLoading) {
+      return;
+    }
+
+
+    homeProductsHasMore = true;
+
+    hideProductsError();
+
+    loadHomeProducts();
+
+  }
+
+
+  /* =================================================
+     PRODUCT DETAIL IMAGE GALLERY
+  ================================================= */
+
+  function renderProductDetailGallery(product) {
+
+    const gallery =
+      createElement(
+        "div",
+        "U9-home-product-gallery"
+      );
+
+
+    const images =
+      getProductImages(product);
+
+
+    const mainImageWrap =
+      createElement(
+        "div",
+        "U9-home-product-main-image-wrap"
+      );
+
+
+    mainImageWrap.classList.add(
+      "U9-home-product-image-wrap"
+    );
+
+
+    const thumbnails =
+      createElement(
+        "div",
+        "U9-home-product-thumbnails"
+      );
+
+
+    function showDetailImage(imageUrl) {
+
+      if (
+        currentHomeProduct !== product
+      ) {
+        return;
+      }
+
+
+      const loadingImage =
+        createElement(
+          "img",
+          "U9-home-product-loading-image"
+        );
+
+      loadingImage.src =
+        HOME_PRODUCTS_CONFIG.loadingImage;
+
+      loadingImage.alt = "Loading";
+
+      loadingImage.draggable = false;
+
+
+      mainImageWrap.replaceChildren(
+        loadingImage
+      );
+
+
+      const preload =
+        new Image();
+
+
+      preload.onload = function () {
+
+        if (
+          currentHomeProduct !== product
+        ) {
+          return;
+        }
+
+
+        const image =
+          createElement(
+            "img",
+            "U9-home-product-main-image"
+          );
+
+        image.src = imageUrl;
+
+        image.alt =
+          product.product_name;
+
+        image.decoding = "async";
+
+        image.draggable = false;
+
+
+        mainImageWrap.replaceChildren(
+          image
+        );
+
+      };
+
+
+      preload.onerror = function () {
+
+        if (
+          currentHomeProduct !== product
+        ) {
+          return;
+        }
+
+
+        mainImageWrap.innerHTML =
+          PRODUCT_ERROR_SVG;
+
+      };
+
+
+      preload.src = imageUrl;
+
+    }
+
+
+    if (images.length) {
+
+      showDetailImage(images[0]);
+
+
+      images.forEach(function (imageUrl, index) {
+
+        const thumbnail =
+          createElement(
+            "button",
+            "U9-home-product-thumbnail"
+          );
+
+        thumbnail.type = "button";
+
+        thumbnail.setAttribute(
+          "aria-label",
+          "View product image " + (index + 1)
+        );
+
+
+        if (index === 0) {
+
+          thumbnail.classList.add(
+            "is-active"
+          );
+
+        }
+
+
+        const thumbnailImage =
+          createProductImage(
+            imageUrl,
+            "",
+            product.product_name
+          );
+
+
+        thumbnail.appendChild(
+          thumbnailImage
+        );
+
+
+        thumbnail.addEventListener("click", function () {
+
+          thumbnails
+            .querySelectorAll(".U9-home-product-thumbnail")
+            .forEach(function (item) {
+
+              item.classList.remove("is-active");
+
+            });
+
+
+          thumbnail.classList.add(
+            "is-active"
+          );
+
+
+          showDetailImage(imageUrl);
+
+        });
+
+
+        thumbnails.appendChild(thumbnail);
+
+      });
+
+    } else {
+
+      mainImageWrap.innerHTML =
+        PRODUCT_ERROR_SVG;
+
+    }
+
+
+    gallery.append(
+      mainImageWrap,
+      thumbnails
+    );
+
+
+    return gallery;
+
+  }
+
+
+  /* =================================================
+     PRODUCT DETAIL INFORMATION
+  ================================================= */
+
+  function renderProductDetailInfo(product) {
+
+    const info =
+      createElement(
+        "div",
+        "U9-home-product-detail-info"
+      );
+
+
+    const name =
+      createElement(
+        "h2",
+        "U9-home-product-detail-name"
+      );
+
+    name.textContent =
+      product.product_name;
+
+
+    const prices =
+      createElement(
+        "div",
+        "U9-home-product-detail-prices"
+      );
+
+
+    const price =
+      Number(product.product_price);
+
+    const discount =
+      Number(product.product_discount) || 0;
+
+
+    if (discount > 0) {
+
+      const discountPrice =
+        createElement(
+          "span",
+          "U9-home-product-discount-price"
+        );
+
+      discountPrice.textContent =
+        formatProductPrice(
+          getProductDiscountPrice(product)
+        );
+
+
+      const originalPrice =
+        createElement(
+          "span",
+          "U9-home-product-original-price"
+        );
+
+      originalPrice.textContent =
+        formatProductPrice(price);
+
+
+      const discountLabel =
+        createElement(
+          "span",
+          "U9-home-product-discount-label"
+        );
+
+      discountLabel.textContent =
+        "-" + discount + "%";
+
+
+      prices.append(
+        discountPrice,
+        originalPrice,
+        discountLabel
+      );
+
+    } else {
+
+      const normalPrice =
+        createElement(
+          "span",
+          "U9-home-product-price"
+        );
+
+      normalPrice.textContent =
+        formatProductPrice(price);
+
+      prices.appendChild(normalPrice);
+
+    }
+
+
+    const description =
+      createElement(
+        "div",
+        "U9-home-product-description"
+      );
+
+    description.textContent =
+      product.product_description || "";
+
+
+    const favoriteButton =
+      createProductFavoriteButton();
+
+
+    info.append(
+      name,
+      prices,
+      description,
+      favoriteButton
+    );
+
+
+    return info;
+
+  }
+
+
+  /* =================================================
+     OPEN PRODUCT DETAIL
+  ================================================= */
+
+  function openHomeProductDetail(product) {
+
+    if (
+      !product ||
+      !homeProductsSection ||
+      !homeProductDetail ||
+      !homeProductDetailContent
+    ) {
+      return;
+    }
+
+
+    currentHomeProduct = product;
+
+
+    // Save current Home Page scroll position
+
+    homeProductsScrollPosition =
+      window.scrollY;
+
+
+    homeProductDetailContent.replaceChildren();
+
+
+    const layout =
+      createElement(
+        "div",
+        "U9-home-product-detail-layout"
+      );
+
+
+    const gallery =
+      renderProductDetailGallery(product);
+
+    const info =
+      renderProductDetailInfo(product);
+
+
+    layout.append(
+      gallery,
+      info
+    );
+
+
+    homeProductDetailContent.appendChild(
+      layout
+    );
+
+
+    homeProductsSection.hidden = true;
+
+    homeProductDetail.hidden = false;
+
+
+    window.scrollTo({
+      top: 0,
+      behavior: "instant"
+    });
+
+  }
+
+
+  /* =================================================
+     CLOSE PRODUCT DETAIL
+  ================================================= */
+
+  function closeHomeProductDetail() {
+
+    if (
+      !homeProductsSection ||
+      !homeProductDetail
+    ) {
+      return;
+    }
+
+
+    currentHomeProduct = null;
+
+
+    homeProductDetail.hidden = true;
+
+    homeProductsSection.hidden = false;
+
+
+    window.requestAnimationFrame(function () {
+
+      window.scrollTo({
+        top: homeProductsScrollPosition,
+        behavior: "instant"
+      });
+
+    });
+
+  }
+
+
+  /* =================================================
+     INITIALIZE PRODUCT SCROLL OBSERVER
+  ================================================= */
+
+  function initializeHomeProductsObserver() {
+
+    if (
+      homeProductsObserver ||
+      !homeProductsSentinel
+    ) {
+      return;
+    }
+
+
+    if (!("IntersectionObserver" in window)) {
+
+      console.warn(
+        "[U9 HOME PRODUCTS] IntersectionObserver is unavailable."
+      );
+
+      return;
+
+    }
+
+
+    homeProductsObserver =
+      new IntersectionObserver(
+        function (entries) {
+
+          entries.forEach(function (entry) {
+
+            if (
+              entry.isIntersecting &&
+              homeProductsHasMore &&
+              !homeProductsLoading
+            ) {
+
+              loadHomeProducts();
+
+            }
+
+          });
+
+        },
+        {
+          root: null,
+
+          rootMargin:
+            HOME_PRODUCTS_CONFIG.observerRootMargin,
+
+          threshold: 0
+        }
+      );
+
+
+    homeProductsObserver.observe(
+      homeProductsSentinel
+    );
+
+  }
+
+
+  /* =================================================
+     INITIALIZE HOME PRODUCTS
+  ================================================= */
+
+  function initializeHomeProducts() {
+
+    if (
+      homeProductsInitialized ||
+      !homeProductsSection ||
+      !homeProductsGrid
+    ) {
+      return;
+    }
+
+
+    homeProductsInitialized = true;
+
+
+    hideProductsError();
+
+    hideProductsStatus();
+
+
+    if (homeProductsError) {
+
+      homeProductsError.addEventListener(
+        "click",
+        retryLoadHomeProducts
+      );
+
+    }
+
+
+    if (homeProductBack) {
+
+      homeProductBack.addEventListener(
+        "click",
+        closeHomeProductDetail
+      );
+
+    }
+
+
+    initializeHomeProductsObserver();
+
+
+    // Load the first 16 products
+
+    loadHomeProducts();
+
+  }
+
+
+  /* =================================================
      OPEN HOME PAGE
   ================================================= */
 
@@ -871,6 +2273,12 @@
 
 
     homePage.style.display = "block";
+
+
+    // Initialize products only once.
+    // Existing products and scroll position are preserved.
+
+    initializeHomeProducts();
 
   }
 
