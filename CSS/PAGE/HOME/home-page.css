@@ -348,6 +348,8 @@
 
 /* Product name */
 
+/* Product name */
+
 .U9-home-product-name {
   display: -webkit-box;
   min-height: 2.6em;
@@ -360,6 +362,7 @@
   overflow-wrap: anywhere;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 /* Product prices */
