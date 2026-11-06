@@ -1804,65 +1804,89 @@
      PRODUCT DETAIL INFORMATION
 ================================================= */
 
+  function createProductDetailSaveButton() {
+
+    const button = createElement(
+      "button",
+      "U9-home-product-detail-save"
+    );
+
+    button.type = "button";
+    button.setAttribute("aria-label", "Save product");
+    button.setAttribute("aria-pressed", "false");
+
+    button.innerHTML = `
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="21"
+        height="21"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
+      </svg>
+      <span>Save</span>
+    `;
+
+    // Visual button only. Save functionality will be connected later.
+    button.addEventListener("click", function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    });
+
+    return button;
+
+  }
+
+
   function renderProductDetailInfo(product) {
 
-    const info =
-      createElement(
-        "div",
-        "U9-home-product-detail-info"
-      );
+    const info = createElement(
+      "div",
+      "U9-home-product-detail-info"
+    );
 
-    const name =
-      createElement(
-        "h2",
-        "U9-home-product-detail-name"
-      );
+    const name = createElement(
+      "h2",
+      "U9-home-product-detail-name"
+    );
 
-    name.textContent =
-      product.product_name;
+    name.textContent = product.product_name;
 
-    const prices =
-      createElement(
-        "div",
-        "U9-home-product-detail-prices"
-      );
+    const prices = createElement(
+      "div",
+      "U9-home-product-detail-prices"
+    );
 
-    const price =
-      Number(product.product_price);
-
-    const discount =
-      Number(product.product_discount) || 0;
+    const price = Number(product.product_price);
+    const discount = Number(product.product_discount) || 0;
 
     if (discount > 0) {
 
-      const discountPrice =
-        createElement(
-          "span",
-          "U9-home-product-discount-price"
-        );
+      const discountPrice = createElement(
+        "span",
+        "U9-home-product-discount-price"
+      );
+      discountPrice.textContent = formatProductPrice(
+        getProductDiscountPrice(product)
+      );
 
-      discountPrice.textContent =
-        formatProductPrice(
-          getProductDiscountPrice(product)
-        );
+      const originalPrice = createElement(
+        "span",
+        "U9-home-product-original-price"
+      );
+      originalPrice.textContent = formatProductPrice(price);
 
-      const originalPrice =
-        createElement(
-          "span",
-          "U9-home-product-original-price"
-        );
-
-      originalPrice.textContent =
-        formatProductPrice(price);
-
-      const discountLabel =
-        createElement(
-          "span",
-          "U9-home-product-discount-label"
-        );
-
-      discountLabel.textContent =
-        "-" + discount + "%";
+      const discountLabel = createElement(
+        "span",
+        "U9-home-product-discount-label"
+      );
+      discountLabel.textContent = "-" + discount + "%";
 
       prices.append(
         discountPrice,
@@ -1872,42 +1896,49 @@
 
     } else {
 
-      const normalPrice =
-        createElement(
-          "span",
-          "U9-home-product-price"
-        );
-
-      normalPrice.textContent =
-        formatProductPrice(price);
-
+      const normalPrice = createElement(
+        "span",
+        "U9-home-product-price"
+      );
+      normalPrice.textContent = formatProductPrice(price);
       prices.appendChild(normalPrice);
 
     }
 
-    const description =
-      createElement(
-        "div",
-        "U9-home-product-description"
-      );
+    const actions = createElement(
+      "div",
+      "U9-home-product-detail-actions"
+    );
 
-    description.textContent =
-      product.product_description || "";
+    const saveButton = createProductDetailSaveButton();
 
-    const favoriteButton =
-      createProductFavoriteButton();
+    const buyButton = createElement(
+      "button",
+      "U9-home-product-detail-buy"
+    );
+    buyButton.type = "button";
+    buyButton.textContent = "Buy";
+    buyButton.setAttribute("aria-label", "Buy product");
+    // Visual button only. Purchase functionality will be connected later.
+
+    actions.append(saveButton, buyButton);
+
+    const description = createElement(
+      "div",
+      "U9-home-product-description"
+    );
+    description.textContent = product.product_description || "";
 
     info.append(
       name,
       prices,
-      description,
-      favoriteButton
+      actions,
+      description
     );
 
     return info;
 
   }
-
 
   /* =================================================
      OPEN PRODUCT DETAIL MODAL
@@ -1928,26 +1959,16 @@
 
     homeProductDetailContent.replaceChildren();
 
-    const layout =
-      createElement(
-        "div",
-        "U9-home-product-detail-layout"
-      );
-
-    const gallery =
-      renderProductDetailGallery(product);
-
-    const info =
-      renderProductDetailInfo(product);
-
-    layout.append(
-      gallery,
-      info
+    const detailPage = createElement(
+      "div",
+      "U9-home-product-detail-page"
     );
 
-    homeProductDetailContent.appendChild(
-      layout
-    );
+    const gallery = renderProductDetailGallery(product);
+    const info = renderProductDetailInfo(product);
+
+    detailPage.append(gallery, info);
+    homeProductDetailContent.appendChild(detailPage);
 
     if (
       window.U9WindowManager &&
