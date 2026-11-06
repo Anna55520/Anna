@@ -46,7 +46,7 @@
     }
 
     modalWindow.addEventListener("transitionend", onTransitionEnd);
-    window.setTimeout(finishClose, 650);
+    window.setTimeout(finishClose, 500);
     return true;
   }
 
