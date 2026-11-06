@@ -1833,6 +1833,12 @@
     const discount =
       Number(product.product_discount) || 0;
 
+    const priceMain =
+      createElement(
+        "div",
+        "U9-home-product-price-main"
+      );
+
     if (discount > 0) {
 
       const discountPrice =
@@ -1864,9 +1870,13 @@
       discountLabel.textContent =
         "-" + discount + "%";
 
-      prices.append(
+      priceMain.append(
         discountPrice,
-        originalPrice,
+        originalPrice
+      );
+
+      prices.append(
+        priceMain,
         discountLabel
       );
 
@@ -1881,7 +1891,8 @@
       normalPrice.textContent =
         formatProductPrice(price);
 
-      prices.appendChild(normalPrice);
+      priceMain.appendChild(normalPrice);
+      prices.appendChild(priceMain);
 
     }
 
@@ -1928,25 +1939,17 @@
 
     homeProductDetailContent.replaceChildren();
 
-    const layout =
-      createElement(
-        "div",
-        "U9-home-product-detail-layout"
-      );
-
     const gallery =
       renderProductDetailGallery(product);
 
     const info =
       renderProductDetailInfo(product);
 
-    layout.append(
+    // The modal owns the full-screen layout and its action buttons.
+    // Home Page only supplies the selected product content and opens the modal.
+    homeProductDetailContent.append(
       gallery,
       info
-    );
-
-    homeProductDetailContent.appendChild(
-      layout
     );
 
     if (
