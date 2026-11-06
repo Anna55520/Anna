@@ -30,8 +30,8 @@
 
   /* =================================================
      HOME BANNER CONFIG
-     STORE 2 PROXY
-  ================================================= */
+     EXISTING STORAGE-2 PROXY
+================================================= */
 
   const HOME_BANNER_CONFIG = {
 
@@ -58,8 +58,7 @@
 
   /* =================================================
      HOME PRODUCTS CONFIG
-     VERCEL PROXY
-  ================================================= */
+================================================= */
 
   const HOME_PRODUCTS_CONFIG = {
 
@@ -75,14 +74,23 @@
 
     observerRootMargin: "300px 0px",
 
-    requestTimeout: 20000
+    requestTimeout: 20000,
+
+    storageHost:
+      "vjlpowhxmflpkjlukkfy.supabase.co",
+
+    storagePrefix:
+      "/storage/v1/object/public/",
+
+    storageProxyPrefix:
+      "/storage-2/"
 
   };
 
 
   /* =================================================
      BANNER ERROR SVG
-  ================================================= */
+================================================= */
 
   const BANNER_ERROR_SVG = `
     <svg
@@ -133,7 +141,7 @@
 
   /* =================================================
      PRODUCT ERROR SVG
-  ================================================= */
+================================================= */
 
   const PRODUCT_ERROR_SVG = `
     <svg
@@ -170,7 +178,7 @@
 
   /* =================================================
      BANNER STATE
-  ================================================= */
+================================================= */
 
   let bannerContainer = null;
 
@@ -203,7 +211,7 @@
 
   /* =================================================
      GET BANNER IMAGES
-  ================================================= */
+================================================= */
 
   function getHomeBannerImages() {
 
@@ -219,18 +227,13 @@
 
   /* =================================================
      GET EXISTING BANNER ELEMENTS
-  ================================================= */
+================================================= */
 
   function createHomeBanner() {
 
     if (!homePage || bannerInitialized) {
       return;
     }
-
-    /*
-      Banner elements are already written in HTML.
-      Do not create duplicate elements here.
-    */
 
     bannerContainer =
       document.getElementById("U9-home-banner");
@@ -275,7 +278,7 @@
 
   /* =================================================
      BANNER IMAGE VISIBILITY
-  ================================================= */
+================================================= */
 
   function hideBannerImages() {
 
@@ -305,7 +308,7 @@
 
   /* =================================================
      BANNER STATUS
-  ================================================= */
+================================================= */
 
   function showBannerLoading() {
 
@@ -359,7 +362,7 @@
 
   /* =================================================
      RESET SLIDE POSITION
-  ================================================= */
+================================================= */
 
   function resetBannerPosition() {
 
@@ -382,7 +385,7 @@
 
   /* =================================================
      CANCEL BANNER ANIMATION
-  ================================================= */
+================================================= */
 
   function cancelBannerAnimation() {
 
@@ -407,7 +410,7 @@
 
   /* =================================================
      LOAD FIRST BANNER IMAGE
-  ================================================= */
+================================================= */
 
   function loadHomeBannerImage(imageUrl) {
 
@@ -419,12 +422,8 @@
       return;
     }
 
-
-    // Invalidate previous requests
-
     const loadToken =
       ++bannerLoadToken;
-
 
     isLoading = true;
 
@@ -432,25 +431,19 @@
 
     bannerHasLoaded = false;
 
-
     clearTimeout(bannerSlideTimer);
 
     bannerSlideTimer = null;
-
 
     resetBannerPosition();
 
     bannerNextImage.removeAttribute("src");
 
-
     showBannerLoading();
-
 
     const preload =
       new Image();
 
-
-    /* IMAGE LOAD SUCCESS */
 
     preload.onload = function () {
 
@@ -461,25 +454,20 @@
         return;
       }
 
-
       bannerImage.src = imageUrl;
 
       bannerNextImage.removeAttribute("src");
 
-
       resetBannerPosition();
-
 
       bannerIndex =
         Math.max(0, bannerImages.indexOf(imageUrl));
-
 
       isLoading = false;
 
       isSliding = false;
 
       bannerHasLoaded = true;
-
 
       showBannerImages();
 
@@ -488,20 +476,16 @@
     };
 
 
-    /* IMAGE LOAD FAILED */
-
     preload.onerror = function () {
 
       if (loadToken !== bannerLoadToken) {
         return;
       }
 
-
       console.warn(
         "[U9 HOME] Banner load failed:",
         imageUrl
       );
-
 
       isLoading = false;
 
@@ -509,15 +493,12 @@
 
       bannerHasLoaded = false;
 
-
       cancelBannerAnimation();
 
       showBannerError();
 
     };
 
-
-    // Set src after event handlers
 
     preload.src = imageUrl;
 
@@ -527,7 +508,7 @@
   /* =================================================
      SWITCH BANNER
      RIGHT TO LEFT
-  ================================================= */
+================================================= */
 
   function switchHomeBanner() {
 
@@ -541,12 +522,6 @@
       return;
     }
 
-
-    /*
-      If current image has not loaded,
-      retry loading the current image.
-    */
-
     if (!bannerHasLoaded) {
 
       loadHomeBannerImage(
@@ -558,26 +533,20 @@
 
     }
 
-
     const nextIndex =
       (bannerIndex + 1) % bannerImages.length;
 
     const nextUrl =
       bannerImages[nextIndex];
 
-
     const loadToken =
       ++bannerLoadToken;
 
-
     isLoading = true;
-
 
     const preload =
       new Image();
 
-
-    /* NEXT IMAGE LOAD SUCCESS */
 
     preload.onload = function () {
 
@@ -589,14 +558,7 @@
         return;
       }
 
-
       isLoading = false;
-
-
-      /*
-        If current image is hidden,
-        restore next image directly.
-      */
 
       if (
         !bannerHasLoaded ||
@@ -609,11 +571,9 @@
 
         bannerHasLoaded = true;
 
-
         resetBannerPosition();
 
         bannerNextImage.removeAttribute("src");
-
 
         showBannerImages();
 
@@ -623,11 +583,7 @@
 
       }
 
-
-      /* START SLIDE */
-
       isSliding = true;
-
 
       bannerNextImage.src = nextUrl;
 
@@ -637,25 +593,17 @@
       bannerImage.style.visibility =
         "visible";
 
-
       bannerNextImage.style.transition = "none";
 
       bannerNextImage.style.transform =
         "translateX(100%)";
-
 
       bannerImage.style.transition = "none";
 
       bannerImage.style.transform =
         "translateX(0)";
 
-
-      /* FORCE REFLOW */
-
       bannerNextImage.offsetWidth;
-
-
-      /* START ANIMATION */
 
       requestAnimationFrame(function () {
 
@@ -666,17 +614,14 @@
           return;
         }
 
-
         const duration =
           HOME_BANNER_CONFIG.slideDuration;
-
 
         bannerImage.style.transition =
           `transform ${duration}ms ease`;
 
         bannerNextImage.style.transition =
           `transform ${duration}ms ease`;
-
 
         bannerImage.style.transform =
           "translateX(-100%)";
@@ -686,11 +631,7 @@
 
       });
 
-
-      /* FINISH SLIDE */
-
       clearTimeout(bannerSlideTimer);
-
 
       bannerSlideTimer = setTimeout(function () {
 
@@ -702,17 +643,11 @@
           return;
         }
 
-
-        // Update current image
-
         bannerImage.src = nextUrl;
 
         bannerIndex = nextIndex;
 
         bannerHasLoaded = true;
-
-
-        // Reset positions
 
         resetBannerPosition();
 
@@ -724,7 +659,6 @@
         bannerImage.style.visibility =
           "visible";
 
-
         isSliding = false;
 
         hideBannerStatus();
@@ -734,27 +668,22 @@
     };
 
 
-    /* NEXT IMAGE LOAD FAILED */
-
     preload.onerror = function () {
 
       if (loadToken !== bannerLoadToken) {
         return;
       }
 
-
       console.warn(
         "[U9 HOME] Banner load failed:",
         nextUrl
       );
-
 
       isLoading = false;
 
       isSliding = false;
 
       bannerHasLoaded = false;
-
 
       cancelBannerAnimation();
 
@@ -763,8 +692,6 @@
     };
 
 
-    // Set src after event handlers
-
     preload.src = nextUrl;
 
   }
@@ -772,7 +699,7 @@
 
   /* =================================================
      START BANNER
-  ================================================= */
+================================================= */
 
   function startHomeBanner() {
 
@@ -780,25 +707,18 @@
       return;
     }
 
-
     createHomeBanner();
-
 
     if (!bannerInitialized) {
       return;
     }
 
-
     bannerImages =
       getHomeBannerImages();
-
 
     if (!bannerImages.length) {
       return;
     }
-
-
-    /* RESET STATE */
 
     bannerIndex = 0;
 
@@ -808,15 +728,9 @@
 
     bannerHasLoaded = false;
 
-
-    /* LOAD FIRST IMAGE */
-
     loadHomeBannerImage(
       bannerImages[0]
     );
-
-
-    /* CLEAR OLD TIMER */
 
     if (bannerTimer) {
 
@@ -826,15 +740,9 @@
 
     }
 
-
-    /* AUTO SWITCH */
-
     bannerTimer = setInterval(
-
       switchHomeBanner,
-
       HOME_BANNER_CONFIG.interval
-
     );
 
   }
@@ -842,20 +750,16 @@
 
   /* =================================================
      RESPONSIVE BANNER
-  ================================================= */
+================================================= */
 
   function handleHomeBannerResize() {
 
     clearTimeout(bannerResizeTimer);
 
-
     bannerResizeTimer = setTimeout(function () {
 
       const newImages =
         getHomeBannerImages();
-
-
-      // Device type has not changed
 
       if (
         JSON.stringify(newImages) ===
@@ -863,9 +767,6 @@
       ) {
         return;
       }
-
-
-      /* CANCEL OLD REQUESTS */
 
       bannerLoadToken++;
 
@@ -875,18 +776,11 @@
 
       bannerHasLoaded = false;
 
-
       cancelBannerAnimation();
-
-
-      /* UPDATE IMAGE LIST */
 
       bannerImages = newImages;
 
       bannerIndex = 0;
-
-
-      /* LOAD NEW DEVICE IMAGE */
 
       loadHomeBannerImage(
         bannerImages[0]
@@ -905,7 +799,7 @@
 
   /* =================================================
      HOME PRODUCTS ELEMENTS
-  ================================================= */
+================================================= */
 
   const homeProductsSection =
     document.getElementById("U9-home-products");
@@ -925,7 +819,7 @@
 
   /* =================================================
      PRODUCT DETAIL ELEMENTS
-  ================================================= */
+================================================= */
 
   const homeProductDetail =
     document.getElementById("U9-home-product-detail");
@@ -939,7 +833,7 @@
 
   /* =================================================
      HOME PRODUCTS STATE
-  ================================================= */
+================================================= */
 
   let homeProductsInitialized = false;
 
@@ -964,7 +858,7 @@
 
   /* =================================================
      PRODUCT HELPERS
-  ================================================= */
+================================================= */
 
   function createElement(tagName, className) {
 
@@ -992,6 +886,76 @@
   }
 
 
+  /* =================================================
+     CONVERT PRODUCT IMAGE URL
+     USE EXISTING STORAGE-2 PROXY
+================================================= */
+
+  function getProductImageProxyUrl(imageUrl) {
+
+    if (
+      typeof imageUrl !== "string" ||
+      !imageUrl.trim()
+    ) {
+      return "";
+    }
+
+    const rawUrl =
+      imageUrl.trim();
+
+    try {
+
+      const url = new URL(
+        rawUrl,
+        window.location.origin
+      );
+
+      const storageHost =
+        HOME_PRODUCTS_CONFIG.storageHost;
+
+      const storagePrefix =
+        HOME_PRODUCTS_CONFIG.storagePrefix;
+
+      if (
+        url.hostname === storageHost &&
+        url.pathname.startsWith(storagePrefix)
+      ) {
+
+        const imagePath =
+          url.pathname.slice(storagePrefix.length);
+
+        return (
+          HOME_PRODUCTS_CONFIG.storageProxyPrefix +
+          imagePath +
+          url.search
+        );
+
+      }
+
+      /*
+        Other image URLs remain unchanged.
+      */
+
+      return rawUrl;
+
+    } catch (error) {
+
+      console.warn(
+        "[U9 HOME PRODUCTS] Invalid image URL:",
+        rawUrl
+      );
+
+      return "";
+
+    }
+
+  }
+
+
+  /* =================================================
+     GET PRODUCT IMAGES
+================================================= */
+
   function getProductImages(product) {
 
     if (!product) {
@@ -1013,7 +977,14 @@
         typeof value === "string" &&
         value.trim()
       ) {
-        images.push(value.trim());
+
+        const proxyUrl =
+          getProductImageProxyUrl(value);
+
+        if (proxyUrl) {
+          images.push(proxyUrl);
+        }
+
       }
 
     }
@@ -1022,6 +993,10 @@
 
   }
 
+
+  /* =================================================
+     PRODUCT PRICE
+================================================= */
 
   function getProductDiscountPrice(product) {
 
@@ -1069,7 +1044,7 @@
 
   /* =================================================
      PRODUCT STATUS
-  ================================================= */
+================================================= */
 
   function showProductsLoading() {
 
@@ -1136,7 +1111,7 @@
   /* =================================================
      FETCH HOME PRODUCTS PAGE
      VERCEL -> SUPABASE EDGE FUNCTION
-  ================================================= */
+================================================= */
 
   async function fetchHomeProductsPage(limit, offset) {
 
@@ -1155,13 +1130,11 @@
       String(offset)
     );
 
-
     const controller =
       new AbortController();
 
     homeProductsRequestController =
       controller;
-
 
     const timeoutId =
       setTimeout(function () {
@@ -1169,7 +1142,6 @@
         controller.abort();
 
       }, HOME_PRODUCTS_CONFIG.requestTimeout);
-
 
     try {
 
@@ -1190,7 +1162,6 @@
         }
       );
 
-
       if (!response.ok) {
 
         const errorText =
@@ -1209,10 +1180,8 @@
 
       }
 
-
       const result =
         await response.json();
-
 
       if (!Array.isArray(result)) {
 
@@ -1226,7 +1195,6 @@
         );
 
       }
-
 
       return result;
 
@@ -1247,7 +1215,7 @@
 
   /* =================================================
      PRODUCT IMAGE
-  ================================================= */
+================================================= */
 
   function createProductImage(
     imageUrl,
@@ -1256,11 +1224,16 @@
   ) {
 
     const wrapper =
-      createElement("div", "U9-home-product-image-wrap");
-
+      createElement(
+        "div",
+        "U9-home-product-image-wrap"
+      );
 
     const loadingImage =
-      createElement("img", "U9-home-product-loading-image");
+      createElement(
+        "img",
+        "U9-home-product-loading-image"
+      );
 
     loadingImage.src =
       HOME_PRODUCTS_CONFIG.loadingImage;
@@ -1269,9 +1242,7 @@
 
     loadingImage.draggable = false;
 
-
     wrapper.appendChild(loadingImage);
-
 
     if (!imageUrl) {
 
@@ -1282,10 +1253,8 @@
 
     }
 
-
     const preload =
       new Image();
-
 
     preload.onload = function () {
 
@@ -1302,11 +1271,9 @@
 
       image.draggable = false;
 
-
       wrapper.replaceChildren(image);
 
     };
-
 
     preload.onerror = function () {
 
@@ -1315,9 +1282,7 @@
 
     };
 
-
     preload.src = imageUrl;
-
 
     return wrapper;
 
@@ -1327,7 +1292,7 @@
   /* =================================================
      PRODUCT FAVORITE BUTTON
      VISUAL ONLY
-  ================================================= */
+================================================= */
 
   function createProductFavoriteButton() {
 
@@ -1367,12 +1332,6 @@
       </svg>
     `;
 
-
-    /*
-      Favorite is visual only.
-      No database operation is performed.
-    */
-
     button.addEventListener("click", function (event) {
 
       event.preventDefault();
@@ -1381,7 +1340,6 @@
 
     });
 
-
     return button;
 
   }
@@ -1389,7 +1347,7 @@
 
   /* =================================================
      CREATE PRODUCT CARD
-  ================================================= */
+================================================= */
 
   function createHomeProductCard(product) {
 
@@ -1411,7 +1369,6 @@
       product.product_name
     );
 
-
     const images =
       getProductImages(product);
 
@@ -1422,17 +1379,14 @@
         product.product_name
       );
 
-
     const favoriteButton =
       createProductFavoriteButton();
-
 
     const info =
       createElement(
         "div",
         "U9-home-product-info"
       );
-
 
     const name =
       createElement(
@@ -1443,20 +1397,17 @@
     name.textContent =
       product.product_name;
 
-
     const prices =
       createElement(
         "div",
         "U9-home-product-prices"
       );
 
-
     const price =
       Number(product.product_price);
 
     const discount =
       Number(product.product_discount) || 0;
-
 
     if (discount > 0) {
 
@@ -1471,7 +1422,6 @@
           getProductDiscountPrice(product)
         );
 
-
       const originalPrice =
         createElement(
           "span",
@@ -1480,7 +1430,6 @@
 
       originalPrice.textContent =
         formatProductPrice(price);
-
 
       prices.append(
         discountPrice,
@@ -1502,12 +1451,10 @@
 
     }
 
-
     info.append(
       name,
       prices
     );
-
 
     card.append(
       imageWrap,
@@ -1515,13 +1462,11 @@
       info
     );
 
-
     card.addEventListener("click", function () {
 
       openHomeProductDetail(product);
 
     });
-
 
     card.addEventListener("keydown", function (event) {
 
@@ -1538,7 +1483,6 @@
 
     });
 
-
     return card;
 
   }
@@ -1546,7 +1490,7 @@
 
   /* =================================================
      RENDER HOME PRODUCTS
-  ================================================= */
+================================================= */
 
   function renderHomeProducts(products) {
 
@@ -1554,10 +1498,8 @@
       return;
     }
 
-
     const fragment =
       document.createDocumentFragment();
-
 
     products.forEach(function (product) {
 
@@ -1565,15 +1507,12 @@
         return;
       }
 
-
       const productId =
         getProductId(product);
-
 
       if (homeProductsById.has(productId)) {
         return;
       }
-
 
       homeProductsById.set(
         productId,
@@ -1582,13 +1521,11 @@
 
       homeProducts.push(product);
 
-
       fragment.appendChild(
         createHomeProductCard(product)
       );
 
     });
-
 
     homeProductsGrid.appendChild(fragment);
 
@@ -1597,7 +1534,7 @@
 
   /* =================================================
      LOAD HOME PRODUCTS
-  ================================================= */
+================================================= */
 
   async function loadHomeProducts() {
 
@@ -1610,17 +1547,14 @@
       return;
     }
 
-
     homeProductsLoading = true;
 
     hideProductsError();
 
     showProductsLoading();
 
-
     const requestOffset =
       homeProductsOffset;
-
 
     try {
 
@@ -1630,18 +1564,10 @@
           requestOffset
         );
 
-
-      /*
-        Advance offset using the number of records
-        returned by the API, not the number rendered.
-      */
-
       homeProductsOffset +=
         products.length;
 
-
       renderHomeProducts(products);
-
 
       if (
         products.length <
@@ -1652,14 +1578,7 @@
 
       }
 
-
       hideProductsStatus();
-
-
-      /*
-        If no products have been returned,
-        the grid remains empty.
-      */
 
     } catch (error) {
 
@@ -1667,7 +1586,6 @@
         "[U9 HOME PRODUCTS] Load error:",
         error
       );
-
 
       hideProductsStatus();
 
@@ -1684,14 +1602,13 @@
 
   /* =================================================
      RETRY HOME PRODUCTS
-  ================================================= */
+================================================= */
 
   function retryLoadHomeProducts() {
 
     if (homeProductsLoading) {
       return;
     }
-
 
     homeProductsHasMore = true;
 
@@ -1704,7 +1621,7 @@
 
   /* =================================================
      PRODUCT DETAIL IMAGE GALLERY
-  ================================================= */
+================================================= */
 
   function renderProductDetailGallery(product) {
 
@@ -1714,10 +1631,8 @@
         "U9-home-product-gallery"
       );
 
-
     const images =
       getProductImages(product);
-
 
     const mainImageWrap =
       createElement(
@@ -1725,18 +1640,15 @@
         "U9-home-product-main-image-wrap"
       );
 
-
     mainImageWrap.classList.add(
       "U9-home-product-image-wrap"
     );
-
 
     const thumbnails =
       createElement(
         "div",
         "U9-home-product-thumbnails"
       );
-
 
     function showDetailImage(imageUrl) {
 
@@ -1745,7 +1657,6 @@
       ) {
         return;
       }
-
 
       const loadingImage =
         createElement(
@@ -1760,15 +1671,12 @@
 
       loadingImage.draggable = false;
 
-
       mainImageWrap.replaceChildren(
         loadingImage
       );
 
-
       const preload =
         new Image();
-
 
       preload.onload = function () {
 
@@ -1777,7 +1685,6 @@
         ) {
           return;
         }
-
 
         const image =
           createElement(
@@ -1794,13 +1701,11 @@
 
         image.draggable = false;
 
-
         mainImageWrap.replaceChildren(
           image
         );
 
       };
-
 
       preload.onerror = function () {
 
@@ -1810,22 +1715,18 @@
           return;
         }
 
-
         mainImageWrap.innerHTML =
           PRODUCT_ERROR_SVG;
 
       };
 
-
       preload.src = imageUrl;
 
     }
 
-
     if (images.length) {
 
       showDetailImage(images[0]);
-
 
       images.forEach(function (imageUrl, index) {
 
@@ -1842,7 +1743,6 @@
           "View product image " + (index + 1)
         );
 
-
         if (index === 0) {
 
           thumbnail.classList.add(
@@ -1851,7 +1751,6 @@
 
         }
 
-
         const thumbnailImage =
           createProductImage(
             imageUrl,
@@ -1859,11 +1758,9 @@
             product.product_name
           );
 
-
         thumbnail.appendChild(
           thumbnailImage
         );
-
 
         thumbnail.addEventListener("click", function () {
 
@@ -1875,16 +1772,13 @@
 
             });
 
-
           thumbnail.classList.add(
             "is-active"
           );
 
-
           showDetailImage(imageUrl);
 
         });
-
 
         thumbnails.appendChild(thumbnail);
 
@@ -1897,12 +1791,10 @@
 
     }
 
-
     gallery.append(
       mainImageWrap,
       thumbnails
     );
-
 
     return gallery;
 
@@ -1911,7 +1803,7 @@
 
   /* =================================================
      PRODUCT DETAIL INFORMATION
-  ================================================= */
+================================================= */
 
   function renderProductDetailInfo(product) {
 
@@ -1920,7 +1812,6 @@
         "div",
         "U9-home-product-detail-info"
       );
-
 
     const name =
       createElement(
@@ -1931,20 +1822,17 @@
     name.textContent =
       product.product_name;
 
-
     const prices =
       createElement(
         "div",
         "U9-home-product-detail-prices"
       );
 
-
     const price =
       Number(product.product_price);
 
     const discount =
       Number(product.product_discount) || 0;
-
 
     if (discount > 0) {
 
@@ -1959,7 +1847,6 @@
           getProductDiscountPrice(product)
         );
 
-
       const originalPrice =
         createElement(
           "span",
@@ -1969,7 +1856,6 @@
       originalPrice.textContent =
         formatProductPrice(price);
 
-
       const discountLabel =
         createElement(
           "span",
@@ -1978,7 +1864,6 @@
 
       discountLabel.textContent =
         "-" + discount + "%";
-
 
       prices.append(
         discountPrice,
@@ -2001,7 +1886,6 @@
 
     }
 
-
     const description =
       createElement(
         "div",
@@ -2011,10 +1895,8 @@
     description.textContent =
       product.product_description || "";
 
-
     const favoriteButton =
       createProductFavoriteButton();
-
 
     info.append(
       name,
@@ -2023,7 +1905,6 @@
       favoriteButton
     );
 
-
     return info;
 
   }
@@ -2031,7 +1912,7 @@
 
   /* =================================================
      OPEN PRODUCT DETAIL
-  ================================================= */
+================================================= */
 
   function openHomeProductDetail(product) {
 
@@ -2044,18 +1925,12 @@
       return;
     }
 
-
     currentHomeProduct = product;
-
-
-    // Save current Home Page scroll position
 
     homeProductsScrollPosition =
       window.scrollY;
 
-
     homeProductDetailContent.replaceChildren();
-
 
     const layout =
       createElement(
@@ -2063,29 +1938,24 @@
         "U9-home-product-detail-layout"
       );
 
-
     const gallery =
       renderProductDetailGallery(product);
 
     const info =
       renderProductDetailInfo(product);
 
-
     layout.append(
       gallery,
       info
     );
 
-
     homeProductDetailContent.appendChild(
       layout
     );
 
-
     homeProductsSection.hidden = true;
 
     homeProductDetail.hidden = false;
-
 
     window.scrollTo({
       top: 0,
@@ -2097,7 +1967,7 @@
 
   /* =================================================
      CLOSE PRODUCT DETAIL
-  ================================================= */
+================================================= */
 
   function closeHomeProductDetail() {
 
@@ -2108,14 +1978,11 @@
       return;
     }
 
-
     currentHomeProduct = null;
-
 
     homeProductDetail.hidden = true;
 
     homeProductsSection.hidden = false;
-
 
     window.requestAnimationFrame(function () {
 
@@ -2131,7 +1998,7 @@
 
   /* =================================================
      INITIALIZE PRODUCT SCROLL OBSERVER
-  ================================================= */
+================================================= */
 
   function initializeHomeProductsObserver() {
 
@@ -2142,7 +2009,6 @@
       return;
     }
 
-
     if (!("IntersectionObserver" in window)) {
 
       console.warn(
@@ -2152,7 +2018,6 @@
       return;
 
     }
-
 
     homeProductsObserver =
       new IntersectionObserver(
@@ -2183,7 +2048,6 @@
         }
       );
 
-
     homeProductsObserver.observe(
       homeProductsSentinel
     );
@@ -2193,7 +2057,7 @@
 
   /* =================================================
      INITIALIZE HOME PRODUCTS
-  ================================================= */
+================================================= */
 
   function initializeHomeProducts() {
 
@@ -2205,14 +2069,11 @@
       return;
     }
 
-
     homeProductsInitialized = true;
-
 
     hideProductsError();
 
     hideProductsStatus();
-
 
     if (homeProductsError) {
 
@@ -2223,7 +2084,6 @@
 
     }
 
-
     if (homeProductBack) {
 
       homeProductBack.addEventListener(
@@ -2233,11 +2093,7 @@
 
     }
 
-
     initializeHomeProductsObserver();
-
-
-    // Load the first 16 products
 
     loadHomeProducts();
 
@@ -2246,14 +2102,13 @@
 
   /* =================================================
      OPEN HOME PAGE
-  ================================================= */
+================================================= */
 
   function openHomePage() {
 
     if (!homePage) {
       return;
     }
-
 
     if (shopPage) {
       shopPage.style.display = "none";
@@ -2271,12 +2126,7 @@
       test2Page.style.display = "none";
     }
 
-
     homePage.style.display = "block";
-
-
-    // Initialize products only once.
-    // Existing products and scroll position are preserved.
 
     initializeHomeProducts();
 
@@ -2285,14 +2135,13 @@
 
   /* =================================================
      INITIALIZE HOME PAGE
-  ================================================= */
+================================================= */
 
   function initializeHomePage() {
 
     if (!homePage) {
       return;
     }
-
 
     openHomePage();
 
@@ -2303,7 +2152,7 @@
 
   /* =================================================
      PUBLIC FUNCTION
-  ================================================= */
+================================================= */
 
   window.openHomePage =
     openHomePage;
@@ -2311,7 +2160,7 @@
 
   /* =================================================
      START HOME PAGE
-  ================================================= */
+================================================= */
 
   initializeHomePage();
 
