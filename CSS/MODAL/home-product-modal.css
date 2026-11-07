@@ -211,6 +211,7 @@
    PRODUCT DETAIL CONTENT
 ================================================= */
 
+#U9-home-product-modal
 #U9-home-product-detail-content {
   display: flex;
   flex-direction: column;
@@ -229,7 +230,7 @@
    MAIN PRODUCT IMAGE + GALLERY
 ================================================= */
 
-.U9-home-product-gallery {
+#U9-home-product-modal .U9-home-product-gallery {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -240,7 +241,7 @@
   gap: 12px;
 }
 
-.U9-home-product-main-image-wrap {
+#U9-home-product-modal .U9-home-product-main-image-wrap {
   position: relative;
 
   display: flex;
@@ -260,6 +261,7 @@
   border-radius: 14px;
 }
 
+#U9-home-product-modal
 .U9-home-product-main-image-wrap img {
   display: block;
 
@@ -270,6 +272,7 @@
   object-position: center;
 }
 
+#U9-home-product-modal
 .U9-home-product-main-image-wrap
 .U9-home-product-loading-image {
   width: 28px !important;
@@ -279,6 +282,7 @@
   max-height: 28px !important;
 }
 
+#U9-home-product-modal
 .U9-home-product-main-image-wrap > svg {
   display: block;
 
@@ -294,7 +298,7 @@
    THUMBNAILS
 ================================================= */
 
-.U9-home-product-thumbnails {
+#U9-home-product-modal .U9-home-product-thumbnails {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -305,7 +309,7 @@
   margin: 0;
 }
 
-.U9-home-product-thumbnail {
+#U9-home-product-modal .U9-home-product-thumbnail {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -324,11 +328,14 @@
   border-radius: 8px;
 }
 
+#U9-home-product-modal
 .U9-home-product-thumbnail.is-active,
+#U9-home-product-modal
 .U9-home-product-thumbnail[aria-pressed="true"] {
   border: 2px solid #78ace9;
 }
 
+#U9-home-product-modal
 .U9-home-product-thumbnail img {
   display: block;
 
@@ -338,6 +345,7 @@
   object-fit: contain;
 }
 
+#U9-home-product-modal
 .U9-home-product-thumbnail
 .U9-home-product-loading-image {
   width: 28px !important;
@@ -352,7 +360,7 @@
    PRODUCT INFORMATION
 ================================================= */
 
-.U9-home-product-detail-info {
+#U9-home-product-modal .U9-home-product-detail-info {
   display: flex;
   flex-direction: column;
 
@@ -364,6 +372,7 @@
   box-sizing: border-box;
 }
 
+#U9-home-product-modal
 .U9-home-product-detail-info h2 {
   margin: 0;
 
@@ -381,6 +390,7 @@
    PRICE + DISCOUNT
 ================================================= */
 
+#U9-home-product-modal
 .U9-home-product-detail-prices {
   display: flex;
   align-items: center;
@@ -405,6 +415,7 @@
 
 /* Price on the left */
 
+#U9-home-product-modal
 .U9-home-product-price-main {
   display: flex;
   align-items: baseline;
@@ -415,7 +426,12 @@
   min-width: 0;
 }
 
+
+/* Modal price only */
+
+#U9-home-product-modal
 .U9-home-product-discount-price,
+#U9-home-product-modal
 .U9-home-product-price {
   color: #202938;
 
@@ -424,6 +440,7 @@
   line-height: 1.25;
 }
 
+#U9-home-product-modal
 .U9-home-product-original-price {
   color: #9ca3af;
 
@@ -436,6 +453,7 @@
 
 /* Discount on the right */
 
+#U9-home-product-modal
 .U9-home-product-discount-label {
   flex: 0 0 auto;
 
@@ -457,6 +475,7 @@
    DESCRIPTION
 ================================================= */
 
+#U9-home-product-modal
 .U9-home-product-description {
   color: #4b5563;
 
@@ -470,7 +489,6 @@
 
 /* =================================================
    SAVE + BUY ACTIONS
-   Created by home-product-modal.js
 ================================================= */
 
 #U9-home-product-modal-actions {
@@ -588,36 +606,44 @@
     padding: 14px 12px 24px;
   }
 
+  #U9-home-product-modal
   #U9-home-product-detail-content {
     gap: 20px;
   }
 
+  #U9-home-product-modal
   .U9-home-product-main-image-wrap {
     width: min(100%, 360px);
 
     border-radius: 12px;
   }
 
+  #U9-home-product-modal
   .U9-home-product-thumbnail {
     width: 58px;
     height: 58px;
   }
 
+  #U9-home-product-modal
   .U9-home-product-detail-info {
     gap: 12px;
   }
 
+  #U9-home-product-modal
   .U9-home-product-detail-info h2 {
     font-size: 19px;
   }
 
+  #U9-home-product-modal
   .U9-home-product-detail-prices {
     min-height: 46px;
 
     padding: 9px 11px;
   }
 
+  #U9-home-product-modal
   .U9-home-product-discount-price,
+  #U9-home-product-modal
   .U9-home-product-price {
     font-size: 19px;
   }
@@ -643,19 +669,24 @@
 
 @media (max-width: 360px) {
 
+  #U9-home-product-modal
   .U9-home-product-detail-prices {
     gap: 8px;
   }
 
+  #U9-home-product-modal
   .U9-home-product-price-main {
     gap: 6px;
   }
 
+  #U9-home-product-modal
   .U9-home-product-discount-price,
+  #U9-home-product-modal
   .U9-home-product-price {
     font-size: 17px;
   }
 
+  #U9-home-product-modal
   .U9-home-product-original-price {
     font-size: 11px;
   }
