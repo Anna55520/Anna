@@ -1,3 +1,4 @@
+
 /* =================================================
    U9 HOME PAGE
 ================================================= */
@@ -397,59 +398,52 @@
 
 
 /* =================================================
-   SAVE & SHARE BUTTONS
-   HORIZONTAL ALIGNMENT
+   PRODUCT SAVE + SHARE BUTTONS
+   SAVE ON TOP
+   SHARE BELOW
 ================================================= */
 
 .U9-home-product-favorite,
 .U9-home-product-share {
-  position: absolute !important;
-  top: 9px !important;
-  bottom: auto !important;
-  left: auto !important;
-  z-index: 5;
+  position: absolute;
+  right: 9px;
+  z-index: 2;
 
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: center !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  width: 36px !important;
-  min-width: 36px;
-  max-width: 36px;
-  height: 36px !important;
-  min-height: 36px;
-  max-height: 36px;
+  width: 36px;
+  height: 36px;
 
-  margin: 0 !important;
-  padding: 0 !important;
+  padding: 0;
 
   color: #6b7280;
   font-size: 22px;
   line-height: 1;
 
   cursor: pointer;
+
   background: rgba(255, 255, 255, 0.94);
+
   border: 1px solid #e5e7eb;
   border-radius: 50%;
-
-  box-sizing: border-box;
 
   transition:
     color 0.2s ease,
     background 0.2s ease;
 }
 
-/* Save button - RIGHT */
+/* Save: top */
 
 .U9-home-product-favorite {
-  right: 9px !important;
+  top: 9px;
 }
 
-/* Share button - LEFT OF SAVE */
+/* Share: below Save */
 
 .U9-home-product-share {
-  right: 52px !important;
+  top: 52px;
 }
 
 /* Hover */
@@ -459,20 +453,13 @@
   background: #ffffff;
 }
 
-/* Save and share SVG */
+/* Save and share icons */
 
 .U9-home-product-favorite img,
 .U9-home-product-share img {
   display: block;
-  flex: 0 0 20px;
-  width: 20px !important;
-  min-width: 20px;
-  max-width: 20px;
-  height: 20px !important;
-  min-height: 20px;
-  max-height: 20px;
-  margin: 0;
-  padding: 0;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
   pointer-events: none;
 }
@@ -527,7 +514,7 @@
 
 
 /* =================================================
-   PRODUCT DETAIL CONTENT (RENDERED INSIDE MODAL)
+   PRODUCT DETAIL CONTENT
 ================================================= */
 
 
@@ -608,36 +595,21 @@
     font-size: 11px;
   }
 
-  /* Save & Share - horizontal */
+  /* Save + Share */
 
   .U9-home-product-favorite,
   .U9-home-product-share {
-    top: 7px !important;
-    width: 32px !important;
-    min-width: 32px;
-    max-width: 32px;
-    height: 32px !important;
-    min-height: 32px;
-    max-height: 32px;
+    right: 7px;
+    width: 32px;
+    height: 32px;
   }
 
   .U9-home-product-favorite {
-    right: 7px !important;
+    top: 7px;
   }
 
   .U9-home-product-share {
-    right: 45px !important;
-  }
-
-  .U9-home-product-favorite img,
-  .U9-home-product-share img {
-    width: 18px !important;
-    min-width: 18px;
-    max-width: 18px;
-    height: 18px !important;
-    min-height: 18px;
-    max-height: 18px;
-    flex: 0 0 18px;
+    top: 45px;
   }
 
   #U9-page-home.home-toolbar-collapsed {
