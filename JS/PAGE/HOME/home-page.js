@@ -1313,23 +1313,66 @@
       "false"
     );
 
-    button.innerHTML = `
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="22"
-        height="22"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.8"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path
-          d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z"
-        />
-      </svg>
-    `;
+    const icon =
+      createElement("img");
+
+    icon.src =
+      "/SSVG/button/save.svg";
+
+    icon.alt = "";
+
+    icon.setAttribute("aria-hidden", "true");
+
+    icon.draggable = false;
+
+    button.appendChild(icon);
+
+    button.addEventListener("click", function (event) {
+
+      event.preventDefault();
+
+      event.stopPropagation();
+
+    });
+
+    return button;
+
+  }
+
+
+  /* =================================================
+     PRODUCT SHARE BUTTON
+     VISUAL ONLY
+================================================= */
+
+  function createProductShareButton() {
+
+    const button =
+      createElement(
+        "button",
+        "U9-home-product-share"
+      );
+
+    button.type = "button";
+
+    button.setAttribute(
+      "aria-label",
+      "Share product"
+    );
+
+    const icon =
+      createElement("img");
+
+    icon.src =
+      "/SSVG/button/share.svg";
+
+    icon.alt = "";
+
+    icon.setAttribute("aria-hidden", "true");
+
+    icon.draggable = false;
+
+    button.appendChild(icon);
 
     button.addEventListener("click", function (event) {
 
@@ -1380,6 +1423,9 @@
 
     const favoriteButton =
       createProductFavoriteButton();
+
+    const shareButton =
+      createProductShareButton();
 
     const info =
       createElement(
@@ -1458,6 +1504,7 @@
     card.append(
       imageWrap,
       favoriteButton,
+      shareButton,
       info
     );
 
