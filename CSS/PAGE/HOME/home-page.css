@@ -404,7 +404,8 @@
 
 /* Favorite button */
 
-.U9-home-product-favorite {
+.U9-home-product-favorite,
+.U9-home-product-share {
   position: absolute;
   top: 9px;
   right: 9px;
@@ -427,9 +428,24 @@
     background 0.2s ease;
 }
 
-.U9-home-product-favorite:hover {
-  color: #ef4444;
+.U9-home-product-favorite:hover,
+.U9-home-product-share:hover {
   background: #ffffff;
+}
+
+/* Save and share icons */
+
+.U9-home-product-favorite img,
+.U9-home-product-share img {
+  display: block;
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.U9-home-product-share {
+  right: 52px;
 }
 
 
@@ -562,12 +578,19 @@
     font-size: 11px;
   }
 
-  .U9-home-product-favorite {
+  .U9-home-product-favorite,
+  .U9-home-product-share {
     top: 7px;
-    right: 7px;
     width: 32px;
     height: 32px;
-    font-size: 20px;
+  }
+
+  .U9-home-product-favorite {
+    right: 7px;
+  }
+
+  .U9-home-product-share {
+    right: 45px;
   }
 
   #U9-page-home.home-toolbar-collapsed {
