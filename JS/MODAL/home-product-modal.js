@@ -12,7 +12,7 @@
    - Product detail rendering
    - Product image gallery
    - Product name and prices
-   - Header title
+   - Fixed header title: Detailed
    - Close handling
    - Save + Buy buttons
 ================================================= */
@@ -83,7 +83,6 @@
 
   /* =================================================
      CONFIG
-     Keep the same Home Products image settings.
   ================================================= */
 
   const MODAL_CONFIG = {
@@ -700,9 +699,6 @@
   /* =================================================
      PRODUCT FAVORITE BUTTON
      VISUAL ONLY
-
-     Preserve the current behavior:
-     No new favorite API or database action.
   ================================================= */
 
   function createProductFavoriteButton() {
@@ -903,16 +899,16 @@
 
   /* =================================================
      HEADER
-     Modal HTML keeps the existing Header and Close.
-     This function only updates the product title.
+     FIXED TITLE: Detailed
+     Product name stays inside Modal Body.
   ================================================= */
 
-  function updateModalHeader(product) {
+  function updateModalHeader() {
 
     if (modalTitle) {
 
       modalTitle.textContent =
-        product.product_name || "Product";
+        "Detailed";
 
     }
 
@@ -920,7 +916,7 @@
 
       modalHeader.setAttribute(
         "aria-label",
-        product.product_name || "Product"
+        "Detailed"
       );
 
     }
@@ -930,8 +926,8 @@
 
   /* =================================================
      SAVE + BUY BUTTONS
-     Save reuses the product favorite button.
-     Buy remains a visual placeholder.
+     Save is visual only.
+     Buy is a visual placeholder.
   ================================================= */
 
   function prepareProductActions() {
@@ -955,7 +951,10 @@
 
 
     const actions =
-      document.createElement("div");
+      createElement(
+        "div",
+        ""
+      );
 
     actions.id =
       "U9-home-product-modal-actions";
@@ -1025,15 +1024,15 @@
     ============================================== */
 
     const buyButton =
-      document.createElement("button");
+      createElement(
+        "button",
+        "U9-home-product-modal-action-button"
+      );
 
     buyButton.type = "button";
 
     buyButton.id =
       "U9-home-product-modal-buy";
-
-    buyButton.className =
-      "U9-home-product-modal-action-button";
 
     buyButton.textContent = "Buy";
 
@@ -1082,7 +1081,7 @@
        HEADER
     ============================================== */
 
-    updateModalHeader(product);
+    updateModalHeader();
 
 
     /* ==============================================
@@ -1166,14 +1165,6 @@
 
   /* =================================================
      PUBLIC OPEN PRODUCT MODAL
-
-     home-page.js calls:
-
-     window.openHomeProductModal(product);
-
-     1. Receive product
-     2. Render product details
-     3. Open Window Manager
   ================================================= */
 
   async function openHomeProductModal(product) {
@@ -1403,11 +1394,6 @@
 
   /* =================================================
      WINDOW MANAGER REGISTRATION
-
-     Important:
-     Manager open uses openModalUI().
-     Product rendering happens in
-     window.openHomeProductModal(product).
   ================================================= */
 
   if (
@@ -1495,12 +1481,6 @@
 
   /* =================================================
      GLOBAL API
-
-     HOME PAGE:
-     window.openHomeProductModal(product);
-
-     CLOSE:
-     window.closeHomeProductModal();
   ================================================= */
 
   window.openHomeProductModal =
