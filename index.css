@@ -189,3 +189,20 @@ main {
     animation: none;
   }
 }
+
+
+/* =================================================
+   INITIAL PAGE VISIBILITY
+   HOME IS DEFAULT
+================================================= */
+
+#U9-page-pages > #U9-page-home {
+  display: block;
+}
+
+#U9-page-pages > #U9-page-shop,
+#U9-page-pages > #U9-page-auction,
+#U9-page-pages > #U9-page-test1,
+#U9-page-pages > #U9-page-test2 {
+  display: none;
+}
