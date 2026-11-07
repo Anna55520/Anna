@@ -485,6 +485,27 @@
     transform 0.2s ease;
 }
 
+/* Save */
+
+#U9-home-product-modal-save {
+  color: #374151;
+
+  background: #fff;
+
+  border: 1px solid #d1d5db;
+}
+
+#U9-home-product-modal-save:hover {
+  color: #e34b62;
+  border-color: #e8a0aa;
+}
+
+#U9-home-product-modal-save svg {
+  width: 19px;
+  height: 19px;
+
+  flex: 0 0 19px;
+}
 
 /* Buy */
 
