@@ -40,7 +40,10 @@
   transition: visibility 0s;
 }
 
-/* Backdrop */
+
+/* =================================================
+   BACKDROP
+================================================= */
 
 #U9-home-product-modal-backdrop {
   position: absolute;
@@ -57,7 +60,10 @@
   opacity: 1;
 }
 
-/* Fullscreen Window */
+
+/* =================================================
+   FULLSCREEN WINDOW
+================================================= */
 
 #U9-home-product-modal-window {
   position: relative;
@@ -105,7 +111,10 @@
   transform: translateY(100%);
 }
 
-/* Header */
+
+/* =================================================
+   HEADER
+================================================= */
 
 #U9-home-product-modal-header {
   position: relative;
@@ -172,7 +181,10 @@
   background: rgba(255, 255, 255, 0.15);
 }
 
-/* Scrollable Body */
+
+/* =================================================
+   SCROLLABLE BODY
+================================================= */
 
 #U9-home-product-modal-body {
   flex: 1 1 auto;
@@ -194,6 +206,7 @@
   background: #f7f8fa;
 }
 
+
 /* =================================================
    PRODUCT DETAIL CONTENT
 ================================================= */
@@ -210,6 +223,7 @@
 
   box-sizing: border-box;
 }
+
 
 /* =================================================
    MAIN PRODUCT IMAGE + GALLERY
@@ -256,7 +270,8 @@
   object-position: center;
 }
 
-.U9-home-product-main-image-wrap .U9-home-product-loading-image {
+.U9-home-product-main-image-wrap
+.U9-home-product-loading-image {
   width: 28px !important;
   height: 28px !important;
 
@@ -274,7 +289,10 @@
   max-height: 36px !important;
 }
 
-/* Thumbnails */
+
+/* =================================================
+   THUMBNAILS
+================================================= */
 
 .U9-home-product-thumbnails {
   display: flex;
@@ -320,13 +338,15 @@
   object-fit: contain;
 }
 
-.U9-home-product-thumbnail .U9-home-product-loading-image {
+.U9-home-product-thumbnail
+.U9-home-product-loading-image {
   width: 28px !important;
   height: 28px !important;
 
   max-width: 28px !important;
   max-height: 28px !important;
 }
+
 
 /* =================================================
    PRODUCT INFORMATION
@@ -356,6 +376,7 @@
   overflow-wrap: anywhere;
 }
 
+
 /* =================================================
    PRICE + DISCOUNT
 ================================================= */
@@ -380,6 +401,7 @@
   border: 1px solid #edf0f3;
   border-radius: 10px;
 }
+
 
 /* Price on the left */
 
@@ -411,6 +433,7 @@
   text-decoration: line-through;
 }
 
+
 /* Discount on the right */
 
 .U9-home-product-discount-label {
@@ -429,7 +452,10 @@
   border-radius: 6px;
 }
 
-/* Description */
+
+/* =================================================
+   DESCRIPTION
+================================================= */
 
 .U9-home-product-description {
   color: #4b5563;
@@ -441,6 +467,7 @@
   overflow-wrap: anywhere;
 }
 
+
 /* =================================================
    SAVE + BUY ACTIONS
    Created by home-product-modal.js
@@ -449,7 +476,9 @@
 #U9-home-product-modal-actions {
   display: grid;
 
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
 
   gap: 12px;
 
@@ -485,7 +514,10 @@
     transform 0.2s ease;
 }
 
-/* Save */
+
+/* =================================================
+   SAVE BUTTON
+================================================= */
 
 #U9-home-product-modal-save {
   color: #374151;
@@ -507,7 +539,10 @@
   flex: 0 0 19px;
 }
 
-/* Buy */
+
+/* =================================================
+   BUY BUTTON
+================================================= */
 
 #U9-home-product-modal-buy {
   color: #fff;
@@ -522,11 +557,15 @@
   border-color: #639bdf;
 }
 
-/* Button active */
+
+/* =================================================
+   BUTTON ACTIVE
+================================================= */
 
 #U9-home-product-modal-actions button:active {
   transform: scale(0.98);
 }
+
 
 /* =================================================
    TABLET + MOBILE
@@ -594,7 +633,9 @@
 
     font-size: 14px;
   }
+
 }
+
 
 /* =================================================
    SMALL MOBILE
@@ -618,7 +659,9 @@
   .U9-home-product-original-price {
     font-size: 11px;
   }
+
 }
+
 
 /* =================================================
    REDUCED MOTION
@@ -631,4 +674,5 @@
   #U9-home-product-modal-actions button {
     transition-duration: 0.01ms;
   }
+
 }
