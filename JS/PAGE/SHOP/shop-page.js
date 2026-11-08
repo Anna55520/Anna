@@ -23,7 +23,7 @@
   const retryButton = document.getElementById("U9-shop-products-retry");
 
   const CONFIG = {
-    table: "shop_products",
+    edgeFunctionUrl: "/api/get-shop-products",
     pageSize: 16,
     maxImages: 5,
     currencySymbol: "$",
@@ -40,7 +40,6 @@
   let hasMore = true;
   let offset = 0;
   let observer = null;
-  let clientWaitPromise = null;
   const renderedIds = new Set();
 
   function createElement(tag, className) {
@@ -81,30 +80,6 @@
 
   function hideError() {
     if (errorBox) errorBox.hidden = true;
-  }
-
-  function waitForSupabaseClient() {
-    if (window.supabaseClient) return Promise.resolve(window.supabaseClient);
-    if (clientWaitPromise) return clientWaitPromise;
-
-    clientWaitPromise = new Promise(function (resolve, reject) {
-      const startedAt = Date.now();
-      (function check() {
-        if (window.supabaseClient) {
-          resolve(window.supabaseClient);
-          return;
-        }
-        if (Date.now() - startedAt >= 15000) {
-          reject(new Error("Supabase client is not ready."));
-          return;
-        }
-        window.setTimeout(check, 150);
-      })();
-    }).finally(function () {
-      clientWaitPromise = null;
-    });
-
-    return clientWaitPromise;
   }
 
   function normalizeImageUrl(value) {
@@ -286,20 +261,39 @@
   }
 
   async function fetchProductsPage() {
-    const client = await waitForSupabaseClient();
-    const from = offset;
-    const to = offset + CONFIG.pageSize - 1;
+    const url = new URL(CONFIG.edgeFunctionUrl, window.location.origin);
+    url.searchParams.set("limit", String(CONFIG.pageSize));
+    url.searchParams.set("offset", String(offset));
 
-    const result = await client
-      .from(CONFIG.table)
-      .select("uuid, product_name, product_price, product_description, product_image_1, product_image_2, product_image_3, product_image_4, product_image_5, is_active")
-      .eq("is_active", true)
-      .order("product_name", { ascending: true })
-      .range(from, to);
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(function () {
+      controller.abort();
+    }, 20000);
 
-    if (result.error) throw result.error;
-    if (!Array.isArray(result.data)) throw new Error("Invalid Shop Products response.");
-    return result.data;
+    try {
+      const response = await fetch(url.toString(), {
+        method: "GET",
+        headers: { "Accept": "application/json" },
+        cache: "no-store",
+        signal: controller.signal
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text().catch(function () { return ""; });
+        throw new Error(
+          "Shop products request failed (" + response.status + "). " +
+          errorBody.slice(0, 300)
+        );
+      }
+
+      const products = await response.json();
+      if (!Array.isArray(products)) {
+        throw new Error("Invalid Shop Products response.");
+      }
+      return products;
+    } finally {
+      window.clearTimeout(timeoutId);
+    }
   }
 
   async function loadProducts() {
