@@ -84,6 +84,9 @@ let currentUserState =
 let currentUserError =
 null;
 
+// Prevent an older /me response from overwriting a newer login/session state.
+let currentUserRequestId = 0;
+
 
 
 
@@ -508,6 +511,12 @@ function notifyUserListeners(){
 async function getCurrentUser(){
 
 
+  const requestId =
+  ++currentUserRequestId;
+
+  const tokenAtRequestStart =
+  getSessionToken();
+
   const previousUser =
   currentUser;
 
@@ -529,7 +538,7 @@ async function getCurrentUser(){
 
 
     const token =
-    getSessionToken();
+    tokenAtRequestStart;
 
 
 
@@ -576,7 +585,16 @@ async function getCurrentUser(){
     );
 
 
+    // Ignore stale responses. A login/logout or a newer refresh may have
+    // changed the active token while this request was waiting on the server.
+    if (requestId !== currentUserRequestId) {
+      return currentUser;
+    }
 
+    const tokenNow = getSessionToken();
+    if (tokenNow !== tokenAtRequestStart) {
+      return await getCurrentUser();
+    }
 
 
     /*
@@ -748,6 +766,9 @@ async function getCurrentUser(){
 
     );
 
+    if (requestId !== currentUserRequestId) {
+      return currentUser;
+    }
 
 
     setUserState(
@@ -898,6 +919,9 @@ async function refreshUser(){
 
 function clearCurrentUser(){
 
+
+  // Invalidate any /me request started before logout.
+  currentUserRequestId += 1;
 
   localStorage.removeItem(
     "u9_token"
