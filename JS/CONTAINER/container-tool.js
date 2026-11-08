@@ -567,7 +567,17 @@ if (profileButton) {
 
 let pageWindowStart = 0;
 
-const pageWindowSize = 3;
+// Mobile keeps the 3-page sliding window; desktop displays every page.
+const mobilePageWindowSize = 3;
+const pageWindowBreakpoint = 480;
+
+function isMobilePageWindow() {
+  return window.matchMedia(`(max-width: ${pageWindowBreakpoint}px)`).matches;
+}
+
+function getPageWindowSize() {
+  return isMobilePageWindow() ? mobilePageWindowSize : pageButtons.length;
+}
 
 
 /* =========================
@@ -624,11 +634,11 @@ function renderPageWindow() {
         return;
       }
 
-      const visible =
+      const windowSize = getPageWindowSize();
+      const visible = !isMobilePageWindow() || (
         index >= pageWindowStart &&
-        index <
-          pageWindowStart +
-          pageWindowSize;
+        index < pageWindowStart + windowSize
+      );
 
       button.style.display =
         visible
@@ -845,6 +855,17 @@ if (test2Button) {
 
 renderPageWindow();
 
+// Re-render page visibility when switching between desktop and mobile widths.
+let pageWindowResizeTimer = null;
+window.addEventListener("resize", function () {
+  clearTimeout(pageWindowResizeTimer);
+  pageWindowResizeTimer = setTimeout(function () {
+    const maxStart = Math.max(0, pageButtons.length - mobilePageWindowSize);
+    pageWindowStart = Math.min(pageWindowStart, maxStart);
+    renderPageWindow();
+  }, 120);
+});
+
 
 /* =========================
    INITIAL ACTIVE PAGE
@@ -864,9 +885,9 @@ if (pageNextButton) {
     "click",
     function () {
       if (
+        isMobilePageWindow() &&
         pageWindowStart <
-        pageButtons.length -
-          pageWindowSize
+        pageButtons.length - mobilePageWindowSize
       ) {
         pageWindowStart++;
 
@@ -885,7 +906,7 @@ if (pagePrevButton) {
   pagePrevButton.addEventListener(
     "click",
     function () {
-      if (pageWindowStart > 0) {
+      if (isMobilePageWindow() && pageWindowStart > 0) {
         pageWindowStart--;
 
         renderPageWindow();
