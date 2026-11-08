@@ -617,7 +617,37 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
     <!-- SHOP -->
 
     <div id="U9-page-shop">
-      Shop
+
+      <section id="U9-shop-products" aria-label="Shop Products">
+
+        <div
+          id="U9-shop-products-grid"
+          aria-live="polite"
+        ></div>
+
+        <div
+          id="U9-shop-products-status"
+          role="status"
+          aria-live="polite"
+          hidden
+        ></div>
+
+        <div
+          id="U9-shop-products-error"
+          role="alert"
+          hidden
+        >
+          Unable to load Shop products.
+          <button id="U9-shop-products-retry" type="button">Try again</button>
+        </div>
+
+        <div
+          id="U9-shop-products-sentinel"
+          aria-hidden="true"
+        ></div>
+
+      </section>
+
     </div>
 
 
