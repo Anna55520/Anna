@@ -389,7 +389,7 @@
     const image =
       createElement(
         "img",
-        "U9-home-product-loading-image"
+        "U9-home-product-modal-loading-image"
       );
 
     image.src =
@@ -418,7 +418,7 @@
     const wrapper =
       createElement(
         "div",
-        "U9-home-product-image-wrap"
+        "U9-home-product-modal-image-wrap"
       );
 
     wrapper.appendChild(
@@ -483,7 +483,7 @@
     const gallery =
       createElement(
         "div",
-        "U9-home-product-gallery"
+        "U9-home-product-modal-gallery"
       );
 
     const images =
@@ -492,17 +492,17 @@
     const mainImageWrap =
       createElement(
         "div",
-        "U9-home-product-main-image-wrap"
+        "U9-home-product-modal-main-image-wrap"
       );
 
     mainImageWrap.classList.add(
-      "U9-home-product-image-wrap"
+      "U9-home-product-modal-image-wrap"
     );
 
     const thumbnails =
       createElement(
         "div",
-        "U9-home-product-thumbnails"
+        "U9-home-product-modal-thumbnails"
       );
 
 
@@ -544,7 +544,7 @@
         const image =
           createElement(
             "img",
-            "U9-home-product-main-image"
+            "U9-home-product-modal-main-image"
           );
 
         image.src = imageUrl;
@@ -603,7 +603,7 @@
         const thumbnail =
           createElement(
             "button",
-            "U9-home-product-thumbnail"
+            "U9-home-product-modal-thumbnail"
           );
 
         thumbnail.type = "button";
@@ -651,7 +651,7 @@
 
             thumbnails
               .querySelectorAll(
-                ".U9-home-product-thumbnail"
+                ".U9-home-product-modal-thumbnail"
               )
               .forEach(function (item) {
 
@@ -706,7 +706,7 @@
     const button =
       createElement(
         "button",
-        "U9-home-product-detail-favorite"
+        "U9-home-product-modal-detail-favorite"
       );
 
     button.type = "button";
@@ -765,7 +765,7 @@
     const info =
       createElement(
         "div",
-        "U9-home-product-detail-info"
+        "U9-home-product-modal-detail-info"
       );
 
 
@@ -776,7 +776,7 @@
     const name =
       createElement(
         "h2",
-        "U9-home-product-detail-name"
+        "U9-home-product-modal-detail-name"
       );
 
     name.textContent =
@@ -790,7 +790,7 @@
     const prices =
       createElement(
         "div",
-        "U9-home-product-detail-prices"
+        "U9-home-product-modal-detail-prices"
       );
 
     const price =
@@ -802,7 +802,7 @@
     const priceMain =
       createElement(
         "div",
-        "U9-home-product-price-main"
+        "U9-home-product-modal-price-main"
       );
 
 
@@ -811,7 +811,7 @@
       const discountPrice =
         createElement(
           "span",
-          "U9-home-product-discount-price"
+          "U9-home-product-modal-discount-price"
         );
 
       discountPrice.textContent =
@@ -823,7 +823,7 @@
       const originalPrice =
         createElement(
           "span",
-          "U9-home-product-original-price"
+          "U9-home-product-modal-original-price"
         );
 
       originalPrice.textContent =
@@ -833,7 +833,7 @@
       const discountLabel =
         createElement(
           "span",
-          "U9-home-product-discount-label"
+          "U9-home-product-modal-discount-label"
         );
 
       discountLabel.textContent =
@@ -855,7 +855,7 @@
       const normalPrice =
         createElement(
           "span",
-          "U9-home-product-price"
+          "U9-home-product-modal-price"
         );
 
       normalPrice.textContent =
@@ -879,7 +879,7 @@
     const description =
       createElement(
         "div",
-        "U9-home-product-description"
+        "U9-home-product-modal-description"
       );
 
     description.textContent =
@@ -946,7 +946,7 @@
 
     const existingSaveButton =
       detailContent.querySelector(
-        ".U9-home-product-detail-favorite"
+        ".U9-home-product-modal-detail-favorite"
       );
 
 
@@ -983,7 +983,7 @@
       "U9-home-product-modal-save";
 
     saveButton.classList.remove(
-      "U9-home-product-detail-favorite"
+      "U9-home-product-modal-detail-favorite"
     );
 
     saveButton.classList.add(
