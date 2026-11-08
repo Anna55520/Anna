@@ -135,6 +135,32 @@ button:not(#U9-page-container-tool-search-button):hover {
 
 
 /* =========================
+   DESKTOP PAGE MENU
+========================= */
+
+@media (min-width: 481px) {
+
+  #U9-page-container-tool-pages {
+    transform: translateX(-100%);
+    gap: 8px;
+  }
+
+  #U9-page-container-tool-pages-prev,
+  #U9-page-container-tool-pages-next {
+    display: none !important;
+  }
+
+  #U9-page-container-tool-home,
+  #U9-page-container-tool-shop-page,
+  #U9-page-container-tool-auction,
+  #U9-page-container-tool-test1,
+  #U9-page-container-tool-test2 {
+    padding: 0 14px;
+  }
+
+}
+
+/* =========================
    MENU BUTTON
 ========================= */
 
@@ -1079,6 +1105,7 @@ button:not(#U9-page-container-tool-search-button):hover {
   #U9-page-container-tool-pages-prev,
   #U9-page-container-tool-pages-next {
 
+    display: flex;
     font-size: 17px;
 
   }
