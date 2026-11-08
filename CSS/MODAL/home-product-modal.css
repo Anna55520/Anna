@@ -1,6 +1,6 @@
 
 /* =================================================
-   U9 HOME PRODUCT MODAL — FULLSCREEN
+   U9 HOME PRODUCT MODAL â€” FULLSCREEN
 ================================================= */
 
 #U9-home-product-modal {
@@ -230,7 +230,7 @@
    MAIN PRODUCT IMAGE + GALLERY
 ================================================= */
 
-#U9-home-product-modal .U9-home-product-gallery {
+#U9-home-product-modal .U9-home-product-modal-gallery {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -241,7 +241,7 @@
   gap: 12px;
 }
 
-#U9-home-product-modal .U9-home-product-main-image-wrap {
+#U9-home-product-modal .U9-home-product-modal-main-image-wrap {
   position: relative;
 
   display: flex;
@@ -262,7 +262,7 @@
 }
 
 #U9-home-product-modal
-.U9-home-product-main-image-wrap img {
+.U9-home-product-modal-main-image-wrap img {
   display: block;
 
   width: 100%;
@@ -273,8 +273,8 @@
 }
 
 #U9-home-product-modal
-.U9-home-product-main-image-wrap
-.U9-home-product-loading-image {
+.U9-home-product-modal-main-image-wrap
+.U9-home-product-modal-loading-image {
   width: 28px !important;
   height: 28px !important;
 
@@ -283,7 +283,7 @@
 }
 
 #U9-home-product-modal
-.U9-home-product-main-image-wrap > svg {
+.U9-home-product-modal-main-image-wrap > svg {
   display: block;
 
   width: 36px !important;
@@ -298,7 +298,7 @@
    THUMBNAILS
 ================================================= */
 
-#U9-home-product-modal .U9-home-product-thumbnails {
+#U9-home-product-modal .U9-home-product-modal-thumbnails {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
@@ -309,7 +309,7 @@
   margin: 0;
 }
 
-#U9-home-product-modal .U9-home-product-thumbnail {
+#U9-home-product-modal .U9-home-product-modal-thumbnail {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -329,14 +329,14 @@
 }
 
 #U9-home-product-modal
-.U9-home-product-thumbnail.is-active,
+.U9-home-product-modal-thumbnail.is-active,
 #U9-home-product-modal
-.U9-home-product-thumbnail[aria-pressed="true"] {
+.U9-home-product-modal-thumbnail[aria-pressed="true"] {
   border: 2px solid #78ace9;
 }
 
 #U9-home-product-modal
-.U9-home-product-thumbnail img {
+.U9-home-product-modal-thumbnail img {
   display: block;
 
   width: 100%;
@@ -346,8 +346,8 @@
 }
 
 #U9-home-product-modal
-.U9-home-product-thumbnail
-.U9-home-product-loading-image {
+.U9-home-product-modal-thumbnail
+.U9-home-product-modal-loading-image {
   width: 28px !important;
   height: 28px !important;
 
@@ -360,7 +360,7 @@
    PRODUCT INFORMATION
 ================================================= */
 
-#U9-home-product-modal .U9-home-product-detail-info {
+#U9-home-product-modal .U9-home-product-modal-detail-info {
   display: flex;
   flex-direction: column;
 
@@ -373,7 +373,7 @@
 }
 
 #U9-home-product-modal
-.U9-home-product-detail-info h2 {
+.U9-home-product-modal-detail-info h2 {
   margin: 0;
 
   color: #1f2937;
@@ -391,7 +391,7 @@
 ================================================= */
 
 #U9-home-product-modal
-.U9-home-product-detail-prices {
+.U9-home-product-modal-detail-prices {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -416,7 +416,7 @@
 /* Price on the left */
 
 #U9-home-product-modal
-.U9-home-product-price-main {
+.U9-home-product-modal-price-main {
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
@@ -430,9 +430,9 @@
 /* Modal price only */
 
 #U9-home-product-modal
-.U9-home-product-discount-price,
+.U9-home-product-modal-discount-price,
 #U9-home-product-modal
-.U9-home-product-price {
+.U9-home-product-modal-price {
   color: #202938;
 
   font-size: 21px;
@@ -441,7 +441,7 @@
 }
 
 #U9-home-product-modal
-.U9-home-product-original-price {
+.U9-home-product-modal-original-price {
   color: #9ca3af;
 
   font-size: 13px;
@@ -454,7 +454,7 @@
 /* Discount on the right */
 
 #U9-home-product-modal
-.U9-home-product-discount-label {
+.U9-home-product-modal-discount-label {
   flex: 0 0 auto;
 
   padding: 5px 9px;
@@ -476,7 +476,7 @@
 ================================================= */
 
 #U9-home-product-modal
-.U9-home-product-description {
+.U9-home-product-modal-description {
   color: #4b5563;
 
   font-size: 14px;
@@ -612,39 +612,39 @@
   }
 
   #U9-home-product-modal
-  .U9-home-product-main-image-wrap {
+  .U9-home-product-modal-main-image-wrap {
     width: min(100%, 360px);
 
     border-radius: 12px;
   }
 
   #U9-home-product-modal
-  .U9-home-product-thumbnail {
+  .U9-home-product-modal-thumbnail {
     width: 58px;
     height: 58px;
   }
 
   #U9-home-product-modal
-  .U9-home-product-detail-info {
+  .U9-home-product-modal-detail-info {
     gap: 12px;
   }
 
   #U9-home-product-modal
-  .U9-home-product-detail-info h2 {
+  .U9-home-product-modal-detail-info h2 {
     font-size: 19px;
   }
 
   #U9-home-product-modal
-  .U9-home-product-detail-prices {
+  .U9-home-product-modal-detail-prices {
     min-height: 46px;
 
     padding: 9px 11px;
   }
 
   #U9-home-product-modal
-  .U9-home-product-discount-price,
+  .U9-home-product-modal-discount-price,
   #U9-home-product-modal
-  .U9-home-product-price {
+  .U9-home-product-modal-price {
     font-size: 19px;
   }
 
@@ -670,24 +670,24 @@
 @media (max-width: 360px) {
 
   #U9-home-product-modal
-  .U9-home-product-detail-prices {
+  .U9-home-product-modal-detail-prices {
     gap: 8px;
   }
 
   #U9-home-product-modal
-  .U9-home-product-price-main {
+  .U9-home-product-modal-price-main {
     gap: 6px;
   }
 
   #U9-home-product-modal
-  .U9-home-product-discount-price,
+  .U9-home-product-modal-discount-price,
   #U9-home-product-modal
-  .U9-home-product-price {
+  .U9-home-product-modal-price {
     font-size: 17px;
   }
 
   #U9-home-product-modal
-  .U9-home-product-original-price {
+  .U9-home-product-modal-original-price {
     font-size: 11px;
   }
 
