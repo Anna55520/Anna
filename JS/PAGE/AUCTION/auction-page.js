@@ -107,15 +107,50 @@
      U9 session.
   ========================================================= */
 
+  function getAuctionSessionToken() {
+    try {
+      return localStorage.getItem("u9_token") || null;
+    } catch (error) {
+      console.warn("U9 Auction: unable to read session token:", error);
+      return null;
+    }
+  }
+
+  function stopAuctionBackgroundTimers() {
+    if (balanceTimer) {
+      clearInterval(balanceTimer);
+      balanceTimer = null;
+    }
+
+    if (matchingTimer) {
+      clearInterval(matchingTimer);
+      matchingTimer = null;
+    }
+
+    if (cooldownTimer) {
+      clearInterval(cooldownTimer);
+      cooldownTimer = null;
+    }
+  }
+
   async function requestAuctionApi(path, body) {
+    const token = getAuctionSessionToken();
+    const headers = {
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+
+    // The U9 API accepts Bearer tokens and falls back to the HttpOnly cookie.
+    // Send the current token explicitly so Auction uses the same session as /me.
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
     const options = {
       method: "POST",
       credentials: "same-origin",
       cache: "no-store",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
+      headers,
       body: JSON.stringify(body || {})
     };
 
@@ -123,6 +158,24 @@
 
     try {
       response = await fetch(path, options);
+
+      // A login may complete while an older request is in flight. If that
+      // request used the previous token, retry once with the newly saved token.
+      if (response.status === 401) {
+        const latestToken = getAuctionSessionToken();
+
+        if (latestToken && latestToken !== token) {
+          const retryHeaders = {
+            ...headers,
+            Authorization: `Bearer ${latestToken}`
+          };
+
+          response = await fetch(path, {
+            ...options,
+            headers: retryHeaders
+          });
+        }
+      }
     } catch (error) {
       console.error("U9 Auction network error:", path, error);
 
@@ -161,6 +214,17 @@
           payload.message ||
           payload.details
         );
+
+      if (response.status === 401 || response.status === 403) {
+        stopAuctionBackgroundTimers();
+
+        const authError = new Error(
+          message || "Your session is no longer valid. Please log in again."
+        );
+        authError.status = response.status;
+        authError.code = "U9_SESSION_INVALID";
+        throw authError;
+      }
 
       throw new Error(
         message ||
