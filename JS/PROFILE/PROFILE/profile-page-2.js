@@ -27,11 +27,6 @@
       "U9-profile-withdrawal-verified-icon"
     );
 
-  const noticeButton =
-    document.getElementById(
-      "U9-profile-withdrawal-notice-button"
-    );
-
 
   /* =========================
      CATEGORIES
@@ -279,35 +274,12 @@
     }
 
     if (user.balance !== undefined) {
-
       setBalance(user.balance);
-
     }
 
     if (user.email_verified !== undefined) {
-
       setEmailVerified(user.email_verified);
-
     }
-
-  }
-
-
-  /* =================================================
-     NOTICE BUTTON
-     FUNCTION WILL BE ADDED LATER
-  ================================================= */
-
-  if (noticeButton) {
-
-    noticeButton.addEventListener(
-      "click",
-      function () {
-
-        // Notice button functionality will be added later.
-
-      }
-    );
 
   }
 
