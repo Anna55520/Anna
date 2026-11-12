@@ -7,6 +7,7 @@
 
   "use strict";
 
+
   /* =========================
      ELEMENTS
   ========================= */
@@ -19,18 +20,16 @@
     "U9-profile-withdrawal-balance-value"
   );
 
-  // BUTTON ELEMENTS
   const verifiedButton = document.getElementById(
     "U9-profile-withdrawal-verified-button"
   );
 
-  const noticeButton = document.getElementById(
-    "U9-profile-withdrawal-notice-button"
-  );
-
-  // SVG ELEMENTS
   const verifiedIcon = document.getElementById(
     "U9-profile-withdrawal-verified-icon"
+  );
+
+  const noticeButton = document.getElementById(
+    "U9-profile-withdrawal-notice-button"
   );
 
   const noticeIcon = document.getElementById(
@@ -178,10 +177,10 @@
 
 
   /* =================================================
-     WITHDRAWAL SVG BUTTONS
+     WITHDRAWAL BUTTON INITIALIZATION
   ================================================= */
 
-  function initializeIconButton(button, icon, name) {
+  function initializeButton(button, icon, name) {
 
     if (!button) {
 
@@ -194,16 +193,12 @@
 
     }
 
-    // Ensure the element is a real button.
-    if (button.tagName === "BUTTON") {
-      button.type = "button";
-    }
+    button.type = "button";
 
-    // Keep the SVG inside the button.
     if (icon && !button.contains(icon)) {
 
       console.warn(
-        "U9 Withdrawal SVG is not inside its button:",
+        "U9 Withdrawal icon is outside its button:",
         name
       );
 
@@ -211,13 +206,13 @@
 
   }
 
-  initializeIconButton(
+  initializeButton(
     verifiedButton,
     verifiedIcon,
     "verified"
   );
 
-  initializeIconButton(
+  initializeButton(
     noticeButton,
     noticeIcon,
     "notice"
@@ -281,6 +276,11 @@
 
     }
 
+    verifiedButton?.setAttribute(
+      "aria-label",
+      verified ? "Email verified" : "Email unverified"
+    );
+
   }
 
 
@@ -335,13 +335,22 @@
 
     updateUserInfo: updateUserInfo,
 
-    // BUTTON ELEMENTS
+    // BUTTON REFERENCES
     getVerifiedButton: function () {
       return verifiedButton;
     },
 
     getNoticeButton: function () {
       return noticeButton;
+    },
+
+    // ICON REFERENCES
+    getVerifiedIcon: function () {
+      return verifiedIcon;
+    },
+
+    getNoticeIcon: function () {
+      return noticeIcon;
     }
 
   };
