@@ -9,6 +9,15 @@
 
 
   /* =========================
+     PREVENT DUPLICATE INIT
+  ========================= */
+
+  if (window.U9ProfileWithdrawal) {
+    return;
+  }
+
+
+  /* =========================
      ELEMENTS
   ========================= */
 
@@ -312,6 +321,79 @@
 
 
   /* =================================================
+     LOAD USER INFO FROM DATABASE
+  ================================================= */
+
+  let userInfoRequest = null;
+
+  async function loadUserInfo() {
+
+    // Prevent concurrent duplicate requests
+    if (userInfoRequest) {
+      return userInfoRequest;
+    }
+
+    userInfoRequest = (async function () {
+
+      try {
+
+        const response = await fetch("/api/me", {
+
+          method: "GET",
+
+          credentials: "include",
+
+          cache: "no-store"
+
+        });
+
+        const result = await response.json();
+
+        if (
+          !response.ok ||
+          result.authenticated !== true ||
+          !result.user
+        ) {
+
+          throw new Error(
+            result.error || "Unable to load user information."
+          );
+
+        }
+
+        updateUserInfo({
+
+          balance: result.user.balance,
+
+          email_verified: result.user.email_verified
+
+        });
+
+        return result.user;
+
+      } catch (error) {
+
+        console.error(
+          "U9 Withdrawal: Failed to load user information:",
+          error
+        );
+
+        return null;
+
+      } finally {
+
+        userInfoRequest = null;
+
+      }
+
+    })();
+
+    return userInfoRequest;
+
+  }
+
+
+  /* =================================================
      PUBLIC API
   ================================================= */
 
@@ -335,6 +417,8 @@
 
     updateUserInfo: updateUserInfo,
 
+    loadUserInfo: loadUserInfo,
+
     // BUTTON REFERENCES
     getVerifiedButton: function () {
       return verifiedButton;
@@ -354,6 +438,13 @@
     }
 
   };
+
+
+  /* =================================================
+     INITIAL LOAD
+  ================================================= */
+
+  loadUserInfo();
 
 
 })();
