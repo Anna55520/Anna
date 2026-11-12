@@ -52,8 +52,18 @@ const u9ProfilePageTitles = {
   5: "buttonpage5"
 };
 
-const u9ProfilePageIcon =
-  "SSVG/account/account-edit-button.svg";
+/* =========================
+   PROFILE PAGE ICONS
+   EACH PAGE IS INDEPENDENT
+========================= */
+
+const u9ProfilePageIcons = {
+  1: "SSVG/account/account-edit-button.svg",
+  2: "SSVG/account/account-edit-button.svg",
+  3: "SSVG/account/account-edit-button.svg",
+  4: "SSVG/account/account-edit-button.svg",
+  5: "SSVG/account/account-edit-button.svg"
+};
 
 
 /* =========================
@@ -98,6 +108,7 @@ const u9ProfileBalanceToggle =
 let u9ProfileBalanceMode = "balance";
 
 let u9ProfileBalanceRefreshPromise = null;
+
 
 /* =========================
    PROFILE INITIAL LOAD STATE
@@ -285,8 +296,6 @@ function u9ProfileAuthHeaders() {
 }
 
 
-
-
 /* =========================
    FORMAT MONEY / COINS
 ========================= */
@@ -405,7 +414,6 @@ async function u9ProfileRefreshBalanceCoins() {
 
       const result = await response.json();
 
-      // Support common API response shapes.
       const user =
         result.user ||
         result.data?.user ||
@@ -423,7 +431,6 @@ async function u9ProfileRefreshBalanceCoins() {
         return false;
       }
 
-      // Update only Profile's Balance and Coins.
       u9ProfileUpdateBalanceCoins(user);
 
       return true;
@@ -443,7 +450,6 @@ async function u9ProfileRefreshBalanceCoins() {
 }
 
 
-
 /* =========================
    TOGGLE BALANCE / COINS
    ALSO REFRESH DATA
@@ -458,11 +464,6 @@ async function u9ProfileToggleBalanceCoins() {
   ) {
     return false;
   }
-
-  /*
-   * Toggle the display immediately.
-   * Do not make the user wait for the network.
-   */
 
   if (u9ProfileBalanceMode === "balance") {
     u9ProfileBalanceMode = "coins";
@@ -487,11 +488,6 @@ async function u9ProfileToggleBalanceCoins() {
       "Refresh balance and coins, then show coins"
     );
   }
-
-  /*
-   * Refresh both values after switching.
-   * If the request fails, retain the displayed values.
-   */
 
   await u9ProfileRefreshBalanceCoins();
 
@@ -521,6 +517,9 @@ if (u9ProfileBalanceToggle) {
 ========================= */
 
 function u9ProfileSetHeader(page) {
+
+  /* MAIN PAGE */
+
   if (page === "main") {
     if (profileModalCloseIcon) {
       profileModalCloseIcon.src = u9ProfileMainCloseIcon;
@@ -541,11 +540,15 @@ function u9ProfileSetHeader(page) {
     return;
   }
 
+  /* INTERNAL PAGES */
+
   const pageNumber = Number(
     String(page).replace("page", "")
   );
 
   const pageTitle = u9ProfilePageTitles[pageNumber];
+
+  const pageIcon = u9ProfilePageIcons[pageNumber];
 
   if (!pageTitle) {
     return;
@@ -563,8 +566,8 @@ function u9ProfileSetHeader(page) {
     profileModalTitle.textContent = pageTitle;
   }
 
-  if (profileModalIcon) {
-    profileModalIcon.src = u9ProfilePageIcon;
+  if (profileModalIcon && pageIcon) {
+    profileModalIcon.src = pageIcon;
   }
 }
 
@@ -654,14 +657,6 @@ function u9ProfileShowLoading() {
   if (u9ProfileInfoLoading) {
     u9ProfileInfoLoading.classList.remove("hidden");
   }
-
-  /*
-   * IMPORTANT:
-   * Do not remove "loaded" here.
-   *
-   * Removing it can hide the whole profile info area,
-   * including #U9-profile-balance-container.
-   */
 }
 
 
@@ -677,10 +672,6 @@ function u9ProfileHideLoading() {
   if (u9ProfileInfo) {
     u9ProfileInfo.classList.add("loaded");
   }
-
-  /*
-   * Keep the balance container visible.
-   */
 
   if (u9ProfileBalanceContainer) {
     u9ProfileBalanceContainer.style.display = "flex";
@@ -719,8 +710,6 @@ async function u9ProfileLoadOnce() {
     return true;
   }
 
-  // Prevent duplicate requests if Profile is opened repeatedly
-  // while the first load is still in progress.
   if (u9ProfileLoadPromise) {
     return u9ProfileLoadPromise;
   }
@@ -769,8 +758,6 @@ function openProfileModal() {
     profileUserButton.classList.add("account-open");
   }
 
-  // Load profile data only on the first successful open.
-  // Reopening the modal keeps the existing user/avatar/frame content.
   u9ProfileLoadOnce();
 
   return true;
@@ -1133,7 +1120,7 @@ async function u9ProfileLoadFrame(frameType, frameId) {
     if (u9ProfileAvatarFrame) {
       u9ProfileAvatarFrame.dataset.u9Fallback = "false";
       u9ProfileAvatarFrame.src =
-      u9ProfileGetImageUrl(currentFrame.svg);
+        u9ProfileGetImageUrl(currentFrame.svg);
     }
 
     return true;
@@ -1162,15 +1149,7 @@ function u9ProfileDisplayUser(user) {
     u9ProfileAccount.textContent = user.account || "";
   }
 
-  /*
-   * Update both values without clearing existing values.
-   */
-
   u9ProfileUpdateBalanceCoins(user);
-
-  /*
-   * Make sure the profile and balance area are visible.
-   */
 
   if (u9ProfileInfo) {
     u9ProfileInfo.classList.add("loaded");
@@ -1199,7 +1178,7 @@ async function u9ProfileLoadAvatarFromUser(user) {
     const avatar = user.avatar || null;
 
     const avatarUrl = u9ProfileGetImageUrl(
-    avatar?.url || ""
+      avatar?.url || ""
     );
 
     if (avatarUrl && u9ProfileAvatarImage) {
@@ -1264,15 +1243,7 @@ async function u9ProfileRefreshAvatar() {
 ========================= */
 
 async function u9ProfileLoad() {
-  /*
-   * Show loading indicator but keep profile info visible.
-   */
-
   u9ProfileShowLoading();
-
-  /*
-   * Reset avatar and return to main page.
-   */
 
   u9ProfileResetAvatar();
   u9ProfileShowMainPage();
@@ -1291,20 +1262,11 @@ async function u9ProfileLoad() {
   }
 
   try {
-    /*
-     * Display cached user information immediately.
-     */
-
     const cachedUser = window.U9User.get();
 
     if (cachedUser) {
       u9ProfileDisplayUser(cachedUser);
     }
-
-    /*
-     * Fetch refreshed user data.
-     * If refresh fails, cached information remains visible.
-     */
 
     let latestUser = null;
 
@@ -1323,10 +1285,6 @@ async function u9ProfileLoad() {
 
     if (user) {
       u9ProfileDisplayUser(user);
-
-      /*
-       * Load avatar/frame from the latest available user data.
-       */
 
       const avatarLoaded =
         await u9ProfileLoadAvatarFromUser(user);
