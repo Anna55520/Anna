@@ -46,7 +46,7 @@ const u9ProfileBackIcon = "SSVG/account/back.svg";
 
 const u9ProfilePageTitles = {
   1: "buttonpage1",
-  2: "buttonpage2",
+  2: "Withdrawal",
   3: "buttonpage3",
   4: "buttonpage4",
   5: "buttonpage5"
