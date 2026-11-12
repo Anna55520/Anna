@@ -290,7 +290,6 @@
 
 /* =========================
    PROFILE INFO
-   KEEP VISIBLE DURING LOADING
 ========================= */
 
 #U9-profile-info {
@@ -304,7 +303,6 @@
 
 /* =========================
    PROFILE INFO LOADED
-   COMPATIBILITY WITH EXISTING JS
 ========================= */
 
 #U9-profile-info.loaded {
@@ -633,12 +631,18 @@
 
 /* =========================
    BUTTON 1 / 2 TEXT
+   CENTER IN TEXT AREA
 ========================= */
 
 #U9-profile-button-1 span,
 #U9-profile-button-2 span {
-  display: block;
-  width: 100%;
+  position: absolute;
+  left: 46px;
+  right: 8px;
+  width: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   text-align: center;
   line-height: 1.2;
   white-space: nowrap;
@@ -799,6 +803,17 @@
     width: 26px;
     height: 26px;
     left: 10px;
+  }
+
+
+  /* =========================
+     BUTTON 1 / 2 TEXT
+  ========================= */
+
+  #U9-profile-button-1 span,
+  #U9-profile-button-2 span {
+    left: 38px;
+    right: 6px;
   }
 
 
