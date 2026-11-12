@@ -213,7 +213,7 @@
 
 
 /* =================================================
-   BALANCE
+   BALANCE BOX
 ================================================= */
 
 #U9-profile-withdrawal-balance {
@@ -227,12 +227,16 @@
 
   gap: 6px;
 
-  padding: 0;
+  min-height: 36px;
 
-  border: none;
-  border-radius: 0;
+  padding: 0 10px;
 
-  background: transparent;
+  box-sizing: border-box;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+
+  background: #ffffff;
 
   color: #333333;
 
@@ -270,7 +274,7 @@
 
 
 /* =================================================
-   RIGHT SVG AREA
+   RIGHT SVG BOXES
 ================================================= */
 
 #U9-profile-withdrawal-verified,
@@ -281,19 +285,19 @@
   align-items: center;
   justify-content: center;
 
-  flex: 0 0 28px;
+  flex: 0 0 36px;
 
-  width: 28px;
-  height: 28px;
+  width: 36px;
+  height: 36px;
 
   padding: 0;
 
   box-sizing: border-box;
 
-  border: none;
-  border-radius: 0;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
 
-  background: transparent;
+  background: #ffffff;
 }
 
 
@@ -333,7 +337,8 @@
   outline: none;
 
   transition:
-    opacity 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
     transform 0.2s ease;
 }
 
@@ -341,7 +346,9 @@
 /* HOVER */
 
 #U9-profile-withdrawal-notice-button:hover {
-  opacity: 0.75;
+  border-color: #cfd8ea;
+
+  background: #f8faff;
 }
 
 
@@ -445,10 +452,14 @@
   }
 
 
-  /* BALANCE */
+  /* BALANCE BOX */
 
   #U9-profile-withdrawal-balance {
     gap: 5px;
+
+    min-height: 34px;
+
+    padding: 0 8px;
 
     font-size: 13px;
   }
@@ -461,14 +472,14 @@
   }
 
 
-  /* RIGHT SVG AREA */
+  /* RIGHT SVG BOXES */
 
   #U9-profile-withdrawal-verified,
   #U9-profile-withdrawal-notice-button {
-    flex-basis: 26px;
+    flex-basis: 34px;
 
-    width: 26px;
-    height: 26px;
+    width: 34px;
+    height: 34px;
   }
 
 
@@ -533,10 +544,14 @@
   }
 
 
-  /* BALANCE */
+  /* BALANCE BOX */
 
   #U9-profile-withdrawal-balance {
     gap: 4px;
+
+    min-height: 32px;
+
+    padding: 0 6px;
 
     font-size: 12px;
   }
@@ -549,14 +564,14 @@
   }
 
 
-  /* RIGHT SVG AREA */
+  /* RIGHT SVG BOXES */
 
   #U9-profile-withdrawal-verified,
   #U9-profile-withdrawal-notice-button {
-    flex-basis: 24px;
+    flex-basis: 32px;
 
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
   }
 
 
