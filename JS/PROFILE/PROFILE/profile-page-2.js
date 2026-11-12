@@ -1,6 +1,6 @@
 
 /* =================================================
-   U9 PROFILE PAGE 2 — NAVIGATION
+   U9 PROFILE PAGE 2 — WITHDRAWAL
 ================================================= */
 
 (function () {
@@ -15,6 +15,21 @@
   const navigation =
     document.getElementById(
       "U9-profile-withdrawal-navigation"
+    );
+
+  const balanceElement =
+    document.getElementById(
+      "U9-profile-withdrawal-balance-value"
+    );
+
+  const verifiedIcon =
+    document.getElementById(
+      "U9-profile-withdrawal-verified-icon"
+    );
+
+  const noticeButton =
+    document.getElementById(
+      "U9-profile-withdrawal-notice-button"
     );
 
 
@@ -43,6 +58,8 @@
 
   function getButton(category) {
 
+    if (!navigation) return null;
+
     return navigation.querySelector(
       `[data-category="${category}"]`
     );
@@ -51,12 +68,16 @@
 
 
   /* =========================
-     SWITCH BUTTON
+     SWITCH CATEGORY
   ========================= */
 
   function switchCategory(category) {
 
     if (!categories.includes(category)) {
+      return;
+    }
+
+    if (!navigation) {
       return;
     }
 
@@ -90,7 +111,7 @@
 
 
   /* =========================
-     CLICK EVENT
+     NAVIGATION CLICK
   ========================= */
 
   if (navigation) {
@@ -166,7 +187,7 @@
 
 
     /* =========================
-       INITIALIZE
+       INITIALIZE NAVIGATION
     ========================= */
 
     switchCategory("crypto");
@@ -180,11 +201,124 @@
   }
 
 
-  /* =========================
+  /* =================================================
+     USER BALANCE
+  ================================================= */
+
+  function setBalance(balance) {
+
+    if (!balanceElement) return;
+
+    const amount = Number(balance);
+
+    if (!Number.isFinite(amount)) {
+      console.warn(
+        "Invalid withdrawal balance:",
+        balance
+      );
+
+      return;
+    }
+
+    balanceElement.textContent =
+      amount.toFixed(2);
+
+  }
+
+
+  /* =================================================
+     EMAIL VERIFIED STATUS
+  ================================================= */
+
+  function setEmailVerified(verified) {
+
+    if (!verifiedIcon) return;
+
+    if (typeof verified !== "boolean") {
+      console.warn(
+        "Invalid email_verified value:",
+        verified
+      );
+
+      return;
+    }
+
+    if (verified) {
+
+      verifiedIcon.src =
+        "/SSVG/Withdraw/verified.svg";
+
+      verifiedIcon.alt =
+        "Verified";
+
+    } else {
+
+      verifiedIcon.src =
+        "/SSVG/Withdraw/unverified.svg";
+
+      verifiedIcon.alt =
+        "Unverified";
+
+    }
+
+  }
+
+
+  /* =================================================
+     UPDATE USER INFO
+  ================================================= */
+
+  function updateUserInfo(user) {
+
+    if (!user || typeof user !== "object") {
+      console.warn(
+        "Invalid withdrawal user data."
+      );
+
+      return;
+    }
+
+    if (user.balance !== undefined) {
+
+      setBalance(user.balance);
+
+    }
+
+    if (user.email_verified !== undefined) {
+
+      setEmailVerified(user.email_verified);
+
+    }
+
+  }
+
+
+  /* =================================================
+     NOTICE BUTTON
+     FUNCTION WILL BE ADDED LATER
+  ================================================= */
+
+  if (noticeButton) {
+
+    noticeButton.addEventListener(
+      "click",
+      function () {
+
+        // Notice button functionality will be added later.
+
+      }
+    );
+
+  }
+
+
+  /* =================================================
      PUBLIC API
-  ========================= */
+  ================================================= */
 
   window.U9ProfileWithdrawal = {
+
+    /* CATEGORY */
 
     switchCategory: switchCategory,
 
@@ -194,7 +328,16 @@
 
     reset: function () {
       switchCategory("crypto");
-    }
+    },
+
+
+    /* USER INFO */
+
+    setBalance: setBalance,
+
+    setEmailVerified: setEmailVerified,
+
+    updateUserInfo: updateUserInfo
 
   };
 
