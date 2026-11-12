@@ -310,85 +310,117 @@
     }
 
     if (user.balance !== undefined) {
+
       setBalance(user.balance);
+
     }
 
     if (user.email_verified !== undefined) {
+
       setEmailVerified(user.email_verified);
+
     }
 
   }
 
 
   /* =================================================
-     LOAD USER INFO FROM DATABASE
+     HEADER USER SYNC
   ================================================= */
 
-  let userInfoRequest = null;
+  let unsubscribeUser = null;
 
-  async function loadUserInfo() {
 
-    // Prevent concurrent duplicate requests
-    if (userInfoRequest) {
-      return userInfoRequest;
+  /* =========================
+     APPLY HEADER USER
+  ========================= */
+
+  function applyHeaderUser(user) {
+
+    if (!user || typeof user !== "object") {
+      return;
     }
 
-    userInfoRequest = (async function () {
+    updateUserInfo({
 
-      try {
+      balance: user.balance,
 
-        const response = await fetch("/api/me", {
+      email_verified: user.email_verified
 
-          method: "GET",
+    });
 
-          credentials: "include",
+  }
 
-          cache: "no-store"
 
-        });
+  /* =========================
+     CONNECT HEADER USER
+  ========================= */
 
-        const result = await response.json();
+  function connectHeaderUser() {
+
+    if (!window.U9User) {
+      return false;
+    }
+
+    // Prevent duplicate subscriptions
+    if (unsubscribeUser) {
+      return true;
+    }
+
+
+    /* =========================
+       SUBSCRIBE USER CHANGES
+    ========================= */
+
+    unsubscribeUser = window.U9User.subscribe(
+
+      function (user, state) {
 
         if (
-          !response.ok ||
-          result.authenticated !== true ||
-          !result.user
+          state === "AUTHENTICATED" &&
+          user
         ) {
 
-          throw new Error(
-            result.error || "Unable to load user information."
-          );
+          applyHeaderUser(user);
 
         }
 
-        updateUserInfo({
-
-          balance: result.user.balance,
-
-          email_verified: result.user.email_verified
-
-        });
-
-        return result.user;
-
-      } catch (error) {
-
-        console.error(
-          "U9 Withdrawal: Failed to load user information:",
-          error
-        );
-
-        return null;
-
-      } finally {
-
-        userInfoRequest = null;
-
       }
 
-    })();
+    );
 
-    return userInfoRequest;
+
+    /* =========================
+       APPLY CURRENT USER
+    ========================= */
+
+    if (
+      window.U9User.getState() ===
+      "AUTHENTICATED"
+    ) {
+
+      applyHeaderUser(
+        window.U9User.get()
+      );
+
+    }
+
+    return true;
+
+  }
+
+
+  /* =================================================
+     HEADER READY LISTENER
+  ================================================= */
+
+  if (!connectHeaderUser()) {
+
+    window.addEventListener(
+      "u9:user-ready",
+      connectHeaderUser,
+      { once: true }
+    );
 
   }
 
@@ -400,6 +432,7 @@
   window.U9ProfileWithdrawal = {
 
     // CATEGORY
+
     switchCategory: switchCategory,
 
     getCurrentCategory: function () {
@@ -410,16 +443,36 @@
       switchCategory("crypto");
     },
 
+
     // USER INFO
+
     setBalance: setBalance,
 
     setEmailVerified: setEmailVerified,
 
     updateUserInfo: updateUserInfo,
 
-    loadUserInfo: loadUserInfo,
+
+    // USER SYNC
+
+    refreshUserInfo: function () {
+
+      if (
+        window.U9User &&
+        window.U9User.getState() === "AUTHENTICATED"
+      ) {
+
+        applyHeaderUser(
+          window.U9User.get()
+        );
+
+      }
+
+    },
+
 
     // BUTTON REFERENCES
+
     getVerifiedButton: function () {
       return verifiedButton;
     },
@@ -428,7 +481,9 @@
       return noticeButton;
     },
 
+
     // ICON REFERENCES
+
     getVerifiedIcon: function () {
       return verifiedIcon;
     },
@@ -438,13 +493,6 @@
     }
 
   };
-
-
-  /* =================================================
-     INITIAL LOAD
-  ================================================= */
-
-  loadUserInfo();
 
 
 })();
