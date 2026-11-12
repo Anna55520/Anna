@@ -1223,7 +1223,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                 role="tab"
                 data-category="crypto"
                 aria-selected="true"
-                aria-controls="U9-profile-withdrawal-panel-crypto"
               >
                 <img
                   id="U9-profile-withdrawal-crypto-icon"
@@ -1247,7 +1246,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                 role="tab"
                 data-category="epayment"
                 aria-selected="false"
-                aria-controls="U9-profile-withdrawal-panel-epayment"
                 tabindex="-1"
               >
                 <img
@@ -1272,7 +1270,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                 role="tab"
                 data-category="bank"
                 aria-selected="false"
-                aria-controls="U9-profile-withdrawal-panel-bank"
                 tabindex="-1"
               >
                 <img
@@ -1297,7 +1294,6 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                 role="tab"
                 data-category="card"
                 aria-selected="false"
-                aria-controls="U9-profile-withdrawal-panel-card"
                 tabindex="-1"
               >
                 <img
@@ -1316,206 +1312,12 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
 
             <!-- =========================
-                WITHDRAWAL INFORMATION
+                EMPTY INFORMATION AREA
             ========================= -->
 
             <div id="U9-profile-withdrawal-information">
 
-
-              <!-- =========================
-                  CRYPTO PANEL
-              ========================= -->
-
-              <section
-                id="U9-profile-withdrawal-panel-crypto"
-                class="U9-profile-withdrawal-panel active"
-                role="tabpanel"
-                aria-labelledby="U9-profile-withdrawal-crypto"
-              >
-
-                <div class="U9-profile-withdrawal-panel-header">
-                  <h3>Cryptocurrency</h3>
-                  <p>Select your cryptocurrency withdrawal method.</p>
-                </div>
-
-                <div class="U9-profile-withdrawal-method-list">
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>USDT</strong>
-                    <span>TRON (TRC20)</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>USDT</strong>
-                    <span>BSC (BEP20)</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>USDT</strong>
-                    <span>Ethereum (ERC20)</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>Bitcoin</strong>
-                    <span>BTC Network</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>Ethereum</strong>
-                    <span>ETH Network</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>BNB</strong>
-                    <span>BSC Network</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>Solana</strong>
-                    <span>SOL Network</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>XRP</strong>
-                    <span>XRP Ledger</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>Litecoin</strong>
-                    <span>LTC Network</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>USDC</strong>
-                    <span>ERC20 / BEP20</span>
-                  </div>
-
-                </div>
-
-              </section>
-
-
-              <!-- =========================
-                  E-PAYMENT PANEL
-              ========================= -->
-
-              <section
-                id="U9-profile-withdrawal-panel-epayment"
-                class="U9-profile-withdrawal-panel"
-                role="tabpanel"
-                aria-labelledby="U9-profile-withdrawal-epayment"
-                hidden
-              >
-
-                <div class="U9-profile-withdrawal-panel-header">
-                  <h3>E-Payment</h3>
-                  <p>Select your electronic payment method.</p>
-                </div>
-
-                <div class="U9-profile-withdrawal-method-list">
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>PPay</strong>
-                    <span>PPay Account</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>PayPal</strong>
-                    <span>PayPal Account</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>Binance Pay</strong>
-                    <span>Binance Pay ID</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>Skrill</strong>
-                    <span>Skrill Account</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>Neteller</strong>
-                    <span>Neteller Account</span>
-                  </div>
-
-                </div>
-
-              </section>
-
-
-              <!-- =========================
-                  BANK TRANSFER PANEL
-              ========================= -->
-
-              <section
-                id="U9-profile-withdrawal-panel-bank"
-                class="U9-profile-withdrawal-panel"
-                role="tabpanel"
-                aria-labelledby="U9-profile-withdrawal-bank"
-                hidden
-              >
-
-                <div class="U9-profile-withdrawal-panel-header">
-                  <h3>Bank Transfer</h3>
-                  <p>Select your bank transfer method.</p>
-                </div>
-
-                <div class="U9-profile-withdrawal-method-list">
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>Local Bank</strong>
-                    <span>Local Bank Account</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>International Bank</strong>
-                    <span>International Bank Account</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>SWIFT</strong>
-                    <span>International SWIFT Transfer</span>
-                  </div>
-
-                </div>
-
-              </section>
-
-
-              <!-- =========================
-                  CARD PANEL
-              ========================= -->
-
-              <section
-                id="U9-profile-withdrawal-panel-card"
-                class="U9-profile-withdrawal-panel"
-                role="tabpanel"
-                aria-labelledby="U9-profile-withdrawal-card"
-                hidden
-              >
-
-                <div class="U9-profile-withdrawal-panel-header">
-                  <h3>Card</h3>
-                  <p>Select your card withdrawal method.</p>
-                </div>
-
-                <div class="U9-profile-withdrawal-method-list">
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>Visa</strong>
-                    <span>Visa Card</span>
-                  </div>
-
-                  <div class="U9-profile-withdrawal-method">
-                    <strong>Mastercard</strong>
-                    <span>Mastercard</span>
-                  </div>
-
-                </div>
-
-              </section>
-
+              <!-- Withdrawal content will be added later -->
 
             </div>
 
