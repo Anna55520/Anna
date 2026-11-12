@@ -1,5 +1,194 @@
 
 /* =================================================
+   U9 PROFILE PAGE 2
+================================================= */
+
+
+/* =================================================
+   PAGE 2
+================================================= */
+
+#U9-profile-page2 {
+  position: relative;
+
+  display: none;
+
+  width: 100%;
+  min-height: 100%;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+}
+
+
+/* =================================================
+   PAGE 2 CONTENT
+================================================= */
+
+#U9-profile-page2-content {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  min-height: 100%;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+}
+
+
+/* =================================================
+   WITHDRAWAL NAVIGATION
+================================================= */
+
+#U9-profile-withdrawal-navigation {
+  position: relative;
+
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 8px;
+
+  width: 100%;
+
+  padding: 12px 14px;
+
+  box-sizing: border-box;
+}
+
+
+/* =================================================
+   NAVIGATION BUTTON
+================================================= */
+
+.U9-profile-withdrawal-nav-button {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 76px;
+
+  padding: 9px 4px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #555555;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+/* HOVER */
+
+.U9-profile-withdrawal-nav-button:hover {
+  border-color: #cfd8ea;
+
+  background: #f8faff;
+}
+
+
+/* ACTIVE */
+
+.U9-profile-withdrawal-nav-button.active {
+  border-color: #2762ea;
+
+  background: #f2f6ff;
+
+  color: #2762ea;
+
+  box-shadow: 0 2px 8px rgba(39, 98, 234, 0.10);
+}
+
+
+/* CLICK */
+
+.U9-profile-withdrawal-nav-button:active {
+  transform: scale(0.97);
+}
+
+
+/* FOCUS */
+
+.U9-profile-withdrawal-nav-button:focus-visible {
+  outline: 2px solid #2762ea;
+  outline-offset: 2px;
+}
+
+
+/* =================================================
+   NAVIGATION ICON
+================================================= */
+
+.U9-profile-withdrawal-nav-icon {
+  display: block;
+
+  width: 22px;
+  height: 22px;
+
+  object-fit: contain;
+  object-position: center;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* =================================================
+   NAVIGATION LABEL
+================================================= */
+
+.U9-profile-withdrawal-nav-label {
+  display: block;
+
+  width: 100%;
+
+  overflow: hidden;
+
+  color: inherit;
+
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+
+  line-height: 1.2;
+
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  pointer-events: none;
+}
+
+
+/* =================================================
    WITHDRAWAL USER INFO
 ================================================= */
 
@@ -15,7 +204,6 @@
   width: 100%;
 
   padding: 0 14px;
-
   margin-top: 2px;
 
   box-sizing: border-box;
@@ -35,7 +223,6 @@
   align-items: center;
 
   flex: 1 1 auto;
-
   min-width: 0;
 
   gap: 6px;
@@ -55,9 +242,7 @@
 }
 
 
-/* =================================================
-   BALANCE LABEL
-================================================= */
+/* BALANCE LABEL */
 
 #U9-profile-withdrawal-balance-label {
   display: block;
@@ -68,9 +253,7 @@
 }
 
 
-/* =================================================
-   BALANCE VALUE
-================================================= */
+/* BALANCE VALUE */
 
 #U9-profile-withdrawal-balance-value {
   display: block;
@@ -124,9 +307,7 @@
 }
 
 
-/* =================================================
-   VERIFIED SVG
-================================================= */
+/* VERIFIED ICON */
 
 #U9-profile-withdrawal-verified-icon {
   display: block;
@@ -157,38 +338,31 @@
 }
 
 
-/* =================================================
-   NOTICE BUTTON HOVER
-================================================= */
+/* HOVER */
 
 #U9-profile-withdrawal-notice-button:hover {
   opacity: 0.75;
 }
 
 
-/* =================================================
-   NOTICE BUTTON ACTIVE
-================================================= */
+/* ACTIVE */
 
 #U9-profile-withdrawal-notice-button:active {
   transform: scale(0.92);
 }
 
 
-/* =================================================
-   NOTICE BUTTON FOCUS
-================================================= */
+/* FOCUS */
 
 #U9-profile-withdrawal-notice-button:focus-visible {
   outline: 2px solid #555555;
   outline-offset: 3px;
+
   border-radius: 4px;
 }
 
 
-/* =================================================
-   NOTICE SVG
-================================================= */
+/* NOTICE ICON */
 
 #U9-profile-withdrawal-notice-icon {
   display: block;
@@ -205,10 +379,64 @@
 
 
 /* =================================================
+   WITHDRAWAL INFORMATION
+================================================= */
+
+#U9-profile-withdrawal-information {
+  position: relative;
+
+  display: block;
+
+  flex: 1 0 auto;
+
+  width: 100%;
+  min-height: 250px;
+
+  padding: 12px 14px 25px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+}
+
+
+/* =================================================
    MOBILE
 ================================================= */
 
-@media (max-width: 480px) {
+@media screen and (max-width: 480px) {
+
+  /* NAVIGATION */
+
+  #U9-profile-withdrawal-navigation {
+    gap: 6px;
+
+    padding: 10px 8px;
+  }
+
+
+  /* NAVIGATION BUTTON */
+
+  .U9-profile-withdrawal-nav-button {
+    min-height: 70px;
+
+    gap: 6px;
+
+    padding: 8px 3px;
+
+    font-size: 10px;
+  }
+
+
+  /* NAVIGATION ICON */
+
+  .U9-profile-withdrawal-nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+
+  /* USER INFO */
 
   #U9-profile-withdrawal-user-info {
     gap: 8px;
@@ -216,15 +444,24 @@
     padding: 0 8px;
   }
 
+
+  /* BALANCE */
+
   #U9-profile-withdrawal-balance {
     gap: 5px;
 
     font-size: 13px;
   }
 
+
+  /* BALANCE VALUE */
+
   #U9-profile-withdrawal-balance-value {
     font-size: 14px;
   }
+
+
+  /* RIGHT SVG AREA */
 
   #U9-profile-withdrawal-verified,
   #U9-profile-withdrawal-notice-button {
@@ -234,26 +471,69 @@
     height: 26px;
   }
 
+
+  /* SVG ICONS */
+
   #U9-profile-withdrawal-verified-icon,
   #U9-profile-withdrawal-notice-icon {
     width: 22px;
     height: 22px;
   }
 
+
+  /* INFORMATION */
+
+  #U9-profile-withdrawal-information {
+    padding: 12px 12px 25px;
+  }
+
 }
 
 
 /* =================================================
-   VERY SMALL MOBILE
+   SMALL MOBILE
 ================================================= */
 
-@media (max-width: 360px) {
+@media screen and (max-width: 360px) {
+
+  /* NAVIGATION */
+
+  #U9-profile-withdrawal-navigation {
+    gap: 5px;
+
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+
+  /* NAVIGATION BUTTON */
+
+  .U9-profile-withdrawal-nav-button {
+    min-height: 66px;
+
+    font-size: 9px;
+  }
+
+
+  /* NAVIGATION ICON */
+
+  .U9-profile-withdrawal-nav-icon {
+    width: 19px;
+    height: 19px;
+  }
+
+
+  /* USER INFO */
 
   #U9-profile-withdrawal-user-info {
     gap: 6px;
 
-    padding: 0 6px;
+    padding-right: 6px;
+    padding-left: 6px;
   }
+
+
+  /* BALANCE */
 
   #U9-profile-withdrawal-balance {
     gap: 4px;
@@ -261,9 +541,15 @@
     font-size: 12px;
   }
 
+
+  /* BALANCE VALUE */
+
   #U9-profile-withdrawal-balance-value {
     font-size: 13px;
   }
+
+
+  /* RIGHT SVG AREA */
 
   #U9-profile-withdrawal-verified,
   #U9-profile-withdrawal-notice-button {
@@ -272,6 +558,9 @@
     width: 24px;
     height: 24px;
   }
+
+
+  /* SVG ICONS */
 
   #U9-profile-withdrawal-verified-icon,
   #U9-profile-withdrawal-notice-icon {
