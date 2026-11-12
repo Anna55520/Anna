@@ -146,7 +146,7 @@
   border-color: #333333;
 
   box-shadow:
-    0 0 0 1px #76ace9
+    0 0 0 1px #76ace9;
 }
 
 
@@ -220,6 +220,224 @@
 
 
 /* =================================================
+   WITHDRAWAL USER INFO
+================================================= */
+
+#U9-profile-withdrawal-user-info {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  width: 100%;
+
+  padding: 0 14px;
+
+  margin-top: 2px;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+}
+
+
+/* =================================================
+   BALANCE
+================================================= */
+
+#U9-profile-withdrawal-balance {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  flex: 1 1 auto;
+
+  min-width: 0;
+  height: 46px;
+
+  padding: 0 14px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 9px;
+
+  background: #f8f8f8;
+
+  color: #333333;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* =================================================
+   BALANCE LABEL
+================================================= */
+
+#U9-profile-withdrawal-balance-label {
+  display: block;
+
+  color: #777777;
+
+  white-space: nowrap;
+}
+
+
+/* =================================================
+   BALANCE VALUE
+================================================= */
+
+#U9-profile-withdrawal-balance-value {
+  display: block;
+
+  margin-left: 10px;
+
+  color: #111111;
+
+  font-size: 14px;
+  font-weight: 900;
+
+  font-variant-numeric: tabular-nums;
+
+  white-space: nowrap;
+}
+
+
+/* =================================================
+   VERIFIED STATUS
+   NOT A BUTTON
+================================================= */
+
+#U9-profile-withdrawal-verified {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 46px;
+
+  width: 46px;
+  height: 46px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 9px;
+
+  background: #ffffff;
+}
+
+
+/* =================================================
+   VERIFIED STATUS SVG
+================================================= */
+
+#U9-profile-withdrawal-verified-icon {
+  display: block;
+
+  width: 25px;
+  height: 25px;
+
+  object-fit: contain;
+  object-position: center;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* =================================================
+   NOTICE BUTTON
+================================================= */
+
+#U9-profile-withdrawal-notice-button {
+  position: relative;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 46px;
+
+  width: 46px;
+  height: 46px;
+
+  padding: 0;
+
+  box-sizing: border-box;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 9px;
+
+  outline: none;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+/* =================================================
+   NOTICE BUTTON HOVER
+================================================= */
+
+#U9-profile-withdrawal-notice-button:hover {
+  background: #f8f8f8;
+
+  border-color: #cccccc;
+}
+
+
+/* =================================================
+   NOTICE BUTTON ACTIVE
+================================================= */
+
+#U9-profile-withdrawal-notice-button:active {
+  transform: scale(0.94);
+}
+
+
+/* =================================================
+   NOTICE BUTTON FOCUS
+================================================= */
+
+#U9-profile-withdrawal-notice-button:focus-visible {
+  outline: 2px solid #555555;
+  outline-offset: 2px;
+}
+
+
+/* =================================================
+   NOTICE SVG
+================================================= */
+
+#U9-profile-withdrawal-notice-icon {
+  display: block;
+
+  width: 24px;
+  height: 24px;
+
+  object-fit: contain;
+  object-position: center;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* =================================================
    EMPTY INFORMATION AREA
 ================================================= */
 
@@ -231,7 +449,7 @@
   width: 100%;
   min-height: 250px;
 
-  padding: 8px 14px 25px;
+  padding: 12px 14px 25px;
 
   box-sizing: border-box;
 
@@ -275,8 +493,54 @@
     line-height: 1.25;
   }
 
+
+  /* USER INFO */
+
+  #U9-profile-withdrawal-user-info {
+    gap: 7px;
+
+    padding: 0 8px;
+  }
+
+  #U9-profile-withdrawal-balance {
+    height: 42px;
+
+    padding: 0 11px;
+
+    border-radius: 8px;
+
+    font-size: 12px;
+  }
+
+  #U9-profile-withdrawal-balance-value {
+    font-size: 13px;
+  }
+
+  #U9-profile-withdrawal-verified,
+  #U9-profile-withdrawal-notice-button {
+    flex-basis: 42px;
+
+    width: 42px;
+    height: 42px;
+
+    border-radius: 8px;
+  }
+
+  #U9-profile-withdrawal-verified-icon {
+    width: 23px;
+    height: 23px;
+  }
+
+  #U9-profile-withdrawal-notice-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+
+  /* INFORMATION */
+
   #U9-profile-withdrawal-information {
-    padding: 8px 12px 25px;
+    padding: 12px 12px 25px;
   }
 
 }
@@ -308,6 +572,45 @@
 
   .U9-profile-withdrawal-nav-label {
     font-size: 9px;
+  }
+
+
+  /* USER INFO */
+
+  #U9-profile-withdrawal-user-info {
+    gap: 6px;
+
+    padding: 0 6px;
+  }
+
+  #U9-profile-withdrawal-balance {
+    height: 40px;
+
+    padding: 0 9px;
+
+    font-size: 11px;
+  }
+
+  #U9-profile-withdrawal-balance-value {
+    font-size: 12px;
+  }
+
+  #U9-profile-withdrawal-verified,
+  #U9-profile-withdrawal-notice-button {
+    flex-basis: 40px;
+
+    width: 40px;
+    height: 40px;
+  }
+
+  #U9-profile-withdrawal-verified-icon {
+    width: 21px;
+    height: 21px;
+  }
+
+  #U9-profile-withdrawal-notice-icon {
+    width: 21px;
+    height: 21px;
   }
 
 }
