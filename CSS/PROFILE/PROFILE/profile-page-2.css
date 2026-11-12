@@ -1,22 +1,22 @@
 
 /* =================================================
-   PROFILE PAGE 2 — WITHDRAWAL
+   U9 PROFILE PAGE 2
 ================================================= */
 
 
 /* =================================================
-   PAGE 2 WINDOW
+   PAGE 2
 ================================================= */
 
 #U9-profile-page2 {
   position: relative;
 
+  display: none;
+
   width: 100%;
   min-height: 100%;
 
   box-sizing: border-box;
-
-  display: none;
 
   background: #ffffff;
 }
@@ -31,7 +31,6 @@
 
   display: flex;
   flex-direction: column;
-  align-items: stretch;
 
   width: 100%;
   min-height: 100%;
@@ -54,15 +53,11 @@
   grid-template-columns:
     repeat(4, minmax(0, 1fr));
 
-  align-content: start;
   align-items: stretch;
-
-  flex: 0 0 auto;
 
   gap: 8px;
 
   width: 100%;
-  min-width: 0;
 
   padding: 12px 14px;
 
@@ -73,7 +68,7 @@
 
 
 /* =================================================
-   NAVIGATION BUTTONS
+   NAVIGATION BUTTON
 ================================================= */
 
 .U9-profile-withdrawal-nav-button {
@@ -101,7 +96,7 @@
   outline: none;
 
   background: #ffffff;
-  color: #78ace9;
+  color: #777777;
 
   font-family: inherit;
 
@@ -127,7 +122,7 @@
 
 
 /* =================================================
-   BUTTON HOVER
+   HOVER
 ================================================= */
 
 .U9-profile-withdrawal-nav-button:hover {
@@ -135,15 +130,12 @@
 
   border-color: #cccccc;
 
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.07);
-
   transform: translateY(-1px);
 }
 
 
 /* =================================================
-   BUTTON ACTIVE
+   ACTIVE BUTTON
 ================================================= */
 
 .U9-profile-withdrawal-nav-button.active {
@@ -159,7 +151,7 @@
 
 
 /* =================================================
-   BUTTON FOCUS
+   FOCUS
 ================================================= */
 
 .U9-profile-withdrawal-nav-button:focus-visible {
@@ -169,7 +161,7 @@
 
 
 /* =================================================
-   NAVIGATION ICONS
+   SVG ICON
 ================================================= */
 
 .U9-profile-withdrawal-nav-icon {
@@ -201,12 +193,13 @@
 .U9-profile-withdrawal-nav-button:hover
 .U9-profile-withdrawal-nav-icon {
   opacity: 1;
+
   transform: scale(1.05);
 }
 
 
 /* =================================================
-   NAVIGATION LABEL
+   BUTTON TEXT
 ================================================= */
 
 .U9-profile-withdrawal-nav-label {
@@ -227,15 +220,15 @@
 
 
 /* =================================================
-   INFORMATION CONTAINER
+   EMPTY INFORMATION AREA
 ================================================= */
 
 #U9-profile-withdrawal-information {
   position: relative;
 
-  width: 100%;
-  min-width: 0;
+  flex: 1 0 auto;
 
+  width: 100%;
   min-height: 250px;
 
   padding: 8px 14px 25px;
@@ -247,202 +240,7 @@
 
 
 /* =================================================
-   WITHDRAWAL PANELS
-================================================= */
-
-.U9-profile-withdrawal-panel {
-  position: relative;
-
-  width: 100%;
-
-  box-sizing: border-box;
-
-  display: block;
-
-  animation:
-    U9WithdrawalPanelFade 0.22s ease;
-}
-
-
-/* =================================================
-   HIDDEN PANEL
-================================================= */
-
-.U9-profile-withdrawal-panel[hidden] {
-  display: none !important;
-}
-
-
-/* =================================================
-   PANEL ANIMATION
-================================================= */
-
-@keyframes U9WithdrawalPanelFade {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-
-/* =================================================
-   PANEL HEADER
-================================================= */
-
-.U9-profile-withdrawal-panel-header {
-  width: 100%;
-
-  margin-bottom: 16px;
-
-  box-sizing: border-box;
-}
-
-
-/* =================================================
-   PANEL TITLE
-================================================= */
-
-.U9-profile-withdrawal-panel-header h3 {
-  margin: 0;
-
-  color: #222222;
-
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-
-/* =================================================
-   PANEL DESCRIPTION
-================================================= */
-
-.U9-profile-withdrawal-panel-header p {
-  margin: 5px 0 0;
-
-  color: #888888;
-
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 1.5;
-}
-
-
-/* =================================================
-   METHOD LIST
-================================================= */
-
-.U9-profile-withdrawal-method-list {
-  display: flex;
-  flex-direction: column;
-
-  gap: 9px;
-
-  width: 100%;
-
-  box-sizing: border-box;
-}
-
-
-/* =================================================
-   METHOD ITEM
-================================================= */
-
-.U9-profile-withdrawal-method {
-  position: relative;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  gap: 12px;
-
-  width: 100%;
-  min-height: 55px;
-
-  padding: 12px 15px;
-
-  box-sizing: border-box;
-
-  border: 1px solid #eeeeee;
-  border-radius: 10px;
-
-  background: #ffffff;
-}
-
-
-/* =================================================
-   METHOD NAME
-================================================= */
-
-.U9-profile-withdrawal-method strong {
-  min-width: 0;
-
-  color: #222222;
-
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-
-/* =================================================
-   METHOD DESCRIPTION
-================================================= */
-
-.U9-profile-withdrawal-method span {
-  min-width: 0;
-
-  color: #888888;
-
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.4;
-
-  text-align: right;
-}
-
-
-/* =================================================
-   RESPONSIVE — DESKTOP
-================================================= */
-
-@media (min-width: 769px) {
-
-  #U9-profile-withdrawal-navigation {
-    gap: 10px;
-    padding: 14px 18px;
-  }
-
-  .U9-profile-withdrawal-nav-button {
-    min-height: 82px;
-
-    padding: 9px 5px;
-
-    font-size: 12px;
-  }
-
-  .U9-profile-withdrawal-nav-icon {
-    flex-basis: 24px;
-
-    width: 24px;
-    height: 24px;
-  }
-
-  #U9-profile-withdrawal-information {
-    padding: 12px 24px 30px;
-  }
-
-}
-
-
-/* =================================================
-   RESPONSIVE — MOBILE
+   MOBILE
 ================================================= */
 
 @media (max-width: 480px) {
@@ -481,27 +279,6 @@
     padding: 8px 12px 25px;
   }
 
-  .U9-profile-withdrawal-panel-header h3 {
-    font-size: 17px;
-  }
-
-  .U9-profile-withdrawal-panel-header p {
-    font-size: 12px;
-  }
-
-  .U9-profile-withdrawal-method {
-    min-height: 52px;
-    padding: 11px 12px;
-  }
-
-  .U9-profile-withdrawal-method strong {
-    font-size: 13px;
-  }
-
-  .U9-profile-withdrawal-method span {
-    font-size: 11px;
-  }
-
 }
 
 
@@ -513,12 +290,14 @@
 
   #U9-profile-withdrawal-navigation {
     gap: 5px;
+
     padding-right: 6px;
     padding-left: 6px;
   }
 
   .U9-profile-withdrawal-nav-button {
     min-height: 66px;
+
     font-size: 9px;
   }
 
