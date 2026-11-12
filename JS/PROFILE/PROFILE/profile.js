@@ -46,14 +46,24 @@ const u9ProfileBackIcon = "SSVG/account/back.svg";
 
 const u9ProfilePageTitles = {
   1: "buttonpage1",
-  2: "buttonpage2",
+  2: "Withdrawal",
   3: "buttonpage3",
   4: "buttonpage4",
   5: "buttonpage5"
 };
 
-const u9ProfilePageIcon =
-  "SSVG/account/account-edit-button.svg";
+/* =========================
+   PROFILE PAGE ICONS
+   EACH PAGE IS INDEPENDENT
+========================= */
+
+const u9ProfilePageIcons = {
+  1: "SSVG/account/account-edit-button.svg",
+  2: "SSVG/account/account-edit-button.svg",
+  3: "SSVG/account/account-edit-button.svg",
+  4: "SSVG/account/account-edit-button.svg",
+  5: "SSVG/account/account-edit-button.svg"
+};
 
 
 /* =========================
@@ -521,7 +531,13 @@ if (u9ProfileBalanceToggle) {
 ========================= */
 
 function u9ProfileSetHeader(page) {
+
+  /* =========================
+     MAIN PAGE HEADER
+  ========================= */
+
   if (page === "main") {
+
     if (profileModalCloseIcon) {
       profileModalCloseIcon.src = u9ProfileMainCloseIcon;
     }
@@ -541,11 +557,17 @@ function u9ProfileSetHeader(page) {
     return;
   }
 
+  /* =========================
+     INTERNAL PAGE HEADER
+  ========================= */
+
   const pageNumber = Number(
     String(page).replace("page", "")
   );
 
   const pageTitle = u9ProfilePageTitles[pageNumber];
+
+  const pageIcon = u9ProfilePageIcons[pageNumber];
 
   if (!pageTitle) {
     return;
@@ -563,8 +585,8 @@ function u9ProfileSetHeader(page) {
     profileModalTitle.textContent = pageTitle;
   }
 
-  if (profileModalIcon) {
-    profileModalIcon.src = u9ProfilePageIcon;
+  if (profileModalIcon && pageIcon) {
+    profileModalIcon.src = pageIcon;
   }
 }
 
