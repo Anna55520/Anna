@@ -291,9 +291,9 @@
 /* ACTIVE */
 
 .U9-profile-withdrawal-nav-button.active {
-  border-color: #2762ea;
+  border-color: #76ace9;
   background: #f2f6ff;
-  color: #2762ea;
+  color: #000000;
 
   box-shadow: 0 2px 8px rgba(39, 98, 234, 0.10);
 }
