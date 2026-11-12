@@ -1,16 +1,7 @@
-
 <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-
   <defs>
-    <mask id="transparentX" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24">
-      <rect
-        x="0"
-        y="0"
-        width="24"
-        height="24"
-        fill="white"
-      />
-
+    <mask id="transparentX">
+      <rect width="24" height="24" fill="white"/>
       <path
         d="M9 9L15 15M15 9L9 15"
         stroke="black"
@@ -25,5 +16,4 @@
     fill="#FF0000"
     mask="url(#transparentX)"
   />
-
 </svg>
