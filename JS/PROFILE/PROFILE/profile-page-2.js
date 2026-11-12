@@ -1,6 +1,6 @@
 
 /* =================================================
-   U9 PROFILE PAGE 2 — WITHDRAWAL
+   U9 PROFILE PAGE 2 — NAVIGATION
 ================================================= */
 
 (function () {
@@ -12,24 +12,14 @@
      ELEMENTS
   ========================= */
 
-  const page =
-    document.getElementById(
-      "U9-profile-page2"
-    );
-
   const navigation =
     document.getElementById(
       "U9-profile-withdrawal-navigation"
     );
 
-  const information =
-    document.getElementById(
-      "U9-profile-withdrawal-information"
-    );
-
 
   /* =========================
-     CATEGORY CONFIG
+     CATEGORIES
   ========================= */
 
   const categories = [
@@ -53,7 +43,7 @@
 
   function getButton(category) {
 
-    return navigation?.querySelector(
+    return navigation.querySelector(
       `[data-category="${category}"]`
     );
 
@@ -61,56 +51,20 @@
 
 
   /* =========================
-     GET PANEL
-  ========================= */
-
-  function getPanel(category) {
-
-    return document.getElementById(
-      "U9-profile-withdrawal-panel-" +
-      category
-    );
-
-  }
-
-
-  /* =========================
-     SWITCH CATEGORY
+     SWITCH BUTTON
   ========================= */
 
   function switchCategory(category) {
 
     if (!categories.includes(category)) {
-      return false;
+      return;
     }
-
-    const selectedButton =
-      getButton(category);
-
-    const selectedPanel =
-      getPanel(category);
-
-    if (!selectedButton || !selectedPanel) {
-      console.warn(
-        "U9 Withdrawal category not found:",
-        category
-      );
-
-      return false;
-    }
-
-
-    /* =========================
-       UPDATE BUTTONS
-    ========================= */
 
     categories.forEach(function (item) {
 
       const button = getButton(item);
 
-      if (!button) {
-        return;
-      }
+      if (!button) return;
 
       const isActive =
         item === category;
@@ -130,45 +84,13 @@
 
     });
 
-
-    /* =========================
-       UPDATE INFORMATION
-    ========================= */
-
-    categories.forEach(function (item) {
-
-      const panel = getPanel(item);
-
-      if (!panel) {
-        return;
-      }
-
-      const isActive =
-        item === category;
-
-      panel.hidden = !isActive;
-
-      panel.classList.toggle(
-        "active",
-        isActive
-      );
-
-    });
-
-
-    /* =========================
-       SAVE CURRENT CATEGORY
-    ========================= */
-
     currentCategory = category;
-
-    return true;
 
   }
 
 
   /* =========================
-     NAVIGATION CLICK
+     CLICK EVENT
   ========================= */
 
   if (navigation) {
@@ -177,68 +99,56 @@
       "click",
       function (event) {
 
-        const button =
-          event.target.closest(
-            ".U9-profile-withdrawal-nav-button"
-          );
+        const button = event.target.closest(
+          ".U9-profile-withdrawal-nav-button"
+        );
 
         if (!button || !navigation.contains(button)) {
           return;
         }
 
-        const category =
-          button.dataset.category;
-
-        switchCategory(category);
+        switchCategory(
+          button.dataset.category
+        );
 
       }
     );
 
-  }
 
-
-  /* =========================
-     KEYBOARD NAVIGATION
-  ========================= */
-
-  if (navigation) {
+    /* =========================
+       KEYBOARD NAVIGATION
+    ========================= */
 
     navigation.addEventListener(
       "keydown",
       function (event) {
 
-        const button =
-          event.target.closest(
-            ".U9-profile-withdrawal-nav-button"
-          );
+        const button = event.target.closest(
+          ".U9-profile-withdrawal-nav-button"
+        );
 
-        if (!button) {
-          return;
-        }
+        if (!button) return;
 
-        const currentIndex =
-          categories.indexOf(
-            button.dataset.category
-          );
+        const index = categories.indexOf(
+          button.dataset.category
+        );
 
-        if (currentIndex === -1) {
-          return;
-        }
+        if (index === -1) return;
 
-        let nextIndex = currentIndex;
+        let nextIndex = index;
 
         if (event.key === "ArrowRight") {
-          nextIndex =
-            (currentIndex + 1) % categories.length;
-        }
 
-        else if (event.key === "ArrowLeft") {
           nextIndex =
-            (currentIndex - 1 + categories.length) %
+            (index + 1) % categories.length;
+
+        } else if (event.key === "ArrowLeft") {
+
+          nextIndex =
+            (index - 1 + categories.length) %
             categories.length;
-        }
 
-        else {
+        } else {
           return;
         }
 
@@ -249,77 +159,44 @@
 
         switchCategory(nextCategory);
 
-        const nextButton =
-          getButton(nextCategory);
-
-        if (nextButton) {
-          nextButton.focus();
-        }
+        getButton(nextCategory)?.focus();
 
       }
     );
 
-  }
 
-
-  /* =========================
-     RESET PAGE
-  ========================= */
-
-  function resetPage() {
+    /* =========================
+       INITIALIZE
+    ========================= */
 
     switchCategory("crypto");
 
-  }
+  } else {
 
-
-  /* =========================
-     INITIALIZE
-  ========================= */
-
-  function initialize() {
-
-    if (!page || !navigation || !information) {
-
-      console.warn(
-        "U9 Withdrawal Page 2 elements not found."
-      );
-
-      return;
-
-    }
-
-    resetPage();
-
-    console.log(
-      "U9 Withdrawal Page 2 initialized."
+    console.warn(
+      "U9 Profile Withdrawal Navigation not found."
     );
 
   }
 
 
   /* =========================
-     PUBLIC METHODS
+     PUBLIC API
   ========================= */
 
   window.U9ProfileWithdrawal = {
 
     switchCategory: switchCategory,
 
-    reset: resetPage,
-
     getCurrentCategory: function () {
       return currentCategory;
+    },
+
+    reset: function () {
+      switchCategory("crypto");
     }
 
   };
-
-
-  /* =========================
-     START
-  ========================= */
-
-  initialize();
 
 
 })();
