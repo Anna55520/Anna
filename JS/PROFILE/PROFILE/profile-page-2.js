@@ -7,25 +7,35 @@
 
   "use strict";
 
-
   /* =========================
      ELEMENTS
   ========================= */
 
-  const navigation =
-    document.getElementById(
-      "U9-profile-withdrawal-navigation"
-    );
+  const navigation = document.getElementById(
+    "U9-profile-withdrawal-navigation"
+  );
 
-  const balanceElement =
-    document.getElementById(
-      "U9-profile-withdrawal-balance-value"
-    );
+  const balanceElement = document.getElementById(
+    "U9-profile-withdrawal-balance-value"
+  );
 
-  const verifiedIcon =
-    document.getElementById(
-      "U9-profile-withdrawal-verified-icon"
-    );
+  // BUTTON ELEMENTS
+  const verifiedButton = document.getElementById(
+    "U9-profile-withdrawal-verified-button"
+  );
+
+  const noticeButton = document.getElementById(
+    "U9-profile-withdrawal-notice-button"
+  );
+
+  // SVG ELEMENTS
+  const verifiedIcon = document.getElementById(
+    "U9-profile-withdrawal-verified-icon"
+  );
+
+  const noticeIcon = document.getElementById(
+    "U9-profile-withdrawal-notice-icon"
+  );
 
 
   /* =========================
@@ -38,11 +48,6 @@
     "bank",
     "card"
   ];
-
-
-  /* =========================
-     CURRENT CATEGORY
-  ========================= */
 
   let currentCategory = "crypto";
 
@@ -68,13 +73,8 @@
 
   function switchCategory(category) {
 
-    if (!categories.includes(category)) {
-      return;
-    }
-
-    if (!navigation) {
-      return;
-    }
+    if (!categories.includes(category)) return;
+    if (!navigation) return;
 
     categories.forEach(function (item) {
 
@@ -82,21 +82,16 @@
 
       if (!button) return;
 
-      const isActive =
-        item === category;
+      const isActive = item === category;
 
-      button.classList.toggle(
-        "active",
-        isActive
-      );
+      button.classList.toggle("active", isActive);
 
       button.setAttribute(
         "aria-selected",
         String(isActive)
       );
 
-      button.tabIndex =
-        isActive ? 0 : -1;
+      button.tabIndex = isActive ? 0 : -1;
 
     });
 
@@ -111,80 +106,66 @@
 
   if (navigation) {
 
-    navigation.addEventListener(
-      "click",
-      function (event) {
+    navigation.addEventListener("click", function (event) {
 
-        const button = event.target.closest(
-          ".U9-profile-withdrawal-nav-button"
-        );
+      const button = event.target.closest(
+        ".U9-profile-withdrawal-nav-button"
+      );
 
-        if (!button || !navigation.contains(button)) {
-          return;
-        }
+      if (!button || !navigation.contains(button)) return;
 
-        switchCategory(
-          button.dataset.category
-        );
+      switchCategory(button.dataset.category);
 
-      }
-    );
+    });
 
 
     /* =========================
        KEYBOARD NAVIGATION
     ========================= */
 
-    navigation.addEventListener(
-      "keydown",
-      function (event) {
+    navigation.addEventListener("keydown", function (event) {
 
-        const button = event.target.closest(
-          ".U9-profile-withdrawal-nav-button"
-        );
+      const button = event.target.closest(
+        ".U9-profile-withdrawal-nav-button"
+      );
 
-        if (!button) return;
+      if (!button) return;
 
-        const index = categories.indexOf(
-          button.dataset.category
-        );
+      const index = categories.indexOf(
+        button.dataset.category
+      );
 
-        if (index === -1) return;
+      if (index === -1) return;
 
-        let nextIndex = index;
+      let nextIndex;
 
-        if (event.key === "ArrowRight") {
+      if (event.key === "ArrowRight") {
 
-          nextIndex =
-            (index + 1) % categories.length;
+        nextIndex = (index + 1) % categories.length;
 
-        } else if (event.key === "ArrowLeft") {
+      } else if (event.key === "ArrowLeft") {
 
-          nextIndex =
-            (index - 1 + categories.length) %
-            categories.length;
+        nextIndex =
+          (index - 1 + categories.length) % categories.length;
 
-        } else {
-          return;
-        }
+      } else {
 
-        event.preventDefault();
-
-        const nextCategory =
-          categories[nextIndex];
-
-        switchCategory(nextCategory);
-
-        getButton(nextCategory)?.focus();
+        return;
 
       }
-    );
+
+      event.preventDefault();
+
+      const nextCategory = categories[nextIndex];
+
+      switchCategory(nextCategory);
+
+      getButton(nextCategory)?.focus();
+
+    });
 
 
-    /* =========================
-       INITIALIZE NAVIGATION
-    ========================= */
-
+    // INITIALIZE
     switchCategory("crypto");
 
   } else {
@@ -194,6 +175,53 @@
     );
 
   }
+
+
+  /* =================================================
+     WITHDRAWAL SVG BUTTONS
+  ================================================= */
+
+  function initializeIconButton(button, icon, name) {
+
+    if (!button) {
+
+      console.warn(
+        "U9 Withdrawal button not found:",
+        name
+      );
+
+      return;
+
+    }
+
+    // Ensure the element is a real button.
+    if (button.tagName === "BUTTON") {
+      button.type = "button";
+    }
+
+    // Keep the SVG inside the button.
+    if (icon && !button.contains(icon)) {
+
+      console.warn(
+        "U9 Withdrawal SVG is not inside its button:",
+        name
+      );
+
+    }
+
+  }
+
+  initializeIconButton(
+    verifiedButton,
+    verifiedIcon,
+    "verified"
+  );
+
+  initializeIconButton(
+    noticeButton,
+    noticeIcon,
+    "notice"
+  );
 
 
   /* =================================================
@@ -207,16 +235,17 @@
     const amount = Number(balance);
 
     if (!Number.isFinite(amount)) {
+
       console.warn(
         "Invalid withdrawal balance:",
         balance
       );
 
       return;
+
     }
 
-    balanceElement.textContent =
-      amount.toFixed(2);
+    balanceElement.textContent = amount.toFixed(2);
 
   }
 
@@ -230,29 +259,25 @@
     if (!verifiedIcon) return;
 
     if (typeof verified !== "boolean") {
+
       console.warn(
         "Invalid email_verified value:",
         verified
       );
 
       return;
+
     }
 
     if (verified) {
 
-      verifiedIcon.src =
-        "/SSVG/Withdraw/verified.svg";
-
-      verifiedIcon.alt =
-        "Verified";
+      verifiedIcon.src = "/SSVG/Withdraw/verified.svg";
+      verifiedIcon.alt = "Verified";
 
     } else {
 
-      verifiedIcon.src =
-        "/SSVG/Withdraw/unverified.svg";
-
-      verifiedIcon.alt =
-        "Unverified";
+      verifiedIcon.src = "/SSVG/Withdraw/unverified.svg";
+      verifiedIcon.alt = "Unverified";
 
     }
 
@@ -266,11 +291,13 @@
   function updateUserInfo(user) {
 
     if (!user || typeof user !== "object") {
+
       console.warn(
         "Invalid withdrawal user data."
       );
 
       return;
+
     }
 
     if (user.balance !== undefined) {
@@ -290,8 +317,7 @@
 
   window.U9ProfileWithdrawal = {
 
-    /* CATEGORY */
-
+    // CATEGORY
     switchCategory: switchCategory,
 
     getCurrentCategory: function () {
@@ -302,14 +328,21 @@
       switchCategory("crypto");
     },
 
-
-    /* USER INFO */
-
+    // USER INFO
     setBalance: setBalance,
 
     setEmailVerified: setEmailVerified,
 
-    updateUserInfo: updateUserInfo
+    updateUserInfo: updateUserInfo,
+
+    // BUTTON ELEMENTS
+    getVerifiedButton: function () {
+      return verifiedButton;
+    },
+
+    getNoticeButton: function () {
+      return noticeButton;
+    }
 
   };
 
