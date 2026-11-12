@@ -34,131 +34,6 @@
 
 
 /* =================================================
-   WITHDRAWAL NAVIGATION
-================================================= */
-
-#U9-profile-withdrawal-navigation {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-  width: 100%;
-  padding: 12px 14px;
-  box-sizing: border-box;
-}
-
-
-/* =================================================
-   NAVIGATION BUTTON
-================================================= */
-
-.U9-profile-withdrawal-nav-button {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-
-  width: 100%;
-  min-width: 0;
-  min-height: 76px;
-  padding: 9px 4px;
-
-  box-sizing: border-box;
-  border: 1px solid #e8e8e8;
-  border-radius: 10px;
-  background: #ffffff;
-
-  color: #555555;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
-}
-
-
-/* HOVER */
-
-.U9-profile-withdrawal-nav-button:hover {
-  border-color: #cfd8ea;
-  background: #f8faff;
-}
-
-
-/* ACTIVE */
-
-.U9-profile-withdrawal-nav-button.active {
-  border-color: #2762ea;
-  background: #f2f6ff;
-  color: #2762ea;
-  box-shadow: 0 2px 8px rgba(39, 98, 234, 0.10);
-}
-
-
-/* CLICK */
-
-.U9-profile-withdrawal-nav-button:active {
-  transform: scale(0.97);
-}
-
-
-/* FOCUS */
-
-.U9-profile-withdrawal-nav-button:focus-visible {
-  outline: 2px solid #2762ea;
-  outline-offset: 2px;
-}
-
-
-/* =================================================
-   NAVIGATION ICON
-================================================= */
-
-.U9-profile-withdrawal-nav-icon {
-  display: block;
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-  object-position: center;
-  pointer-events: none;
-  user-select: none;
-}
-
-
-/* =================================================
-   NAVIGATION LABEL
-================================================= */
-
-.U9-profile-withdrawal-nav-label {
-  display: block;
-  width: 100%;
-  overflow: hidden;
-
-  color: inherit;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
-
-  line-height: 1.2;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-
-  pointer-events: none;
-}
-
-
-/* =================================================
    WITHDRAWAL USER INFO
 ================================================= */
 
@@ -241,7 +116,7 @@
 
 
 /* =================================================
-   RIGHT SVG BOXES
+   RIGHT SVG BUTTONS
 ================================================= */
 
 #U9-profile-withdrawal-verified-button,
@@ -257,23 +132,64 @@
   height: 36px;
 
   padding: 0;
+  margin-top: 0;
+
   box-sizing: border-box;
 
   border: 1px solid #e8e8e8;
   border-radius: 8px;
+
   background: #ffffff;
+
+  cursor: pointer;
+  pointer-events: auto;
+
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 
-/* VERIFIED - PUSH BOTH ICONS TO RIGHT */
+/* VERIFIED - PUSH BUTTONS TO RIGHT */
 
 #U9-profile-withdrawal-verified-button {
   margin-left: auto;
-  pointer-events: none;
 }
 
 
-/* VERIFIED ICON */
+/* BOTH BUTTONS HOVER */
+
+#U9-profile-withdrawal-verified-button:hover,
+#U9-profile-withdrawal-notice-button:hover {
+  border-color: #cfd8ea;
+  background: #f8faff;
+}
+
+
+/* BOTH BUTTONS ACTIVE */
+
+#U9-profile-withdrawal-verified-button:active,
+#U9-profile-withdrawal-notice-button:active {
+  transform: scale(0.92);
+}
+
+
+/* BOTH BUTTONS FOCUS */
+
+#U9-profile-withdrawal-verified-button:focus-visible,
+#U9-profile-withdrawal-notice-button:focus-visible {
+  outline: 2px solid #555555;
+  outline-offset: 3px;
+}
+
+
+/* =================================================
+   VERIFIED ICON
+================================================= */
 
 #U9-profile-withdrawal-verified-icon {
   display: block;
@@ -289,47 +205,8 @@
 
 
 /* =================================================
-   NOTICE BUTTON
+   NOTICE ICON
 ================================================= */
-
-#U9-profile-withdrawal-notice-button {
-  flex-shrink: 0;
-
-  cursor: pointer;
-  outline: none;
-
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-
-/* HOVER */
-
-#U9-profile-withdrawal-notice-button:hover {
-  border-color: #cfd8ea;
-  background: #f8faff;
-}
-
-
-/* ACTIVE */
-
-#U9-profile-withdrawal-notice-button:active {
-  transform: scale(0.92);
-}
-
-
-/* FOCUS */
-
-#U9-profile-withdrawal-notice-button:focus-visible {
-  outline: 2px solid #555555;
-  outline-offset: 3px;
-  border-radius: 4px;
-}
-
-
-/* NOTICE ICON */
 
 #U9-profile-withdrawal-notice-icon {
   display: block;
@@ -341,6 +218,140 @@
 
   pointer-events: none;
   user-select: none;
+}
+
+
+/* =================================================
+   WITHDRAWAL NAVIGATION
+================================================= */
+
+#U9-profile-withdrawal-navigation {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 8px;
+  width: 100%;
+  padding: 12px 14px;
+
+  box-sizing: border-box;
+}
+
+
+/* =================================================
+   NAVIGATION BUTTON
+================================================= */
+
+.U9-profile-withdrawal-nav-button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  width: 100%;
+  min-width: 0;
+  min-height: 76px;
+  padding: 9px 4px;
+
+  box-sizing: border-box;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #555555;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+/* HOVER */
+
+.U9-profile-withdrawal-nav-button:hover {
+  border-color: #cfd8ea;
+  background: #f8faff;
+}
+
+
+/* ACTIVE */
+
+.U9-profile-withdrawal-nav-button.active {
+  border-color: #2762ea;
+  background: #f2f6ff;
+  color: #2762ea;
+
+  box-shadow: 0 2px 8px rgba(39, 98, 234, 0.10);
+}
+
+
+/* CLICK */
+
+.U9-profile-withdrawal-nav-button:active {
+  transform: scale(0.97);
+}
+
+
+/* FOCUS */
+
+.U9-profile-withdrawal-nav-button:focus-visible {
+  outline: 2px solid #2762ea;
+  outline-offset: 2px;
+}
+
+
+/* =================================================
+   NAVIGATION ICON
+================================================= */
+
+.U9-profile-withdrawal-nav-icon {
+  display: block;
+
+  width: 22px;
+  height: 22px;
+
+  object-fit: contain;
+  object-position: center;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* =================================================
+   NAVIGATION LABEL
+================================================= */
+
+.U9-profile-withdrawal-nav-label {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  pointer-events: none;
 }
 
 
@@ -357,8 +368,8 @@
   min-height: 250px;
 
   padding: 12px 14px 25px;
-  box-sizing: border-box;
 
+  box-sizing: border-box;
   background: #ffffff;
 }
 
@@ -368,6 +379,8 @@
 ================================================= */
 
 @media screen and (max-width: 480px) {
+
+  /* NAVIGATION */
 
   #U9-profile-withdrawal-navigation {
     gap: 6px;
@@ -412,7 +425,7 @@
   }
 
 
-  /* RIGHT SVG BOXES */
+  /* RIGHT BUTTONS */
 
   #U9-profile-withdrawal-verified-button,
   #U9-profile-withdrawal-notice-button {
@@ -446,6 +459,8 @@
 ================================================= */
 
 @media screen and (max-width: 360px) {
+
+  /* NAVIGATION */
 
   #U9-profile-withdrawal-navigation {
     gap: 5px;
@@ -490,7 +505,7 @@
   }
 
 
-  /* RIGHT SVG BOXES */
+  /* RIGHT BUTTONS */
 
   #U9-profile-withdrawal-verified-button,
   #U9-profile-withdrawal-notice-button {
