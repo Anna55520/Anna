@@ -59,7 +59,7 @@ const u9ProfilePageTitles = {
 
 const u9ProfilePageIcons = {
   1: "SSVG/account/account-edit-button.svg",
-  2: "SSVG/account/account-edit-button.svg",
+  2: "SSVG/Withdraw/withdraw2.svg",
   3: "SSVG/account/account-edit-button.svg",
   4: "SSVG/account/account-edit-button.svg",
   5: "SSVG/account/account-edit-button.svg"
