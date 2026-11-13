@@ -44,12 +44,10 @@
   align-items: center;
   justify-content: flex-start;
   flex-wrap: nowrap;
-
   gap: 10px;
   width: 100%;
   padding: 0 14px;
   margin-top: 12px;
-
   box-sizing: border-box;
   background: #ffffff;
 }
@@ -64,27 +62,21 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-
   flex: 0 1 auto;
   width: fit-content;
   min-width: 0;
   max-width: calc(100% - 92px);
-
   gap: 6px;
   min-height: 36px;
   padding: 0 10px;
-
   box-sizing: border-box;
   border: 1px solid #e8e8e8;
   border-radius: 8px;
-
   background: #ffffff;
   color: #333333;
-
   font-family: inherit;
   font-size: 14px;
   font-weight: 600;
-
   overflow: hidden;
 }
 
@@ -95,7 +87,6 @@
   display: block;
   flex: 0 1 auto;
   min-width: 0;
-
   color: #777777;
   white-space: nowrap;
 }
@@ -106,7 +97,6 @@
 #U9-profile-withdrawal-balance-value {
   display: block;
   flex: 0 0 auto;
-
   color: #111111;
   font-size: 15px;
   font-weight: 900;
@@ -126,28 +116,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
   flex: 0 0 36px;
   width: 36px;
   min-width: 36px;
   height: 36px;
-
   padding: 0;
   margin-top: 0;
-
   box-sizing: border-box;
-
   border: 1px solid #e8e8e8;
   border-radius: 8px;
-
   background: #ffffff;
-
   cursor: pointer;
   pointer-events: auto;
-
   -webkit-tap-highlight-color: transparent;
   user-select: none;
-
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease,
@@ -162,7 +144,7 @@
 }
 
 
-/* BOTH BUTTONS HOVER */
+/* HOVER */
 
 #U9-profile-withdrawal-verified-button:hover,
 #U9-profile-withdrawal-history-button:hover,
@@ -172,7 +154,7 @@
 }
 
 
-/* BOTH BUTTONS ACTIVE */
+/* ACTIVE */
 
 #U9-profile-withdrawal-verified-button:active,
 #U9-profile-withdrawal-history-button:active,
@@ -181,7 +163,7 @@
 }
 
 
-/* BOTH BUTTONS FOCUS */
+/* FOCUS */
 
 #U9-profile-withdrawal-verified-button:focus-visible,
 #U9-profile-withdrawal-history-button:focus-visible,
@@ -199,10 +181,8 @@
   display: block;
   width: 24px;
   height: 24px;
-
   object-fit: contain;
   object-position: center;
-
   pointer-events: none;
   user-select: none;
 }
@@ -231,10 +211,8 @@
   display: block;
   width: 24px;
   height: 24px;
-
   object-fit: contain;
   object-position: center;
-
   pointer-events: none;
   user-select: none;
 }
@@ -248,11 +226,9 @@
   position: relative;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-
   gap: 8px;
   width: 100%;
   padding: 12px 14px;
-
   box-sizing: border-box;
 }
 
@@ -267,30 +243,21 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
   gap: 7px;
-
   width: 100%;
   min-width: 0;
   min-height: 76px;
   padding: 9px 4px;
-
   box-sizing: border-box;
-
   border: 1px solid #e8e8e8;
   border-radius: 10px;
-
   background: #ffffff;
-
   color: #555555;
   font-family: inherit;
   font-size: 13px;
   font-weight: 700;
-
   cursor: pointer;
-
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-
   transition:
     background-color 0.2s ease,
     border-color 0.2s ease,
@@ -313,7 +280,6 @@
   border-color: #76ace9;
   background: #f2f6ff;
   color: #000000;
-
   box-shadow: 0 2px 8px rgba(39, 98, 234, 0.10);
 }
 
@@ -339,13 +305,10 @@
 
 .U9-profile-withdrawal-nav-icon {
   display: block;
-
   width: 22px;
   height: 22px;
-
   object-fit: contain;
   object-position: center;
-
   pointer-events: none;
   user-select: none;
 }
@@ -359,17 +322,14 @@
   display: block;
   width: 100%;
   overflow: hidden;
-
   color: inherit;
   font-family: inherit;
   font-size: inherit;
   font-weight: inherit;
-
   line-height: 1.2;
   text-align: center;
   text-overflow: ellipsis;
   white-space: nowrap;
-
   pointer-events: none;
 }
 
@@ -390,31 +350,44 @@
   display: none;
 }
 
+
+/* CRYPTO BUTTON */
+
 .U9-profile-withdrawal-crypto-button {
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
+  justify-content: flex-start;
+  gap: 0;
   width: 100%;
   min-width: 0;
-  min-height: 58px;
-  padding: 8px 10px;
+  min-height: 52px;
+  padding: 6px 8px;
   box-sizing: border-box;
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 14px;
   background: #ffffff;
   color: #333333;
   font-family: inherit;
   cursor: pointer;
   box-shadow: 0 2px 7px rgba(0, 0, 0, 0.045);
-  transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 }
+
+
+/* HOVER */
 
 .U9-profile-withdrawal-crypto-button:hover {
   border-color: #b8c9e8;
   background: #f8faff;
 }
+
+
+/* SELECTED */
 
 .U9-profile-withdrawal-crypto-button.active {
   border: 1px solid #76ace9;
@@ -423,37 +396,52 @@
   box-shadow: 0 3px 10px rgba(39, 98, 234, 0.12);
 }
 
+
+/* CLICK */
+
 .U9-profile-withdrawal-crypto-button:active {
   transform: scale(0.98);
 }
+
+
+/* FOCUS */
 
 .U9-profile-withdrawal-crypto-button:focus-visible {
   outline: 2px solid #2762ea;
   outline-offset: 3px;
 }
 
+
+/* CRYPTO SVG - FIXED ON LEFT */
+
 .U9-profile-withdrawal-crypto-icon {
   display: block;
-  width: 30px;
-  height: 30px;
-  flex: 0 0 30px;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
   object-fit: contain;
   object-position: center;
   pointer-events: none;
   user-select: none;
 }
 
+
+/* CRYPTO TEXT - CENTERED IN REMAINING SPACE */
+
 .U9-profile-withdrawal-crypto-label {
   display: block;
-  max-width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: none;
   color: inherit;
   font-family: inherit;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
   line-height: 1.2;
   text-align: center;
-  overflow-wrap: anywhere;
+  overflow: hidden;
+  text-overflow: ellipsis;
   pointer-events: none;
 }
 
@@ -465,13 +453,10 @@
 #U9-profile-withdrawal-information {
   position: relative;
   display: block;
-
   flex: 1 0 auto;
   width: 100%;
   min-height: 250px;
-
   padding: 12px 14px 25px;
-
   box-sizing: border-box;
   background: #ffffff;
 }
@@ -488,21 +473,21 @@
   }
 
   .U9-profile-withdrawal-crypto-button {
-    min-height: 48px;
-    gap: 5px;
-    padding: 6px 4px;
-    border-radius: 9px;
+    min-height: 44px;
+    padding: 5px 6px;
+    border-radius: 12px;
   }
 
   .U9-profile-withdrawal-crypto-icon {
-    width: 24px;
-    height: 24px;
-    flex-basis: 24px;
+    flex-basis: 19px;
+    width: 19px;
+    height: 19px;
   }
 
   .U9-profile-withdrawal-crypto-label {
     font-size: 12px;
   }
+
 
   /* NAVIGATION */
 
@@ -537,7 +522,6 @@
   #U9-profile-withdrawal-balance {
     flex: 0 1 auto;
     max-width: calc(100% - 84px);
-
     gap: 5px;
     min-height: 34px;
     padding: 0 8px;
@@ -589,20 +573,21 @@
   }
 
   .U9-profile-withdrawal-crypto-button {
-    min-height: 44px;
-    gap: 3px;
-    padding: 5px 2px;
+    min-height: 42px;
+    padding: 4px 5px;
+    border-radius: 11px;
   }
 
   .U9-profile-withdrawal-crypto-icon {
-    width: 21px;
-    height: 21px;
-    flex-basis: 21px;
+    flex-basis: 17px;
+    width: 17px;
+    height: 17px;
   }
 
   .U9-profile-withdrawal-crypto-label {
     font-size: 11px;
   }
+
 
   /* NAVIGATION */
 
@@ -637,7 +622,6 @@
   #U9-profile-withdrawal-balance {
     flex: 0 1 auto;
     max-width: calc(100% - 80px);
-
     gap: 4px;
     min-height: 32px;
     padding: 0 6px;
