@@ -135,6 +135,12 @@ const u9ProfileHistoryButton =
 const u9ProfileHistoryPage =
   document.getElementById("U9-profile-history-page");
 
+const u9ProfileWithdrawalHistoryButton =
+  document.getElementById("U9-profile-withdrawal-history-button");
+
+// The page to return to after closing the shared History page.
+let u9ProfileHistoryReturnPage = "main";
+
 
 /* =========================
    BALANCE / COINS STATE
@@ -754,12 +760,17 @@ function u9ProfileShowPage(pageNumber) {
    SHOW PROFILE HISTORY PAGE
 ========================= */
 
-function u9ProfileShowHistoryPage() {
+function u9ProfileShowHistoryPage(returnPage) {
   if (!u9ProfileHistoryPage) {
     console.warn("U9 Profile History page not found");
 
     return false;
   }
+
+  // Default to the currently visible profile page. Callers may explicitly
+  // provide "main" or "page2" for a known entry point.
+  u9ProfileHistoryReturnPage =
+    returnPage || u9ProfileCurrentPage || "main";
 
   u9ProfileHideAllPages();
 
@@ -772,6 +783,22 @@ function u9ProfileShowHistoryPage() {
   u9ProfileSetHeader("history");
 
   return true;
+}
+
+
+/* =========================
+   RETURN FROM HISTORY
+========================= */
+
+function u9ProfileReturnFromHistory() {
+  const target = u9ProfileHistoryReturnPage;
+  u9ProfileHistoryReturnPage = "main";
+
+  if (target === "page2") {
+    return u9ProfileShowPage(2);
+  }
+
+  return u9ProfileShowMainPage();
 }
 
 
@@ -1004,6 +1031,11 @@ if (profileModalClose) {
   profileModalClose.addEventListener(
     "click",
     async function() {
+      if (u9ProfileCurrentPage === "history") {
+        u9ProfileReturnFromHistory();
+        return;
+      }
+
       if (u9ProfileCurrentPage === "main") {
         if (window.U9WindowManager) {
           await window.U9WindowManager.close("profile");
@@ -1033,6 +1065,19 @@ if (u9ProfileHistoryButton) {
       event.stopPropagation();
 
       u9ProfileShowHistoryPage();
+    }
+  );
+}
+
+
+// Withdrawal History uses the same History page but returns to Withdrawal.
+if (u9ProfileWithdrawalHistoryButton) {
+  u9ProfileWithdrawalHistoryButton.addEventListener(
+    "click",
+    function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      u9ProfileShowHistoryPage("page2");
     }
   );
 }
@@ -1597,6 +1642,8 @@ window.U9Profile = {
   showPage: u9ProfileShowPage,
 
   showHistory: u9ProfileShowHistoryPage,
+
+  returnFromHistory: u9ProfileReturnFromHistory,
 
   toggleBalanceCoins: u9ProfileToggleBalanceCoins,
 
