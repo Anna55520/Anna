@@ -361,11 +361,11 @@
   gap: 0;
   width: 100%;
   min-width: 0;
-  min-height: 52px;
+  min-height: 35px;
   padding: 6px 8px;
   box-sizing: border-box;
   border: 1px solid #e5e7eb;
-  border-radius: 14px;
+  border-radius: 18px;
   background: #ffffff;
   color: #333333;
   font-family: inherit;
@@ -473,9 +473,9 @@
   }
 
   .U9-profile-withdrawal-crypto-button {
-    min-height: 44px;
+    min-height: 35px;
     padding: 5px 6px;
-    border-radius: 12px;
+    border-radius: 18px;
   }
 
   .U9-profile-withdrawal-crypto-icon {
