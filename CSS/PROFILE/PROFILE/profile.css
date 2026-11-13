@@ -933,3 +933,146 @@
     right: 15px;
   }
 }
+
+
+/* ================================================
+   PROFILE BALANCE ACTIONS
+================================================ */
+
+#U9-profile-balance-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 6px;
+
+  flex-shrink: 0;
+}
+
+
+/* ================================================
+   PROFILE HISTORY BUTTON
+================================================ */
+
+#U9-profile-history-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 32px;
+  height: 32px;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+#U9-profile-history-button img {
+  width: 22px;
+  height: 22px;
+
+  object-fit: contain;
+}
+
+
+/* ================================================
+   PROFILE HISTORY PAGE
+================================================ */
+
+#U9-profile-history-page {
+  position: absolute;
+  inset: 0;
+
+  display: none;
+
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+
+  background: #ffffff;
+
+  z-index: 20;
+}
+
+#U9-profile-history-page-content {
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  width: 100%;
+  height: 100%;
+
+  box-sizing: border-box;
+}
+
+
+/* HISTORY HEADER */
+
+#U9-profile-history-header {
+  display: flex;
+  align-items: center;
+
+  width: 100%;
+  height: 56px;
+
+  padding: 0 16px;
+
+  box-sizing: border-box;
+
+  border-bottom: 1px solid #eeeeee;
+}
+
+#U9-profile-history-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+}
+
+#U9-profile-history-back img {
+  width: 22px;
+  height: 22px;
+
+  object-fit: contain;
+}
+
+#U9-profile-history-title {
+  flex: 1;
+
+  text-align: center;
+
+  font-size: 18px;
+  font-weight: 600;
+
+  color: #222222;
+}
+
+
+/* HISTORY BODY */
+
+#U9-profile-history-body {
+  flex: 1;
+
+  width: 100%;
+
+  overflow-y: auto;
+
+  box-sizing: border-box;
+
+  padding: 16px;
+}
