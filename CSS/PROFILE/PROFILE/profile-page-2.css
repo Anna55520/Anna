@@ -392,14 +392,14 @@
 
 .U9-profile-withdrawal-crypto-button {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 8px;
   width: 100%;
   min-width: 0;
-  min-height: 126px;
-  padding: 14px 8px;
+  min-height: 58px;
+  padding: 8px 10px;
   box-sizing: border-box;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -434,8 +434,9 @@
 
 .U9-profile-withdrawal-crypto-icon {
   display: block;
-  width: 48px;
-  height: 48px;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
   object-fit: contain;
   object-position: center;
   pointer-events: none;
@@ -447,8 +448,9 @@
   max-width: 100%;
   color: inherit;
   font-family: inherit;
-  font-size: 17px;
+  font-size: 15px;
   font-weight: 700;
+  white-space: nowrap;
   line-height: 1.2;
   text-align: center;
   overflow-wrap: anywhere;
@@ -486,19 +488,20 @@
   }
 
   .U9-profile-withdrawal-crypto-button {
-    min-height: 104px;
-    gap: 8px;
-    padding: 10px 4px;
-    border-radius: 10px;
+    min-height: 48px;
+    gap: 5px;
+    padding: 6px 4px;
+    border-radius: 9px;
   }
 
   .U9-profile-withdrawal-crypto-icon {
-    width: 38px;
-    height: 38px;
+    width: 24px;
+    height: 24px;
+    flex-basis: 24px;
   }
 
   .U9-profile-withdrawal-crypto-label {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   /* NAVIGATION */
@@ -580,6 +583,26 @@
 ================================================= */
 
 @media screen and (max-width: 360px) {
+
+  #U9-profile-withdrawal-crypto-options {
+    gap: 5px;
+  }
+
+  .U9-profile-withdrawal-crypto-button {
+    min-height: 44px;
+    gap: 3px;
+    padding: 5px 2px;
+  }
+
+  .U9-profile-withdrawal-crypto-icon {
+    width: 21px;
+    height: 21px;
+    flex-basis: 21px;
+  }
+
+  .U9-profile-withdrawal-crypto-label {
+    font-size: 11px;
+  }
 
   /* NAVIGATION */
 
