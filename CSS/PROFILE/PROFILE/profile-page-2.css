@@ -120,6 +120,7 @@
 ================================================= */
 
 #U9-profile-withdrawal-verified-button,
+#U9-profile-withdrawal-history-button,
 #U9-profile-withdrawal-notice-button {
   position: relative;
   display: flex;
@@ -164,6 +165,7 @@
 /* BOTH BUTTONS HOVER */
 
 #U9-profile-withdrawal-verified-button:hover,
+#U9-profile-withdrawal-history-button:hover,
 #U9-profile-withdrawal-notice-button:hover {
   border-color: #cfd8ea;
   background: #f8faff;
@@ -173,6 +175,7 @@
 /* BOTH BUTTONS ACTIVE */
 
 #U9-profile-withdrawal-verified-button:active,
+#U9-profile-withdrawal-history-button:active,
 #U9-profile-withdrawal-notice-button:active {
   transform: scale(0.92);
 }
@@ -181,6 +184,7 @@
 /* BOTH BUTTONS FOCUS */
 
 #U9-profile-withdrawal-verified-button:focus-visible,
+#U9-profile-withdrawal-history-button:focus-visible,
 #U9-profile-withdrawal-notice-button:focus-visible {
   outline: 2px solid #555555;
   outline-offset: 3px;
@@ -199,6 +203,21 @@
   object-fit: contain;
   object-position: center;
 
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* =================================================
+   HISTORY ICON
+================================================= */
+
+#U9-profile-withdrawal-history-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  object-position: center;
   pointer-events: none;
   user-select: none;
 }
