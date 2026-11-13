@@ -1,79 +1,19 @@
-
 /* =================================================
    U9 PROFILE HISTORY PAGE
+   Navigation is managed centrally by profile.js so
+   History can return to its correct origin.
 ================================================= */
 
 (function () {
+  window.openProfileHistory = function () {
+    if (window.U9Profile?.showHistory) {
+      window.U9Profile.showHistory();
+    }
+  };
 
-  /* =================================
-     ELEMENTS
-  ================================= */
-
-  const historyPage =
-    document.getElementById(
-      "U9-profile-history-page"
-    );
-
-  const historyButton =
-    document.getElementById(
-      "U9-profile-history-button"
-    );
-
-  const historyBack =
-    document.getElementById(
-      "U9-profile-history-back"
-    );
-
-
-  /* =================================
-     OPEN HISTORY
-  ================================= */
-
-  function openProfileHistory() {
-
-    if (!historyPage) return;
-
-    historyPage.style.display = "flex";
-
-  }
-
-
-  /* =================================
-     CLOSE HISTORY
-  ================================= */
-
-  function closeProfileHistory() {
-
-    if (!historyPage) return;
-
-    historyPage.style.display = "none";
-
-  }
-
-
-  /* =================================
-     EVENTS
-  ================================= */
-
-  historyButton?.addEventListener(
-    "click",
-    openProfileHistory
-  );
-
-  historyBack?.addEventListener(
-    "click",
-    closeProfileHistory
-  );
-
-
-  /* =================================
-     PUBLIC API
-  ================================= */
-
-  window.openProfileHistory =
-    openProfileHistory;
-
-  window.closeProfileHistory =
-    closeProfileHistory;
-
+  window.closeProfileHistory = function () {
+    if (window.U9Profile?.returnFromHistory) {
+      window.U9Profile.returnFromHistory();
+    }
+  };
 })();
