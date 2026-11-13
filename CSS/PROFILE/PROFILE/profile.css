@@ -1000,7 +1000,7 @@
   box-sizing: border-box;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 480px) {
   #U9-profile-history-button {
     right: calc((100% - 304px) / 2);
     width: 34px;
