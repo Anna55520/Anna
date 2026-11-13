@@ -1016,46 +1016,59 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
               <div id="U9-profile-balance-info">
 
-                <div
-                  id="U9-profile-balance-title"
-                >
+                <div id="U9-profile-balance-title">
                   Balance
                 </div>
 
+                <div id="U9-profile-balance-value-row">
 
-                <div
-                  id="U9-profile-balance-value-row"
-                >
+                  <div id="U9-profile-balance">
+                  </div>
 
-                  <div
-                    id="U9-profile-balance"
-                  ></div>
+                  <div id="U9-profile-coins" hidden>
+                  </div>
 
+                  <!-- HISTORY + BALANCE TOGGLE -->
 
-                  <div
-                    id="U9-profile-coins"
-                    hidden
-                  ></div>
+                  <div id="U9-profile-balance-actions">
 
+                    <!-- HISTORY BUTTON -->
 
-                  <button
-                    id="U9-profile-balance-toggle"
-                    type="button"
-                    aria-label="Show Coins"
-                  >
-
-                    <img
-                      src="SSVG/button/refresh.svg"
-                      alt=""
-                      aria-hidden="true"
+                    <button
+                      id="U9-profile-history-button"
+                      type="button"
+                      aria-label="History"
                     >
 
-                  </button>
+                      <img
+                        src="SSVG/button/profile-history.svg"
+                        alt=""
+                        aria-hidden="true"
+                      >
+
+                    </button>
+
+                    <!-- BALANCE TOGGLE -->
+
+                    <button
+                      id="U9-profile-balance-toggle"
+                      type="button"
+                      aria-label="Show Coins"
+                    >
+
+                      <img
+                        src="SSVG/button/refresh.svg"
+                        alt=""
+                        aria-hidden="true"
+                      >
+
+                    </button>
+
+                  </div>
 
                 </div>
 
               </div>
-
 
               <div id="U9-profile-balance-buttons">
 
@@ -1070,12 +1083,9 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                     aria-hidden="true"
                   >
 
-                  <span>
-                    Deposits
-                  </span>
+                  <span>Deposits</span>
 
                 </button>
-
 
                 <button
                   id="U9-profile-button-2"
@@ -1088,9 +1098,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                     aria-hidden="true"
                   >
 
-                  <span>
-                    Withdrawal
-                  </span>
+                  <span>Withdrawal</span>
 
                 </button>
 
@@ -1419,6 +1427,50 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
         </div>
 
+
+        <!-- =================================
+            PROFILE HISTORY PAGE
+        ================================= -->
+
+        <div id="U9-profile-history-page">
+
+          <div id="U9-profile-history-page-content">
+
+            <!-- HISTORY HEADER -->
+
+            <div id="U9-profile-history-header">
+
+              <button
+                id="U9-profile-history-back"
+                type="button"
+                aria-label="Back"
+              >
+
+                <img
+                  src="SSVG/account/back.svg"
+                  alt=""
+                  aria-hidden="true"
+                >
+
+              </button>
+
+              <div id="U9-profile-history-title">
+                History
+              </div>
+
+            </div>
+
+            <!-- HISTORY BODY -->
+
+            <div id="U9-profile-history-body">
+
+              <!-- History records will be added later -->
+
+            </div>
+
+          </div>
+
+        </div>
 
       </div>
 
