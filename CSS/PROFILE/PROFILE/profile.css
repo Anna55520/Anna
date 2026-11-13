@@ -475,8 +475,8 @@
 
 #U9-profile-history-button {
   position: absolute;
-  top: 50%;
-  left: calc((100% - 352px) / 2);
+  top: -36px;
+  right: calc((100% - 352px) / 2);
   width: 36px;
   height: 36px;
   padding: 0;
@@ -489,7 +489,6 @@
   justify-content: center;
   background: transparent;
   cursor: pointer;
-  transform: translateY(-50%);
   transition: transform 0.15s ease, background-color 0.2s ease;
 }
 
@@ -506,7 +505,7 @@
 }
 
 #U9-profile-history-button:active {
-  transform: translateY(-50%) scale(0.92);
+  transform: scale(0.92);
 }
 
 
@@ -1003,7 +1002,7 @@
 
 @media (max-width: 600px) {
   #U9-profile-history-button {
-    left: calc((100% - 304px) / 2);
+    right: calc((100% - 304px) / 2);
     width: 34px;
     height: 34px;
   }
