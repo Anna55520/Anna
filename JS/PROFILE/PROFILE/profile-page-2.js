@@ -25,6 +25,16 @@
     "U9-profile-withdrawal-navigation"
   );
 
+  const cryptoOptions = document.getElementById(
+    "U9-profile-withdrawal-crypto-options"
+  );
+
+  const cryptoOptionButtons = cryptoOptions
+    ? Array.from(cryptoOptions.querySelectorAll("[data-crypto]"))
+    : [];
+
+  let currentCrypto = "usdt";
+
   const balanceElement = document.getElementById(
     "U9-profile-withdrawal-balance-value"
   );
@@ -76,6 +86,30 @@
 
 
   /* =========================
+     SWITCH CRYPTO OPTION
+  ========================= */
+
+  function switchCryptoOption(crypto) {
+
+    const validOptions = ["usdt", "binance", "btc"];
+
+    if (!validOptions.includes(crypto)) return;
+
+    cryptoOptionButtons.forEach(function (button) {
+
+      const isActive = button.dataset.crypto === crypto;
+
+      button.classList.toggle("active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+
+    });
+
+    currentCrypto = crypto;
+
+  }
+
+
+  /* =========================
      SWITCH CATEGORY
   ========================= */
 
@@ -105,6 +139,15 @@
 
     currentCategory = category;
 
+    if (cryptoOptions) {
+      cryptoOptions.hidden = category !== "crypto";
+    }
+
+    // Entering Crypto or reopening Withdrawal starts on Tether.
+    if (category === "crypto") {
+      switchCryptoOption("usdt");
+    }
+
   }
 
 
@@ -125,6 +168,20 @@
       switchCategory(button.dataset.category);
 
     });
+
+    if (cryptoOptions) {
+
+      cryptoOptions.addEventListener("click", function (event) {
+
+        const button = event.target.closest("[data-crypto]");
+
+        if (!button || !cryptoOptions.contains(button)) return;
+
+        switchCryptoOption(button.dataset.crypto);
+
+      });
+
+    }
 
 
     /* =========================
@@ -438,6 +495,12 @@
     getCurrentCategory: function () {
       return currentCategory;
     },
+
+    getCurrentCrypto: function () {
+      return currentCrypto;
+    },
+
+    switchCryptoOption: switchCryptoOption,
 
     reset: function () {
       switchCategory("crypto");
