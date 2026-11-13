@@ -417,7 +417,7 @@
 }
 
 .U9-profile-withdrawal-crypto-button.active {
-  border: 2px solid #2762ea;
+  border: 1px solid #76ace9;
   background: #f2f6ff;
   color: #111111;
   box-shadow: 0 3px 10px rgba(39, 98, 234, 0.12);
