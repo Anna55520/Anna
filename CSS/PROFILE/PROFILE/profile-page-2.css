@@ -14,7 +14,7 @@
   width: 100%;
   min-height: 100%;
   box-sizing: border-box;
-  background: #ff00ee;
+  background: #ffffff;
 }
 
 
@@ -29,7 +29,7 @@
   width: 100%;
   min-height: 100%;
   box-sizing: border-box;
-  background: #1dff29;
+  background: #ffffff;
 }
 
 
@@ -44,12 +44,14 @@
   align-items: center;
   justify-content: flex-start;
   flex-wrap: nowrap;
+
   gap: 10px;
   width: 100%;
   padding: 0 14px;
   margin-top: 12px;
+
   box-sizing: border-box;
-  background: #0f1fc9;
+  background: #ffffff;
 }
 
 
@@ -379,12 +381,15 @@
 #U9-profile-withdrawal-information {
   position: relative;
   display: block;
+
   flex: 1 0 auto;
   width: 100%;
   min-height: 250px;
+
   padding: 12px 14px 25px;
+
   box-sizing: border-box;
-  background: #ff0000;
+  background: #ffffff;
 }
 
 
@@ -538,196 +543,4 @@
     height: 21px;
   }
 
-}
-
-
-/* =================================================
-   CRYPTO WITHDRAWAL FORM
-================================================= */
-
-#U9-withdrawal-crypto-panel {
-  width: 100%;
-  max-width: 560px;
-  margin: 0 auto;
-  padding: 8px 2px 20px;
-  box-sizing: border-box;
-}
-
-.U9-withdrawal-section-heading {
-  margin-bottom: 22px;
-}
-
-.U9-withdrawal-section-heading h2 {
-  margin: 0;
-  color: #171717;
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.U9-withdrawal-section-heading p {
-  margin: 6px 0 0;
-  color: #858585;
-  font-size: 13px;
-}
-
-#U9-withdrawal-crypto-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.U9-withdrawal-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-.U9-withdrawal-field > label {
-  color: #292929;
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.U9-withdrawal-input-wrap,
-.U9-withdrawal-select-wrap {
-  display: flex;
-  align-items: center;
-  min-height: 48px;
-  border: 1px solid #e5e5e5;
-  border-radius: 9px;
-  background: #fff;
-  box-sizing: border-box;
-}
-
-.U9-withdrawal-input-wrap:focus-within,
-.U9-withdrawal-field > input:focus,
-.U9-withdrawal-select-wrap:focus-within {
-  border-color: #76ace9;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(39, 98, 234, .08);
-}
-
-.U9-withdrawal-input-wrap input,
-.U9-withdrawal-field > input,
-.U9-withdrawal-select-wrap select {
-  width: 100%;
-  min-width: 0;
-  min-height: 46px;
-  padding: 0 13px;
-  border: 1px solid #e5e5e5;
-  border-radius: 9px;
-  background: #fff;
-  color: #222;
-  font: inherit;
-  font-size: 14px;
-  box-sizing: border-box;
-}
-
-.U9-withdrawal-input-wrap input {
-  flex: 1;
-  border: 0;
-  outline: 0;
-  box-shadow: none;
-}
-
-.U9-withdrawal-input-suffix {
-  padding: 0 14px;
-  color: #666;
-  font-size: 12px;
-  font-weight: 800;
-}
-
-.U9-withdrawal-select-wrap select {
-  border: 0;
-  outline: 0;
-  cursor: pointer;
-}
-
-.U9-withdrawal-field-meta {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #888;
-  font-size: 12px;
-}
-
-.U9-withdrawal-field-meta strong {
-  color: #333;
-  font-variant-numeric: tabular-nums;
-}
-
-#U9-withdrawal-use-max {
-  margin-left: auto;
-  padding: 4px 8px;
-  border: 0;
-  border-radius: 5px;
-  background: #f0f5ff;
-  color: #2762ea;
-  font: inherit;
-  font-size: 11px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-.U9-withdrawal-help {
-  margin: 0;
-  color: #929292;
-  font-size: 11px;
-  line-height: 1.5;
-}
-
-.U9-withdrawal-message {
-  display: none;
-  padding: 10px 12px;
-  border-radius: 7px;
-  font-size: 12px;
-  line-height: 1.5;
-}
-
-.U9-withdrawal-message.is-error {
-  display: block;
-  background: #fff2f1;
-  color: #b42318;
-}
-
-.U9-withdrawal-message.is-success {
-  display: block;
-  background: #effaf3;
-  color: #18713b;
-}
-
-#U9-withdrawal-crypto-confirm {
-  width: 100%;
-  min-height: 48px;
-  border: 0;
-  border-radius: 9px;
-  background: #171717;
-  color: #fff;
-  font: inherit;
-  font-size: 14px;
-  font-weight: 800;
-  cursor: pointer;
-  transition: opacity .2s ease, transform .2s ease;
-}
-
-#U9-withdrawal-crypto-confirm:hover {
-  opacity: .88;
-}
-
-#U9-withdrawal-crypto-confirm:active {
-  transform: scale(.99);
-}
-
-#U9-withdrawal-crypto-confirm:focus-visible,
-#U9-withdrawal-use-max:focus-visible {
-  outline: 2px solid #2762ea;
-  outline-offset: 2px;
-}
-
-@media (max-width: 480px) {
-  #U9-withdrawal-crypto-panel {
-    padding-right: 0;
-    padding-left: 0;
-  }
 }
