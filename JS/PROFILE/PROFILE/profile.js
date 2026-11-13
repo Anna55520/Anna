@@ -60,7 +60,7 @@ const u9ProfilePageTitles = {
 const u9ProfilePageIcons = {
   1: "SSVG/account/account-edit-button.svg",
   2: "SSVG/Withdraw/withdraw2.svg",
-  3: "SSVG/logo/edit2.svg",
+  3: "SSVG/account/account-edit-button.svg",
   4: "SSVG/account/account-edit-button.svg",
   5: "SSVG/account/account-edit-button.svg"
 };
@@ -99,6 +99,12 @@ const u9ProfileCoins =
 
 const u9ProfileBalanceToggle =
   document.getElementById("U9-profile-balance-toggle");
+
+const u9ProfileHistoryButton =
+  document.getElementById("U9-profile-history-button");
+
+const u9ProfileHistoryPage =
+  document.getElementById("U9-profile-history-page");
 
 
 /* =========================
@@ -533,6 +539,30 @@ if (u9ProfileBalanceToggle) {
 function u9ProfileSetHeader(page) {
 
   /* =========================
+     HISTORY PAGE HEADER
+  ========================= */
+
+  if (page === "history") {
+    if (profileModalCloseIcon) {
+      profileModalCloseIcon.src = u9ProfileBackIcon;
+    }
+
+    if (profileModalClose) {
+      profileModalClose.setAttribute("aria-label", "Back");
+    }
+
+    if (profileModalTitle) {
+      profileModalTitle.textContent = "History";
+    }
+
+    if (profileModalIcon) {
+      profileModalIcon.src = u9ProfileMainIcon;
+    }
+
+    return;
+  }
+
+  /* =========================
      MAIN PAGE HEADER
   ========================= */
 
@@ -609,6 +639,11 @@ function u9ProfileHideAllPages() {
     page.classList.remove("profile-page-active");
     page.style.display = "none";
   });
+
+  if (u9ProfileHistoryPage) {
+    u9ProfileHistoryPage.classList.remove("profile-page-active");
+    u9ProfileHistoryPage.style.display = "none";
+  }
 }
 
 
@@ -662,6 +697,28 @@ function u9ProfileShowPage(pageNumber) {
   u9ProfileCurrentPage = "page" + pageNumber;
 
   u9ProfileSetHeader(u9ProfileCurrentPage);
+
+  return true;
+}
+
+
+/* =========================
+   SHOW PROFILE HISTORY PAGE
+========================= */
+
+function u9ProfileShowHistoryPage() {
+  if (!u9ProfileHistoryPage) {
+    console.warn("U9 Profile History page not found");
+    return false;
+  }
+
+  u9ProfileHideAllPages();
+
+  u9ProfileHistoryPage.style.display = "block";
+  u9ProfileHistoryPage.classList.add("profile-page-active");
+
+  u9ProfileCurrentPage = "history";
+  u9ProfileSetHeader("history");
 
   return true;
 }
@@ -920,6 +977,19 @@ if (profileModalClose) {
       u9ProfileShowMainPage();
     }
   );
+}
+
+
+/* =========================
+   PROFILE HISTORY BUTTON
+========================= */
+
+if (u9ProfileHistoryButton) {
+  u9ProfileHistoryButton.addEventListener("click", function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    u9ProfileShowHistoryPage();
+  });
 }
 
 
@@ -1466,6 +1536,8 @@ window.U9Profile = {
   showMain: u9ProfileShowMainPage,
 
   showPage: u9ProfileShowPage,
+
+  showHistory: u9ProfileShowHistoryPage,
 
   toggleBalanceCoins: u9ProfileToggleBalanceCoins,
 
