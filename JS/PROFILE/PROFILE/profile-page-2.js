@@ -25,16 +25,6 @@
     "U9-profile-withdrawal-navigation"
   );
 
-  const cryptoOptions = document.getElementById(
-    "U9-profile-withdrawal-crypto-options"
-  );
-
-  const cryptoOptionButtons = cryptoOptions
-    ? Array.from(cryptoOptions.querySelectorAll("[data-crypto]"))
-    : [];
-
-  let currentCrypto = "usdt";
-
   const balanceElement = document.getElementById(
     "U9-profile-withdrawal-balance-value"
   );
@@ -86,30 +76,6 @@
 
 
   /* =========================
-     SWITCH CRYPTO OPTION
-  ========================= */
-
-  function switchCryptoOption(crypto) {
-
-    const validOptions = ["usdt", "binance", "btc"];
-
-    if (!validOptions.includes(crypto)) return;
-
-    cryptoOptionButtons.forEach(function (button) {
-
-      const isActive = button.dataset.crypto === crypto;
-
-      button.classList.toggle("active", isActive);
-      button.setAttribute("aria-pressed", String(isActive));
-
-    });
-
-    currentCrypto = crypto;
-
-  }
-
-
-  /* =========================
      SWITCH CATEGORY
   ========================= */
 
@@ -139,13 +105,12 @@
 
     currentCategory = category;
 
-    if (cryptoOptions) {
-      cryptoOptions.hidden = category !== "crypto";
-    }
+    const cryptoPanel = document.getElementById(
+      "U9-withdrawal-crypto-panel"
+    );
 
-    // Entering Crypto or reopening Withdrawal starts on Tether.
-    if (category === "crypto") {
-      switchCryptoOption("usdt");
+    if (cryptoPanel) {
+      cryptoPanel.hidden = category !== "crypto";
     }
 
   }
@@ -168,20 +133,6 @@
       switchCategory(button.dataset.category);
 
     });
-
-    if (cryptoOptions) {
-
-      cryptoOptions.addEventListener("click", function (event) {
-
-        const button = event.target.closest("[data-crypto]");
-
-        if (!button || !cryptoOptions.contains(button)) return;
-
-        switchCryptoOption(button.dataset.crypto);
-
-      });
-
-    }
 
 
     /* =========================
@@ -307,6 +258,22 @@
     }
 
     balanceElement.textContent = amount.toFixed(2);
+
+    const availableBalance = document.getElementById(
+      "U9-withdrawal-available-balance"
+    );
+
+    if (availableBalance) {
+      availableBalance.textContent = amount.toFixed(2);
+    }
+
+    const amountInput = document.getElementById(
+      "U9-withdrawal-crypto-amount"
+    );
+
+    if (amountInput) {
+      amountInput.max = String(amount);
+    }
 
   }
 
@@ -483,6 +450,120 @@
 
 
   /* =================================================
+     CRYPTO WITHDRAWAL FORM — FRONTEND ONLY
+  ================================================= */
+
+  const cryptoForm = document.getElementById(
+    "U9-withdrawal-crypto-form"
+  );
+
+  const cryptoAmountInput = document.getElementById(
+    "U9-withdrawal-crypto-amount"
+  );
+
+  const cryptoAddressInput = document.getElementById(
+    "U9-withdrawal-crypto-address"
+  );
+
+  const cryptoNetworkInput = document.getElementById(
+    "U9-withdrawal-crypto-network"
+  );
+
+  const cryptoMessage = document.getElementById(
+    "U9-withdrawal-crypto-message"
+  );
+
+  const useMaxButton = document.getElementById(
+    "U9-withdrawal-use-max"
+  );
+
+  function getAvailableBalance() {
+    const value = Number(balanceElement?.textContent || 0);
+    return Number.isFinite(value) && value > 0 ? value : 0;
+  }
+
+  function showCryptoMessage(message, type) {
+    if (!cryptoMessage) return;
+
+    cryptoMessage.textContent = message;
+    cryptoMessage.className =
+      "U9-withdrawal-message is-" + type;
+  }
+
+  function clearCryptoMessage() {
+    if (!cryptoMessage) return;
+
+    cryptoMessage.textContent = "";
+    cryptoMessage.className = "U9-withdrawal-message";
+  }
+
+  if (useMaxButton && cryptoAmountInput) {
+    useMaxButton.addEventListener("click", function () {
+      const balance = getAvailableBalance();
+      cryptoAmountInput.value = balance > 0 ? balance.toFixed(2) : "";
+      clearCryptoMessage();
+    });
+  }
+
+  if (cryptoAmountInput) {
+    cryptoAmountInput.addEventListener("input", clearCryptoMessage);
+  }
+
+  if (cryptoAddressInput) {
+    cryptoAddressInput.addEventListener("input", clearCryptoMessage);
+  }
+
+  if (cryptoForm) {
+    cryptoForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      clearCryptoMessage();
+
+      const amount = Number(cryptoAmountInput?.value);
+      const balance = getAvailableBalance();
+      const address = String(cryptoAddressInput?.value || "").trim();
+      const network = cryptoNetworkInput?.value || "";
+
+      if (!Number.isFinite(amount) || amount <= 0) {
+        showCryptoMessage("Please enter a valid withdrawal amount.", "error");
+        cryptoAmountInput?.focus();
+        return;
+      }
+
+      if (!Number.isInteger(Math.round(amount * 100)) ||
+          Math.abs(amount * 100 - Math.round(amount * 100)) > 0.000001) {
+        showCryptoMessage("Please enter an amount with no more than 2 decimal places.", "error");
+        cryptoAmountInput?.focus();
+        return;
+      }
+
+      if (amount > balance) {
+        showCryptoMessage("The withdrawal amount cannot exceed your available balance.", "error");
+        cryptoAmountInput?.focus();
+        return;
+      }
+
+      if (network !== "TRC20") {
+        showCryptoMessage("Please select the USDT TRC20 network.", "error");
+        cryptoNetworkInput?.focus();
+        return;
+      }
+
+      // Basic TRON address format check (starts with T, 34 Base58 characters).
+      if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address)) {
+        showCryptoMessage("Please enter a valid USDT TRC20 wallet address.", "error");
+        cryptoAddressInput?.focus();
+        return;
+      }
+
+      // No API/database call is made until the backend endpoint is implemented.
+      showCryptoMessage(
+        "Your withdrawal details are valid. Database submission will be enabled when the backend is ready.",
+        "success"
+      );
+    });
+  }
+
+  /* =================================================
      PUBLIC API
   ================================================= */
 
@@ -495,12 +576,6 @@
     getCurrentCategory: function () {
       return currentCategory;
     },
-
-    getCurrentCrypto: function () {
-      return currentCrypto;
-    },
-
-    switchCryptoOption: switchCryptoOption,
 
     reset: function () {
       switchCategory("crypto");
