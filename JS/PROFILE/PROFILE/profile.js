@@ -3,6 +3,7 @@
    PROFILE MODAL
 ========================= */
 
+
 /* =========================
    ELEMENTS
 ========================= */
@@ -38,11 +39,38 @@ const profileUserButton =
 
 const u9ProfileMainTitle = "Profile";
 
-const u9ProfileMainIcon = "SSVG/logo/U9website.svg";
+const u9ProfileMainCloseIcon =
+  "SSVG/account/close.svg";
 
-const u9ProfileMainCloseIcon = "SSVG/account/close.svg";
+const u9ProfileBackIcon =
+  "SSVG/account/back.svg";
 
-const u9ProfileBackIcon = "SSVG/account/back.svg";
+
+/* =========================
+   PROFILE HEADER RIGHT ICONS
+   EACH PAGE IS INDEPENDENT
+========================= */
+
+const u9ProfileHeaderIcons = {
+  main: "SSVG/logo/U9website.svg",
+
+  history: "SSVG/button/profile-history.svg",
+
+  1: "SSVG/account/account-edit-button.svg",
+
+  2: "SSVG/Withdraw/withdraw2.svg",
+
+  3: "SSVG/account/account-edit-button.svg",
+
+  4: "SSVG/account/account-edit-button.svg",
+
+  5: "SSVG/account/account-edit-button.svg"
+};
+
+
+/* =========================
+   PROFILE PAGE TITLES
+========================= */
 
 const u9ProfilePageTitles = {
   1: "buttonpage1",
@@ -51,6 +79,7 @@ const u9ProfilePageTitles = {
   4: "buttonpage4",
   5: "buttonpage5"
 };
+
 
 /* =========================
    PROFILE PAGE ICONS
@@ -115,11 +144,13 @@ let u9ProfileBalanceMode = "balance";
 
 let u9ProfileBalanceRefreshPromise = null;
 
+
 /* =========================
    PROFILE INITIAL LOAD STATE
 ========================= */
 
 let u9ProfileHasLoaded = false;
+
 let u9ProfileLoadPromise = null;
 
 
@@ -197,9 +228,11 @@ const u9ProfileAvatarFrame =
    API
 ========================= */
 
-const u9ProfileFreeFrameUrl = "/api/avatar-frame-free";
+const u9ProfileFreeFrameUrl =
+  "/api/avatar-frame-free";
 
-const u9ProfilePaidFrameUrl = "/api/avatar-frame-paid";
+const u9ProfilePaidFrameUrl =
+  "/api/avatar-frame-paid";
 
 
 /* =========================
@@ -241,7 +274,10 @@ function u9ProfileGetImageUrl(source) {
   }
 
   try {
-    const url = new URL(value, window.location.origin);
+    const url = new URL(
+      value,
+      window.location.origin
+    );
 
     if (
       url.origin === U9_PROFILE_STORAGE_ORIGIN &&
@@ -291,6 +327,7 @@ function u9ProfileGetToken() {
 
 function u9ProfileAuthHeaders() {
   const token = u9ProfileGetToken();
+
   const headers = {};
 
   if (token) {
@@ -301,14 +338,16 @@ function u9ProfileAuthHeaders() {
 }
 
 
-
-
 /* =========================
    FORMAT MONEY / COINS
 ========================= */
 
 function u9ProfileFormatValue(value) {
-  if (value === null || value === undefined || value === "") {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
     return "0.00";
   }
 
@@ -416,12 +455,12 @@ async function u9ProfileRefreshBalanceCoins() {
           "Balance / Coins request failed:",
           response.status
         );
+
         return false;
       }
 
       const result = await response.json();
 
-      // Support common API response shapes.
       const user =
         result.user ||
         result.data?.user ||
@@ -436,13 +475,14 @@ async function u9ProfileRefreshBalanceCoins() {
         console.warn(
           "Balance / Coins response is missing values."
         );
+
         return false;
       }
 
-      // Update only Profile's Balance and Coins.
       u9ProfileUpdateBalanceCoins(user);
 
       return true;
+
     } catch (error) {
       console.error(
         "Refresh Balance / Coins failed:",
@@ -450,6 +490,7 @@ async function u9ProfileRefreshBalanceCoins() {
       );
 
       return false;
+
     } finally {
       u9ProfileBalanceRefreshPromise = null;
     }
@@ -457,7 +498,6 @@ async function u9ProfileRefreshBalanceCoins() {
 
   return u9ProfileBalanceRefreshPromise;
 }
-
 
 
 /* =========================
@@ -475,27 +515,27 @@ async function u9ProfileToggleBalanceCoins() {
     return false;
   }
 
-  /*
-   * Toggle the display immediately.
-   * Do not make the user wait for the network.
-   */
-
   if (u9ProfileBalanceMode === "balance") {
     u9ProfileBalanceMode = "coins";
 
     u9ProfileBalanceTitle.textContent = "Coins";
+
     u9ProfileBalance.hidden = true;
+
     u9ProfileCoins.hidden = false;
 
     u9ProfileBalanceToggle.setAttribute(
       "aria-label",
       "Refresh balance and coins, then show balance"
     );
+
   } else {
     u9ProfileBalanceMode = "balance";
 
     u9ProfileBalanceTitle.textContent = "Balance";
+
     u9ProfileBalance.hidden = false;
+
     u9ProfileCoins.hidden = true;
 
     u9ProfileBalanceToggle.setAttribute(
@@ -503,11 +543,6 @@ async function u9ProfileToggleBalanceCoins() {
       "Refresh balance and coins, then show coins"
     );
   }
-
-  /*
-   * Refresh both values after switching.
-   * If the request fails, retain the displayed values.
-   */
 
   await u9ProfileRefreshBalanceCoins();
 
@@ -534,90 +569,98 @@ if (u9ProfileBalanceToggle) {
 
 /* =========================
    SET PROFILE HEADER
+   EACH PAGE HAS ITS OWN RIGHT ICON
 ========================= */
 
 function u9ProfileSetHeader(page) {
+  let pageTitle = "";
+
+  let rightIcon = "";
+
+  let isMain = false;
 
   /* =========================
-     HISTORY PAGE HEADER
-  ========================= */
-
-  if (page === "history") {
-    if (profileModalCloseIcon) {
-      profileModalCloseIcon.src = u9ProfileBackIcon;
-    }
-
-    if (profileModalClose) {
-      profileModalClose.setAttribute("aria-label", "Back");
-    }
-
-    if (profileModalTitle) {
-      profileModalTitle.textContent = "History";
-    }
-
-    if (profileModalIcon) {
-      profileModalIcon.src = u9ProfileMainIcon;
-    }
-
-    return;
-  }
-
-  /* =========================
-     MAIN PAGE HEADER
+     MAIN PAGE
   ========================= */
 
   if (page === "main") {
+    pageTitle = u9ProfileMainTitle;
 
-    if (profileModalCloseIcon) {
-      profileModalCloseIcon.src = u9ProfileMainCloseIcon;
-    }
+    rightIcon = u9ProfileHeaderIcons.main;
 
-    if (profileModalClose) {
-      profileModalClose.setAttribute("aria-label", "Close");
-    }
-
-    if (profileModalTitle) {
-      profileModalTitle.textContent = u9ProfileMainTitle;
-    }
-
-    if (profileModalIcon) {
-      profileModalIcon.src = u9ProfileMainIcon;
-    }
-
-    return;
+    isMain = true;
   }
 
   /* =========================
-     INTERNAL PAGE HEADER
+     HISTORY PAGE
   ========================= */
 
-  const pageNumber = Number(
-    String(page).replace("page", "")
-  );
+  else if (page === "history") {
+    pageTitle = "History";
 
-  const pageTitle = u9ProfilePageTitles[pageNumber];
-
-  const pageIcon = u9ProfilePageIcons[pageNumber];
-
-  if (!pageTitle) {
-    return;
+    rightIcon = u9ProfileHeaderIcons.history;
   }
 
+  /* =========================
+     INTERNAL PAGES
+  ========================= */
+
+  else {
+    const pageNumber = Number(
+      String(page).replace("page", "")
+    );
+
+    pageTitle = u9ProfilePageTitles[pageNumber];
+
+    rightIcon = u9ProfileHeaderIcons[pageNumber];
+
+    if (!pageTitle) {
+      return false;
+    }
+  }
+
+  /* =========================
+     LEFT CLOSE / BACK BUTTON
+  ========================= */
+
   if (profileModalCloseIcon) {
-    profileModalCloseIcon.src = u9ProfileBackIcon;
+    profileModalCloseIcon.src = isMain
+      ? u9ProfileMainCloseIcon
+      : u9ProfileBackIcon;
   }
 
   if (profileModalClose) {
-    profileModalClose.setAttribute("aria-label", "Back");
+    profileModalClose.setAttribute(
+      "aria-label",
+      isMain ? "Close" : "Back"
+    );
   }
+
+  /* =========================
+     CENTER TITLE
+  ========================= */
 
   if (profileModalTitle) {
     profileModalTitle.textContent = pageTitle;
   }
 
-  if (profileModalIcon && pageIcon) {
-    profileModalIcon.src = pageIcon;
+  /* =========================
+     RIGHT SVG
+  ========================= */
+
+  if (profileModalIcon) {
+    if (rightIcon) {
+      profileModalIcon.src = rightIcon;
+
+      profileModalIcon.style.display = "block";
+    } else {
+      profileModalIcon.removeAttribute("src");
+
+      profileModalIcon.style.display = "none";
+    }
   }
+
+  return true;
 }
 
 
@@ -628,6 +671,7 @@ function u9ProfileSetHeader(page) {
 function u9ProfileHideAllPages() {
   if (u9ProfileMain) {
     u9ProfileMain.classList.remove("profile-page-active");
+
     u9ProfileMain.style.display = "none";
   }
 
@@ -637,11 +681,13 @@ function u9ProfileHideAllPages() {
     }
 
     page.classList.remove("profile-page-active");
+
     page.style.display = "none";
   });
 
   if (u9ProfileHistoryPage) {
     u9ProfileHistoryPage.classList.remove("profile-page-active");
+
     u9ProfileHistoryPage.style.display = "none";
   }
 }
@@ -656,6 +702,7 @@ function u9ProfileShowMainPage() {
 
   if (u9ProfileMain) {
     u9ProfileMain.style.display = "block";
+
     u9ProfileMain.classList.add("profile-page-active");
   }
 
@@ -692,6 +739,7 @@ function u9ProfileShowPage(pageNumber) {
   u9ProfileHideAllPages();
 
   page.style.display = "block";
+
   page.classList.add("profile-page-active");
 
   u9ProfileCurrentPage = "page" + pageNumber;
@@ -709,15 +757,18 @@ function u9ProfileShowPage(pageNumber) {
 function u9ProfileShowHistoryPage() {
   if (!u9ProfileHistoryPage) {
     console.warn("U9 Profile History page not found");
+
     return false;
   }
 
   u9ProfileHideAllPages();
 
   u9ProfileHistoryPage.style.display = "block";
+
   u9ProfileHistoryPage.classList.add("profile-page-active");
 
   u9ProfileCurrentPage = "history";
+
   u9ProfileSetHeader("history");
 
   return true;
@@ -733,14 +784,6 @@ function u9ProfileShowLoading() {
   if (u9ProfileInfoLoading) {
     u9ProfileInfoLoading.classList.remove("hidden");
   }
-
-  /*
-   * IMPORTANT:
-   * Do not remove "loaded" here.
-   *
-   * Removing it can hide the whole profile info area,
-   * including #U9-profile-balance-container.
-   */
 }
 
 
@@ -757,10 +800,6 @@ function u9ProfileHideLoading() {
     u9ProfileInfo.classList.add("loaded");
   }
 
-  /*
-   * Keep the balance container visible.
-   */
-
   if (u9ProfileBalanceContainer) {
     u9ProfileBalanceContainer.style.display = "flex";
   }
@@ -774,6 +813,7 @@ function u9ProfileHideLoading() {
 function u9ProfileCanOpen() {
   if (!window.U9User) {
     console.warn("U9User is not available.");
+
     return false;
   }
 
@@ -798,8 +838,6 @@ async function u9ProfileLoadOnce() {
     return true;
   }
 
-  // Prevent duplicate requests if Profile is opened repeatedly
-  // while the first load is still in progress.
   if (u9ProfileLoadPromise) {
     return u9ProfileLoadPromise;
   }
@@ -813,6 +851,7 @@ async function u9ProfileLoadOnce() {
       }
 
       return loaded;
+
     } finally {
       u9ProfileLoadPromise = null;
     }
@@ -842,14 +881,13 @@ function openProfileModal() {
   u9ProfileShowMainPage();
 
   profileModal.classList.remove("modal-closing");
+
   profileModal.classList.add("modal-open");
 
   if (profileUserButton) {
     profileUserButton.classList.add("account-open");
   }
 
-  // Load profile data only on the first successful open.
-  // Reopening the modal keeps the existing user/avatar/frame content.
   u9ProfileLoadOnce();
 
   return true;
@@ -872,6 +910,7 @@ function closeProfileModal() {
   u9ProfileShowMainPage();
 
   profileModal.classList.remove("modal-open");
+
   profileModal.classList.add("modal-closing");
 
   if (profileUserButton) {
@@ -950,6 +989,7 @@ if (profileUserButton) {
     "click",
     async function(event) {
       event.stopPropagation();
+
       await toggleProfileModal();
     }
   );
@@ -985,11 +1025,16 @@ if (profileModalClose) {
 ========================= */
 
 if (u9ProfileHistoryButton) {
-  u9ProfileHistoryButton.addEventListener("click", function(event) {
-    event.preventDefault();
-    event.stopPropagation();
-    u9ProfileShowHistoryPage();
-  });
+  u9ProfileHistoryButton.addEventListener(
+    "click",
+    function(event) {
+      event.preventDefault();
+
+      event.stopPropagation();
+
+      u9ProfileShowHistoryPage();
+    }
+  );
 }
 
 
@@ -1076,8 +1121,10 @@ if (u9ProfileButton6) {
 
       if (typeof window.openLogoutConfirm === "function") {
         window.openLogoutConfirm();
+
       } else if (typeof openLogoutConfirm === "function") {
         openLogoutConfirm();
+
       } else {
         console.warn(
           "openLogoutConfirm is not available."
@@ -1095,11 +1142,13 @@ if (u9ProfileButton6) {
 function u9ProfileResetAvatar() {
   if (u9ProfileAvatarImage) {
     u9ProfileAvatarImage.dataset.u9Fallback = "false";
+
     u9ProfileAvatarImage.src = u9ProfileDefaultAvatar;
   }
 
   if (u9ProfileAvatarFrame) {
     u9ProfileAvatarFrame.dataset.u9Fallback = "false";
+
     u9ProfileAvatarFrame.src = u9ProfileDefaultFrame;
   }
 }
@@ -1118,6 +1167,7 @@ if (u9ProfileAvatarImage) {
       }
 
       this.dataset.u9Fallback = "true";
+
       this.src = u9ProfileDefaultAvatar;
     }
   );
@@ -1137,6 +1187,7 @@ if (u9ProfileAvatarFrame) {
       }
 
       this.dataset.u9Fallback = "true";
+
       this.src = u9ProfileDefaultFrame;
     }
   );
@@ -1151,6 +1202,7 @@ async function u9ProfileLoadFrame(frameType, frameId) {
   if (!frameType || frameType === "default") {
     if (u9ProfileAvatarFrame) {
       u9ProfileAvatarFrame.dataset.u9Fallback = "false";
+
       u9ProfileAvatarFrame.src = u9ProfileDefaultFrame;
     }
 
@@ -1160,6 +1212,7 @@ async function u9ProfileLoadFrame(frameType, frameId) {
   if (!frameId) {
     if (u9ProfileAvatarFrame) {
       u9ProfileAvatarFrame.dataset.u9Fallback = "false";
+
       u9ProfileAvatarFrame.src = u9ProfileDefaultFrame;
     }
 
@@ -1170,10 +1223,13 @@ async function u9ProfileLoadFrame(frameType, frameId) {
 
   if (frameType === "free") {
     requestUrl = u9ProfileFreeFrameUrl;
+
   } else if (frameType === "paid") {
     requestUrl = u9ProfilePaidFrameUrl;
+
   } else {
     u9ProfileResetAvatar();
+
     return false;
   }
 
@@ -1198,6 +1254,7 @@ async function u9ProfileLoadFrame(frameType, frameId) {
       );
 
       u9ProfileResetAvatar();
+
       return false;
     }
 
@@ -1219,19 +1276,24 @@ async function u9ProfileLoadFrame(frameType, frameId) {
       );
 
       u9ProfileResetAvatar();
+
       return false;
     }
 
     if (u9ProfileAvatarFrame) {
       u9ProfileAvatarFrame.dataset.u9Fallback = "false";
+
       u9ProfileAvatarFrame.src =
-      u9ProfileGetImageUrl(currentFrame.svg);
+        u9ProfileGetImageUrl(currentFrame.svg);
     }
 
     return true;
+
   } catch (error) {
     console.error("Load profile frame failed:", error);
+
     u9ProfileResetAvatar();
+
     return false;
   }
 }
@@ -1247,22 +1309,16 @@ function u9ProfileDisplayUser(user) {
   }
 
   if (u9ProfileUsername) {
-    u9ProfileUsername.textContent = user.username || "";
+    u9ProfileUsername.textContent =
+      user.username || "";
   }
 
   if (u9ProfileAccount) {
-    u9ProfileAccount.textContent = user.account || "";
+    u9ProfileAccount.textContent =
+      user.account || "";
   }
 
-  /*
-   * Update both values without clearing existing values.
-   */
-
   u9ProfileUpdateBalanceCoins(user);
-
-  /*
-   * Make sure the profile and balance area are visible.
-   */
 
   if (u9ProfileInfo) {
     u9ProfileInfo.classList.add("loaded");
@@ -1291,19 +1347,25 @@ async function u9ProfileLoadAvatarFromUser(user) {
     const avatar = user.avatar || null;
 
     const avatarUrl = u9ProfileGetImageUrl(
-    avatar?.url || ""
+      avatar?.url || ""
     );
 
     if (avatarUrl && u9ProfileAvatarImage) {
       u9ProfileAvatarImage.dataset.u9Fallback = "false";
+
       u9ProfileAvatarImage.src = avatarUrl;
+
     } else if (u9ProfileAvatarImage) {
       u9ProfileAvatarImage.dataset.u9Fallback = "false";
+
       u9ProfileAvatarImage.src = u9ProfileDefaultAvatar;
     }
 
-    const frameType = user.avatar_frame_type || "default";
-    const frameId = user.avatar_frame_id || null;
+    const frameType =
+      user.avatar_frame_type || "default";
+
+    const frameId =
+      user.avatar_frame_id || null;
 
     const frameLoaded = await u9ProfileLoadFrame(
       frameType,
@@ -1312,13 +1374,17 @@ async function u9ProfileLoadAvatarFromUser(user) {
 
     if (!frameLoaded) {
       u9ProfileResetAvatar();
+
       return false;
     }
 
     return true;
+
   } catch (error) {
     console.error("Load profile avatar failed:", error);
+
     u9ProfileResetAvatar();
+
     return false;
   }
 }
@@ -1344,8 +1410,10 @@ async function u9ProfileRefreshAvatar() {
     }
 
     return await u9ProfileLoadAvatarFromUser(user);
+
   } catch (error) {
     console.error("Refresh profile avatar failed:", error);
+
     return false;
   }
 }
@@ -1356,53 +1424,41 @@ async function u9ProfileRefreshAvatar() {
 ========================= */
 
 async function u9ProfileLoad() {
-  /*
-   * Show loading indicator but keep profile info visible.
-   */
-
   u9ProfileShowLoading();
 
-  /*
-   * Reset avatar and return to main page.
-   */
-
   u9ProfileResetAvatar();
+
   u9ProfileShowMainPage();
 
   if (!window.U9User) {
     console.warn("U9User is not available.");
 
     u9ProfileHideLoading();
+
     return false;
   }
 
   if (!window.U9User.isLoggedIn()) {
     u9ProfileResetAvatar();
+
     u9ProfileHideLoading();
+
     return false;
   }
 
   try {
-    /*
-     * Display cached user information immediately.
-     */
-
     const cachedUser = window.U9User.get();
 
     if (cachedUser) {
       u9ProfileDisplayUser(cachedUser);
     }
 
-    /*
-     * Fetch refreshed user data.
-     * If refresh fails, cached information remains visible.
-     */
-
     let latestUser = null;
 
     if (typeof window.U9User.refresh === "function") {
       try {
         latestUser = await window.U9User.refresh();
+
       } catch (refreshError) {
         console.warn(
           "Could not refresh profile data; keeping existing values:",
@@ -1416,26 +1472,28 @@ async function u9ProfileLoad() {
     if (user) {
       u9ProfileDisplayUser(user);
 
-      /*
-       * Load avatar/frame from the latest available user data.
-       */
-
       const avatarLoaded =
         await u9ProfileLoadAvatarFromUser(user);
 
       if (!avatarLoaded) {
         u9ProfileResetAvatar();
       }
+
     } else {
       u9ProfileResetAvatar();
     }
 
     console.log("Profile Loaded:", user);
+
     return Boolean(user);
+
   } catch (error) {
     console.error("Load profile failed:", error);
+
     u9ProfileResetAvatar();
+
     return false;
+
   } finally {
     u9ProfileHideLoading();
   }
@@ -1468,6 +1526,7 @@ if (window.U9WindowManager) {
       canOpen: u9ProfileCanOpen
     }
   );
+
 } else {
   console.warn(
     "U9WindowManager is not available when Profile was initialized."
