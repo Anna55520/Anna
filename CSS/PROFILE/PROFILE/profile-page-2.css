@@ -29,7 +29,7 @@
   width: 100%;
   min-height: 100%;
   box-sizing: border-box;
-  background: #ffffff;
+  background: #1dff29;
 }
 
 
@@ -44,14 +44,12 @@
   align-items: center;
   justify-content: flex-start;
   flex-wrap: nowrap;
-
   gap: 10px;
   width: 100%;
   padding: 0 14px;
   margin-top: 12px;
-
   box-sizing: border-box;
-  background: #ffffff;
+  background: #0f1fc9;
 }
 
 
@@ -381,15 +379,12 @@
 #U9-profile-withdrawal-information {
   position: relative;
   display: block;
-
   flex: 1 0 auto;
   width: 100%;
   min-height: 250px;
-
   padding: 12px 14px 25px;
-
   box-sizing: border-box;
-  background: #ffffff;
+  background: #ff0000;
 }
 
 
