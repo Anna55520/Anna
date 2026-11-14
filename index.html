@@ -1399,13 +1399,33 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
             <div
               id="U9-profile-withdrawal-kyc-notice"
-              class="U9-profile-withdrawal-empty"
+              class="U9-profile-withdrawal-kyc-card"
               role="status"
               aria-live="polite"
               hidden
             >
-              <h3>提示</h3>
-              <p>你还没有验证 KYC</p>
+              <img
+                class="U9-profile-withdrawal-kyc-hint-icon"
+                src="/SSVG/Withdraw/hint.svg"
+                alt="Information"
+              >
+              <h3>Notice</h3>
+              <p>KYC verification is required before you can use this withdrawal method.</p>
+            </div>
+
+            <div
+              id="U9-profile-withdrawal-kyc-guide"
+              class="U9-profile-withdrawal-kyc-card U9-profile-withdrawal-kyc-guide"
+              aria-label="KYC verification guide"
+              hidden
+            >
+              <h3>KYC Verification Guide</h3>
+              <ol>
+                <li>Prepare a valid, unexpired government-issued ID.</li>
+                <li>Upload clear photos with all document details visible.</li>
+                <li>Complete the selfie or liveness check if requested.</li>
+              </ol>
+              <p>Make sure your personal details match your ID before submitting.</p>
             </div>
 
           </div>
