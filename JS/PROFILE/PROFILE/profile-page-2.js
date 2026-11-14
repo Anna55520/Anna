@@ -1,6 +1,6 @@
 
 /* =================================================
-   U9 PROFILE PAGE 2 — WITHDRAWAL
+   U9 PROFILE PAGE 2 — WITHDRAWAL / KYC STATUS
 ================================================= */
 
 (function () {
@@ -237,7 +237,7 @@
   initializeButton(
     verifiedButton,
     verifiedIcon,
-    "verified"
+    "kyc"
   );
 
   initializeButton(
@@ -274,17 +274,17 @@
 
 
   /* =================================================
-     EMAIL VERIFIED STATUS
+     KYC VERIFIED STATUS
   ================================================= */
 
-  function setEmailVerified(verified) {
+  function setKycStatus(verified) {
 
     if (!verifiedIcon) return;
 
     if (typeof verified !== "boolean") {
 
       console.warn(
-        "Invalid email_verified value:",
+        "Invalid kyc value:",
         verified
       );
 
@@ -306,7 +306,7 @@
 
     verifiedButton?.setAttribute(
       "aria-label",
-      verified ? "Email verified" : "Email unverified"
+      verified ? "KYC verified" : "KYC unverified"
     );
 
   }
@@ -334,9 +334,9 @@
 
     }
 
-    if (user.email_verified !== undefined) {
+    if (user.kyc !== undefined) {
 
-      setEmailVerified(user.email_verified);
+      setKycStatus(user.kyc);
 
     }
 
@@ -364,7 +364,7 @@
 
       balance: user.balance,
 
-      email_verified: user.email_verified
+      kyc: user.kyc
 
     });
 
@@ -467,7 +467,7 @@
 
     setBalance: setBalance,
 
-    setEmailVerified: setEmailVerified,
+    setKycStatus: setKycStatus,
 
     updateUserInfo: updateUserInfo,
 
@@ -492,7 +492,7 @@
 
     // BUTTON REFERENCES
 
-    getVerifiedButton: function () {
+    getKycButton: function () {
       return verifiedButton;
     },
 
@@ -503,7 +503,7 @@
 
     // ICON REFERENCES
 
-    getVerifiedIcon: function () {
+    getKycIcon: function () {
       return verifiedIcon;
     },
 
