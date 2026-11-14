@@ -29,7 +29,6 @@
   width: 100%;
   min-height: 100%;
   box-sizing: border-box;
-  background: transparent;
 }
 
 
@@ -49,7 +48,6 @@
   padding: 0 14px;
   margin-top: 12px;
   box-sizing: border-box;
-  background: transparent;
 }
 
 
@@ -372,21 +370,6 @@
 }
 
 
-/* =================================================
-   WITHDRAWAL INFORMATION
-================================================= */
-
-#U9-profile-withdrawal-information {
-  position: relative;
-  display: block;
-  flex: 1 0 auto;
-  width: 100%;
-  min-height: 223px;
-  padding: 12px 14px 25px;
-  box-sizing: border-box;
-  background: transparent;
-}
-
 
 /* =================================================
    MOBILE
@@ -456,13 +439,6 @@
   #U9-profile-withdrawal-notice-icon {
     width: 22px;
     height: 22px;
-  }
-
-
-  /* INFORMATION */
-
-  #U9-profile-withdrawal-information {
-    padding: 12px 12px 25px;
   }
 
 }
