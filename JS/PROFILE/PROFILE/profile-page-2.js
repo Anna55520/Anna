@@ -45,6 +45,10 @@
     "U9-profile-withdrawal-notice-icon"
   );
 
+  const kycNotice = document.getElementById(
+    "U9-profile-withdrawal-kyc-notice"
+  );
+
 
   /* =========================
      CATEGORIES
@@ -104,6 +108,11 @@
     });
 
     currentCategory = category;
+
+    // KYC is required for E-Payment, Bank Transfer and Card.
+    if (kycNotice) {
+      kycNotice.hidden = category === "crypto";
+    }
 
   }
 
