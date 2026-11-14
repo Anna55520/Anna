@@ -605,3 +605,77 @@
   }
 
 }
+
+
+/* =================================================
+   KYC STATUS — VERIFY BUTTON & FIVE ICON SLOTS
+================================================= */
+
+.U9-profile-withdrawal-kyc-verify-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 92px;
+  min-height: 34px;
+  margin: 12px 0 2px;
+  padding: 7px 22px;
+  border: 0;
+  border-radius: 7px;
+  background: #70c8f5;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.U9-profile-withdrawal-kyc-verify-button:hover {
+  background: #55b9ed;
+}
+
+.U9-profile-withdrawal-kyc-verify-button:active {
+  transform: scale(0.97);
+}
+
+.U9-profile-withdrawal-kyc-icon-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 9px;
+  width: 100%;
+  margin: 16px auto 0;
+}
+
+.U9-profile-withdrawal-kyc-icon-row img {
+  display: block;
+  flex: 0 0 25px;
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.U9-profile-withdrawal-kyc-unavailable p {
+  max-width: 440px;
+}
+
+@media screen and (max-width: 480px) {
+  .U9-profile-withdrawal-kyc-icon-row {
+    gap: 7px;
+    margin-top: 14px;
+  }
+
+  .U9-profile-withdrawal-kyc-icon-row img {
+    flex-basis: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  .U9-profile-withdrawal-kyc-verify-button {
+    min-height: 32px;
+    font-size: 12px;
+  }
+}
