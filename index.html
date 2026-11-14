@@ -1394,20 +1394,21 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
             </nav>
 
             <!-- =========================
-                KYC NOTICE
+                KYC REQUIRED — kyc = false
             ========================= -->
 
             <div
               id="U9-profile-withdrawal-kyc-notice"
-              class="U9-profile-withdrawal-kyc-card"
+              class="U9-profile-withdrawal-kyc-card U9-profile-withdrawal-kyc-notice"
               role="status"
               aria-live="polite"
               hidden
             >
               <img
+                id="U9-profile-withdrawal-kyc-status-hint-icon"
                 class="U9-profile-withdrawal-kyc-hint-icon"
                 src="/SSVG/Withdraw/hint.svg"
-                alt="Information"
+                alt="KYC information"
               >
               <h3>Notice</h3>
               <p>KYC verification is required before you can use this withdrawal method.</p>
@@ -1426,6 +1427,56 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                 <li>Complete the selfie or liveness check if requested.</li>
               </ol>
               <p>Make sure your personal details match your ID before submitting.</p>
+
+              <button
+                id="U9-profile-withdrawal-kyc-verify-button"
+                class="U9-profile-withdrawal-kyc-verify-button"
+                type="button"
+              >
+                Verify
+              </button>
+
+              <!--
+                Each icon has its own src so you can replace them separately later:
+                hint1.svg, hint2.svg, hint3.svg, hint4.svg, hint5.svg.
+                They intentionally all use hint.svg for now.
+              -->
+              <div class="U9-profile-withdrawal-kyc-icon-row" aria-label="KYC information icons">
+                <img id="U9-profile-withdrawal-kyc-icon-1" src="/SSVG/Withdraw/hint.svg" alt="">
+                <img id="U9-profile-withdrawal-kyc-icon-2" src="/SSVG/Withdraw/hint.svg" alt="">
+                <img id="U9-profile-withdrawal-kyc-icon-3" src="/SSVG/Withdraw/hint.svg" alt="">
+                <img id="U9-profile-withdrawal-kyc-icon-4" src="/SSVG/Withdraw/hint.svg" alt="">
+                <img id="U9-profile-withdrawal-kyc-icon-5" src="/SSVG/Withdraw/hint.svg" alt="">
+              </div>
+            </div>
+
+            <!-- =========================
+                PAYMENT UNAVAILABLE — kyc = true
+            ========================= -->
+
+            <div
+              id="U9-profile-withdrawal-kyc-unavailable"
+              class="U9-profile-withdrawal-kyc-card U9-profile-withdrawal-kyc-unavailable"
+              role="status"
+              aria-live="polite"
+              hidden
+            >
+              <img
+                class="U9-profile-withdrawal-kyc-hint-icon"
+                src="/SSVG/Withdraw/hint-true.svg"
+                alt="Payment services unavailable"
+              >
+              <h3>Payment Services Unavailable</h3>
+              <p>We’re sorry, but withdrawal services for your country are currently unavailable. We’re working to expand our supported payment options. Please check back later for updates. Thank you for your patience and understanding.</p>
+
+              <!-- Each image can be changed independently when your new SVGs are ready. -->
+              <div class="U9-profile-withdrawal-kyc-icon-row" aria-label="Payment information icons">
+                <img id="U9-profile-withdrawal-kyc-unavailable-icon-1" src="/SSVG/Withdraw/hint.svg" alt="">
+                <img id="U9-profile-withdrawal-kyc-unavailable-icon-2" src="/SSVG/Withdraw/hint.svg" alt="">
+                <img id="U9-profile-withdrawal-kyc-unavailable-icon-3" src="/SSVG/Withdraw/hint.svg" alt="">
+                <img id="U9-profile-withdrawal-kyc-unavailable-icon-4" src="/SSVG/Withdraw/hint.svg" alt="">
+                <img id="U9-profile-withdrawal-kyc-unavailable-icon-5" src="/SSVG/Withdraw/hint.svg" alt="">
+              </div>
             </div>
 
           </div>
