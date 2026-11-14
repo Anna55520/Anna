@@ -53,6 +53,16 @@
     "U9-profile-withdrawal-kyc-guide"
   );
 
+  const kycUnavailable = document.getElementById(
+    "U9-profile-withdrawal-kyc-unavailable"
+  );
+
+  const kycStatusHintIcon = document.getElementById(
+    "U9-profile-withdrawal-kyc-status-hint-icon"
+  );
+
+  let currentKycStatus = false;
+
 
   /* =========================
      CATEGORIES
@@ -79,6 +89,49 @@
     return navigation.querySelector(
       `[data-category="${category}"]`
     );
+
+  }
+
+
+  /* =========================
+     RENDER KYC INFORMATION
+  ========================= */
+
+  function renderKycInformation() {
+
+    // Crypto does not require KYC in the current design.
+    const requiresKyc = currentCategory !== "crypto";
+
+    if (!requiresKyc) {
+      if (kycNotice) kycNotice.hidden = true;
+      if (kycGuide) kycGuide.hidden = true;
+      if (kycUnavailable) kycUnavailable.hidden = true;
+      return;
+    }
+
+    if (currentKycStatus === true) {
+      // KYC is approved: show country/payment availability notice only.
+      if (kycNotice) kycNotice.hidden = true;
+      if (kycGuide) kycGuide.hidden = true;
+      if (kycUnavailable) kycUnavailable.hidden = false;
+
+      if (kycStatusHintIcon) {
+        kycStatusHintIcon.src = "/SSVG/Withdraw/hint-true.svg";
+        kycStatusHintIcon.alt = "Payment services unavailable";
+      }
+
+      return;
+    }
+
+    // KYC is not approved: show the KYC requirement and guide.
+    if (kycNotice) kycNotice.hidden = false;
+    if (kycGuide) kycGuide.hidden = false;
+    if (kycUnavailable) kycUnavailable.hidden = true;
+
+    if (kycStatusHintIcon) {
+      kycStatusHintIcon.src = "/SSVG/Withdraw/hint.svg";
+      kycStatusHintIcon.alt = "KYC information";
+    }
 
   }
 
@@ -112,17 +165,7 @@
     });
 
     currentCategory = category;
-
-    // KYC is required for E-Payment, Bank Transfer and Card.
-    const requiresKyc = category !== "crypto";
-
-    if (kycNotice) {
-      kycNotice.hidden = !requiresKyc;
-    }
-
-    if (kycGuide) {
-      kycGuide.hidden = !requiresKyc;
-    }
+    renderKycInformation();
 
   }
 
@@ -304,10 +347,14 @@
 
     }
 
+    currentKycStatus = verified;
+
     verifiedButton?.setAttribute(
       "aria-label",
       verified ? "KYC verified" : "KYC unverified"
     );
+
+    renderKycInformation();
 
   }
 
