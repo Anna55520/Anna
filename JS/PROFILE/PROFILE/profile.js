@@ -56,7 +56,7 @@ const u9ProfileHeaderIcons = {
 
   history: "SSVG/button/profile-history.svg",
 
-  1: "SSVG/button/deposits.svg",
+  1: "SSVG/button/deposits2.svg",
 
   2: "SSVG/Withdraw/withdraw2.svg",
 
