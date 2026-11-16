@@ -1,1 +1,564 @@
 
+/* =================================================
+   U9 PROFILE PAGE 2 — DEPOSIT / KYC STATUS
+================================================= */
+
+(function () {
+
+  "use strict";
+
+
+  /* =========================
+     PREVENT DUPLICATE INIT
+  ========================= */
+
+  if (window.U9ProfileDeposit) {
+    return;
+  }
+
+
+  /* =========================
+     ELEMENTS
+  ========================= */
+
+  const navigation = document.getElementById(
+    "U9-profile-deposit-navigation"
+  );
+
+  const balanceElement = document.getElementById(
+    "U9-profile-deposit-balance-value"
+  );
+
+  const verifiedButton = document.getElementById(
+    "U9-profile-deposit-verified-button"
+  );
+
+  const verifiedIcon = document.getElementById(
+    "U9-profile-deposit-verified-icon"
+  );
+
+  const noticeButton = document.getElementById(
+    "U9-profile-deposit-notice-button"
+  );
+
+  const noticeIcon = document.getElementById(
+    "U9-profile-deposit-notice-icon"
+  );
+
+  const kycNotice = document.getElementById(
+    "U9-profile-deposit-kyc-notice"
+  );
+
+  const kycGuide = document.getElementById(
+    "U9-profile-deposit-kyc-guide"
+  );
+
+  const kycUnavailable = document.getElementById(
+    "U9-profile-deposit-kyc-unavailable"
+  );
+
+  const kycStatusHintIcon = document.getElementById(
+    "U9-profile-deposit-kyc-status-hint-icon"
+  );
+
+  let currentKycStatus = false;
+
+
+  /* =========================
+     CATEGORIES
+  ========================= */
+
+  const categories = [
+    "crypto",
+    "epayment",
+    "bank",
+    "card"
+  ];
+
+  let currentCategory = "crypto";
+
+
+  /* =========================
+     GET BUTTON
+  ========================= */
+
+  function getButton(category) {
+
+    if (!navigation) return null;
+
+    return navigation.querySelector(
+      `[data-category="${category}"]`
+    );
+
+  }
+
+
+  /* =========================
+     RENDER KYC INFORMATION
+  ========================= */
+
+  function renderKycInformation() {
+
+    // Crypto does not require KYC in the current design.
+    const requiresKyc = currentCategory !== "crypto";
+
+    if (!requiresKyc) {
+      if (kycNotice) kycNotice.hidden = true;
+      if (kycGuide) kycGuide.hidden = true;
+      if (kycUnavailable) kycUnavailable.hidden = true;
+      return;
+    }
+
+    if (currentKycStatus === true) {
+      // KYC is approved: show country/payment availability notice only.
+      if (kycNotice) kycNotice.hidden = true;
+      if (kycGuide) kycGuide.hidden = true;
+      if (kycUnavailable) kycUnavailable.hidden = false;
+
+      if (kycStatusHintIcon) {
+        kycStatusHintIcon.src = "/SSVG/Withdraw/hint-true.svg";
+        kycStatusHintIcon.alt = "Payment services unavailable";
+      }
+
+      return;
+    }
+
+    // KYC is not approved: show the KYC requirement and guide.
+    if (kycNotice) kycNotice.hidden = false;
+    if (kycGuide) kycGuide.hidden = false;
+    if (kycUnavailable) kycUnavailable.hidden = true;
+
+    if (kycStatusHintIcon) {
+      kycStatusHintIcon.src = "/SSVG/Withdraw/hint.svg";
+      kycStatusHintIcon.alt = "KYC information";
+    }
+
+  }
+
+
+  /* =========================
+     SWITCH CATEGORY
+  ========================= */
+
+  function switchCategory(category) {
+
+    if (!categories.includes(category)) return;
+    if (!navigation) return;
+
+    categories.forEach(function (item) {
+
+      const button = getButton(item);
+
+      if (!button) return;
+
+      const isActive = item === category;
+
+      button.classList.toggle("active", isActive);
+
+      button.setAttribute(
+        "aria-selected",
+        String(isActive)
+      );
+
+      button.tabIndex = isActive ? 0 : -1;
+
+    });
+
+    currentCategory = category;
+    renderKycInformation();
+
+  }
+
+
+  /* =========================
+     NAVIGATION CLICK
+  ========================= */
+
+  if (navigation) {
+
+    navigation.addEventListener("click", function (event) {
+
+      const button = event.target.closest(
+        ".U9-profile-deposit-nav-button"
+      );
+
+      if (!button || !navigation.contains(button)) return;
+
+      switchCategory(button.dataset.category);
+
+    });
+
+
+    /* =========================
+       KEYBOARD NAVIGATION
+    ========================= */
+
+    navigation.addEventListener("keydown", function (event) {
+
+      const button = event.target.closest(
+        ".U9-profile-deposit-nav-button"
+      );
+
+      if (!button) return;
+
+      const index = categories.indexOf(
+        button.dataset.category
+      );
+
+      if (index === -1) return;
+
+      let nextIndex;
+
+      if (event.key === "ArrowRight") {
+
+        nextIndex = (index + 1) % categories.length;
+
+      } else if (event.key === "ArrowLeft") {
+
+        nextIndex =
+          (index - 1 + categories.length) % categories.length;
+
+      } else {
+
+        return;
+
+      }
+
+      event.preventDefault();
+
+      const nextCategory = categories[nextIndex];
+
+      switchCategory(nextCategory);
+
+      getButton(nextCategory)?.focus();
+
+    });
+
+
+    // INITIALIZE
+    switchCategory("crypto");
+
+  } else {
+
+    console.warn(
+      "U9 Profile Deposit Navigation not found."
+    );
+
+  }
+
+
+  /* =================================================
+     DEPOSIT BUTTON INITIALIZATION
+  ================================================= */
+
+  function initializeButton(button, icon, name) {
+
+    if (!button) {
+
+      console.warn(
+        "U9 Deposit button not found:",
+        name
+      );
+
+      return;
+
+    }
+
+    button.type = "button";
+
+    if (icon && !button.contains(icon)) {
+
+      console.warn(
+        "U9 Deposit icon is outside its button:",
+        name
+      );
+
+    }
+
+  }
+
+  initializeButton(
+    verifiedButton,
+    verifiedIcon,
+    "kyc"
+  );
+
+  initializeButton(
+    noticeButton,
+    noticeIcon,
+    "notice"
+  );
+
+
+  /* =================================================
+     USER BALANCE
+  ================================================= */
+
+  function setBalance(balance) {
+
+    if (!balanceElement) return;
+
+    const amount = Number(balance);
+
+    if (!Number.isFinite(amount)) {
+
+      console.warn(
+        "Invalid deposit balance:",
+        balance
+      );
+
+      return;
+
+    }
+
+    balanceElement.textContent = amount.toFixed(2);
+
+  }
+
+
+  /* =================================================
+     KYC VERIFIED STATUS
+  ================================================= */
+
+  function setKycStatus(verified) {
+
+    if (!verifiedIcon) return;
+
+    if (typeof verified !== "boolean") {
+
+      console.warn(
+        "Invalid kyc value:",
+        verified
+      );
+
+      return;
+
+    }
+
+    if (verified) {
+
+      verifiedIcon.src = "/SSVG/Withdraw/verified.svg";
+      verifiedIcon.alt = "Verified";
+
+    } else {
+
+      verifiedIcon.src = "/SSVG/Withdraw/unverified.svg";
+      verifiedIcon.alt = "Unverified";
+
+    }
+
+    currentKycStatus = verified;
+
+    verifiedButton?.setAttribute(
+      "aria-label",
+      verified ? "KYC verified" : "KYC unverified"
+    );
+
+    renderKycInformation();
+
+  }
+
+
+  /* =================================================
+     UPDATE USER INFO
+  ================================================= */
+
+  function updateUserInfo(user) {
+
+    if (!user || typeof user !== "object") {
+
+      console.warn(
+        "Invalid deposit user data."
+      );
+
+      return;
+
+    }
+
+    if (user.balance !== undefined) {
+
+      setBalance(user.balance);
+
+    }
+
+    if (user.kyc !== undefined) {
+
+      setKycStatus(user.kyc);
+
+    }
+
+  }
+
+
+  /* =================================================
+     HEADER USER SYNC
+  ================================================= */
+
+  let unsubscribeUser = null;
+
+
+  /* =========================
+     APPLY HEADER USER
+  ========================= */
+
+  function applyHeaderUser(user) {
+
+    if (!user || typeof user !== "object") {
+      return;
+    }
+
+    updateUserInfo({
+
+      balance: user.balance,
+
+      kyc: user.kyc
+
+    });
+
+  }
+
+
+  /* =========================
+     CONNECT HEADER USER
+  ========================= */
+
+  function connectHeaderUser() {
+
+    if (!window.U9User) {
+      return false;
+    }
+
+    // Prevent duplicate subscriptions
+    if (unsubscribeUser) {
+      return true;
+    }
+
+
+    /* =========================
+       SUBSCRIBE USER CHANGES
+    ========================= */
+
+    unsubscribeUser = window.U9User.subscribe(
+
+      function (user, state) {
+
+        if (
+          state === "AUTHENTICATED" &&
+          user
+        ) {
+
+          applyHeaderUser(user);
+
+        }
+
+      }
+
+    );
+
+
+    /* =========================
+       APPLY CURRENT USER
+    ========================= */
+
+    if (
+      window.U9User.getState() ===
+      "AUTHENTICATED"
+    ) {
+
+      applyHeaderUser(
+        window.U9User.get()
+      );
+
+    }
+
+    return true;
+
+  }
+
+
+  /* =================================================
+     HEADER READY LISTENER
+  ================================================= */
+
+  if (!connectHeaderUser()) {
+
+    window.addEventListener(
+      "u9:user-ready",
+      connectHeaderUser,
+      { once: true }
+    );
+
+  }
+
+
+  /* =================================================
+     PUBLIC API
+  ================================================= */
+
+  window.U9ProfileDeposit = {
+
+    // CATEGORY
+
+    switchCategory: switchCategory,
+
+    getCurrentCategory: function () {
+      return currentCategory;
+    },
+
+    reset: function () {
+      switchCategory("crypto");
+    },
+
+
+    // USER INFO
+
+    setBalance: setBalance,
+
+    setKycStatus: setKycStatus,
+
+    updateUserInfo: updateUserInfo,
+
+
+    // USER SYNC
+
+    refreshUserInfo: function () {
+
+      if (
+        window.U9User &&
+        window.U9User.getState() === "AUTHENTICATED"
+      ) {
+
+        applyHeaderUser(
+          window.U9User.get()
+        );
+
+      }
+
+    },
+
+
+    // BUTTON REFERENCES
+
+    getKycButton: function () {
+      return verifiedButton;
+    },
+
+    getNoticeButton: function () {
+      return noticeButton;
+    },
+
+
+    // ICON REFERENCES
+
+    getKycIcon: function () {
+      return verifiedIcon;
+    },
+
+    getNoticeIcon: function () {
+      return noticeIcon;
+    }
+
+  };
+
+
+})();
