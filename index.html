@@ -1202,7 +1202,249 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
         <div id="U9-profile-page1">
 
           <div id="U9-profile-page1-content">
-            <!-- Page 1 content -->
+
+
+            <!-- =========================
+                USER BALANCE & BUTTONS
+            ========================= -->
+
+            <div id="U9-profile-deposit-user-info">
+<!-- KYC VERIFIED BUTTON -->
+
+              <button
+                id="U9-profile-deposit-verified-button"
+                type="button"
+                aria-label="KYC verification status"
+              >
+
+                <img
+                  id="U9-profile-deposit-verified-icon"
+                  src="/SSVG/Withdraw/unverified.svg"
+                  alt="Unverified"
+                >
+
+              </button>
+
+
+              <!-- WITHDRAWAL HISTORY BUTTON -->
+
+              <button
+                id="U9-profile-deposit-history-button"
+                type="button"
+                aria-label="Deposit History"
+              >
+                <img
+                  id="U9-profile-deposit-history-icon"
+                  src="SSVG/Withdraw/withdraw-history.svg"
+                  alt=""
+                >
+              </button>
+
+
+              <!-- NOTICE BUTTON -->
+
+              <button
+                id="U9-profile-deposit-notice-button"
+                type="button"
+                aria-label="Notice"
+              >
+
+                <img
+                  id="U9-profile-deposit-notice-icon"
+                  src="/SSVG/Withdraw/exclamation-mark.svg"
+                  alt=""
+                >
+
+              </button>
+
+            </div>
+
+
+            <!-- =========================
+                WITHDRAWAL NAVIGATION
+            ========================= -->
+
+            <nav
+              id="U9-profile-deposit-navigation"
+              role="tablist"
+              aria-label="Deposit categories"
+            >
+
+              <!-- CRYPTO -->
+
+              <button
+                id="U9-profile-deposit-crypto"
+                class="U9-profile-deposit-nav-button active"
+                type="button"
+                role="tab"
+                data-category="crypto"
+                aria-selected="true"
+              >
+                <img
+                  id="U9-profile-deposit-crypto-icon"
+                  class="U9-profile-deposit-nav-icon"
+                  src="/SSVG/Withdraw/btc.svg"
+                  alt=""
+                >
+
+                <span class="U9-profile-deposit-nav-label">
+                  Crypto
+                </span>
+              </button>
+
+
+              <!-- E-PAYMENT -->
+
+              <button
+                id="U9-profile-deposit-epayment"
+                class="U9-profile-deposit-nav-button"
+                type="button"
+                role="tab"
+                data-category="epayment"
+                aria-selected="false"
+                tabindex="-1"
+              >
+                <img
+                  id="U9-profile-deposit-epayment-icon"
+                  class="U9-profile-deposit-nav-icon"
+                  src="/SSVG/Withdraw/epay.svg"
+                  alt=""
+                >
+
+                <span class="U9-profile-deposit-nav-label">
+                  E-Payment
+                </span>
+              </button>
+
+
+              <!-- BANK TRANSFER -->
+
+              <button
+                id="U9-profile-deposit-bank"
+                class="U9-profile-deposit-nav-button"
+                type="button"
+                role="tab"
+                data-category="bank"
+                aria-selected="false"
+                tabindex="-1"
+              >
+                <img
+                  id="U9-profile-deposit-bank-icon"
+                  class="U9-profile-deposit-nav-icon"
+                  src="/SSVG/Withdraw/bank.svg"
+                  alt=""
+                >
+
+                <span class="U9-profile-deposit-nav-label">
+                  Bank Transfer
+                </span>
+              </button>
+
+
+              <!-- CARD -->
+
+              <button
+                id="U9-profile-deposit-card"
+                class="U9-profile-deposit-nav-button"
+                type="button"
+                role="tab"
+                data-category="card"
+                aria-selected="false"
+                tabindex="-1"
+              >
+                <img
+                  id="U9-profile-deposit-card-icon"
+                  class="U9-profile-deposit-nav-icon"
+                  src="/SSVG/Withdraw/card.svg"
+                  alt=""
+                >
+
+                <span class="U9-profile-deposit-nav-label">
+                  Card
+                </span>
+              </button>
+
+            </nav>
+
+            <!-- =========================
+                KYC REQUIRED — kyc = false
+            ========================= -->
+
+            <div
+              id="U9-profile-deposit-kyc-notice"
+              class="U9-profile-deposit-kyc-card U9-profile-deposit-kyc-notice"
+              role="status"
+              aria-live="polite"
+              hidden
+            >
+              <img
+                id="U9-profile-deposit-kyc-status-hint-icon"
+                class="U9-profile-deposit-kyc-hint-icon"
+                src="/SSVG/Withdraw/hint.svg"
+                alt="KYC information"
+              >
+              <h3>Notice</h3>
+              <p>KYC verification is required before you can use this withdrawal method.</p>
+            </div>
+
+            <div
+              id="U9-profile-deposit-kyc-guide"
+              class="U9-profile-deposit-kyc-card U9-profile-deposit-kyc-guide"
+              aria-label="KYC verification guide"
+              hidden
+            >
+              <h3>KYC Verification Guide</h3>
+              <ol>
+                <li>Prepare a valid, unexpired government-issued ID.</li>
+                <li>Upload clear photos with all document details visible.</li>
+                <li>Complete the selfie or liveness check if requested.</li>
+              </ol>
+              <p class="U9-profile-deposit-kyc-verify-text">Make sure your personal details match your ID before submitting. <button id="U9-profile-deposit-kyc-verify-button" class="U9-profile-deposit-kyc-verify-button" type="button">Verify</button></p>
+
+              <!--
+                Each icon has its own src so you can replace them separately later:
+                hint1.svg, hint2.svg, hint3.svg, hint4.svg, hint5.svg.
+                They intentionally all use hint.svg for now.
+              -->
+              <div class="U9-profile-deposit-kyc-icon-row" aria-label="KYC information icons">
+                <img id="U9-profile-deposit-kyc-icon-1" src="/SSVG/Withdraw/hint.svg" alt="">
+                <img id="U9-profile-deposit-kyc-icon-2" src="/SSVG/Withdraw/hint.svg" alt="">
+                <img id="U9-profile-deposit-kyc-icon-3" src="/SSVG/Withdraw/hint.svg" alt="">
+                <img id="U9-profile-deposit-kyc-icon-4" src="/SSVG/Withdraw/hint.svg" alt="">
+                <img id="U9-profile-deposit-kyc-icon-5" src="/SSVG/Withdraw/hint.svg" alt="">
+              </div>
+            </div>
+
+            <!-- =========================
+                PAYMENT UNAVAILABLE — kyc = true
+            ========================= -->
+
+            <div
+              id="U9-profile-deposit-kyc-unavailable"
+              class="U9-profile-deposit-kyc-card U9-profile-deposit-kyc-unavailable"
+              role="status"
+              aria-live="polite"
+              hidden
+            >
+              <img
+                class="U9-profile-deposit-kyc-hint-icon"
+                src="/SSVG/Withdraw/hint-true.svg"
+                alt="Payment services unavailable"
+              >
+              <h3>Payment Services Unavailable</h3>
+              <p>We’re sorry, but withdrawal services for your country are currently unavailable. We’re working to expand our supported payment options. Please check back later for updates. Thank you for your patience and understanding.</p>
+
+              <!-- Each image can be changed independently when your new SVGs are ready. -->
+              <div class="U9-profile-deposit-kyc-icon-row" aria-label="Payment information icons">
+                <img id="U9-profile-deposit-kyc-unavailable-icon-1" src="/SSVG/Withdraw/A1.svg" alt="">
+                <img id="U9-profile-deposit-kyc-unavailable-icon-2" src="/SSVG/Withdraw/A2.svg" alt="">
+                <img id="U9-profile-deposit-kyc-unavailable-icon-3" src="/SSVG/Withdraw/A3.svg" alt="">
+                <img id="U9-profile-deposit-kyc-unavailable-icon-4" src="/SSVG/Withdraw/A4.svg" alt="">
+                <img id="U9-profile-deposit-kyc-unavailable-icon-5" src="/SSVG/Withdraw/A5.svg" alt="">
+              </div>
+            </div>
+
+          
           </div>
 
         </div>
