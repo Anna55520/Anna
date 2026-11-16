@@ -138,6 +138,9 @@ const u9ProfileHistoryPage =
 const u9ProfileWithdrawalHistoryButton =
   document.getElementById("U9-profile-withdrawal-history-button");
 
+const u9ProfileDepositHistoryButton =
+  document.getElementById("U9-profile-deposit-history-button");
+
 // The page to return to after closing the shared History page.
 let u9ProfileHistoryReturnPage = "main";
 
@@ -1078,6 +1081,18 @@ if (u9ProfileWithdrawalHistoryButton) {
       event.preventDefault();
       event.stopPropagation();
       u9ProfileShowHistoryPage("page2");
+    }
+  );
+}
+
+// Deposit History uses the shared History page and returns to Deposit.
+if (u9ProfileDepositHistoryButton) {
+  u9ProfileDepositHistoryButton.addEventListener(
+    "click",
+    function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      u9ProfileShowHistoryPage("page1");
     }
   );
 }
