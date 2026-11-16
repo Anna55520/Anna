@@ -1,79 +1,670 @@
+
 /* =================================================
-   PROFILE PAGE 1
-
-
-   IMPORTANT:
-
-   DO NOT MODIFY PROFILE HEADER HERE.
-
-
-   The following elements are controlled by:
-
-   CSS/PROFILE/PROFILE/profile.css
-
-
-   Header:
-
-   #U9-profile-modal-header
-
-   #U9-profile-modal-close
-
-   #U9-profile-modal-title
-
-   #U9-profile-modal-icon
-
-
-   This file only controls:
-
-   #U9-profile-page1
-
-   #U9-profile-page1-content
-
-   Page 1 own elements.
-
-
+   U9 PROFILE PAGE 1 — DEPOSIT
 ================================================= */
 
 
 /* =================================================
-   PROFILE PAGE 1 WINDOW
+   PAGE 2
 ================================================= */
 
 #U9-profile-page1 {
+  position: relative;
+  display: none;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+
+/* =================================================
+   PAGE 2 CONTENT
+================================================= */
+
+#U9-profile-page1-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+
+/* =================================================
+   WITHDRAWAL USER INFO
+================================================= */
+
+#U9-profile-deposit-user-info {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: nowrap;
+  gap: 10px;
+  width: 100%;
+  padding: 0 14px;
+  margin-top: 12px;
+  box-sizing: border-box;
+}
+
+
+/* =================================================
+   BALANCE BOX - LEFT
+================================================= */
+
+
+
+
+/* BALANCE LABEL */
+
+
+
+
+/* BALANCE VALUE */
+
+
+
+
+/* =================================================
+   RIGHT SVG BUTTONS
+================================================= */
+
+#U9-profile-deposit-verified-button,
+#U9-profile-deposit-history-button,
+#U9-profile-deposit-notice-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 36px;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+
+  padding: 0;
+  margin-top: 0;
+
+  box-sizing: border-box;
+
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+
+  background: #ffffff;
+
+  cursor: pointer;
+  pointer-events: auto;
+
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+/* KYC STATUS - PUSH BUTTONS TO RIGHT */
+
+#U9-profile-deposit-verified-button {
+  margin-left: 0;
+}
+
+
+/* BOTH BUTTONS HOVER */
+
+#U9-profile-deposit-verified-button:hover,
+#U9-profile-deposit-history-button:hover,
+#U9-profile-deposit-notice-button:hover {
+  border-color: #cfd8ea;
+  background: #f8faff;
+}
+
+
+/* BOTH BUTTONS ACTIVE */
+
+#U9-profile-deposit-verified-button:active,
+#U9-profile-deposit-history-button:active,
+#U9-profile-deposit-notice-button:active {
+  transform: scale(0.92);
+}
+
+
+/* BOTH BUTTONS FOCUS */
+
+#U9-profile-deposit-verified-button:focus-visible,
+#U9-profile-deposit-history-button:focus-visible,
+#U9-profile-deposit-notice-button:focus-visible {
+  outline: 2px solid #555555;
+  outline-offset: 3px;
+}
+
+
+/* =================================================
+   KYC STATUS ICON
+================================================= */
+
+#U9-profile-deposit-verified-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+
+  object-fit: contain;
+  object-position: center;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* =================================================
+   HISTORY ICON
+================================================= */
+
+#U9-profile-deposit-history-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* =================================================
+   NOTICE ICON
+================================================= */
+
+#U9-profile-deposit-notice-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+
+  object-fit: contain;
+  object-position: center;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* =================================================
+   WITHDRAWAL NAVIGATION
+================================================= */
+
+#U9-profile-deposit-navigation {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 8px;
+  width: 100%;
+  padding: 12px 14px;
+
+  box-sizing: border-box;
+}
+
+
+/* =================================================
+   NAVIGATION BUTTON
+================================================= */
+
+.U9-profile-deposit-nav-button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
 
   width: 100%;
+  min-width: 0;
+  min-height: 76px;
+  padding: 9px 4px;
 
-  min-height: 100%;
+  box-sizing: border-box;
 
-  display: none;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #555555;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+
+/* HOVER */
+
+.U9-profile-deposit-nav-button:hover {
+  border-color: #cfd8ea;
+  background: #f8faff;
+}
+
+
+/* ACTIVE */
+
+.U9-profile-deposit-nav-button.active {
+  border-color: #76ace9;
+  background: #f2f6ff;
+  color: #000000;
+
+  box-shadow: 0 2px 8px rgba(39, 98, 234, 0.10);
+}
+
+
+/* CLICK */
+
+.U9-profile-deposit-nav-button:active {
+  transform: scale(0.97);
+}
+
+
+/* FOCUS */
+
+.U9-profile-deposit-nav-button:focus-visible {
+  outline: 2px solid #2762ea;
+  outline-offset: 2px;
+}
+
+
+/* =================================================
+   KYC NOTICE AND GUIDE — MATCH HISTORY EMPTY STATE
+================================================= */
+
+.U9-profile-deposit-kyc-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: calc(100% - 28px);
+  min-width: 0;
+  min-height: 190px;
+  margin: 0 14px 16px;
+  padding: 20px 16px;
+  box-sizing: border-box;
+  border: 1px dashed #dddddd;
+  border-radius: 12px;
+  background: #ffffff;
+  text-align: center;
+}
+
+.U9-profile-deposit-kyc-card[hidden] {
+  display: none !important;
+}
+
+.U9-profile-deposit-kyc-hint-icon {
+  display: block;
+  flex: 0 0 auto;
+  width: 80px;
+  height: 80px;
+  margin: 0 0 10px;
+  object-fit: contain;
+}
+
+.U9-profile-deposit-kyc-card h3 {
+  margin: 0 0 8px;
+  color: #333333;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.U9-profile-deposit-kyc-card p {
+  margin: 0;
+  color: #888888;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.U9-profile-deposit-kyc-guide ol {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  width: 100%;
+  margin: 0 0 8px;
+  padding: 0;
+  color: #666666;
+  font-size: 12px;
+  line-height: 1.4;
+  text-align: left;
+  list-style-position: inside;
+}
+
+.U9-profile-deposit-kyc-guide li {
+  margin: 0;
+  padding: 0;
+}
+
+@media screen and (max-width: 480px) {
+  .U9-profile-deposit-kyc-card {
+    width: calc(100% - 16px);
+    min-height: 190px;
+    margin: 0 8px 14px;
+    padding: 18px 14px;
+  }
+
+  .U9-profile-deposit-kyc-card h3 {
+    font-size: 15px;
+  }
+
+  .U9-profile-deposit-kyc-card p {
+    font-size: 12px;
+  }
+
+  .U9-profile-deposit-kyc-guide ol {
+    font-size: 11px;
+  }
+}
+
+
+/* =================================================
+   NAVIGATION ICON
+================================================= */
+
+.U9-profile-deposit-nav-icon {
+  display: block;
+
+  width: 22px;
+  height: 22px;
+
+  object-fit: contain;
+  object-position: center;
+
+  pointer-events: none;
+  user-select: none;
+}
+
+
+/* =================================================
+   NAVIGATION LABEL
+================================================= */
+
+.U9-profile-deposit-nav-label {
+  display: block;
+  width: 100%;
+  overflow: hidden;
+
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  pointer-events: none;
+}
+
+
+
+/* =================================================
+   MOBILE
+================================================= */
+
+@media screen and (max-width: 480px) {
+
+  /* NAVIGATION */
+
+  #U9-profile-deposit-navigation {
+    gap: 6px;
+    padding: 10px 8px;
+  }
+
+  .U9-profile-deposit-nav-button {
+    min-height: 70px;
+    gap: 6px;
+    padding: 8px 3px;
+    font-size: 10px;
+  }
+
+  .U9-profile-deposit-nav-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+
+  /* USER INFO */
+
+  #U9-profile-deposit-user-info {
+    gap: 8px;
+    padding: 0 8px;
+  }
+
+
+  /* BALANCE */
+
+  
+
+  
+
+
+  /* RIGHT BUTTONS */
+
+  #U9-profile-deposit-verified-button,
+  #U9-profile-deposit-notice-button {
+    flex-basis: 34px;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+  }
+
+
+  /* SVG ICONS */
+
+  #U9-profile-deposit-verified-icon,
+  #U9-profile-deposit-notice-icon {
+    width: 22px;
+    height: 22px;
+  }
 
 }
 
 
 /* =================================================
-   PROFILE PAGE 1 CONTENT
+   SMALL MOBILE
 ================================================= */
 
-#U9-profile-page1-content {
+@media screen and (max-width: 360px) {
 
-  width: 100%;
+  /* NAVIGATION */
 
-  min-height: 300px;
+  #U9-profile-deposit-navigation {
+    gap: 5px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
 
-  background: green;
+  .U9-profile-deposit-nav-button {
+    min-height: 66px;
+    font-size: 9px;
+  }
 
-  border-radius: 12px;
+  .U9-profile-deposit-nav-icon {
+    width: 19px;
+    height: 19px;
+  }
 
-  display: flex;
 
+  /* USER INFO */
+
+  #U9-profile-deposit-user-info {
+    gap: 6px;
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+
+  /* BALANCE */
+
+  
+
+  
+
+
+  /* RIGHT BUTTONS */
+
+  #U9-profile-deposit-verified-button,
+  #U9-profile-deposit-notice-button {
+    flex-basis: 32px;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+  }
+
+
+  /* SVG ICONS */
+
+  #U9-profile-deposit-verified-icon,
+  #U9-profile-deposit-notice-icon {
+    width: 21px;
+    height: 21px;
+  }
+
+}
+
+
+/* =================================================
+   KYC STATUS — VERIFY BUTTON & FIVE ICON SLOTS
+================================================= */
+
+.U9-profile-deposit-kyc-verify-button {
+  display: inline-flex;
   align-items: center;
-
   justify-content: center;
-
-  color: white;
-
-  font-size: 24px;
-
+  min-width: 92px;
+  min-height: 34px;
+  margin: 12px 0 2px;
+  padding: 7px 22px;
+  border: 0;
+  border-radius: 7px;
+  background: #70c8f5;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
   font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
 
+.U9-profile-deposit-kyc-verify-button:hover {
+  background: #55b9ed;
+}
+
+.U9-profile-deposit-kyc-verify-button:active {
+  transform: scale(0.97);
+}
+
+.U9-profile-deposit-kyc-icon-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: nowrap;
+  gap: 9px;
+  width: 100%;
+  margin: 16px auto 0;
+}
+
+.U9-profile-deposit-kyc-icon-row img {
+  display: block;
+  flex: 0 0 25px;
+  width: 25px;
+  height: 25px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.U9-profile-deposit-kyc-unavailable p {
+  max-width: 440px;
+}
+
+@media screen and (max-width: 480px) {
+  .U9-profile-deposit-kyc-icon-row {
+    gap: 7px;
+    margin-top: 14px;
+  }
+
+  .U9-profile-deposit-kyc-icon-row img {
+    flex-basis: 22px;
+    width: 22px;
+    height: 22px;
+  }
+
+  .U9-profile-deposit-kyc-verify-button {
+    min-height: 32px;
+    font-size: 12px;
+  }
+}
+
+
+/* =================================================
+   DEPOSIT KYC GUIDE ALIGNMENT
+================================================= */
+
+.U9-profile-deposit-kyc-guide {
+  align-items: stretch;
+  text-align: left;
+}
+
+.U9-profile-deposit-kyc-guide h3,
+.U9-profile-deposit-kyc-guide p,
+.U9-profile-deposit-kyc-guide ol,
+.U9-profile-deposit-kyc-guide li {
+  text-align: left;
+}
+
+.U9-profile-deposit-kyc-guide .U9-profile-deposit-kyc-icon-row {
+  justify-content: center;
+  align-self: center;
+}
+
+.U9-profile-deposit-kyc-verify-text {
+  display: block;
+  text-align: left;
+}
+
+.U9-profile-deposit-kyc-verify-button {
+  display: inline;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #2762ea;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  line-height: inherit;
+  cursor: pointer;
+  vertical-align: baseline;
+}
+
+.U9-profile-deposit-kyc-verify-button:hover,
+.U9-profile-deposit-kyc-verify-button:active {
+  background: transparent;
+  transform: none;
+  color: #174fc8;
 }
