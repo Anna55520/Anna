@@ -56,7 +56,7 @@ const u9ProfileHeaderIcons = {
 
   history: "SSVG/button/profile-history.svg",
 
-  1: "SSVG/account/account-edit-button.svg",
+  1: "SSVG/button/deposits.svg",
 
   2: "SSVG/Withdraw/withdraw2.svg",
 
@@ -73,7 +73,7 @@ const u9ProfileHeaderIcons = {
 ========================= */
 
 const u9ProfilePageTitles = {
-  1: "buttonpage1",
+  1: "Deposits",
   2: "Withdrawal",
   3: "buttonpage3",
   4: "buttonpage4",
