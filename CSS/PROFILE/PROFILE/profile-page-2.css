@@ -679,3 +679,55 @@
     font-size: 12px;
   }
 }
+
+
+/* =================================================
+   WITHDRAWAL KYC GUIDE ALIGNMENT (MATCH DEPOSIT)
+================================================= */
+
+.U9-profile-withdrawal-kyc-guide {
+  align-items: stretch;
+  text-align: left;
+}
+
+.U9-profile-withdrawal-kyc-guide h3,
+.U9-profile-withdrawal-kyc-guide p,
+.U9-profile-withdrawal-kyc-guide ol,
+.U9-profile-withdrawal-kyc-guide li {
+  text-align: left;
+}
+
+.U9-profile-withdrawal-kyc-guide .U9-profile-withdrawal-kyc-icon-row {
+  justify-content: center;
+  align-self: center;
+}
+
+.U9-profile-withdrawal-kyc-verify-text {
+  display: block;
+  text-align: left;
+}
+
+.U9-profile-withdrawal-kyc-verify-button {
+  display: inline;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #2762ea;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: underline;
+  line-height: inherit;
+  cursor: pointer;
+  vertical-align: baseline;
+}
+
+.U9-profile-withdrawal-kyc-verify-button:hover,
+.U9-profile-withdrawal-kyc-verify-button:active {
+  background: transparent;
+  transform: none;
+  color: #174fc8;
+}
