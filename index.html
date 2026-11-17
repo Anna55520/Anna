@@ -1455,509 +1455,675 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
         <div id="U9-profile-page2">
 
-          <div id="U9-profile-page2-content">
+                <div id="U9-profile-page2-content">
 
-            <!-- =========================
-                USER BALANCE & BUTTONS
-            ========================= -->
+                    <!-- =========================
+                        USER BALANCE & BUTTONS
+                    ========================= -->
 
-            <div id="U9-profile-withdrawal-user-info">
+                    <div id="U9-profile-withdrawal-user-info">
 
-              <!-- EXISTING BALANCE -->
+                    <!-- EXISTING BALANCE -->
 
-              <div id="U9-profile-withdrawal-balance">
+                    <div id="U9-profile-withdrawal-balance">
 
-                <span id="U9-profile-withdrawal-balance-label">
-                  Balance
-                </span>
+                        <span id="U9-profile-withdrawal-balance-label">
+                        Balance
+                        </span>
 
-                <span id="U9-profile-withdrawal-balance-value">
-                  0.00
-                </span>
+                        <span id="U9-profile-withdrawal-balance-value">
+                        0.00
+                        </span>
 
-              </div>
-
-
-              <!-- KYC VERIFIED BUTTON -->
-
-              <button
-                id="U9-profile-withdrawal-verified-button"
-                type="button"
-                aria-label="KYC verification status"
-              >
-
-                <img
-                  id="U9-profile-withdrawal-verified-icon"
-                  src="/SSVG/Withdraw/unverified.svg"
-                  alt="Unverified"
-                >
-
-              </button>
+                    </div>
 
 
-              <!-- EXISTING HISTORY BUTTON -->
+                    <!-- KYC VERIFIED BUTTON -->
 
-              <button
-                id="U9-profile-withdrawal-history-button"
-                type="button"
-                aria-label="Withdrawal History"
-              >
+                    <button
+                        id="U9-profile-withdrawal-verified-button"
+                        type="button"
+                        aria-label="KYC verification status"
+                    >
 
-                <img
-                  id="U9-profile-withdrawal-history-icon"
-                  src="/SSVG/Withdraw/withdraw-history.svg"
-                  alt=""
-                >
+                        <img
+                        id="U9-profile-withdrawal-verified-icon"
+                        src="/SSVG/Withdraw/unverified.svg"
+                        alt="Unverified"
+                        >
 
-              </button>
-
-
-              <!-- NOTICE BUTTON -->
-
-              <button
-                id="U9-profile-withdrawal-notice-button"
-                type="button"
-                aria-label="Notice"
-              >
-
-                <img
-                  id="U9-profile-withdrawal-notice-icon"
-                  src="/SSVG/Withdraw/exclamation-mark.svg"
-                  alt=""
-                >
-
-              </button>
-
-            </div>
+                    </button>
 
 
-            <!-- =========================
-                WITHDRAWAL NAVIGATION
-            ========================= -->
+                    <!-- WITHDRAWAL PASSWORD SETTINGS BUTTON -->
 
-            <nav
-              id="U9-profile-withdrawal-navigation"
-              role="tablist"
-              aria-label="Withdrawal categories"
-            >
-
-              <!-- CRYPTO -->
-
-              <button
-                id="U9-profile-withdrawal-crypto"
-                class="U9-profile-withdrawal-nav-button active"
-                type="button"
-                role="tab"
-                data-category="crypto"
-                aria-selected="true"
-                aria-controls="U9-profile-withdrawal-crypto-panel"
-              >
-
-                <img
-                  id="U9-profile-withdrawal-crypto-icon"
-                  class="U9-profile-withdrawal-nav-icon"
-                  src="/SSVG/Withdraw/btc.svg"
-                  alt=""
-                >
-
-                <span class="U9-profile-withdrawal-nav-label">
-                  Crypto
-                </span>
-
-              </button>
+                    <button
+                        id="U9-profile-withdrawal-password-settings-button"
+                        type="button"
+                        aria-label="Withdrawal password settings"
+                        title="Withdrawal Password"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M7 10V7a5 5 0 0 1 10 0v3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        <rect x="4" y="10" width="16" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                        <circle cx="12" cy="15" r="1.3" fill="currentColor"/>
+                        <path d="M12 16.3v1.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+                        </svg>
+                    </button>
 
 
-              <!-- E-PAYMENT -->
+                    <!-- WALLET BINDING BUTTON -->
 
-              <button
-                id="U9-profile-withdrawal-epayment"
-                class="U9-profile-withdrawal-nav-button"
-                type="button"
-                role="tab"
-                data-category="epayment"
-                aria-selected="false"
-                aria-controls="U9-profile-withdrawal-kyc-notice"
-                tabindex="-1"
-              >
-
-                <img
-                  id="U9-profile-withdrawal-epayment-icon"
-                  class="U9-profile-withdrawal-nav-icon"
-                  src="/SSVG/Withdraw/epay.svg"
-                  alt=""
-                >
-
-                <span class="U9-profile-withdrawal-nav-label">
-                  E-Payment
-                </span>
-
-              </button>
+                    <button
+                        id="U9-profile-withdrawal-wallet-settings-button"
+                        type="button"
+                        aria-label="Withdrawal wallet settings"
+                        title="Wallet Settings"
+                    >
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M3 9h18" fill="none" stroke="currentColor" stroke-width="1.8"/>
+                        <path d="M16 14h2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
 
 
-              <!-- BANK TRANSFER -->
+                    <!-- EXISTING HISTORY BUTTON -->
 
-              <button
-                id="U9-profile-withdrawal-bank"
-                class="U9-profile-withdrawal-nav-button"
-                type="button"
-                role="tab"
-                data-category="bank"
-                aria-selected="false"
-                aria-controls="U9-profile-withdrawal-kyc-notice"
-                tabindex="-1"
-              >
+                    <button
+                        id="U9-profile-withdrawal-history-button"
+                        type="button"
+                        aria-label="Withdrawal History"
+                    >
 
-                <img
-                  id="U9-profile-withdrawal-bank-icon"
-                  class="U9-profile-withdrawal-nav-icon"
-                  src="/SSVG/Withdraw/bank.svg"
-                  alt=""
-                >
+                        <img
+                        id="U9-profile-withdrawal-history-icon"
+                        src="/SSVG/Withdraw/withdraw-history.svg"
+                        alt=""
+                        >
 
-                <span class="U9-profile-withdrawal-nav-label">
-                  Bank Transfer
-                </span>
-
-              </button>
+                    </button>
 
 
-              <!-- CARD -->
+                    <!-- NOTICE BUTTON -->
 
-              <button
-                id="U9-profile-withdrawal-card"
-                class="U9-profile-withdrawal-nav-button"
-                type="button"
-                role="tab"
-                data-category="card"
-                aria-selected="false"
-                aria-controls="U9-profile-withdrawal-kyc-notice"
-                tabindex="-1"
-              >
+                    <button
+                        id="U9-profile-withdrawal-notice-button"
+                        type="button"
+                        aria-label="Notice"
+                    >
 
-                <img
-                  id="U9-profile-withdrawal-card-icon"
-                  class="U9-profile-withdrawal-nav-icon"
-                  src="/SSVG/Withdraw/card.svg"
-                  alt=""
-                >
+                        <img
+                        id="U9-profile-withdrawal-notice-icon"
+                        src="/SSVG/Withdraw/exclamation-mark.svg"
+                        alt=""
+                        >
 
-                <span class="U9-profile-withdrawal-nav-label">
-                  Card
-                </span>
+                    </button>
 
-              </button>
-
-            </nav>
+                    </div>
 
 
-            <!-- =========================
-                CRYPTO WITHDRAWAL PANEL
-                USDT TRC20
-            ========================= -->
+                    <!-- =========================
+                        WITHDRAWAL NAVIGATION
+                    ========================= -->
 
-            <section
-              id="U9-profile-withdrawal-crypto-panel"
-              role="tabpanel"
-              aria-labelledby="U9-profile-withdrawal-crypto"
-            >
+                    <nav
+                    id="U9-profile-withdrawal-navigation"
+                    role="tablist"
+                    aria-label="Withdrawal categories"
+                    >
 
-              <form
-                id="U9-profile-withdrawal-form"
-                autocomplete="off"
-                novalidate
-              >
+                    <!-- CRYPTO -->
 
-                <!-- =========================
-                    WITHDRAWAL METHOD
-                ========================= -->
+                    <button
+                        id="U9-profile-withdrawal-crypto"
+                        class="U9-profile-withdrawal-nav-button active"
+                        type="button"
+                        role="tab"
+                        data-category="crypto"
+                        aria-selected="true"
+                        aria-controls="U9-profile-withdrawal-crypto-panel"
+                    >
 
-                <div class="U9-profile-withdrawal-method">
+                        <img
+                        id="U9-profile-withdrawal-crypto-icon"
+                        class="U9-profile-withdrawal-nav-icon"
+                        src="/SSVG/Withdraw/btc.svg"
+                        alt=""
+                        >
 
-                  <img
-                    class="U9-profile-withdrawal-method-icon"
-                    src="/SSVG/Withdraw/Crypto/usdt.svg"
-                    alt="USDT"
-                  >
+                        <span class="U9-profile-withdrawal-nav-label">
+                        Crypto
+                        </span>
 
-                  <div class="U9-profile-withdrawal-method-info">
+                    </button>
 
-                    <span class="U9-profile-withdrawal-method-name">
-                      Tether (USDT)
-                    </span>
 
-                    <span class="U9-profile-withdrawal-method-network">
-                      TRON (TRC20)
-                    </span>
+                    <!-- E-PAYMENT -->
 
-                  </div>
+                    <button
+                        id="U9-profile-withdrawal-epayment"
+                        class="U9-profile-withdrawal-nav-button"
+                        type="button"
+                        role="tab"
+                        data-category="epayment"
+                        aria-selected="false"
+                        aria-controls="U9-profile-withdrawal-kyc-notice"
+                        tabindex="-1"
+                    >
+
+                        <img
+                        id="U9-profile-withdrawal-epayment-icon"
+                        class="U9-profile-withdrawal-nav-icon"
+                        src="/SSVG/Withdraw/epay.svg"
+                        alt=""
+                        >
+
+                        <span class="U9-profile-withdrawal-nav-label">
+                        E-Payment
+                        </span>
+
+                    </button>
+
+
+                    <!-- BANK TRANSFER -->
+
+                    <button
+                        id="U9-profile-withdrawal-bank"
+                        class="U9-profile-withdrawal-nav-button"
+                        type="button"
+                        role="tab"
+                        data-category="bank"
+                        aria-selected="false"
+                        aria-controls="U9-profile-withdrawal-kyc-notice"
+                        tabindex="-1"
+                    >
+
+                        <img
+                        id="U9-profile-withdrawal-bank-icon"
+                        class="U9-profile-withdrawal-nav-icon"
+                        src="/SSVG/Withdraw/bank.svg"
+                        alt=""
+                        >
+
+                        <span class="U9-profile-withdrawal-nav-label">
+                        Bank Transfer
+                        </span>
+
+                    </button>
+
+
+                    <!-- CARD -->
+
+                    <button
+                        id="U9-profile-withdrawal-card"
+                        class="U9-profile-withdrawal-nav-button"
+                        type="button"
+                        role="tab"
+                        data-category="card"
+                        aria-selected="false"
+                        aria-controls="U9-profile-withdrawal-kyc-notice"
+                        tabindex="-1"
+                    >
+
+                        <img
+                        id="U9-profile-withdrawal-card-icon"
+                        class="U9-profile-withdrawal-nav-icon"
+                        src="/SSVG/Withdraw/card.svg"
+                        alt=""
+                        >
+
+                        <span class="U9-profile-withdrawal-nav-label">
+                        Card
+                        </span>
+
+                    </button>
+
+                    </nav>
+
+
+                    <!-- =========================
+                        CRYPTO WITHDRAWAL PANEL
+                        USDT TRC20
+                    ========================= -->
+
+                    <section
+                    id="U9-profile-withdrawal-crypto-panel"
+                    role="tabpanel"
+                    aria-labelledby="U9-profile-withdrawal-crypto"
+                    >
+
+                    <form
+                        id="U9-profile-withdrawal-form"
+                        autocomplete="off"
+                        novalidate
+                    >
+
+                        <!-- =========================
+                            WITHDRAWAL METHOD
+                        ========================= -->
+
+                        <div class="U9-profile-withdrawal-method">
+
+                        <img
+                            class="U9-profile-withdrawal-method-icon"
+                            src="/SSVG/Withdraw/Crypto/usdt.svg"
+                            alt="USDT"
+                        >
+
+                        <div class="U9-profile-withdrawal-method-info">
+
+                            <span class="U9-profile-withdrawal-method-name">
+                            Tether (USDT)
+                            </span>
+
+                            <span class="U9-profile-withdrawal-method-network">
+                            TRON (TRC20)
+                            </span>
+
+                        </div>
+
+                        </div>
+
+
+                        <!-- =========================
+                            WITHDRAWAL AMOUNT
+                        ========================= -->
+
+                        <div class="U9-profile-withdrawal-field">
+
+                        <label for="U9-profile-withdrawal-amount">
+                            Withdrawal Amount (USDT)
+                        </label>
+
+                        <div class="U9-profile-withdrawal-input-group">
+                            <input
+                            id="U9-profile-withdrawal-amount"
+                            name="amount"
+                            type="number"
+                            inputmode="decimal"
+                            min="0.01"
+                            step="0.01"
+                            placeholder="Enter withdrawal amount"
+                            autocomplete="off"
+                            required
+                            >
+                            <button
+                            id="U9-profile-withdrawal-max-button"
+                            type="button"
+                            aria-label="Use maximum available balance"
+                            >MAX</button>
+                        </div>
+
+                        </div>
+
+
+                        <!-- =========================
+                            WALLET ADDRESS
+                        ========================= -->
+
+                        <div class="U9-profile-withdrawal-field">
+
+                        <label for="U9-profile-withdrawal-wallet-address">
+                            USDT TRC20 Wallet Address
+                        </label>
+
+                        <div class="U9-profile-withdrawal-input-group">
+                            <input
+                            id="U9-profile-withdrawal-wallet-address"
+                            name="wallet_address"
+                            type="text"
+                            placeholder="Enter your TRON wallet address"
+                            autocomplete="off"
+                            autocapitalize="off"
+                            spellcheck="false"
+                            required
+                            >
+                            <button
+                            id="U9-profile-withdrawal-paste-button"
+                            type="button"
+                            aria-label="Paste wallet address"
+                            >PASTE</button>
+                        </div>
+
+                        <span class="U9-profile-withdrawal-field-hint">
+                            Make sure your wallet supports USDT on the TRC20 network.
+                        </span>
+
+                        </div>
+
+
+                        <!-- =========================
+                            WITHDRAWAL FEE PREVIEW
+                        ========================= -->
+
+                        <div
+                        id="U9-profile-withdrawal-fee-summary"
+                        aria-live="polite"
+                        >
+                        <div class="U9-profile-withdrawal-fee-row">
+                            <span>Withdrawal Fee (1%)</span>
+                            <strong id="U9-profile-withdrawal-fee-value">0.00 USDT</strong>
+                        </div>
+                        <div class="U9-profile-withdrawal-fee-row U9-profile-withdrawal-net-row">
+                            <span>You Will Receive</span>
+                            <strong id="U9-profile-withdrawal-net-value">0.00 USDT</strong>
+                        </div>
+                        </div>
+
+
+                        <!-- =========================
+                            SUBMIT BUTTON
+                        ========================= -->
+
+                        <button
+                        id="U9-profile-withdrawal-submit"
+                        type="submit"
+                        >
+                        Withdraw
+                        </button>
+
+
+                        <!-- =========================
+                            RESPONSE MESSAGE
+                        ========================= -->
+
+                        <div
+                        id="U9-profile-withdrawal-message"
+                        role="status"
+                        aria-live="polite"
+                        hidden
+                        ></div>
+
+                    </form>
+
+                    </section>
+
+
+                    <!-- =========================
+                        KYC REQUIRED — kyc = false
+                    ========================= -->
+
+                    <div
+                    id="U9-profile-withdrawal-kyc-notice"
+                    class="U9-profile-withdrawal-kyc-card U9-profile-withdrawal-kyc-notice"
+                    role="status"
+                    aria-live="polite"
+                    hidden
+                    >
+
+                    <img
+                        id="U9-profile-withdrawal-kyc-status-hint-icon"
+                        class="U9-profile-withdrawal-kyc-hint-icon"
+                        src="/SSVG/Withdraw/hint.svg"
+                        alt="KYC information"
+                    >
+
+                    <h3>Notice</h3>
+
+                    <p>
+                        KYC verification is required before you can use this withdrawal method.
+                    </p>
+
+                    </div>
+
+
+                    <!-- =========================
+                        KYC VERIFICATION GUIDE
+                    ========================= -->
+
+                    <div
+                    id="U9-profile-withdrawal-kyc-guide"
+                    class="U9-profile-withdrawal-kyc-card U9-profile-withdrawal-kyc-guide"
+                    aria-label="KYC verification guide"
+                    hidden
+                    >
+
+                    <h3>KYC Verification Guide</h3>
+
+                    <ol>
+
+                        <li>
+                        Prepare a valid, unexpired government-issued ID.
+                        </li>
+
+                        <li>
+                        Upload clear photos with all document details visible.
+                        </li>
+
+                        <li>
+                        Complete the selfie or liveness check if requested.
+                        </li>
+
+                    </ol>
+
+                    <p class="U9-profile-withdrawal-kyc-verify-text">
+
+                        Make sure your personal details match your ID before submitting.
+
+                        <button
+                        id="U9-profile-withdrawal-kyc-verify-button"
+                        class="U9-profile-withdrawal-kyc-verify-button"
+                        type="button"
+                        >
+                        Verify
+                        </button>
+
+                    </p>
+
+
+                    <!-- KYC ICONS -->
+
+                    <div
+                        class="U9-profile-withdrawal-kyc-icon-row"
+                        aria-label="KYC information icons"
+                    >
+
+                        <img
+                        id="U9-profile-withdrawal-kyc-icon-1"
+                        src="/SSVG/Profile/B1.svg"
+                        alt=""
+                        >
+
+                        <img
+                        id="U9-profile-withdrawal-kyc-icon-2"
+                        src="/SSVG/Profile/B2.svg"
+                        alt=""
+                        >
+
+                        <img
+                        id="U9-profile-withdrawal-kyc-icon-3"
+                        src="/SSVG/Profile/B3.svg"
+                        alt=""
+                        >
+
+                        <img
+                        id="U9-profile-withdrawal-kyc-icon-4"
+                        src="/SSVG/Profile/B4.svg"
+                        alt=""
+                        >
+
+                        <img
+                        id="U9-profile-withdrawal-kyc-icon-5"
+                        src="/SSVG/Profile/B5.svg"
+                        alt=""
+                        >
+
+                    </div>
+
+                    </div>
+
+
+                    <!-- =========================
+                        PAYMENT UNAVAILABLE — kyc = true
+                    ========================= -->
+
+                    <div
+                    id="U9-profile-withdrawal-kyc-unavailable"
+                    class="U9-profile-withdrawal-kyc-card U9-profile-withdrawal-kyc-unavailable"
+                    role="status"
+                    aria-live="polite"
+                    hidden
+                    >
+
+                    <img
+                        class="U9-profile-withdrawal-kyc-hint-icon"
+                        src="/SSVG/Withdraw/hint-true.svg"
+                        alt="Payment services unavailable"
+                    >
+
+                    <h3>Payment Services Unavailable</h3>
+
+                    <p>
+                        We’re sorry, but withdrawal services for your country are currently unavailable. We’re working to expand our supported payment options. Please check back later for updates. Thank you for your patience and understanding.
+                    </p>
+
+
+                    <!-- PAYMENT INFORMATION ICONS -->
+
+                    <div
+                        class="U9-profile-withdrawal-kyc-icon-row"
+                        aria-label="Payment information icons"
+                    >
+
+                        <img
+                        id="U9-profile-withdrawal-kyc-unavailable-icon-1"
+                        src="/SSVG/Withdraw/A1.svg"
+                        alt=""
+                        >
+
+                        <img
+                        id="U9-profile-withdrawal-kyc-unavailable-icon-2"
+                        src="/SSVG/Withdraw/A2.svg"
+                        alt=""
+                        >
+
+                        <img
+                        id="U9-profile-withdrawal-kyc-unavailable-icon-3"
+                        src="/SSVG/Withdraw/A3.svg"
+                        alt=""
+                        >
+
+                        <img
+                        id="U9-profile-withdrawal-kyc-unavailable-icon-4"
+                        src="/SSVG/Withdraw/A4.svg"
+                        alt=""
+                        >
+
+                        <img
+                        id="U9-profile-withdrawal-kyc-unavailable-icon-5"
+                        src="/SSVG/Withdraw/A5.svg"
+                        alt=""
+                        >
+
+                    </div>
+
+                    </div>
+
+                </div>
 
                 </div>
 
 
-                <!-- =========================
-                    WITHDRAWAL AMOUNT
-                ========================= -->
+        <!-- =================================
+            WITHDRAWAL PASSWORD SETUP MODAL
+        ================================= -->
 
-                <div class="U9-profile-withdrawal-field">
+        <div
+        id="U9-profile-withdrawal-password-modal"
+        class="U9-profile-withdrawal-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="U9-profile-withdrawal-password-modal-title"
+        hidden
+        >
+        <div class="U9-profile-withdrawal-modal-content">
+            <button id="U9-profile-withdrawal-password-modal-close" class="U9-profile-withdrawal-modal-close" type="button" aria-label="Close">&times;</button>
+            <h3 id="U9-profile-withdrawal-password-modal-title">Withdrawal Password</h3>
+            <p class="U9-profile-withdrawal-modal-description">Set a six-digit password to protect your withdrawals.</p>
 
-                  <label for="U9-profile-withdrawal-amount">
-                    Withdrawal Amount (USDT)
-                  </label>
-
-                  <input
-                    id="U9-profile-withdrawal-amount"
-                    name="amount"
-                    type="number"
-                    inputmode="decimal"
-                    min="0.01"
-                    step="0.01"
-                    placeholder="Enter withdrawal amount"
-                    autocomplete="off"
-                    required
-                  >
-
-                </div>
-
-
-                <!-- =========================
-                    WALLET ADDRESS
-                ========================= -->
-
-                <div class="U9-profile-withdrawal-field">
-
-                  <label for="U9-profile-withdrawal-wallet-address">
-                    USDT TRC20 Wallet Address
-                  </label>
-
-                  <input
-                    id="U9-profile-withdrawal-wallet-address"
-                    name="wallet_address"
-                    type="text"
-                    placeholder="Enter your TRON wallet address"
-                    autocomplete="off"
-                    autocapitalize="off"
-                    spellcheck="false"
-                    required
-                  >
-
-                  <span class="U9-profile-withdrawal-field-hint">
-                    Make sure your wallet supports USDT on the TRC20 network.
-                  </span>
-
-                </div>
-
-
-                <!-- =========================
-                    SUBMIT BUTTON
-                ========================= -->
-
-                <button
-                  id="U9-profile-withdrawal-submit"
-                  type="submit"
-                >
-                  Withdraw
-                </button>
-
-
-                <!-- =========================
-                    RESPONSE MESSAGE
-                ========================= -->
-
-                <div
-                  id="U9-profile-withdrawal-message"
-                  role="status"
-                  aria-live="polite"
-                  hidden
-                ></div>
-
-              </form>
-
-            </section>
-
-
-            <!-- =========================
-                KYC REQUIRED — kyc = false
-            ========================= -->
-
-            <div
-              id="U9-profile-withdrawal-kyc-notice"
-              class="U9-profile-withdrawal-kyc-card U9-profile-withdrawal-kyc-notice"
-              role="status"
-              aria-live="polite"
-              hidden
-            >
-
-              <img
-                id="U9-profile-withdrawal-kyc-status-hint-icon"
-                class="U9-profile-withdrawal-kyc-hint-icon"
-                src="/SSVG/Withdraw/hint.svg"
-                alt="KYC information"
-              >
-
-              <h3>Notice</h3>
-
-              <p>
-                KYC verification is required before you can use this withdrawal method.
-              </p>
-
+            <form id="U9-profile-withdrawal-password-form" autocomplete="off" novalidate>
+            <div id="U9-profile-withdrawal-current-password-group" class="U9-profile-withdrawal-field" hidden>
+                <label for="U9-profile-withdrawal-current-password">Current Withdrawal Password</label>
+                <input id="U9-profile-withdrawal-current-password" name="current_password" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="Enter current six-digit password" autocomplete="off">
             </div>
 
-
-            <!-- =========================
-                KYC VERIFICATION GUIDE
-            ========================= -->
-
-            <div
-              id="U9-profile-withdrawal-kyc-guide"
-              class="U9-profile-withdrawal-kyc-card U9-profile-withdrawal-kyc-guide"
-              aria-label="KYC verification guide"
-              hidden
-            >
-
-              <h3>KYC Verification Guide</h3>
-
-              <ol>
-
-                <li>
-                  Prepare a valid, unexpired government-issued ID.
-                </li>
-
-                <li>
-                  Upload clear photos with all document details visible.
-                </li>
-
-                <li>
-                  Complete the selfie or liveness check if requested.
-                </li>
-
-              </ol>
-
-              <p class="U9-profile-withdrawal-kyc-verify-text">
-
-                Make sure your personal details match your ID before submitting.
-
-                <button
-                  id="U9-profile-withdrawal-kyc-verify-button"
-                  class="U9-profile-withdrawal-kyc-verify-button"
-                  type="button"
-                >
-                  Verify
-                </button>
-
-              </p>
-
-
-              <!-- KYC ICONS -->
-
-              <div
-                class="U9-profile-withdrawal-kyc-icon-row"
-                aria-label="KYC information icons"
-              >
-
-                <img
-                  id="U9-profile-withdrawal-kyc-icon-1"
-                  src="/SSVG/Profile/B1.svg"
-                  alt=""
-                >
-
-                <img
-                  id="U9-profile-withdrawal-kyc-icon-2"
-                  src="/SSVG/Profile/B2.svg"
-                  alt=""
-                >
-
-                <img
-                  id="U9-profile-withdrawal-kyc-icon-3"
-                  src="/SSVG/Profile/B3.svg"
-                  alt=""
-                >
-
-                <img
-                  id="U9-profile-withdrawal-kyc-icon-4"
-                  src="/SSVG/Profile/B4.svg"
-                  alt=""
-                >
-
-                <img
-                  id="U9-profile-withdrawal-kyc-icon-5"
-                  src="/SSVG/Profile/B5.svg"
-                  alt=""
-                >
-
-              </div>
-
+            <div class="U9-profile-withdrawal-field">
+                <label for="U9-profile-withdrawal-new-password">New Withdrawal Password</label>
+                <input id="U9-profile-withdrawal-new-password" name="new_password" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="Enter six-digit password" autocomplete="new-password" required>
             </div>
 
-
-            <!-- =========================
-                PAYMENT UNAVAILABLE — kyc = true
-            ========================= -->
-
-            <div
-              id="U9-profile-withdrawal-kyc-unavailable"
-              class="U9-profile-withdrawal-kyc-card U9-profile-withdrawal-kyc-unavailable"
-              role="status"
-              aria-live="polite"
-              hidden
-            >
-
-              <img
-                class="U9-profile-withdrawal-kyc-hint-icon"
-                src="/SSVG/Withdraw/hint-true.svg"
-                alt="Payment services unavailable"
-              >
-
-              <h3>Payment Services Unavailable</h3>
-
-              <p>
-                We’re sorry, but withdrawal services for your country are currently unavailable. We’re working to expand our supported payment options. Please check back later for updates. Thank you for your patience and understanding.
-              </p>
-
-
-              <!-- PAYMENT INFORMATION ICONS -->
-
-              <div
-                class="U9-profile-withdrawal-kyc-icon-row"
-                aria-label="Payment information icons"
-              >
-
-                <img
-                  id="U9-profile-withdrawal-kyc-unavailable-icon-1"
-                  src="/SSVG/Withdraw/A1.svg"
-                  alt=""
-                >
-
-                <img
-                  id="U9-profile-withdrawal-kyc-unavailable-icon-2"
-                  src="/SSVG/Withdraw/A2.svg"
-                  alt=""
-                >
-
-                <img
-                  id="U9-profile-withdrawal-kyc-unavailable-icon-3"
-                  src="/SSVG/Withdraw/A3.svg"
-                  alt=""
-                >
-
-                <img
-                  id="U9-profile-withdrawal-kyc-unavailable-icon-4"
-                  src="/SSVG/Withdraw/A4.svg"
-                  alt=""
-                >
-
-                <img
-                  id="U9-profile-withdrawal-kyc-unavailable-icon-5"
-                  src="/SSVG/Withdraw/A5.svg"
-                  alt=""
-                >
-
-              </div>
-
+            <div class="U9-profile-withdrawal-field">
+                <label for="U9-profile-withdrawal-confirm-password">Confirm Withdrawal Password</label>
+                <input id="U9-profile-withdrawal-confirm-password" name="confirm_password" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="Confirm six-digit password" autocomplete="new-password" required>
             </div>
 
-          </div>
-
+            <button id="U9-profile-withdrawal-password-save" type="submit">Save Password</button>
+            <div id="U9-profile-withdrawal-password-message" role="status" aria-live="polite" hidden></div>
+            </form>
         </div>
+        </div>
+
+
+        <!-- =================================
+            WALLET BINDING MODAL
+        ================================= -->
+
+        <div
+        id="U9-profile-withdrawal-wallet-modal"
+        class="U9-profile-withdrawal-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="U9-profile-withdrawal-wallet-modal-title"
+        hidden
+        >
+        <div class="U9-profile-withdrawal-modal-content">
+            <button id="U9-profile-withdrawal-wallet-modal-close" class="U9-profile-withdrawal-modal-close" type="button" aria-label="Close">&times;</button>
+            <h3 id="U9-profile-withdrawal-wallet-modal-title">Bind Withdrawal Wallet</h3>
+            <p class="U9-profile-withdrawal-modal-description">Bind your USDT TRC20 wallet address for future withdrawals.</p>
+
+            <form id="U9-profile-withdrawal-wallet-form" autocomplete="off" novalidate>
+            <div class="U9-profile-withdrawal-field">
+                <label for="U9-profile-withdrawal-bound-wallet">USDT TRC20 Wallet Address</label>
+                <input id="U9-profile-withdrawal-bound-wallet" name="wallet_address" type="text" placeholder="Enter your TRON wallet address" autocomplete="off" autocapitalize="off" spellcheck="false" required>
+                <span class="U9-profile-withdrawal-field-hint">Please make sure the address supports USDT on TRC20.</span>
+            </div>
+            <button id="U9-profile-withdrawal-wallet-save" type="submit">Save Wallet</button>
+            <div id="U9-profile-withdrawal-wallet-message" role="status" aria-live="polite" hidden></div>
+            </form>
+        </div>
+        </div>
+
+
+        <!-- =================================
+            WITHDRAWAL PASSWORD CONFIRMATION
+        ================================= -->
+
+        <div
+        id="U9-profile-withdrawal-confirm-modal"
+        class="U9-profile-withdrawal-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="U9-profile-withdrawal-confirm-modal-title"
+        hidden
+        >
+        <div class="U9-profile-withdrawal-modal-content">
+            <button id="U9-profile-withdrawal-confirm-modal-close" class="U9-profile-withdrawal-modal-close" type="button" aria-label="Close">&times;</button>
+            <h3 id="U9-profile-withdrawal-confirm-modal-title">Confirm Withdrawal</h3>
+            <p class="U9-profile-withdrawal-modal-description">Enter your six-digit withdrawal password to continue.</p>
+
+            <form id="U9-profile-withdrawal-confirm-form" autocomplete="off" novalidate>
+            <div class="U9-profile-withdrawal-field">
+                <label for="U9-profile-withdrawal-confirm-input">Withdrawal Password</label>
+                <input id="U9-profile-withdrawal-confirm-input" name="withdrawal_password" type="password" inputmode="numeric" maxlength="6" pattern="[0-9]{6}" placeholder="Enter six-digit password" autocomplete="off" required>
+            </div>
+            <button id="U9-profile-withdrawal-confirm-submit" type="submit">Confirm &amp; Withdraw</button>
+            <div id="U9-profile-withdrawal-confirm-message" role="status" aria-live="polite" hidden></div>
+            </form>
+        </div>
+        </div>
+
 
 
         <!-- =================================
