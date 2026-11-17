@@ -9,12 +9,12 @@
 ================================================= */
 
 #U9-profile-page2 {
-  position: relative;
-  display: none;
-  width: 100%;
-  min-height: 100%;
-  box-sizing: border-box;
-  background: #ffd700;
+    position: relative;
+    display: none;
+    width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+    background: #ffd700;
 }
 
 
@@ -23,12 +23,12 @@
 ================================================= */
 
 #U9-profile-page2-content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-height: 100%;
-  box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
 }
 
 
@@ -37,17 +37,17 @@
 ================================================= */
 
 #U9-profile-withdrawal-user-info {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  flex-wrap: nowrap;
-  gap: 10px;
-  width: 100%;
-  padding: 0 14px;
-  margin-top: 12px;
-  box-sizing: border-box;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    gap: 8px;
+    width: 100%;
+    padding: 0 14px;
+    margin-top: 12px;
+    box-sizing: border-box;
 }
 
 
@@ -56,134 +56,161 @@
 ================================================= */
 
 #U9-profile-withdrawal-balance {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 
-  flex: 0 1 auto;
-  width: fit-content;
-  min-width: 0;
-  max-width: calc(100% - 92px);
+    flex: 0 1 auto;
+    width: fit-content;
+    min-width: 0;
+    max-width: calc(100% - 92px);
 
-  gap: 6px;
-  min-height: 36px;
-  padding: 0 10px;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 10px;
 
-  box-sizing: border-box;
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
+    box-sizing: border-box;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
 
-  background: #ffffff;
-  color: #333333;
+    background: #ffffff;
+    color: #333333;
 
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 600;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
 
-  overflow: hidden;
+    overflow: hidden;
 }
 
 #U9-profile-withdrawal-balance-label {
-  display: block;
-  flex: 0 1 auto;
-  min-width: 0;
-  color: #777777;
-  white-space: nowrap;
+    display: block;
+    flex: 0 1 auto;
+    min-width: 0;
+    color: #777777;
+    white-space: nowrap;
 }
 
 #U9-profile-withdrawal-balance-value {
-  display: block;
-  flex: 0 0 auto;
+    display: block;
+    flex: 0 0 auto;
 
-  color: #111111;
-  font-size: 15px;
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+    color: #111111;
+    font-size: 15px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 }
 
 
 /* =================================================
-   RIGHT SVG BUTTONS
+   TOP ACTION BUTTONS
+   ALL FIVE BUTTONS
 ================================================= */
 
 #U9-profile-withdrawal-verified-button,
 #U9-profile-withdrawal-history-button,
-#U9-profile-withdrawal-notice-button {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+#U9-profile-withdrawal-notice-button,
+#U9-profile-withdrawal-password-settings-button,
+#U9-profile-withdrawal-wallet-settings-button {
 
-  flex: 0 0 36px;
-  width: 36px;
-  min-width: 36px;
-  height: 36px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-  padding: 0;
-  margin-top: 0;
+    flex: 0 0 36px;
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
 
-  box-sizing: border-box;
+    padding: 0;
+    margin-top: 0;
 
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
+    box-sizing: border-box;
 
-  background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
 
-  cursor: pointer;
-  pointer-events: auto;
+    background: #ffffff;
+    color: #444444;
 
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
+    cursor: pointer;
+    pointer-events: auto;
 
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
 }
+
+
+/* PUSH BUTTON GROUP TO THE RIGHT */
 
 #U9-profile-withdrawal-verified-button {
-  margin-left: auto;
+    margin-left: auto;
 }
+
+
+/* BUTTON HOVER */
 
 #U9-profile-withdrawal-verified-button:hover,
 #U9-profile-withdrawal-history-button:hover,
-#U9-profile-withdrawal-notice-button:hover {
-  border-color: #cfd8ea;
-  background: #f8faff;
+#U9-profile-withdrawal-notice-button:hover,
+#U9-profile-withdrawal-password-settings-button:hover,
+#U9-profile-withdrawal-wallet-settings-button:hover {
+    border-color: #cfd8ea;
+    background: #f8faff;
 }
+
+
+/* BUTTON ACTIVE */
 
 #U9-profile-withdrawal-verified-button:active,
 #U9-profile-withdrawal-history-button:active,
-#U9-profile-withdrawal-notice-button:active {
-  transform: scale(0.92);
+#U9-profile-withdrawal-notice-button:active,
+#U9-profile-withdrawal-password-settings-button:active,
+#U9-profile-withdrawal-wallet-settings-button:active {
+    transform: scale(0.92);
 }
+
+
+/* BUTTON FOCUS */
 
 #U9-profile-withdrawal-verified-button:focus-visible,
 #U9-profile-withdrawal-history-button:focus-visible,
-#U9-profile-withdrawal-notice-button:focus-visible {
-  outline: 2px solid #555555;
-  outline-offset: 3px;
+#U9-profile-withdrawal-notice-button:focus-visible,
+#U9-profile-withdrawal-password-settings-button:focus-visible,
+#U9-profile-withdrawal-wallet-settings-button:focus-visible {
+    outline: 2px solid #555555;
+    outline-offset: 3px;
 }
 
 
 /* =================================================
-   TOP SVG ICONS
+   TOP SVG / IMAGE ICONS
 ================================================= */
 
 #U9-profile-withdrawal-verified-icon,
 #U9-profile-withdrawal-history-icon,
-#U9-profile-withdrawal-notice-icon {
-  display: block;
-  width: 24px;
-  height: 24px;
+#U9-profile-withdrawal-notice-icon,
+#U9-profile-withdrawal-password-settings-button img,
+#U9-profile-withdrawal-wallet-settings-button img {
 
-  object-fit: contain;
-  object-position: center;
+    display: block;
 
-  pointer-events: none;
-  user-select: none;
+    width: 24px;
+    height: 24px;
+
+    object-fit: contain;
+    object-position: center;
+
+    pointer-events: none;
+    user-select: none;
 }
 
 
@@ -192,15 +219,15 @@
 ================================================= */
 
 #U9-profile-withdrawal-navigation {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 
-  gap: 8px;
-  width: 100%;
-  padding: 12px 14px;
+    gap: 8px;
+    width: 100%;
+    padding: 12px 14px;
 
-  box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 
@@ -209,62 +236,62 @@
 ================================================= */
 
 .U9-profile-withdrawal-nav-button {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-  gap: 7px;
+    gap: 7px;
 
-  width: 100%;
-  min-width: 0;
-  min-height: 76px;
-  padding: 9px 4px;
+    width: 100%;
+    min-width: 0;
+    min-height: 76px;
+    padding: 9px 4px;
 
-  box-sizing: border-box;
+    box-sizing: border-box;
 
-  border: 1px solid #e8e8e8;
-  border-radius: 10px;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
 
-  background: #ffffff;
+    background: #ffffff;
 
-  color: #555555;
-  font-family: inherit;
-  font-size: 13px;
-  font-weight: 700;
+    color: #555555;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
 
-  cursor: pointer;
+    cursor: pointer;
 
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
 }
 
 .U9-profile-withdrawal-nav-button:hover {
-  border-color: #cfd8ea;
-  background: #f8faff;
+    border-color: #cfd8ea;
+    background: #f8faff;
 }
 
 .U9-profile-withdrawal-nav-button.active {
-  border-color: #76ace9;
-  background: #f2f6ff;
-  color: #000000;
+    border-color: #76ace9;
+    background: #f2f6ff;
+    color: #000000;
 
-  box-shadow: 0 2px 8px rgba(39, 98, 234, 0.10);
+    box-shadow: 0 2px 8px rgba(39, 98, 234, 0.10);
 }
 
 .U9-profile-withdrawal-nav-button:active {
-  transform: scale(0.97);
+    transform: scale(0.97);
 }
 
 .U9-profile-withdrawal-nav-button:focus-visible {
-  outline: 2px solid #2762ea;
-  outline-offset: 2px;
+    outline: 2px solid #2762ea;
+    outline-offset: 2px;
 }
 
 
@@ -273,15 +300,15 @@
 ================================================= */
 
 .U9-profile-withdrawal-nav-icon {
-  display: block;
-  width: 22px;
-  height: 22px;
+    display: block;
+    width: 22px;
+    height: 22px;
 
-  object-fit: contain;
-  object-position: center;
+    object-fit: contain;
+    object-position: center;
 
-  pointer-events: none;
-  user-select: none;
+    pointer-events: none;
+    user-select: none;
 }
 
 
@@ -290,21 +317,21 @@
 ================================================= */
 
 .U9-profile-withdrawal-nav-label {
-  display: block;
-  width: 100%;
-  overflow: hidden;
+    display: block;
+    width: 100%;
+    overflow: hidden;
 
-  color: inherit;
-  font-family: inherit;
-  font-size: inherit;
-  font-weight: inherit;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
 
-  line-height: 1.2;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+    line-height: 1.2;
+    text-align: center;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 
-  pointer-events: none;
+    pointer-events: none;
 }
 
 
@@ -313,80 +340,80 @@
 ================================================= */
 
 .U9-profile-withdrawal-kyc-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
 
-  width: calc(100% - 28px);
-  min-width: 0;
-  min-height: 190px;
+    width: calc(100% - 28px);
+    min-width: 0;
+    min-height: 190px;
 
-  margin: 0 14px 16px;
-  padding: 20px 16px;
+    margin: 0 14px 16px;
+    padding: 20px 16px;
 
-  box-sizing: border-box;
+    box-sizing: border-box;
 
-  border: 1px dashed #dddddd;
-  border-radius: 12px;
+    border: 1px dashed #dddddd;
+    border-radius: 12px;
 
-  background: #ffffff;
-  text-align: center;
+    background: #ffffff;
+    text-align: center;
 }
 
 .U9-profile-withdrawal-kyc-card[hidden] {
-  display: none !important;
+    display: none !important;
 }
 
 .U9-profile-withdrawal-kyc-hint-icon {
-  display: block;
-  flex: 0 0 auto;
+    display: block;
+    flex: 0 0 auto;
 
-  width: 80px;
-  height: 80px;
+    width: 80px;
+    height: 80px;
 
-  margin: 0 0 10px;
+    margin: 0 0 10px;
 
-  object-fit: contain;
+    object-fit: contain;
 }
 
 .U9-profile-withdrawal-kyc-card h3 {
-  margin: 0 0 8px;
+    margin: 0 0 8px;
 
-  color: #333333;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.3;
+    color: #333333;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
 }
 
 .U9-profile-withdrawal-kyc-card p {
-  margin: 0;
+    margin: 0;
 
-  color: #888888;
-  font-size: 13px;
-  line-height: 1.6;
+    color: #888888;
+    font-size: 13px;
+    line-height: 1.6;
 }
 
 .U9-profile-withdrawal-kyc-guide ol {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 
-  width: 100%;
-  margin: 0 0 8px;
-  padding: 0;
+    width: 100%;
+    margin: 0 0 8px;
+    padding: 0;
 
-  color: #666666;
-  font-size: 12px;
-  line-height: 1.4;
+    color: #666666;
+    font-size: 12px;
+    line-height: 1.4;
 
-  text-align: left;
-  list-style-position: inside;
+    text-align: left;
+    list-style-position: inside;
 }
 
 .U9-profile-withdrawal-kyc-guide li {
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 }
 
 
@@ -395,29 +422,29 @@
 ================================================= */
 
 .U9-profile-withdrawal-kyc-icon-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: nowrap;
 
-  gap: 9px;
-  width: 100%;
-  margin: 16px auto 0;
+    gap: 9px;
+    width: 100%;
+    margin: 16px auto 0;
 }
 
 .U9-profile-withdrawal-kyc-icon-row img {
-  display: block;
-  flex: 0 0 25px;
+    display: block;
+    flex: 0 0 25px;
 
-  width: 25px;
-  height: 25px;
+    width: 25px;
+    height: 25px;
 
-  object-fit: contain;
-  object-position: center;
+    object-fit: contain;
+    object-position: center;
 }
 
 .U9-profile-withdrawal-kyc-unavailable p {
-  max-width: 440px;
+    max-width: 440px;
 }
 
 
@@ -426,21 +453,21 @@
 ================================================= */
 
 .U9-profile-withdrawal-kyc-guide {
-  align-items: stretch;
-  text-align: left;
+    align-items: stretch;
+    text-align: left;
 }
 
 .U9-profile-withdrawal-kyc-guide h3,
 .U9-profile-withdrawal-kyc-guide p,
 .U9-profile-withdrawal-kyc-guide ol,
 .U9-profile-withdrawal-kyc-guide li {
-  text-align: left;
+    text-align: left;
 }
 
 .U9-profile-withdrawal-kyc-guide
 .U9-profile-withdrawal-kyc-icon-row {
-  justify-content: center;
-  align-self: center;
+    justify-content: center;
+    align-self: center;
 }
 
 
@@ -449,40 +476,40 @@
 ================================================= */
 
 .U9-profile-withdrawal-kyc-verify-button {
-  display: inline;
+    display: inline;
 
-  min-width: 0;
-  min-height: 0;
+    min-width: 0;
+    min-height: 0;
 
-  margin: 0;
-  padding: 0;
+    margin: 0;
+    padding: 0;
 
-  border: 0;
-  border-radius: 0;
+    border: 0;
+    border-radius: 0;
 
-  background: transparent;
-  color: #2762ea;
+    background: transparent;
+    color: #2762ea;
 
-  font: inherit;
-  font-weight: 600;
+    font: inherit;
+    font-weight: 600;
 
-  text-decoration: underline;
-  line-height: inherit;
+    text-decoration: underline;
+    line-height: inherit;
 
-  cursor: pointer;
-  vertical-align: baseline;
+    cursor: pointer;
+    vertical-align: baseline;
 }
 
 .U9-profile-withdrawal-kyc-verify-button:hover,
 .U9-profile-withdrawal-kyc-verify-button:active {
-  background: transparent;
-  transform: none;
-  color: #174fc8;
+    background: transparent;
+    transform: none;
+    color: #174fc8;
 }
 
 .U9-profile-withdrawal-kyc-verify-text {
-  display: block;
-  text-align: left;
+    display: block;
+    text-align: left;
 }
 
 
@@ -491,23 +518,23 @@
 ================================================= */
 
 #U9-profile-withdrawal-form {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 
-  width: calc(100% - 28px);
-  margin: 0 14px 20px;
-  padding: 18px 16px;
+    width: calc(100% - 28px);
+    margin: 0 14px 20px;
+    padding: 18px 16px;
 
-  box-sizing: border-box;
+    box-sizing: border-box;
 
-  border: 1px solid #e8e8e8;
-  border-radius: 12px;
+    border: 1px solid #e8e8e8;
+    border-radius: 12px;
 
-  background: #ffffff;
+    background: #ffffff;
 }
 
 #U9-profile-withdrawal-form[hidden] {
-  display: none !important;
+    display: none !important;
 }
 
 
@@ -516,55 +543,55 @@
 ================================================= */
 
 .U9-profile-withdrawal-method {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 
-  gap: 12px;
+    gap: 12px;
 
-  width: 100%;
-  min-height: 64px;
-  margin-bottom: 20px;
-  padding: 12px;
+    width: 100%;
+    min-height: 64px;
+    margin-bottom: 20px;
+    padding: 12px;
 
-  box-sizing: border-box;
+    box-sizing: border-box;
 
-  border: 1px solid #e8e8e8;
-  border-radius: 10px;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
 
-  background: #fafafa;
+    background: #fafafa;
 }
 
 .U9-profile-withdrawal-method-icon {
-  display: block;
-  flex: 0 0 38px;
+    display: block;
+    flex: 0 0 38px;
 
-  width: 38px;
-  height: 38px;
+    width: 38px;
+    height: 38px;
 
-  object-fit: contain;
+    object-fit: contain;
 }
 
 .U9-profile-withdrawal-method-info {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
+    display: flex;
+    flex: 1;
+    flex-direction: column;
 
-  min-width: 0;
-  gap: 4px;
+    min-width: 0;
+    gap: 4px;
 }
 
 .U9-profile-withdrawal-method-name {
-  color: #222222;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.3;
+    color: #222222;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.3;
 }
 
 .U9-profile-withdrawal-method-network {
-  color: #888888;
-  font-size: 12px;
-  line-height: 1.4;
+    color: #888888;
+    font-size: 12px;
+    line-height: 1.4;
 }
 
 
@@ -573,68 +600,68 @@
 ================================================= */
 
 .U9-profile-withdrawal-field {
-  display: flex;
-  flex-direction: column;
+    display: flex;
+    flex-direction: column;
 
-  width: 100%;
-  margin-bottom: 16px;
+    width: 100%;
+    margin-bottom: 16px;
 }
 
 .U9-profile-withdrawal-field label {
-  display: block;
+    display: block;
 
-  margin-bottom: 8px;
+    margin-bottom: 8px;
 
-  color: #333333;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.4;
+    color: #333333;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.4;
 }
 
 .U9-profile-withdrawal-field input {
-  display: block;
+    display: block;
 
-  width: 100%;
-  min-width: 0;
-  height: 44px;
+    width: 100%;
+    min-width: 0;
+    height: 44px;
 
-  padding: 0 12px;
+    padding: 0 12px;
 
-  box-sizing: border-box;
+    box-sizing: border-box;
 
-  border: 1px solid #dddddd;
-  border-radius: 8px;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
 
-  outline: none;
+    outline: none;
 
-  background: #ffffff;
-  color: #222222;
+    background: #ffffff;
+    color: #222222;
 
-  font-family: inherit;
-  font-size: 14px;
+    font-family: inherit;
+    font-size: 14px;
 
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
 .U9-profile-withdrawal-field input::placeholder {
-  color: #aaaaaa;
+    color: #aaaaaa;
 }
 
 .U9-profile-withdrawal-field input:hover {
-  border-color: #bbbbbb;
+    border-color: #bbbbbb;
 }
 
 .U9-profile-withdrawal-field input:focus {
-  border-color: #76ace9;
-  box-shadow: 0 0 0 3px rgba(118, 172, 233, 0.12);
+    border-color: #76ace9;
+    box-shadow: 0 0 0 3px rgba(118, 172, 233, 0.12);
 }
 
 .U9-profile-withdrawal-field input:disabled {
-  background: #f5f5f5;
-  color: #999999;
-  cursor: not-allowed;
+    background: #f5f5f5;
+    color: #999999;
+    cursor: not-allowed;
 }
 
 
@@ -643,7 +670,7 @@
 ================================================= */
 
 #U9-profile-withdrawal-amount {
-  font-variant-numeric: tabular-nums;
+    font-variant-numeric: tabular-nums;
 }
 
 
@@ -652,9 +679,9 @@
 ================================================= */
 
 #U9-profile-withdrawal-wallet-address {
-  font-family: monospace;
-  font-size: 13px;
-  letter-spacing: 0.2px;
+    font-family: monospace;
+    font-size: 13px;
+    letter-spacing: 0.2px;
 }
 
 
@@ -663,13 +690,13 @@
 ================================================= */
 
 .U9-profile-withdrawal-field-hint {
-  display: block;
+    display: block;
 
-  margin-top: 7px;
+    margin-top: 7px;
 
-  color: #999999;
-  font-size: 11px;
-  line-height: 1.5;
+    color: #999999;
+    font-size: 11px;
+    line-height: 1.5;
 }
 
 
@@ -678,53 +705,53 @@
 ================================================= */
 
 #U9-profile-withdrawal-submit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-  width: 100%;
-  min-height: 44px;
+    width: 100%;
+    min-height: 44px;
 
-  margin-top: 4px;
-  padding: 10px 16px;
+    margin-top: 4px;
+    padding: 10px 16px;
 
-  box-sizing: border-box;
+    box-sizing: border-box;
 
-  border: 0;
-  border-radius: 8px;
+    border: 0;
+    border-radius: 8px;
 
-  background: #2762ea;
-  color: #ffffff;
+    background: #2762ea;
+    color: #ffffff;
 
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 700;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
 
-  cursor: pointer;
+    cursor: pointer;
 
-  transition:
-    background-color 0.2s ease,
-    transform 0.2s ease,
-    opacity 0.2s ease;
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease;
 }
 
 #U9-profile-withdrawal-submit:hover {
-  background: #174fc8;
+    background: #174fc8;
 }
 
 #U9-profile-withdrawal-submit:active {
-  transform: scale(0.98);
+    transform: scale(0.98);
 }
 
 #U9-profile-withdrawal-submit:focus-visible {
-  outline: 2px solid #2762ea;
-  outline-offset: 3px;
+    outline: 2px solid #2762ea;
+    outline-offset: 3px;
 }
 
 #U9-profile-withdrawal-submit:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-  transform: none;
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
 }
 
 
@@ -733,46 +760,309 @@
 ================================================= */
 
 #U9-profile-withdrawal-message {
-  display: block;
+    display: block;
 
-  width: 100%;
-  margin-top: 14px;
-  padding: 10px 12px;
+    width: 100%;
+    margin-top: 14px;
+    padding: 10px 12px;
 
-  box-sizing: border-box;
+    box-sizing: border-box;
 
-  border: 1px solid #dddddd;
-  border-radius: 8px;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
 
-  background: #f8f8f8;
-  color: #555555;
+    background: #f8f8f8;
+    color: #555555;
 
-  font-size: 12px;
-  line-height: 1.6;
+    font-size: 12px;
+    line-height: 1.6;
 
-  overflow-wrap: anywhere;
+    overflow-wrap: anywhere;
 }
 
 #U9-profile-withdrawal-message[hidden] {
-  display: none !important;
+    display: none !important;
 }
 
 #U9-profile-withdrawal-message[data-status="success"] {
-  border-color: #b9e5c5;
-  background: #f0fbf3;
-  color: #26743c;
+    border-color: #b9e5c5;
+    background: #f0fbf3;
+    color: #26743c;
 }
 
 #U9-profile-withdrawal-message[data-status="error"] {
-  border-color: #f0c1c1;
-  background: #fff5f5;
-  color: #c0392b;
+    border-color: #f0c1c1;
+    background: #fff5f5;
+    color: #c0392b;
 }
 
 #U9-profile-withdrawal-message[data-status="info"] {
-  border-color: #c9dcf5;
-  background: #f4f8ff;
-  color: #315b91;
+    border-color: #c9dcf5;
+    background: #f4f8ff;
+    color: #315b91;
+}
+
+
+/* =================================================
+   MAX / PASTE INPUT GROUP
+================================================= */
+
+.U9-profile-withdrawal-input-group {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    gap: 7px;
+}
+
+.U9-profile-withdrawal-input-group input {
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+}
+
+#U9-profile-withdrawal-max-button,
+#U9-profile-withdrawal-paste-button {
+    flex: 0 0 auto;
+    min-width: 58px;
+    padding: 0 12px;
+
+    border: 1px solid #dce3ee;
+    border-radius: 8px;
+
+    background: #f6f8fc;
+    color: #315b91;
+
+    font: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.35px;
+
+    cursor: pointer;
+}
+
+#U9-profile-withdrawal-max-button:hover,
+#U9-profile-withdrawal-paste-button:hover {
+    background: #edf3ff;
+    border-color: #b9cbea;
+}
+
+#U9-profile-withdrawal-max-button:disabled,
+#U9-profile-withdrawal-paste-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* =================================================
+   WITHDRAWAL FEE SUMMARY
+================================================= */
+
+#U9-profile-withdrawal-fee-summary {
+    display: block;
+    width: 100%;
+    margin: 2px 0 12px;
+    padding: 12px 13px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #e7ebf2;
+    border-radius: 9px;
+
+    background: #f8faff;
+    color: #555555;
+}
+
+.U9-profile-withdrawal-fee-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.U9-profile-withdrawal-fee-row strong {
+    color: #333333;
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.U9-profile-withdrawal-net-row {
+    margin-top: 8px;
+    padding-top: 8px;
+
+    border-top: 1px solid #e4e9f1;
+
+    color: #222222;
+    font-weight: 700;
+}
+
+.U9-profile-withdrawal-net-row strong {
+    color: #1d6b3a;
+    font-size: 14px;
+    font-weight: 900;
+}
+
+
+/* =================================================
+   INDEPENDENT MODAL WINDOWS
+================================================= */
+
+.U9-profile-withdrawal-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 18px;
+    box-sizing: border-box;
+
+    background: rgba(0, 0, 0, 0.58);
+}
+
+.U9-profile-withdrawal-modal[hidden],
+#U9-profile-withdrawal-form[hidden],
+#U9-profile-withdrawal-kyc-notice[hidden],
+#U9-profile-withdrawal-kyc-guide[hidden],
+#U9-profile-withdrawal-kyc-unavailable[hidden],
+#U9-profile-withdrawal-current-password-group[hidden] {
+    display: none !important;
+}
+
+.U9-profile-withdrawal-modal-content {
+    position: relative;
+
+    width: min(100%, 420px);
+    max-height: min(90vh, 720px);
+
+    overflow-y: auto;
+
+    padding: 25px 21px 21px;
+    box-sizing: border-box;
+
+    border-radius: 14px;
+
+    background: #ffffff;
+    color: #222222;
+
+    box-shadow: 0 18px 55px rgba(0, 0, 0, 0.24);
+}
+
+.U9-profile-withdrawal-modal-content h3 {
+    margin: 0 32px 8px 0;
+
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.U9-profile-withdrawal-modal-description {
+    margin: 0 0 18px;
+
+    color: #777777;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.U9-profile-withdrawal-modal-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+
+    width: 32px;
+    height: 32px;
+
+    padding: 0;
+
+    border: 0;
+    border-radius: 50%;
+
+    background: #f2f3f5;
+    color: #555555;
+
+    font-size: 23px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.U9-profile-withdrawal-modal
+.U9-profile-withdrawal-field {
+    margin-bottom: 14px;
+}
+
+.U9-profile-withdrawal-modal
+.U9-profile-withdrawal-field input {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+/* =================================================
+   MODAL SUBMIT BUTTONS
+================================================= */
+
+#U9-profile-withdrawal-password-save,
+#U9-profile-withdrawal-wallet-save,
+#U9-profile-withdrawal-confirm-submit {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-height: 43px;
+
+    margin-top: 8px;
+    padding: 10px 14px;
+
+    border: 0;
+    border-radius: 8px;
+
+    background: #2762ea;
+    color: #ffffff;
+
+    font: inherit;
+    font-size: 13px;
+    font-weight: 800;
+
+    cursor: pointer;
+}
+
+#U9-profile-withdrawal-password-save:disabled,
+#U9-profile-withdrawal-wallet-save:disabled,
+#U9-profile-withdrawal-confirm-submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+
+/* =================================================
+   MODAL RESPONSE MESSAGES
+================================================= */
+
+#U9-profile-withdrawal-password-message,
+#U9-profile-withdrawal-wallet-message,
+#U9-profile-withdrawal-confirm-message {
+    margin-top: 12px;
+    padding: 9px 11px;
+
+    border: 1px solid #dddddd;
+    border-radius: 7px;
+
+    font-size: 12px;
+    line-height: 1.5;
+
+    overflow-wrap: anywhere;
+}
+
+#U9-profile-withdrawal-password-message[hidden],
+#U9-profile-withdrawal-wallet-message[hidden],
+#U9-profile-withdrawal-confirm-message[hidden] {
+    display: none !important;
 }
 
 
@@ -782,148 +1072,170 @@
 
 @media screen and (max-width: 480px) {
 
-  /* NAVIGATION */
+    /* NAVIGATION */
 
-  #U9-profile-withdrawal-navigation {
-    gap: 6px;
-    padding: 10px 8px;
-  }
+    #U9-profile-withdrawal-navigation {
+        gap: 6px;
+        padding: 10px 8px;
+    }
 
-  .U9-profile-withdrawal-nav-button {
-    min-height: 70px;
-    gap: 6px;
-    padding: 8px 3px;
-    font-size: 10px;
-  }
+    .U9-profile-withdrawal-nav-button {
+        min-height: 70px;
+        gap: 6px;
+        padding: 8px 3px;
+        font-size: 10px;
+    }
 
-  .U9-profile-withdrawal-nav-icon {
-    width: 20px;
-    height: 20px;
-  }
-
-
-  /* USER INFO */
-
-  #U9-profile-withdrawal-user-info {
-    gap: 8px;
-    padding: 0 8px;
-  }
+    .U9-profile-withdrawal-nav-icon {
+        width: 20px;
+        height: 20px;
+    }
 
 
-  /* BALANCE */
+    /* USER INFO */
 
-  #U9-profile-withdrawal-balance {
-    flex: 0 1 auto;
-    max-width: calc(100% - 84px);
-
-    gap: 5px;
-    min-height: 34px;
-    padding: 0 8px;
-    font-size: 13px;
-  }
-
-  #U9-profile-withdrawal-balance-value {
-    font-size: 14px;
-  }
+    #U9-profile-withdrawal-user-info {
+        gap: 8px;
+        padding: 0 8px;
+    }
 
 
-  /* RIGHT BUTTONS */
+    /* BALANCE */
 
-  #U9-profile-withdrawal-verified-button,
-  #U9-profile-withdrawal-notice-button {
-    flex-basis: 34px;
-    width: 34px;
-    min-width: 34px;
-    height: 34px;
-  }
+    #U9-profile-withdrawal-balance {
+        flex: 0 1 auto;
+        max-width: calc(100% - 84px);
 
+        gap: 5px;
+        min-height: 34px;
+        padding: 0 8px;
+        font-size: 13px;
+    }
 
-  /* SVG ICONS */
-
-  #U9-profile-withdrawal-verified-icon,
-  #U9-profile-withdrawal-notice-icon {
-    width: 22px;
-    height: 22px;
-  }
+    #U9-profile-withdrawal-balance-value {
+        font-size: 14px;
+    }
 
 
-  /* KYC CARD */
+    /* ALL FIVE TOP BUTTONS */
 
-  .U9-profile-withdrawal-kyc-card {
-    width: calc(100% - 16px);
-    min-height: 190px;
-    margin: 0 8px 14px;
-    padding: 18px 14px;
-  }
-
-  .U9-profile-withdrawal-kyc-card h3 {
-    font-size: 15px;
-  }
-
-  .U9-profile-withdrawal-kyc-card p {
-    font-size: 12px;
-  }
-
-  .U9-profile-withdrawal-kyc-guide ol {
-    font-size: 11px;
-  }
+    #U9-profile-withdrawal-verified-button,
+    #U9-profile-withdrawal-history-button,
+    #U9-profile-withdrawal-notice-button,
+    #U9-profile-withdrawal-password-settings-button,
+    #U9-profile-withdrawal-wallet-settings-button {
+        flex-basis: 34px;
+        width: 34px;
+        min-width: 34px;
+        height: 34px;
+    }
 
 
-  /* KYC ICON ROW */
+    /* ALL FIVE TOP ICONS */
 
-  .U9-profile-withdrawal-kyc-icon-row {
-    gap: 7px;
-    margin-top: 14px;
-  }
-
-  .U9-profile-withdrawal-kyc-icon-row img {
-    flex-basis: 22px;
-    width: 22px;
-    height: 22px;
-  }
+    #U9-profile-withdrawal-verified-icon,
+    #U9-profile-withdrawal-history-icon,
+    #U9-profile-withdrawal-notice-icon,
+    #U9-profile-withdrawal-password-settings-button img,
+    #U9-profile-withdrawal-wallet-settings-button img {
+        width: 22px;
+        height: 22px;
+    }
 
 
-  /* KYC BUTTON */
+    /* KYC CARD */
 
-  .U9-profile-withdrawal-kyc-verify-button {
-    min-height: 32px;
-    font-size: 12px;
-  }
+    .U9-profile-withdrawal-kyc-card {
+        width: calc(100% - 16px);
+        min-height: 190px;
+        margin: 0 8px 14px;
+        padding: 18px 14px;
+    }
+
+    .U9-profile-withdrawal-kyc-card h3 {
+        font-size: 15px;
+    }
+
+    .U9-profile-withdrawal-kyc-card p {
+        font-size: 12px;
+    }
+
+    .U9-profile-withdrawal-kyc-guide ol {
+        font-size: 11px;
+    }
 
 
-  /* WITHDRAWAL FORM */
+    /* KYC ICON ROW */
 
-  #U9-profile-withdrawal-form {
-    width: calc(100% - 16px);
-    margin: 0 8px 16px;
-    padding: 15px 13px;
-  }
+    .U9-profile-withdrawal-kyc-icon-row {
+        gap: 7px;
+        margin-top: 14px;
+    }
 
-  .U9-profile-withdrawal-method {
-    gap: 10px;
-    min-height: 60px;
-    padding: 10px;
-  }
+    .U9-profile-withdrawal-kyc-icon-row img {
+        flex-basis: 22px;
+        width: 22px;
+        height: 22px;
+    }
 
-  .U9-profile-withdrawal-method-icon {
-    flex-basis: 34px;
-    width: 34px;
-    height: 34px;
-  }
 
-  .U9-profile-withdrawal-method-name {
-    font-size: 14px;
-  }
+    /* KYC BUTTON */
 
-  .U9-profile-withdrawal-field input {
-    height: 42px;
-    font-size: 13px;
-  }
+    .U9-profile-withdrawal-kyc-verify-button {
+        min-height: 32px;
+        font-size: 12px;
+    }
 
-  #U9-profile-withdrawal-submit {
-    min-height: 42px;
-    font-size: 13px;
-  }
+
+    /* WITHDRAWAL FORM */
+
+    #U9-profile-withdrawal-form {
+        width: calc(100% - 16px);
+        margin: 0 8px 16px;
+        padding: 15px 13px;
+    }
+
+    .U9-profile-withdrawal-method {
+        gap: 10px;
+        min-height: 60px;
+        padding: 10px;
+    }
+
+    .U9-profile-withdrawal-method-icon {
+        flex-basis: 34px;
+        width: 34px;
+        height: 34px;
+    }
+
+    .U9-profile-withdrawal-method-name {
+        font-size: 14px;
+    }
+
+    .U9-profile-withdrawal-field input {
+        height: 42px;
+        font-size: 13px;
+    }
+
+    #U9-profile-withdrawal-submit {
+        min-height: 42px;
+        font-size: 13px;
+    }
+
+
+    /* MAX / PASTE */
+
+    #U9-profile-withdrawal-max-button,
+    #U9-profile-withdrawal-paste-button {
+        min-width: 52px;
+        padding: 0 8px;
+    }
+
+
+    /* MODAL */
+
+    .U9-profile-withdrawal-modal-content {
+        padding: 23px 16px 17px;
+    }
 
 }
 
@@ -934,379 +1246,100 @@
 
 @media screen and (max-width: 360px) {
 
-  /* NAVIGATION */
+    /* NAVIGATION */
 
-  #U9-profile-withdrawal-navigation {
-    gap: 5px;
-    padding-right: 6px;
-    padding-left: 6px;
-  }
+    #U9-profile-withdrawal-navigation {
+        gap: 5px;
+        padding-right: 6px;
+        padding-left: 6px;
+    }
 
-  .U9-profile-withdrawal-nav-button {
-    min-height: 66px;
-    font-size: 9px;
-  }
+    .U9-profile-withdrawal-nav-button {
+        min-height: 66px;
+        font-size: 9px;
+    }
 
-  .U9-profile-withdrawal-nav-icon {
-    width: 19px;
-    height: 19px;
-  }
-
-
-  /* USER INFO */
-
-  #U9-profile-withdrawal-user-info {
-    gap: 6px;
-    padding-right: 6px;
-    padding-left: 6px;
-  }
+    .U9-profile-withdrawal-nav-icon {
+        width: 19px;
+        height: 19px;
+    }
 
 
-  /* BALANCE */
+    /* USER INFO */
 
-  #U9-profile-withdrawal-balance {
-    flex: 0 1 auto;
-    max-width: calc(100% - 80px);
-
-    gap: 4px;
-    min-height: 32px;
-    padding: 0 6px;
-    font-size: 12px;
-  }
-
-  #U9-profile-withdrawal-balance-value {
-    font-size: 13px;
-  }
+    #U9-profile-withdrawal-user-info {
+        gap: 6px;
+        padding-right: 6px;
+        padding-left: 6px;
+    }
 
 
-  /* RIGHT BUTTONS */
+    /* BALANCE */
 
-  #U9-profile-withdrawal-verified-button,
-  #U9-profile-withdrawal-notice-button {
-    flex-basis: 32px;
-    width: 32px;
-    min-width: 32px;
-    height: 32px;
-  }
+    #U9-profile-withdrawal-balance {
+        flex: 0 1 auto;
+        max-width: calc(100% - 80px);
 
+        gap: 4px;
+        min-height: 32px;
+        padding: 0 6px;
+        font-size: 12px;
+    }
 
-  /* SVG ICONS */
-
-  #U9-profile-withdrawal-verified-icon,
-  #U9-profile-withdrawal-notice-icon {
-    width: 21px;
-    height: 21px;
-  }
+    #U9-profile-withdrawal-balance-value {
+        font-size: 13px;
+    }
 
 
-  /* WITHDRAWAL FORM */
+    /* ALL FIVE TOP BUTTONS */
 
-  #U9-profile-withdrawal-form {
-    padding: 13px 11px;
-  }
-
-  .U9-profile-withdrawal-method {
-    gap: 8px;
-  }
-
-  .U9-profile-withdrawal-method-icon {
-    flex-basis: 32px;
-    width: 32px;
-    height: 32px;
-  }
-
-  .U9-profile-withdrawal-field label {
-    font-size: 12px;
-  }
-
-  .U9-profile-withdrawal-field input {
-    padding: 0 9px;
-    font-size: 12px;
-  }
-
-}
+    #U9-profile-withdrawal-verified-button,
+    #U9-profile-withdrawal-history-button,
+    #U9-profile-withdrawal-notice-button,
+    #U9-profile-withdrawal-password-settings-button,
+    #U9-profile-withdrawal-wallet-settings-button {
+        flex-basis: 32px;
+        width: 32px;
+        min-width: 32px;
+        height: 32px;
+    }
 
 
-/* =================================================
-   PAGE 2 ADDITIONS — MAX / PASTE / SETTINGS
-================================================= */
+    /* ALL FIVE TOP ICONS */
 
-#U9-profile-withdrawal-password-settings-button,
-#U9-profile-withdrawal-wallet-settings-button {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 36px;
-  width: 36px;
-  min-width: 36px;
-  height: 36px;
-  padding: 0;
-  border: 1px solid #e8e8e8;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #444444;
-  cursor: pointer;
-  transition: background-color .2s ease, border-color .2s ease, transform .2s ease;
-}
+    #U9-profile-withdrawal-verified-icon,
+    #U9-profile-withdrawal-history-icon,
+    #U9-profile-withdrawal-notice-icon,
+    #U9-profile-withdrawal-password-settings-button img,
+    #U9-profile-withdrawal-wallet-settings-button img {
+        width: 21px;
+        height: 21px;
+    }
 
-#U9-profile-withdrawal-password-settings-button svg,
-#U9-profile-withdrawal-wallet-settings-button svg {
-  width: 21px;
-  height: 21px;
-}
 
-#U9-profile-withdrawal-password-settings-button:hover,
-#U9-profile-withdrawal-wallet-settings-button:hover {
-  border-color: #cfd8ea;
-  background: #f8faff;
-}
+    /* WITHDRAWAL FORM */
 
-#U9-profile-withdrawal-password-settings-button:active,
-#U9-profile-withdrawal-wallet-settings-button:active {
-  transform: scale(.92);
-}
+    #U9-profile-withdrawal-form {
+        padding: 13px 11px;
+    }
 
-#U9-profile-withdrawal-password-settings-button:focus-visible,
-#U9-profile-withdrawal-wallet-settings-button:focus-visible {
-  outline: 2px solid #555;
-  outline-offset: 3px;
-}
+    .U9-profile-withdrawal-method {
+        gap: 8px;
+    }
 
-/* All four small action buttons stay beside KYC. */
-#U9-profile-withdrawal-user-info {
-  gap: 8px;
-}
+    .U9-profile-withdrawal-method-icon {
+        flex-basis: 32px;
+        width: 32px;
+        height: 32px;
+    }
 
-#U9-profile-withdrawal-user-info > button:first-of-type {
-  margin-left: auto;
-}
+    .U9-profile-withdrawal-field label {
+        font-size: 12px;
+    }
 
-/* Amount / wallet input with action button */
-.U9-profile-withdrawal-input-group {
-  display: flex;
-  align-items: stretch;
-  width: 100%;
-  gap: 7px;
-}
+    .U9-profile-withdrawal-field input {
+        padding: 0 9px;
+        font-size: 12px;
+    }
 
-.U9-profile-withdrawal-input-group input {
-  flex: 1 1 auto;
-  width: 1%;
-  min-width: 0;
-}
-
-#U9-profile-withdrawal-max-button,
-#U9-profile-withdrawal-paste-button {
-  flex: 0 0 auto;
-  min-width: 58px;
-  padding: 0 12px;
-  border: 1px solid #dce3ee;
-  border-radius: 8px;
-  background: #f6f8fc;
-  color: #315b91;
-  font: inherit;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: .35px;
-  cursor: pointer;
-}
-
-#U9-profile-withdrawal-max-button:hover,
-#U9-profile-withdrawal-paste-button:hover {
-  background: #edf3ff;
-  border-color: #b9cbea;
-}
-
-#U9-profile-withdrawal-max-button:disabled,
-#U9-profile-withdrawal-paste-button:disabled {
-  opacity: .5;
-  cursor: not-allowed;
-}
-
-/* Fee preview */
-#U9-profile-withdrawal-fee-summary {
-  display: block;
-  width: 100%;
-  margin: 2px 0 12px;
-  padding: 12px 13px;
-  box-sizing: border-box;
-  border: 1px solid #e7ebf2;
-  border-radius: 9px;
-  background: #f8faff;
-  color: #555;
-}
-
-.U9-profile-withdrawal-fee-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-.U9-profile-withdrawal-fee-row strong {
-  color: #333;
-  font-size: 12px;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.U9-profile-withdrawal-net-row {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #e4e9f1;
-  color: #222;
-  font-weight: 700;
-}
-
-.U9-profile-withdrawal-net-row strong {
-  color: #1d6b3a;
-  font-size: 14px;
-  font-weight: 900;
-}
-
-/* Independent modal windows */
-.U9-profile-withdrawal-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 10050;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 18px;
-  box-sizing: border-box;
-  background: rgba(0, 0, 0, .58);
-}
-
-.U9-profile-withdrawal-modal[hidden],
-#U9-profile-withdrawal-form[hidden],
-#U9-profile-withdrawal-kyc-notice[hidden],
-#U9-profile-withdrawal-kyc-guide[hidden],
-#U9-profile-withdrawal-kyc-unavailable[hidden],
-#U9-profile-withdrawal-current-password-group[hidden] {
-  display: none !important;
-}
-
-.U9-profile-withdrawal-modal-content {
-  position: relative;
-  width: min(100%, 420px);
-  max-height: min(90vh, 720px);
-  overflow-y: auto;
-  padding: 25px 21px 21px;
-  box-sizing: border-box;
-  border-radius: 14px;
-  background: #ffffff;
-  color: #222;
-  box-shadow: 0 18px 55px rgba(0, 0, 0, .24);
-}
-
-.U9-profile-withdrawal-modal-content h3 {
-  margin: 0 32px 8px 0;
-  font-size: 18px;
-  font-weight: 800;
-}
-
-.U9-profile-withdrawal-modal-description {
-  margin: 0 0 18px;
-  color: #777;
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-.U9-profile-withdrawal-modal-close {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  width: 32px;
-  height: 32px;
-  padding: 0;
-  border: 0;
-  border-radius: 50%;
-  background: #f2f3f5;
-  color: #555;
-  font-size: 23px;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.U9-profile-withdrawal-modal .U9-profile-withdrawal-field {
-  margin-bottom: 14px;
-}
-
-.U9-profile-withdrawal-modal .U9-profile-withdrawal-field input {
-  width: 100%;
-  box-sizing: border-box;
-}
-
-#U9-profile-withdrawal-password-save,
-#U9-profile-withdrawal-wallet-save,
-#U9-profile-withdrawal-confirm-submit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  min-height: 43px;
-  margin-top: 8px;
-  padding: 10px 14px;
-  border: 0;
-  border-radius: 8px;
-  background: #2762ea;
-  color: #fff;
-  font: inherit;
-  font-size: 13px;
-  font-weight: 800;
-  cursor: pointer;
-}
-
-#U9-profile-withdrawal-password-save:disabled,
-#U9-profile-withdrawal-wallet-save:disabled,
-#U9-profile-withdrawal-confirm-submit:disabled {
-  opacity: .55;
-  cursor: not-allowed;
-}
-
-#U9-profile-withdrawal-password-message,
-#U9-profile-withdrawal-wallet-message,
-#U9-profile-withdrawal-confirm-message {
-  margin-top: 12px;
-  padding: 9px 11px;
-  border: 1px solid #ddd;
-  border-radius: 7px;
-  font-size: 12px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
-#U9-profile-withdrawal-password-message[hidden],
-#U9-profile-withdrawal-wallet-message[hidden],
-#U9-profile-withdrawal-confirm-message[hidden] {
-  display: none !important;
-}
-
-@media screen and (max-width: 480px) {
-  #U9-profile-withdrawal-password-settings-button,
-  #U9-profile-withdrawal-wallet-settings-button {
-    flex-basis: 32px;
-    width: 32px;
-    min-width: 32px;
-    height: 34px;
-  }
-
-  #U9-profile-withdrawal-password-settings-button svg,
-  #U9-profile-withdrawal-wallet-settings-button svg {
-    width: 19px;
-    height: 19px;
-  }
-
-  #U9-profile-withdrawal-max-button,
-  #U9-profile-withdrawal-paste-button {
-    min-width: 52px;
-    padding: 0 8px;
-  }
-
-  .U9-profile-withdrawal-modal-content {
-    padding: 23px 16px 17px;
-  }
 }
