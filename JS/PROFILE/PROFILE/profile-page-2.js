@@ -1,564 +1,371 @@
-
 /* =================================================
-   U9 PROFILE PAGE 2 — WITHDRAWAL / KYC STATUS
+   U9 PROFILE PAGE 2 — USDT TRC20 WITHDRAWAL
+   API: /api/withdrawal
+   Actions: info / create / history
 ================================================= */
 
 (function () {
-
   "use strict";
 
+  if (window.U9ProfileWithdrawal) return;
 
-  /* =========================
-     PREVENT DUPLICATE INIT
-  ========================= */
+  const API_URL = "/api/withdrawal";
 
-  if (window.U9ProfileWithdrawal) {
-    return;
-  }
+  const balanceElement = document.getElementById("U9-profile-withdrawal-balance-value");
+  const verifiedButton = document.getElementById("U9-profile-withdrawal-verified-button");
+  const verifiedIcon = document.getElementById("U9-profile-withdrawal-verified-icon");
+  const noticeButton = document.getElementById("U9-profile-withdrawal-notice-button");
+  const noticeIcon = document.getElementById("U9-profile-withdrawal-notice-icon");
 
+  const form = document.getElementById("U9-withdrawal-form");
+  const amountInput = document.getElementById("U9-withdrawal-amount");
+  const walletInput = document.getElementById("U9-withdrawal-wallet");
+  const availableElement = document.getElementById("U9-withdrawal-available");
+  const summaryAmount = document.getElementById("U9-withdrawal-summary-amount");
+  const summaryFee = document.getElementById("U9-withdrawal-summary-fee");
+  const summaryNet = document.getElementById("U9-withdrawal-summary-net");
+  const messageElement = document.getElementById("U9-withdrawal-message");
+  const submitButton = document.getElementById("U9-withdrawal-submit");
+  const historySection = document.getElementById("U9-withdrawal-history-section");
+  const historyToggleButton = document.getElementById("U9-withdrawal-history-more-toggle");
+  const historyList = document.getElementById("U9-withdrawal-history-list");
+  const historyRefreshButton = document.getElementById("U9-withdrawal-history-refresh");
+  const historyMoreButton = document.getElementById("U9-withdrawal-history-more");
+  const openWithdrawalButton = document.getElementById("U9-profile-button-2");
 
-  /* =========================
-     ELEMENTS
-  ========================= */
-
-  const navigation = document.getElementById(
-    "U9-profile-withdrawal-navigation"
-  );
-
-  const balanceElement = document.getElementById(
-    "U9-profile-withdrawal-balance-value"
-  );
-
-  const verifiedButton = document.getElementById(
-    "U9-profile-withdrawal-verified-button"
-  );
-
-  const verifiedIcon = document.getElementById(
-    "U9-profile-withdrawal-verified-icon"
-  );
-
-  const noticeButton = document.getElementById(
-    "U9-profile-withdrawal-notice-button"
-  );
-
-  const noticeIcon = document.getElementById(
-    "U9-profile-withdrawal-notice-icon"
-  );
-
-  const kycNotice = document.getElementById(
-    "U9-profile-withdrawal-kyc-notice"
-  );
-
-  const kycGuide = document.getElementById(
-    "U9-profile-withdrawal-kyc-guide"
-  );
-
-  const kycUnavailable = document.getElementById(
-    "U9-profile-withdrawal-kyc-unavailable"
-  );
-
-  const kycStatusHintIcon = document.getElementById(
-    "U9-profile-withdrawal-kyc-status-hint-icon"
-  );
-
+  let currentBalance = 0;
   let currentKycStatus = false;
-
-
-  /* =========================
-     CATEGORIES
-  ========================= */
-
-  const categories = [
-    "crypto",
-    "epayment",
-    "bank",
-    "card"
-  ];
-
-  let currentCategory = "crypto";
-
-
-  /* =========================
-     GET BUTTON
-  ========================= */
-
-  function getButton(category) {
-
-    if (!navigation) return null;
-
-    return navigation.querySelector(
-      `[data-category="${category}"]`
-    );
-
-  }
-
-
-  /* =========================
-     RENDER KYC INFORMATION
-  ========================= */
-
-  function renderKycInformation() {
-
-    // Crypto does not require KYC in the current design.
-    const requiresKyc = currentCategory !== "crypto";
-
-    if (!requiresKyc) {
-      if (kycNotice) kycNotice.hidden = true;
-      if (kycGuide) kycGuide.hidden = true;
-      if (kycUnavailable) kycUnavailable.hidden = true;
-      return;
-    }
-
-    if (currentKycStatus === true) {
-      // KYC is approved: show country/payment availability notice only.
-      if (kycNotice) kycNotice.hidden = true;
-      if (kycGuide) kycGuide.hidden = true;
-      if (kycUnavailable) kycUnavailable.hidden = false;
-
-      if (kycStatusHintIcon) {
-        kycStatusHintIcon.src = "/SSVG/Withdraw/hint-true.svg";
-        kycStatusHintIcon.alt = "Payment services unavailable";
-      }
-
-      return;
-    }
-
-    // KYC is not approved: show the KYC requirement and guide.
-    if (kycNotice) kycNotice.hidden = false;
-    if (kycGuide) kycGuide.hidden = false;
-    if (kycUnavailable) kycUnavailable.hidden = true;
-
-    if (kycStatusHintIcon) {
-      kycStatusHintIcon.src = "/SSVG/Withdraw/hint.svg";
-      kycStatusHintIcon.alt = "KYC information";
-    }
-
-  }
-
-
-  /* =========================
-     SWITCH CATEGORY
-  ========================= */
-
-  function switchCategory(category) {
-
-    if (!categories.includes(category)) return;
-    if (!navigation) return;
-
-    categories.forEach(function (item) {
-
-      const button = getButton(item);
-
-      if (!button) return;
-
-      const isActive = item === category;
-
-      button.classList.toggle("active", isActive);
-
-      button.setAttribute(
-        "aria-selected",
-        String(isActive)
-      );
-
-      button.tabIndex = isActive ? 0 : -1;
-
-    });
-
-    currentCategory = category;
-    renderKycInformation();
-
-  }
-
-
-  /* =========================
-     NAVIGATION CLICK
-  ========================= */
-
-  if (navigation) {
-
-    navigation.addEventListener("click", function (event) {
-
-      const button = event.target.closest(
-        ".U9-profile-withdrawal-nav-button"
-      );
-
-      if (!button || !navigation.contains(button)) return;
-
-      switchCategory(button.dataset.category);
-
-    });
-
-
-    /* =========================
-       KEYBOARD NAVIGATION
-    ========================= */
-
-    navigation.addEventListener("keydown", function (event) {
-
-      const button = event.target.closest(
-        ".U9-profile-withdrawal-nav-button"
-      );
-
-      if (!button) return;
-
-      const index = categories.indexOf(
-        button.dataset.category
-      );
-
-      if (index === -1) return;
-
-      let nextIndex;
-
-      if (event.key === "ArrowRight") {
-
-        nextIndex = (index + 1) % categories.length;
-
-      } else if (event.key === "ArrowLeft") {
-
-        nextIndex =
-          (index - 1 + categories.length) % categories.length;
-
-      } else {
-
-        return;
-
-      }
-
-      event.preventDefault();
-
-      const nextCategory = categories[nextIndex];
-
-      switchCategory(nextCategory);
-
-      getButton(nextCategory)?.focus();
-
-    });
-
-
-    // INITIALIZE
-    switchCategory("crypto");
-
-  } else {
-
-    console.warn(
-      "U9 Profile Withdrawal Navigation not found."
-    );
-
-  }
-
-
-  /* =================================================
-     WITHDRAWAL BUTTON INITIALIZATION
-  ================================================= */
-
-  function initializeButton(button, icon, name) {
-
-    if (!button) {
-
-      console.warn(
-        "U9 Withdrawal button not found:",
-        name
-      );
-
-      return;
-
-    }
-
-    button.type = "button";
-
-    if (icon && !button.contains(icon)) {
-
-      console.warn(
-        "U9 Withdrawal icon is outside its button:",
-        name
-      );
-
-    }
-
-  }
-
-  initializeButton(
-    verifiedButton,
-    verifiedIcon,
-    "kyc"
-  );
-
-  initializeButton(
-    noticeButton,
-    noticeIcon,
-    "notice"
-  );
-
-
-  /* =================================================
-     USER BALANCE
-  ================================================= */
-
-  function setBalance(balance) {
-
-    if (!balanceElement) return;
-
-    const amount = Number(balance);
-
-    if (!Number.isFinite(amount)) {
-
-      console.warn(
-        "Invalid withdrawal balance:",
-        balance
-      );
-
-      return;
-
-    }
-
-    balanceElement.textContent = amount.toFixed(2);
-
-  }
-
-
-  /* =================================================
-     KYC VERIFIED STATUS
-  ================================================= */
-
-  function setKycStatus(verified) {
-
-    if (!verifiedIcon) return;
-
-    if (typeof verified !== "boolean") {
-
-      console.warn(
-        "Invalid kyc value:",
-        verified
-      );
-
-      return;
-
-    }
-
-    if (verified) {
-
-      verifiedIcon.src = "/SSVG/Withdraw/verified.svg";
-      verifiedIcon.alt = "Verified";
-
-    } else {
-
-      verifiedIcon.src = "/SSVG/Withdraw/unverified.svg";
-      verifiedIcon.alt = "Unverified";
-
-    }
-
-    currentKycStatus = verified;
-
-    verifiedButton?.setAttribute(
-      "aria-label",
-      verified ? "KYC verified" : "KYC unverified"
-    );
-
-    renderKycInformation();
-
-  }
-
-
-  /* =================================================
-     UPDATE USER INFO
-  ================================================= */
-
-  function updateUserInfo(user) {
-
-    if (!user || typeof user !== "object") {
-
-      console.warn(
-        "Invalid withdrawal user data."
-      );
-
-      return;
-
-    }
-
-    if (user.balance !== undefined) {
-
-      setBalance(user.balance);
-
-    }
-
-    if (user.kyc !== undefined) {
-
-      setKycStatus(user.kyc);
-
-    }
-
-  }
-
-
-  /* =================================================
-     HEADER USER SYNC
-  ================================================= */
-
+  let isSubmitting = false;
+  let historyOffset = 0;
+  const HISTORY_LIMIT = 20;
+  let historyLoading = false;
   let unsubscribeUser = null;
 
+  function formatMoney(value) {
+    const number = Number(value);
+    return Number.isFinite(number) ? number.toFixed(2) : "0.00";
+  }
 
-  /* =========================
-     APPLY HEADER USER
-  ========================= */
+  function setBalance(value) {
+    const amount = Number(value);
+    if (!Number.isFinite(amount) || amount < 0) return;
+    currentBalance = amount;
+    if (balanceElement) balanceElement.textContent = formatMoney(amount);
+    if (availableElement) availableElement.textContent = `${formatMoney(amount)} USDT`;
+    updateSummary();
+  }
 
-  function applyHeaderUser(user) {
+  function setKycStatus(verified) {
+    if (typeof verified !== "boolean") return;
+    currentKycStatus = verified;
+    if (verifiedIcon) {
+      verifiedIcon.src = verified ? "/SSVG/Withdraw/verified.svg" : "/SSVG/Withdraw/unverified.svg";
+      verifiedIcon.alt = verified ? "Verified" : "Unverified";
+    }
+    verifiedButton?.setAttribute("aria-label", verified ? "KYC verified" : "KYC unverified");
+  }
 
-    if (!user || typeof user !== "object") {
+  function updateUserInfo(user) {
+    if (!user || typeof user !== "object") return;
+    if (user.balance !== undefined) setBalance(user.balance);
+    if (user.kyc !== undefined) setKycStatus(user.kyc);
+  }
+
+  function getToken() {
+    try {
+      return localStorage.getItem("u9_token");
+    } catch (error) {
+      console.error("U9 Withdrawal: Unable to read session token.", error);
+      return null;
+    }
+  }
+
+  async function apiRequest(payload) {
+    const token = getToken();
+    const headers = { "Content-Type": "application/json" };
+    if (token) headers.Authorization = `Bearer ${token}`;
+
+    const response = await fetch(API_URL, {
+      method: "POST",
+      credentials: "include",
+      cache: "no-store",
+      headers,
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok || result.success !== true) {
+      throw new Error(result.error || result.message || `Request failed (${response.status})`);
+    }
+    return result;
+  }
+
+  function showMessage(message, type) {
+    if (!messageElement) return;
+    messageElement.textContent = message;
+    messageElement.dataset.type = type || "error";
+    messageElement.hidden = !message;
+  }
+
+  function calculateFee(amount) {
+    return Math.round((amount * 0.01 + Number.EPSILON) * 100) / 100;
+  }
+
+  function updateSummary() {
+    const amount = Number(amountInput?.value || 0);
+    const valid = Number.isFinite(amount) && amount > 0;
+    const fee = valid ? calculateFee(amount) : 0;
+    const net = valid ? Math.max(0, amount - fee) : 0;
+    if (summaryAmount) summaryAmount.textContent = `${formatMoney(valid ? amount : 0)} USDT`;
+    if (summaryFee) summaryFee.textContent = `${formatMoney(fee)} USDT`;
+    if (summaryNet) summaryNet.textContent = `${formatMoney(net)} USDT`;
+  }
+
+  async function loadInfo() {
+    try {
+      const result = await apiRequest({ action: "info" });
+      const data = result.data || {};
+      if (data.balance !== undefined) setBalance(data.balance);
+      return data;
+    } catch (error) {
+      showMessage(error.message || "Unable to load withdrawal information.", "error");
+      return null;
+    }
+  }
+
+  function statusLabel(status) {
+    const labels = {
+      pending: "Pending",
+      approved: "Approved",
+      processing: "Processing",
+      completed: "Completed",
+      rejected: "Rejected",
+      cancelled: "Cancelled"
+    };
+    return labels[status] || String(status || "Unknown");
+  }
+
+  function createHistoryItem(item) {
+    const card = document.createElement("article");
+    card.className = "U9-withdrawal-history-item";
+
+    const top = document.createElement("div");
+    top.className = "U9-withdrawal-history-item-top";
+
+    const amount = document.createElement("strong");
+    amount.textContent = `${formatMoney(item.amount)} USDT`;
+
+    const status = document.createElement("span");
+    status.className = "U9-withdrawal-status";
+    status.dataset.status = String(item.status || "pending");
+    status.textContent = statusLabel(item.status);
+
+    top.append(amount, status);
+
+    const details = document.createElement("div");
+    details.className = "U9-withdrawal-history-details";
+    details.textContent = `Fee ${formatMoney(item.fee)} USDT · Received ${formatMoney(item.net_amount)} USDT`;
+
+    const wallet = document.createElement("div");
+    wallet.className = "U9-withdrawal-history-wallet";
+    const address = String(item.wallet_address || "");
+    wallet.textContent = address ? `${address.slice(0, 8)}…${address.slice(-6)}` : "Wallet address unavailable";
+    wallet.title = address;
+
+    const date = document.createElement("time");
+    date.className = "U9-withdrawal-history-date";
+    if (item.created_at) {
+      const parsed = new Date(item.created_at);
+      date.dateTime = parsed.toISOString ? item.created_at : "";
+      date.textContent = Number.isNaN(parsed.getTime()) ? String(item.created_at) : parsed.toLocaleString();
+    }
+
+    card.append(top, details, wallet, date);
+    return card;
+  }
+
+  async function loadHistory(reset) {
+    if (historyLoading || !historyList) return;
+    historyLoading = true;
+    if (reset) {
+      historyOffset = 0;
+      historyList.replaceChildren();
+    }
+    if (historyRefreshButton) historyRefreshButton.disabled = true;
+    if (historyMoreButton) historyMoreButton.disabled = true;
+
+    try {
+      const result = await apiRequest({ action: "history", limit: HISTORY_LIMIT, offset: historyOffset });
+      const records = Array.isArray(result.data) ? result.data : [];
+      if (reset && records.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "U9-withdrawal-history-empty";
+        empty.textContent = "No withdrawal records yet.";
+        historyList.appendChild(empty);
+      } else {
+        records.forEach((item) => historyList.appendChild(createHistoryItem(item)));
+      }
+      historyOffset += records.length;
+      const total = Number(result.pagination?.total || 0);
+      if (historyMoreButton) historyMoreButton.hidden = historyOffset >= total || records.length < HISTORY_LIMIT;
+    } catch (error) {
+      if (reset) {
+        const errorText = document.createElement("p");
+        errorText.className = "U9-withdrawal-history-empty is-error";
+        errorText.textContent = error.message || "Unable to load withdrawal history.";
+        historyList.appendChild(errorText);
+      } else {
+        showMessage(error.message || "Unable to load more records.", "error");
+      }
+    } finally {
+      historyLoading = false;
+      if (historyRefreshButton) historyRefreshButton.disabled = false;
+      if (historyMoreButton) historyMoreButton.disabled = false;
+    }
+  }
+
+  async function handleSubmit(event) {
+    event.preventDefault();
+    if (isSubmitting || !form || !amountInput || !walletInput) return;
+    showMessage("", "");
+
+    const amountText = amountInput.value.trim();
+    const amount = Number(amountText);
+    const walletAddress = walletInput.value.trim();
+
+    if (!/^\d{1,10}(?:\.\d{1,2})?$/.test(amountText) || !Number.isFinite(amount) || amount <= 0) {
+      showMessage("Enter a valid amount with up to 2 decimal places.", "error");
+      amountInput.focus();
+      return;
+    }
+    if (amount > currentBalance) {
+      showMessage("Insufficient balance.", "error");
+      amountInput.focus();
+      return;
+    }
+    if (!/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(walletAddress)) {
+      showMessage("Enter a valid USDT TRC20 wallet address.", "error");
+      walletInput.focus();
       return;
     }
 
-    updateUserInfo({
-
-      balance: user.balance,
-
-      kyc: user.kyc
-
-    });
-
-  }
-
-
-  /* =========================
-     CONNECT HEADER USER
-  ========================= */
-
-  function connectHeaderUser() {
-
-    if (!window.U9User) {
-      return false;
-    }
-
-    // Prevent duplicate subscriptions
-    if (unsubscribeUser) {
-      return true;
-    }
-
-
-    /* =========================
-       SUBSCRIBE USER CHANGES
-    ========================= */
-
-    unsubscribeUser = window.U9User.subscribe(
-
-      function (user, state) {
-
-        if (
-          state === "AUTHENTICATED" &&
-          user
-        ) {
-
-          applyHeaderUser(user);
-
-        }
-
-      }
-
+    const fee = calculateFee(amount);
+    const net = Math.max(0, amount - fee);
+    const confirmed = window.confirm(
+      `Confirm USDT TRC20 withdrawal?\n\nAmount: ${formatMoney(amount)} USDT\nFee (1%): ${formatMoney(fee)} USDT\nEstimated received: ${formatMoney(net)} USDT\n\nWallet: ${walletAddress}`
     );
+    if (!confirmed) return;
 
+    isSubmitting = true;
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.textContent = "Submitting…";
+    }
 
-    /* =========================
-       APPLY CURRENT USER
-    ========================= */
+    try {
+      const result = await apiRequest({
+        action: "create",
+        amount: amountText,
+        wallet_address: walletAddress
+      });
+      const responseData = result.data || {};
+      const withdrawal = responseData.withdrawal || {};
+      if (responseData.balance !== undefined) setBalance(responseData.balance);
+      else await loadInfo();
 
-    if (
-      window.U9User.getState() ===
-      "AUTHENTICATED"
-    ) {
-
-      applyHeaderUser(
-        window.U9User.get()
+      amountInput.value = "";
+      updateSummary();
+      showMessage(
+        `Withdrawal request submitted. Request ID: ${withdrawal.id || "created"}. Amount: ${formatMoney(withdrawal.amount ?? amount)} USDT; fee: ${formatMoney(withdrawal.fee ?? fee)} USDT; estimated received: ${formatMoney(withdrawal.net_amount ?? net)} USDT.`,
+        "success"
       );
 
+      if (historySection) historySection.hidden = false;
+      await loadHistory(true);
+    } catch (error) {
+      showMessage(error.message || "Unable to submit withdrawal request.", "error");
+    } finally {
+      isSubmitting = false;
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = "Submit Withdrawal";
+      }
     }
-
-    return true;
-
   }
 
+  function applyHeaderUser(user) {
+    if (!user || typeof user !== "object") return;
+    updateUserInfo({ balance: user.balance, kyc: user.kyc });
+  }
 
-  /* =================================================
-     HEADER READY LISTENER
-  ================================================= */
+  function connectHeaderUser() {
+    if (!window.U9User) return false;
+    if (unsubscribeUser) return true;
+    if (typeof window.U9User.subscribe === "function") {
+      unsubscribeUser = window.U9User.subscribe((user, state) => {
+        if (state === "AUTHENTICATED" && user) applyHeaderUser(user);
+      });
+    }
+    if (
+      typeof window.U9User.getState === "function" &&
+      window.U9User.getState() === "AUTHENTICATED" &&
+      typeof window.U9User.get === "function"
+    ) {
+      applyHeaderUser(window.U9User.get());
+    }
+    return true;
+  }
+
+  if (form) form.addEventListener("submit", handleSubmit);
+  if (amountInput) amountInput.addEventListener("input", updateSummary);
+
+  if (openWithdrawalButton) {
+    openWithdrawalButton.addEventListener("click", () => {
+      showMessage("", "");
+      loadInfo();
+      loadHistory(true);
+    });
+  }
+
+  if (historyToggleButton) {
+    historyToggleButton.addEventListener("click", () => {
+      const willHide = historyList?.hidden !== true;
+      if (historyList) historyList.hidden = willHide;
+      if (historyMoreButton) historyMoreButton.hidden = willHide;
+      historyToggleButton.textContent = willHide ? "Show" : "Hide";
+      if (!willHide) loadHistory(true);
+    });
+  }
+
+  if (historyRefreshButton) historyRefreshButton.addEventListener("click", () => loadHistory(true));
+  if (historyMoreButton) historyMoreButton.addEventListener("click", () => loadHistory(false));
+
+  if (verifiedButton) verifiedButton.type = "button";
+  if (noticeButton) noticeButton.type = "button";
+  if (noticeIcon && !noticeButton?.contains(noticeIcon)) {
+    console.warn("U9 Withdrawal: Notice icon is outside its button.");
+  }
 
   if (!connectHeaderUser()) {
-
-    window.addEventListener(
-      "u9:user-ready",
-      connectHeaderUser,
-      { once: true }
-    );
-
+    window.addEventListener("u9:user-ready", connectHeaderUser, { once: true });
   }
 
-
-  /* =================================================
-     PUBLIC API
-  ================================================= */
+  updateSummary();
 
   window.U9ProfileWithdrawal = {
-
-    // CATEGORY
-
-    switchCategory: switchCategory,
-
-    getCurrentCategory: function () {
-      return currentCategory;
-    },
-
-    reset: function () {
-      switchCategory("crypto");
-    },
-
-
-    // USER INFO
-
-    setBalance: setBalance,
-
-    setKycStatus: setKycStatus,
-
-    updateUserInfo: updateUserInfo,
-
-
-    // USER SYNC
-
+    setBalance,
+    setKycStatus,
+    updateUserInfo,
     refreshUserInfo: function () {
-
-      if (
-        window.U9User &&
-        window.U9User.getState() === "AUTHENTICATED"
-      ) {
-
-        applyHeaderUser(
-          window.U9User.get()
-        );
-
+      if (window.U9User?.getState?.() === "AUTHENTICATED") {
+        applyHeaderUser(window.U9User.get());
       }
-
     },
-
-
-    // BUTTON REFERENCES
-
-    getKycButton: function () {
-      return verifiedButton;
-    },
-
-    getNoticeButton: function () {
-      return noticeButton;
-    },
-
-
-    // ICON REFERENCES
-
-    getKycIcon: function () {
-      return verifiedIcon;
-    },
-
-    getNoticeIcon: function () {
-      return noticeIcon;
-    }
-
+    refresh: loadInfo,
+    loadHistory: () => loadHistory(true),
+    getKycButton: () => verifiedButton,
+    getNoticeButton: () => noticeButton,
+    getKycIcon: () => verifiedIcon,
+    getNoticeIcon: () => noticeIcon
   };
-
-
 })();
