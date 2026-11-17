@@ -25,6 +25,7 @@
     "U9-profile-withdrawal-navigation"
   );
 
+  // Existing balance display — keep the original one.
   const balanceElement = document.getElementById(
     "U9-profile-withdrawal-balance-value"
   );
@@ -61,12 +62,37 @@
     "U9-profile-withdrawal-kyc-status-hint-icon"
   );
 
-  let currentKycStatus = false;
+
+  /* =========================
+     WITHDRAWAL FORM
+  ========================= */
+
+  const withdrawalForm = document.getElementById(
+    "U9-profile-withdrawal-form"
+  );
+
+  const amountInput = document.getElementById(
+    "U9-profile-withdrawal-amount"
+  );
+
+  const walletInput = document.getElementById(
+    "U9-profile-withdrawal-wallet-address"
+  );
+
+  const submitButton = document.getElementById(
+    "U9-profile-withdrawal-submit"
+  );
+
+  const messageElement = document.getElementById(
+    "U9-profile-withdrawal-message"
+  );
 
 
   /* =========================
-     CATEGORIES
+     STATE
   ========================= */
+
+  let currentKycStatus = false;
 
   const categories = [
     "crypto",
@@ -77,10 +103,16 @@
 
   let currentCategory = "crypto";
 
+  let isSubmitting = false;
 
-  /* =========================
-     GET BUTTON
-  ========================= */
+  let userSubscribed = false;
+
+  let unsubscribeUser = null;
+
+
+  /* =================================================
+     CATEGORY NAVIGATION
+  ================================================= */
 
   function getButton(category) {
 
@@ -93,9 +125,9 @@
   }
 
 
-  /* =========================
-     RENDER KYC INFORMATION
-  ========================= */
+  /* =================================================
+     KYC INFORMATION
+  ================================================= */
 
   function renderKycInformation() {
 
@@ -103,57 +135,106 @@
     const requiresKyc = currentCategory !== "crypto";
 
     if (!requiresKyc) {
-      if (kycNotice) kycNotice.hidden = true;
-      if (kycGuide) kycGuide.hidden = true;
-      if (kycUnavailable) kycUnavailable.hidden = true;
-      return;
-    }
 
-    if (currentKycStatus === true) {
-      // KYC is approved: show country/payment availability notice only.
-      if (kycNotice) kycNotice.hidden = true;
-      if (kycGuide) kycGuide.hidden = true;
-      if (kycUnavailable) kycUnavailable.hidden = false;
+      if (kycNotice) {
+        kycNotice.hidden = true;
+      }
 
-      if (kycStatusHintIcon) {
-        kycStatusHintIcon.src = "/SSVG/Withdraw/hint-true.svg";
-        kycStatusHintIcon.alt = "Payment services unavailable";
+      if (kycGuide) {
+        kycGuide.hidden = true;
+      }
+
+      if (kycUnavailable) {
+        kycUnavailable.hidden = true;
       }
 
       return;
     }
 
-    // KYC is not approved: show the KYC requirement and guide.
-    if (kycNotice) kycNotice.hidden = false;
-    if (kycGuide) kycGuide.hidden = false;
-    if (kycUnavailable) kycUnavailable.hidden = true;
+
+    // KYC approved.
+    if (currentKycStatus === true) {
+
+      if (kycNotice) {
+        kycNotice.hidden = true;
+      }
+
+      if (kycGuide) {
+        kycGuide.hidden = true;
+      }
+
+      if (kycUnavailable) {
+        kycUnavailable.hidden = false;
+      }
+
+      if (kycStatusHintIcon) {
+
+        kycStatusHintIcon.src =
+          "/SSVG/Withdraw/hint-true.svg";
+
+        kycStatusHintIcon.alt =
+          "Payment services unavailable";
+
+      }
+
+      return;
+    }
+
+
+    // KYC not approved.
+    if (kycNotice) {
+      kycNotice.hidden = false;
+    }
+
+    if (kycGuide) {
+      kycGuide.hidden = false;
+    }
+
+    if (kycUnavailable) {
+      kycUnavailable.hidden = true;
+    }
 
     if (kycStatusHintIcon) {
-      kycStatusHintIcon.src = "/SSVG/Withdraw/hint.svg";
-      kycStatusHintIcon.alt = "KYC information";
+
+      kycStatusHintIcon.src =
+        "/SSVG/Withdraw/hint.svg";
+
+      kycStatusHintIcon.alt =
+        "KYC information";
+
     }
 
   }
 
 
-  /* =========================
+  /* =================================================
      SWITCH CATEGORY
-  ========================= */
+  ================================================= */
 
   function switchCategory(category) {
 
-    if (!categories.includes(category)) return;
-    if (!navigation) return;
+    if (!categories.includes(category)) {
+      return;
+    }
+
+    if (!navigation) {
+      return;
+    }
 
     categories.forEach(function (item) {
 
       const button = getButton(item);
 
-      if (!button) return;
+      if (!button) {
+        return;
+      }
 
       const isActive = item === category;
 
-      button.classList.toggle("active", isActive);
+      button.classList.toggle(
+        "active",
+        isActive
+      );
 
       button.setAttribute(
         "aria-selected",
@@ -165,75 +246,105 @@
     });
 
     currentCategory = category;
+
     renderKycInformation();
+
+    // Only the Crypto withdrawal form is implemented.
+    if (withdrawalForm) {
+
+      withdrawalForm.hidden =
+        category !== "crypto";
+
+    }
+
+    clearMessage();
 
   }
 
 
-  /* =========================
+  /* =================================================
      NAVIGATION CLICK
-  ========================= */
+  ================================================= */
 
   if (navigation) {
 
-    navigation.addEventListener("click", function (event) {
+    navigation.addEventListener(
+      "click",
+      function (event) {
 
-      const button = event.target.closest(
-        ".U9-profile-withdrawal-nav-button"
-      );
+        const button = event.target.closest(
+          ".U9-profile-withdrawal-nav-button"
+        );
 
-      if (!button || !navigation.contains(button)) return;
+        if (
+          !button ||
+          !navigation.contains(button)
+        ) {
+          return;
+        }
 
-      switchCategory(button.dataset.category);
+        switchCategory(
+          button.dataset.category
+        );
 
-    });
+      }
+    );
 
 
     /* =========================
        KEYBOARD NAVIGATION
     ========================= */
 
-    navigation.addEventListener("keydown", function (event) {
+    navigation.addEventListener(
+      "keydown",
+      function (event) {
 
-      const button = event.target.closest(
-        ".U9-profile-withdrawal-nav-button"
-      );
+        const button = event.target.closest(
+          ".U9-profile-withdrawal-nav-button"
+        );
 
-      if (!button) return;
+        if (!button) {
+          return;
+        }
 
-      const index = categories.indexOf(
-        button.dataset.category
-      );
+        const index = categories.indexOf(
+          button.dataset.category
+        );
 
-      if (index === -1) return;
+        if (index === -1) {
+          return;
+        }
 
-      let nextIndex;
+        let nextIndex;
 
-      if (event.key === "ArrowRight") {
+        if (event.key === "ArrowRight") {
 
-        nextIndex = (index + 1) % categories.length;
+          nextIndex =
+            (index + 1) % categories.length;
 
-      } else if (event.key === "ArrowLeft") {
+        } else if (event.key === "ArrowLeft") {
 
-        nextIndex =
-          (index - 1 + categories.length) % categories.length;
+          nextIndex =
+            (index - 1 + categories.length) %
+            categories.length;
 
-      } else {
+        } else {
 
-        return;
+          return;
+
+        }
+
+        event.preventDefault();
+
+        const nextCategory =
+          categories[nextIndex];
+
+        switchCategory(nextCategory);
+
+        getButton(nextCategory)?.focus();
 
       }
-
-      event.preventDefault();
-
-      const nextCategory = categories[nextIndex];
-
-      switchCategory(nextCategory);
-
-      getButton(nextCategory)?.focus();
-
-    });
-
+    );
 
     // INITIALIZE
     switchCategory("crypto");
@@ -248,7 +359,7 @@
 
 
   /* =================================================
-     WITHDRAWAL BUTTON INITIALIZATION
+     BUTTON INITIALIZATION
   ================================================= */
 
   function initializeButton(button, icon, name) {
@@ -277,6 +388,7 @@
 
   }
 
+
   initializeButton(
     verifiedButton,
     verifiedIcon,
@@ -291,12 +403,14 @@
 
 
   /* =================================================
-     USER BALANCE
+     EXISTING USER BALANCE
   ================================================= */
 
   function setBalance(balance) {
 
-    if (!balanceElement) return;
+    if (!balanceElement) {
+      return;
+    }
 
     const amount = Number(balance);
 
@@ -311,7 +425,8 @@
 
     }
 
-    balanceElement.textContent = amount.toFixed(2);
+    balanceElement.textContent =
+      amount.toFixed(2);
 
   }
 
@@ -321,8 +436,6 @@
   ================================================= */
 
   function setKycStatus(verified) {
-
-    if (!verifiedIcon) return;
 
     if (typeof verified !== "boolean") {
 
@@ -335,15 +448,23 @@
 
     }
 
-    if (verified) {
+    if (verifiedIcon) {
 
-      verifiedIcon.src = "/SSVG/Withdraw/verified.svg";
-      verifiedIcon.alt = "Verified";
+      if (verified) {
 
-    } else {
+        verifiedIcon.src =
+          "/SSVG/Withdraw/verified.svg";
 
-      verifiedIcon.src = "/SSVG/Withdraw/unverified.svg";
-      verifiedIcon.alt = "Unverified";
+        verifiedIcon.alt = "Verified";
+
+      } else {
+
+        verifiedIcon.src =
+          "/SSVG/Withdraw/unverified.svg";
+
+        verifiedIcon.alt = "Unverified";
+
+      }
 
     }
 
@@ -394,13 +515,6 @@
      HEADER USER SYNC
   ================================================= */
 
-  let unsubscribeUser = null;
-
-
-  /* =========================
-     APPLY HEADER USER
-  ========================= */
-
   function applyHeaderUser(user) {
 
     if (!user || typeof user !== "object") {
@@ -418,25 +532,23 @@
   }
 
 
-  /* =========================
-     CONNECT HEADER USER
-  ========================= */
-
   function connectHeaderUser() {
 
     if (!window.U9User) {
       return false;
     }
 
-    // Prevent duplicate subscriptions
-    if (unsubscribeUser) {
+    if (userSubscribed) {
       return true;
     }
 
+    if (
+      typeof window.U9User.subscribe !== "function"
+    ) {
+      return false;
+    }
 
-    /* =========================
-       SUBSCRIBE USER CHANGES
-    ========================= */
+    userSubscribed = true;
 
     unsubscribeUser = window.U9User.subscribe(
 
@@ -456,13 +568,11 @@
     );
 
 
-    /* =========================
-       APPLY CURRENT USER
-    ========================= */
-
+    // Apply current user.
     if (
-      window.U9User.getState() ===
-      "AUTHENTICATED"
+      typeof window.U9User.getState === "function" &&
+      window.U9User.getState() === "AUTHENTICATED" &&
+      typeof window.U9User.get === "function"
     ) {
 
       applyHeaderUser(
@@ -484,8 +594,458 @@
 
     window.addEventListener(
       "u9:user-ready",
-      connectHeaderUser,
-      { once: true }
+      connectHeaderUser
+    );
+
+  }
+
+
+  /* =================================================
+     AUTHENTICATION
+  ================================================= */
+
+  function isAuthenticated() {
+
+    return Boolean(
+      window.U9User &&
+      typeof window.U9User.isLoggedIn === "function" &&
+      window.U9User.isLoggedIn()
+    );
+
+  }
+
+
+  /* =================================================
+     GET ACCESS TOKEN
+  ================================================= */
+
+  function getAccessToken() {
+
+    const tokenKeys = [
+      "u9_token",
+      "u9_access_token",
+      "access_token",
+      "authToken",
+      "token"
+    ];
+
+    for (const key of tokenKeys) {
+
+      const token = localStorage.getItem(key);
+
+      if (token) {
+        return token;
+      }
+
+    }
+
+    return null;
+
+  }
+
+
+  /* =================================================
+     WITHDRAWAL API
+  ================================================= */
+
+  async function callWithdrawalAPI(payload) {
+
+    const headers = {
+      "Content-Type": "application/json"
+    };
+
+    const token = getAccessToken();
+
+    if (token) {
+
+      headers.Authorization =
+        "Bearer " + token;
+
+    }
+
+    const response = await fetch(
+      "/api/withdrawal",
+      {
+        method: "POST",
+        headers: headers,
+        credentials: "include",
+        cache: "no-store",
+        body: JSON.stringify(payload)
+      }
+    );
+
+    let result;
+
+    try {
+
+      result = await response.json();
+
+    } catch (error) {
+
+      throw new Error(
+        "Invalid server response."
+      );
+
+    }
+
+    if (!response.ok) {
+
+      throw new Error(
+        result?.error ||
+        result?.message ||
+        "Withdrawal request failed."
+      );
+
+    }
+
+    if (result.success !== true) {
+
+      throw new Error(
+        result?.error ||
+        result?.message ||
+        "Withdrawal request failed."
+      );
+
+    }
+
+    return result;
+
+  }
+
+
+  /* =================================================
+     FORM MESSAGE
+  ================================================= */
+
+  function showMessage(message, type) {
+
+    if (!messageElement) {
+      return;
+    }
+
+    messageElement.textContent = message;
+
+    messageElement.dataset.status =
+      type || "info";
+
+    messageElement.hidden = false;
+
+  }
+
+
+  function clearMessage() {
+
+    if (!messageElement) {
+      return;
+    }
+
+    messageElement.textContent = "";
+
+    messageElement.dataset.status = "";
+
+    messageElement.hidden = true;
+
+  }
+
+
+  /* =================================================
+     FORMAT MONEY
+  ================================================= */
+
+  function formatMoney(value) {
+
+    return Number(value).toFixed(2);
+
+  }
+
+
+  /* =================================================
+     VALIDATE WITHDRAWAL INPUT
+  ================================================= */
+
+  function validateWithdrawalInput() {
+
+    if (!amountInput || !walletInput) {
+
+      throw new Error(
+        "Withdrawal form is not configured."
+      );
+
+    }
+
+    const amountText =
+      amountInput.value.trim();
+
+    const amount = Number(amountText);
+
+    const walletAddress =
+      walletInput.value.trim();
+
+    if (
+      !amountText ||
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ) {
+
+      throw new Error(
+        "Please enter a valid withdrawal amount."
+      );
+
+    }
+
+    // Two decimal places, matching the account balance precision.
+    if (!/^\d+(\.\d{1,2})?$/.test(amountText)) {
+
+      throw new Error(
+        "Please enter an amount with up to 2 decimal places."
+      );
+
+    }
+
+    // Basic TRON address format validation.
+    if (
+      !/^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(walletAddress)
+    ) {
+
+      throw new Error(
+        "Please enter a valid USDT TRC20 wallet address."
+      );
+
+    }
+
+    return {
+      amount: formatMoney(amount),
+      wallet_address: walletAddress
+    };
+
+  }
+
+
+  /* =================================================
+     SUBMIT WITHDRAWAL
+  ================================================= */
+
+  async function submitWithdrawal(event) {
+
+    event.preventDefault();
+
+    if (isSubmitting) {
+      return;
+    }
+
+    clearMessage();
+
+
+    /* =========================
+       CHECK LOGIN
+    ========================= */
+
+    if (!isAuthenticated()) {
+
+      showMessage(
+        "Please sign in before submitting a withdrawal.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    /* =========================
+       CHECK CATEGORY
+    ========================= */
+
+    if (currentCategory !== "crypto") {
+
+      showMessage(
+        "This withdrawal method is not available yet.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    /* =========================
+       VALIDATE INPUT
+    ========================= */
+
+    let withdrawalData;
+
+    try {
+
+      withdrawalData =
+        validateWithdrawalInput();
+
+    } catch (error) {
+
+      showMessage(
+        error.message,
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    /* =========================
+       CONFIRM REQUEST
+    ========================= */
+
+    const amount = Number(
+      withdrawalData.amount
+    );
+
+    const fee = Math.round(
+      amount * 0.01 * 100
+    ) / 100;
+
+    const netAmount =
+      Math.round(
+        (amount - fee) * 100
+      ) / 100;
+
+    const confirmed = window.confirm(
+
+      "Confirm your USDT TRC20 withdrawal?\n\n" +
+      "Withdrawal amount: " + formatMoney(amount) + " USDT\n" +
+      "Fee (1%): " + formatMoney(fee) + " USDT\n" +
+      "You will receive: " + formatMoney(netAmount) + " USDT\n\n" +
+      "Please make sure your wallet address is correct."
+
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+
+    /* =========================
+       SUBMITTING STATE
+    ========================= */
+
+    isSubmitting = true;
+
+    if (submitButton) {
+
+      submitButton.disabled = true;
+
+      submitButton.setAttribute(
+        "aria-busy",
+        "true"
+      );
+
+      submitButton.textContent =
+        "Submitting...";
+
+    }
+
+
+    try {
+
+      const result = await callWithdrawalAPI({
+
+        action: "create",
+
+        amount: withdrawalData.amount,
+
+        wallet_address:
+          withdrawalData.wallet_address
+
+      });
+
+
+      /* =========================
+         SUCCESS
+      ========================= */
+
+      showMessage(
+        result.message ||
+        "Your withdrawal request has been submitted successfully.",
+        "success"
+      );
+
+
+      // Clear inputs after successful submission.
+      if (amountInput) {
+        amountInput.value = "";
+      }
+
+      if (walletInput) {
+        walletInput.value = "";
+      }
+
+
+      // Update the existing balance display only
+      // when the server returns the new balance.
+      const data = result.data || result;
+
+      const newBalance =
+        data.new_balance ??
+        data.balance;
+
+      if (
+        newBalance !== undefined &&
+        newBalance !== null
+      ) {
+
+        setBalance(newBalance);
+
+      }
+
+    } catch (error) {
+
+      console.error(
+        "U9 Withdrawal Error:",
+        error
+      );
+
+      showMessage(
+        error.message ||
+        "Unable to submit your withdrawal. Please try again.",
+        "error"
+      );
+
+    } finally {
+
+      isSubmitting = false;
+
+      if (submitButton) {
+
+        submitButton.disabled = false;
+
+        submitButton.removeAttribute(
+          "aria-busy"
+        );
+
+        submitButton.textContent =
+          "Withdraw";
+
+      }
+
+    }
+
+  }
+
+
+  /* =================================================
+     WITHDRAWAL FORM INITIALIZATION
+  ================================================= */
+
+  if (withdrawalForm) {
+
+    withdrawalForm.addEventListener(
+      "submit",
+      submitWithdrawal
+    );
+
+  } else {
+
+    console.warn(
+      "U9 Withdrawal form not found."
     );
 
   }
@@ -496,6 +1056,7 @@
   ================================================= */
 
   window.U9ProfileWithdrawal = {
+
 
     // CATEGORY
 
@@ -525,7 +1086,9 @@
 
       if (
         window.U9User &&
-        window.U9User.getState() === "AUTHENTICATED"
+        typeof window.U9User.getState === "function" &&
+        window.U9User.getState() === "AUTHENTICATED" &&
+        typeof window.U9User.get === "function"
       ) {
 
         applyHeaderUser(
@@ -535,6 +1098,11 @@
       }
 
     },
+
+
+    // WITHDRAWAL
+
+    submitWithdrawal: submitWithdrawal,
 
 
     // BUTTON REFERENCES
