@@ -115,6 +115,10 @@
     {
       "source": "/api/get-shop-products",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/get-shop-products"
+    },
+    {
+      "source": "/api/withdrawal",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/withdrawal"
     }
   ]
 }
