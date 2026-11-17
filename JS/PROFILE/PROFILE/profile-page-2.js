@@ -1092,7 +1092,7 @@
     try {
       const payload = {
         action: "set_password",
-        new_password: newPassword
+        password: newPassword
       };
 
       if (hasWithdrawalPassword) {
