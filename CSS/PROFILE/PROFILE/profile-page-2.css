@@ -1343,3 +1343,77 @@
     }
 
 }
+
+
+/* =================================================
+   WITHDRAWAL PASSWORD INPUT ICONS
+================================================= */
+
+.U9-withdraw-password-input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 48px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    border: 1px solid #dfe3e8;
+    border-radius: 9px;
+    background: #ffffff;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.U9-withdraw-password-input-wrap:focus-within {
+    border-color: #2762ea;
+    box-shadow: 0 0 0 3px rgba(39, 98, 234, 0.09);
+}
+
+.U9-profile-withdrawal-modal .U9-withdraw-password-input-wrap input {
+    flex: 1 1 auto;
+    width: 0;
+    min-width: 0;
+    height: 46px;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+.U9-withdraw-password-leading-icon {
+    display: block;
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.U9-withdraw-password-eye {
+    display: flex;
+    flex: 0 0 28px;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.U9-withdraw-password-eye img {
+    display: block;
+    width: 21px;
+    height: 21px;
+    object-fit: contain;
+    pointer-events: none;
+}
+
+.U9-withdraw-password-eye:focus-visible {
+    outline: 2px solid #2762ea;
+    outline-offset: 2px;
+    border-radius: 5px;
+}
