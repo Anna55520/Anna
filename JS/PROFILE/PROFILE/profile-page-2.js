@@ -151,6 +151,59 @@
     "U9-profile-withdrawal-confirm-password"
   );
 
+  /* =================================================
+     WITHDRAWAL PASSWORD VISIBILITY + DIGIT FILTER
+  ================================================= */
+
+  const withdrawalPasswordInputs = [
+    currentPasswordInput,
+    newPasswordInput,
+    confirmPasswordInput
+  ].filter(Boolean);
+
+  function setWithdrawalPasswordVisibility(input, visible) {
+    if (!input) return;
+
+    input.type = visible ? "text" : "password";
+
+    const eyeButton = document.querySelector(
+      '.U9-withdraw-password-eye[data-password-target="' + input.id + '"]'
+    );
+
+    if (!eyeButton) return;
+
+    const eyeImage = eyeButton.querySelector("img");
+    if (eyeImage) {
+      eyeImage.src = visible
+        ? "SSVG/Withdraw/test4.svg"
+        : "SSVG/Withdraw/test3.svg";
+    }
+
+    eyeButton.setAttribute("aria-pressed", visible ? "true" : "false");
+    eyeButton.setAttribute("aria-label", visible ? "Hide password" : "Show password");
+  }
+
+  function resetWithdrawalPasswordVisibility() {
+    withdrawalPasswordInputs.forEach(function (input) {
+      setWithdrawalPasswordVisibility(input, false);
+    });
+  }
+
+  withdrawalPasswordInputs.forEach(function (input) {
+    input.addEventListener("input", function () {
+      const digitsOnly = input.value.replace(/\D/g, "").slice(0, 6);
+      if (input.value !== digitsOnly) input.value = digitsOnly;
+    });
+  });
+
+  document.querySelectorAll(".U9-withdraw-password-eye").forEach(function (button) {
+    button.addEventListener("click", function () {
+      const input = document.getElementById(button.dataset.passwordTarget);
+      if (!input) return;
+      setWithdrawalPasswordVisibility(input, input.type === "password");
+    });
+  });
+
   const boundWalletInput = document.getElementById(
     "U9-profile-withdrawal-bound-wallet"
   );
@@ -1015,6 +1068,7 @@
     if (currentPasswordInput) currentPasswordInput.value = "";
     if (newPasswordInput) newPasswordInput.value = "";
     if (confirmPasswordInput) confirmPasswordInput.value = "";
+    resetWithdrawalPasswordVisibility();
 
     const title = document.getElementById(
       "U9-profile-withdrawal-password-modal-title"
