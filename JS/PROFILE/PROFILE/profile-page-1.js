@@ -79,10 +79,9 @@
   const copyAddressButton = document.getElementById("U9-profile-deposit-copy-address");
   const copyFeedback = document.getElementById("U9-profile-deposit-copy-feedback");
 
-  // Configure these two values for Database B before going live.
-  // The access token must be a Supabase Auth JWT belonging to Database B.
-  const DEPOSIT_FUNCTION_URL = window.U9_DEPOSIT_CONFIG?.functionUrl || "";
-  const DEPOSIT_ANON_KEY = window.U9_DEPOSIT_CONFIG?.anonKey || "";
+  // Same-origin Vercel rewrite to the Database B Edge Function.
+  // Authentication uses the same U9 custom session as Group API.
+  const DEPOSIT_API_URL = "/api/deposit_requests";
   const DEPOSIT_MAX_FILE_BYTES = 8 * 1024 * 1024;
   const DEPOSIT_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
   const DEPOSIT_WALLET_ADDRESS = "TC1hvrfZVHaCGwg1rJRoB7Ke7v1UkzzGV5";
@@ -295,12 +294,35 @@
     submitStatus.className = "";
   }
 
-  function getDepositAccessToken() {
-    // U9 login currently stores its bearer token here. It must also be a
-    // valid Supabase Auth JWT for the project hosting deposit-submit.
-    return localStorage.getItem("u9_token") ||
-      localStorage.getItem("u9_access_token") ||
-      localStorage.getItem("access_token") || "";
+  function getDepositSessionToken() {
+    // Match the U9 custom-session token convention used by Group API.
+    const keys = [
+      "u9_token",
+      "u9_session",
+      "session_token",
+      "access_token",
+      "u9_access_token",
+      "authToken",
+      "token"
+    ];
+
+    for (const key of keys) {
+      try {
+        const value = localStorage.getItem(key);
+        if (value && value.trim()) return value.trim();
+      } catch (_) {
+        // Continue to the next key; the HttpOnly/session cookie may still work.
+      }
+    }
+
+    try {
+      const match = document.cookie.match(/(?:^|;\s*)u9_session=([^;]+)/);
+      if (match?.[1]) return decodeURIComponent(match[1]);
+    } catch (_) {
+      // If the cookie is HttpOnly it is sent automatically with credentials.
+    }
+
+    return "";
   }
 
   function validateReceipt(file) {
@@ -377,16 +399,7 @@
       return;
     }
 
-    if (!DEPOSIT_FUNCTION_URL || !DEPOSIT_ANON_KEY) {
-      showDepositStatus("Deposit is not connected yet. Configure U9_DEPOSIT_CONFIG with Database B Function URL and anon key.", "error");
-      return;
-    }
-
-    const accessToken = getDepositAccessToken();
-    if (!accessToken) {
-      showDepositStatus("Please sign in before submitting a deposit request.", "error");
-      return;
-    }
+    const sessionToken = getDepositSessionToken();
 
     const formData = new FormData();
     formData.append("amount", rawAmount);
@@ -399,14 +412,17 @@
     }
 
     try {
-      const response = await fetch(DEPOSIT_FUNCTION_URL, {
+      const headers = {};
+      if (sessionToken) {
+        headers.Authorization = "Bearer " + sessionToken;
+      }
+
+      const response = await fetch(DEPOSIT_API_URL, {
         method: "POST",
-        headers: {
-          "apikey": DEPOSIT_ANON_KEY,
-          "Authorization": "Bearer " + accessToken
-        },
+        headers,
         body: formData,
-        credentials: "omit",
+        // Sends the same u9_session cookie used by the other U9 APIs.
+        credentials: "include",
         cache: "no-store"
       });
 
