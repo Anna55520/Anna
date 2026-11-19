@@ -1366,6 +1366,90 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
 
             </nav>
 
+            <!-- =========================================
+                 CRYPTO DEPOSIT — USDT TRC20
+            ========================================== -->
+            <section id="U9-profile-deposit-crypto-panel" aria-label="USDT deposit">
+
+              <div class="U9-profile-deposit-payment-card">
+                <h2 class="U9-profile-deposit-payment-heading">Transfer USDT</h2>
+                <p class="U9-profile-deposit-payment-subtitle">Scan the QR code or copy the wallet address below to transfer your USDT.</p>
+
+                <div id="U9-profile-deposit-qr-wrap">
+                  <img
+                    id="U9-profile-deposit-qr-image"
+                    src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&amp;margin=8&amp;data=TC1hvrfZVHaCGwg1rJRoB7Ke7v1UkzzGV5"
+                    alt="USDT TRC20 deposit wallet QR code"
+                    loading="lazy"
+                  >
+                </div>
+
+                <div class="U9-profile-deposit-network-pill">USDT · TRON (TRC20)</div>
+
+                <label class="U9-profile-deposit-wallet-label" for="U9-profile-deposit-wallet-address">Wallet address</label>
+                <div class="U9-profile-deposit-wallet-row">
+                  <span id="U9-profile-deposit-wallet-address">TC1hvrfZVHaCGwg1rJRoB7Ke7v1UkzzGV5</span>
+                  <button id="U9-profile-deposit-copy-address" type="button" aria-label="Copy wallet address">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <rect x="8" y="8" width="12" height="12" rx="2"></rect>
+                      <path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"></path>
+                    </svg>
+                    <span>Copy</span>
+                  </button>
+                </div>
+                <p id="U9-profile-deposit-copy-feedback" aria-live="polite"></p>
+              </div>
+
+              <div class="U9-profile-deposit-form-card">
+                <h2 class="U9-profile-deposit-payment-heading">Submit payment</h2>
+                <p class="U9-profile-deposit-payment-subtitle">After transferring USDT, enter the amount and upload your transfer receipt.</p>
+
+                <form id="U9-profile-deposit-form" novalidate>
+                  <div>
+                    <label class="U9-profile-deposit-field-label" for="U9-profile-deposit-amount">Deposit amount (USDT)</label>
+                    <input
+                      id="U9-profile-deposit-amount"
+                      name="amount"
+                      type="number"
+                      inputmode="decimal"
+                      min="0.000001"
+                      max="100000000"
+                      step="0.000001"
+                      placeholder="Enter USDT amount"
+                      autocomplete="off"
+                      required
+                    >
+                  </div>
+
+                  <div>
+                    <span class="U9-profile-deposit-field-label">Transfer receipt image</span>
+                    <input
+                      id="U9-profile-deposit-receipt-input"
+                      name="receipt"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      required
+                    >
+                    <button id="U9-profile-deposit-receipt-trigger" type="button">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"></path>
+                        <path d="M4 16.5v2A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5v-2"></path>
+                      </svg>
+                      <span>Choose receipt image (JPG, PNG, WebP · Max 8 MB)</span>
+                    </button>
+                    <div id="U9-profile-deposit-receipt-preview-wrap">
+                      <img id="U9-profile-deposit-receipt-preview" alt="Selected transfer receipt preview">
+                      <p id="U9-profile-deposit-receipt-name"></p>
+                    </div>
+                  </div>
+
+                  <p class="U9-profile-deposit-form-hint">Please make sure the transfer amount and network are correct. Your deposit will remain pending until it is reviewed.</p>
+                  <p id="U9-profile-deposit-submit-status" aria-live="polite"></p>
+                  <button id="U9-profile-deposit-submit" type="submit">Submit Deposit</button>
+                </form>
+              </div>
+            </section>
+
             <!-- =========================
                 KYC REQUIRED — kyc = false
             ========================= -->
@@ -1384,7 +1468,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                 alt="KYC information"
               >
               <h3>Notice</h3>
-              <p>KYC verification is required before you can use this withdrawal method.</p>
+              <p>KYC verification is required before you can use this payment method.</p>
             </div>
 
             <div
@@ -1432,7 +1516,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                 alt="Payment services unavailable"
               >
               <h3>Payment Services Unavailable</h3>
-              <p>We’re sorry, but withdrawal services for your country are currently unavailable. We’re working to expand our supported payment options. Please check back later for updates. Thank you for your patience and understanding.</p>
+              <p>We’re sorry, but payment services for your country are currently unavailable. We’re working to expand our supported payment options. Please check back later for updates. Thank you for your patience and understanding.</p>
 
               <!-- Each image can be changed independently when your new SVGs are ready. -->
               <div class="U9-profile-deposit-kyc-icon-row" aria-label="Payment information icons">
@@ -1852,7 +1936,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                     <h3>Notice</h3>
 
                     <p>
-                        KYC verification is required before you can use this withdrawal method.
+                        KYC verification is required before you can use this payment method.
                     </p>
 
                     </div>
@@ -1965,7 +2049,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                     <h3>Payment Services Unavailable</h3>
 
                     <p>
-                        We’re sorry, but withdrawal services for your country are currently unavailable. We’re working to expand our supported payment options. Please check back later for updates. Thank you for your patience and understanding.
+                        We’re sorry, but payment services for your country are currently unavailable. We’re working to expand our supported payment options. Please check back later for updates. Thank you for your patience and understanding.
                     </p>
 
 
