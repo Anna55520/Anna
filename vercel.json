@@ -89,6 +89,10 @@
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/customer-service-api"
     },
     {
+      "source": "/api/deposit_requests",
+      "destination": "https://tvtakmswbzawaweytimx.supabase.co/functions/v1/deposit_requests"
+    },
+    {
       "source": "/storage/:path*",
       "destination": "https://tvtakmswbzawaweytimx.supabase.co/storage/v1/object/public/:path*"
     },
