@@ -387,7 +387,7 @@
     const rawAmount = amountInput?.value.trim() || "";
     const receipt = receiptInput?.files?.[0] || null;
     if (!/^\d{1,12}(\.\d{1,6})?$/.test(rawAmount) || !Number.isFinite(Number(rawAmount)) || Number(rawAmount) <= 0) {
-      showDepositStatus("Please enter a valid USDT amount greater than zero (up to 6 decimal places).", "error");
+      showDepositStatus("Please enter a valid USDT amount.", "error");
       amountInput?.focus();
       return;
     }
@@ -433,7 +433,7 @@
         throw new Error(result.error || "Could not submit the deposit request. Please try again.");
       }
 
-      showDepositStatus("Deposit request submitted successfully. It is now pending review.", "success");
+      showDepositStatus("Deposit request submitted successfully.", "success");
       if (depositForm) depositForm.reset();
       if (receiptPreviewObjectUrl) {
         URL.revokeObjectURL(receiptPreviewObjectUrl);
