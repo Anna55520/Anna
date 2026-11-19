@@ -61,6 +61,33 @@
     "U9-profile-deposit-kyc-status-hint-icon"
   );
 
+
+  /* =========================
+     CRYPTO DEPOSIT FORM
+  ========================= */
+
+  const cryptoPanel = document.getElementById("U9-profile-deposit-crypto-panel");
+  const depositForm = document.getElementById("U9-profile-deposit-form");
+  const amountInput = document.getElementById("U9-profile-deposit-amount");
+  const receiptInput = document.getElementById("U9-profile-deposit-receipt-input");
+  const receiptTrigger = document.getElementById("U9-profile-deposit-receipt-trigger");
+  const receiptPreviewWrap = document.getElementById("U9-profile-deposit-receipt-preview-wrap");
+  const receiptPreview = document.getElementById("U9-profile-deposit-receipt-preview");
+  const receiptName = document.getElementById("U9-profile-deposit-receipt-name");
+  const submitButton = document.getElementById("U9-profile-deposit-submit");
+  const submitStatus = document.getElementById("U9-profile-deposit-submit-status");
+  const copyAddressButton = document.getElementById("U9-profile-deposit-copy-address");
+  const copyFeedback = document.getElementById("U9-profile-deposit-copy-feedback");
+
+  // Configure these two values for Database B before going live.
+  // The access token must be a Supabase Auth JWT belonging to Database B.
+  const DEPOSIT_FUNCTION_URL = window.U9_DEPOSIT_CONFIG?.functionUrl || "";
+  const DEPOSIT_ANON_KEY = window.U9_DEPOSIT_CONFIG?.anonKey || "";
+  const DEPOSIT_MAX_FILE_BYTES = 8 * 1024 * 1024;
+  const DEPOSIT_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+  const DEPOSIT_WALLET_ADDRESS = "TC1hvrfZVHaCGwg1rJRoB7Ke7v1UkzzGV5";
+  let receiptPreviewObjectUrl = null;
+
   let currentKycStatus = false;
 
 
@@ -98,6 +125,10 @@
   ========================= */
 
   function renderKycInformation() {
+
+    if (cryptoPanel) {
+      cryptoPanel.hidden = currentCategory !== "crypto";
+    }
 
     // Crypto does not require KYC in the current design.
     const requiresKyc = currentCategory !== "crypto";
@@ -246,6 +277,184 @@
 
   }
 
+
+  /* =================================================
+     DEPOSIT FORM HELPERS
+  ================================================= */
+
+  function showDepositStatus(message, type) {
+    if (!submitStatus) return;
+    submitStatus.textContent = message;
+    submitStatus.className = "is-visible is-" + (type || "info");
+    submitStatus.setAttribute("role", type === "error" ? "alert" : "status");
+  }
+
+  function clearDepositStatus() {
+    if (!submitStatus) return;
+    submitStatus.textContent = "";
+    submitStatus.className = "";
+  }
+
+  function getDepositAccessToken() {
+    // U9 login currently stores its bearer token here. It must also be a
+    // valid Supabase Auth JWT for the project hosting deposit-submit.
+    return localStorage.getItem("u9_token") ||
+      localStorage.getItem("u9_access_token") ||
+      localStorage.getItem("access_token") || "";
+  }
+
+  function validateReceipt(file) {
+    if (!file) return "Please upload your transfer receipt image.";
+    if (!DEPOSIT_ALLOWED_TYPES.includes(file.type)) {
+      return "Only JPG, PNG, and WebP images are accepted.";
+    }
+    if (file.size <= 0 || file.size > DEPOSIT_MAX_FILE_BYTES) {
+      return "The receipt image must be smaller than 8 MB.";
+    }
+    return "";
+  }
+
+  function setReceiptFile(file) {
+    clearDepositStatus();
+    if (!file) return;
+    const validationError = validateReceipt(file);
+    if (validationError) {
+      if (receiptInput) receiptInput.value = "";
+      if (receiptPreviewWrap) receiptPreviewWrap.classList.remove("has-image");
+      if (receiptPreview) receiptPreview.removeAttribute("src");
+      if (receiptName) receiptName.textContent = "";
+      showDepositStatus(validationError, "error");
+      return;
+    }
+
+    if (receiptPreviewObjectUrl) URL.revokeObjectURL(receiptPreviewObjectUrl);
+    receiptPreviewObjectUrl = URL.createObjectURL(file);
+    if (receiptPreview) receiptPreview.src = receiptPreviewObjectUrl;
+    if (receiptName) receiptName.textContent = file.name;
+    if (receiptPreviewWrap) receiptPreviewWrap.classList.add("has-image");
+  }
+
+  async function copyDepositAddress() {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(DEPOSIT_WALLET_ADDRESS);
+      } else {
+        const temporaryInput = document.createElement("textarea");
+        temporaryInput.value = DEPOSIT_WALLET_ADDRESS;
+        temporaryInput.setAttribute("readonly", "");
+        temporaryInput.style.position = "fixed";
+        temporaryInput.style.opacity = "0";
+        document.body.appendChild(temporaryInput);
+        temporaryInput.select();
+        const copied = document.execCommand("copy");
+        temporaryInput.remove();
+        if (!copied) throw new Error("Clipboard permission was denied.");
+      }
+      if (copyFeedback) copyFeedback.textContent = "Wallet address copied.";
+      if (copyAddressButton) copyAddressButton.setAttribute("aria-label", "Wallet address copied");
+    } catch (error) {
+      if (copyFeedback) copyFeedback.textContent = "Could not copy. Please copy the address manually.";
+      console.warn("U9 Deposit: copy address failed.", error);
+    }
+  }
+
+  async function submitDepositRequest(event) {
+    event.preventDefault();
+    clearDepositStatus();
+
+    const rawAmount = amountInput?.value.trim() || "";
+    const receipt = receiptInput?.files?.[0] || null;
+    if (!/^\d{1,12}(\.\d{1,6})?$/.test(rawAmount) || !Number.isFinite(Number(rawAmount)) || Number(rawAmount) <= 0) {
+      showDepositStatus("Please enter a valid USDT amount greater than zero (up to 6 decimal places).", "error");
+      amountInput?.focus();
+      return;
+    }
+
+    const receiptError = validateReceipt(receipt);
+    if (receiptError) {
+      showDepositStatus(receiptError, "error");
+      receiptTrigger?.focus();
+      return;
+    }
+
+    if (!DEPOSIT_FUNCTION_URL || !DEPOSIT_ANON_KEY) {
+      showDepositStatus("Deposit is not connected yet. Configure U9_DEPOSIT_CONFIG with Database B Function URL and anon key.", "error");
+      return;
+    }
+
+    const accessToken = getDepositAccessToken();
+    if (!accessToken) {
+      showDepositStatus("Please sign in before submitting a deposit request.", "error");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("amount", rawAmount);
+    formData.append("receipt", receipt, receipt.name);
+
+    if (submitButton) {
+      submitButton.disabled = true;
+      submitButton.dataset.originalText = submitButton.textContent.trim();
+      submitButton.textContent = "Submitting...";
+    }
+
+    try {
+      const response = await fetch(DEPOSIT_FUNCTION_URL, {
+        method: "POST",
+        headers: {
+          "apikey": DEPOSIT_ANON_KEY,
+          "Authorization": "Bearer " + accessToken
+        },
+        body: formData,
+        credentials: "omit",
+        cache: "no-store"
+      });
+
+      let result = {};
+      try { result = await response.json(); } catch (_) {}
+
+      if (!response.ok || result.success !== true) {
+        throw new Error(result.error || "Could not submit the deposit request. Please try again.");
+      }
+
+      showDepositStatus("Deposit request submitted successfully. It is now pending review.", "success");
+      if (depositForm) depositForm.reset();
+      if (receiptPreviewObjectUrl) {
+        URL.revokeObjectURL(receiptPreviewObjectUrl);
+        receiptPreviewObjectUrl = null;
+      }
+      if (receiptPreview) receiptPreview.removeAttribute("src");
+      if (receiptPreviewWrap) receiptPreviewWrap.classList.remove("has-image");
+      if (receiptName) receiptName.textContent = "";
+    } catch (error) {
+      console.error("U9 Deposit submission failed:", error);
+      showDepositStatus(error.message || "Deposit submission failed. Please try again.", "error");
+    } finally {
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = submitButton.dataset.originalText || "Submit Deposit";
+      }
+    }
+  }
+
+  if (copyAddressButton) {
+    copyAddressButton.addEventListener("click", copyDepositAddress);
+  }
+
+  if (receiptTrigger && receiptInput) {
+    receiptTrigger.addEventListener("click", function () { receiptInput.click(); });
+    receiptInput.addEventListener("change", function () {
+      setReceiptFile(receiptInput.files?.[0] || null);
+    });
+  }
+
+  if (depositForm) {
+    depositForm.addEventListener("submit", submitDepositRequest);
+  }
+
+  window.addEventListener("beforeunload", function () {
+    if (receiptPreviewObjectUrl) URL.revokeObjectURL(receiptPreviewObjectUrl);
+  }, { once: true });
 
   /* =================================================
      DEPOSIT BUTTON INITIALIZATION
@@ -509,6 +718,10 @@
       switchCategory("crypto");
     },
 
+
+    // DEPOSIT FORM
+
+    copyWalletAddress: copyDepositAddress,
 
     // USER INFO
 
