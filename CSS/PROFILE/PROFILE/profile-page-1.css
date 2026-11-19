@@ -668,3 +668,262 @@
   transform: none;
   color: #174fc8;
 }
+
+
+/* =========================================================
+   U9 DEPOSIT FORM — USDT TRC20
+========================================================= */
+
+#U9-profile-deposit-crypto-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+  padding: 8px 14px 28px;
+  box-sizing: border-box;
+}
+
+#U9-profile-deposit-crypto-panel[hidden] { display: none !important; }
+
+.U9-profile-deposit-payment-card,
+.U9-profile-deposit-form-card {
+  width: 100%;
+  padding: 18px;
+  border: 1px solid #e9edf3;
+  border-radius: 16px;
+  background: #fff;
+  box-sizing: border-box;
+  box-shadow: 0 4px 18px rgba(20, 35, 60, .045);
+}
+
+.U9-profile-deposit-payment-heading {
+  margin: 0 0 5px;
+  color: #171b24;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.U9-profile-deposit-payment-subtitle {
+  margin: 0;
+  color: #7b8492;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+#U9-profile-deposit-qr-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 18px auto 14px;
+  width: 208px;
+  height: 208px;
+  padding: 10px;
+  border: 1px solid #edf0f4;
+  border-radius: 14px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+#U9-profile-deposit-qr-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.U9-profile-deposit-network-pill {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: fit-content;
+  margin: 0 auto 16px;
+  padding: 6px 11px;
+  border-radius: 999px;
+  background: #f0f7f4;
+  color: #168451;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .35px;
+}
+
+.U9-profile-deposit-wallet-label,
+.U9-profile-deposit-field-label {
+  display: block;
+  margin: 0 0 8px;
+  color: #4d5665;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.U9-profile-deposit-wallet-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px;
+  border: 1px solid #e8ebf0;
+  border-radius: 10px;
+  background: #f8f9fb;
+}
+
+#U9-profile-deposit-wallet-address {
+  min-width: 0;
+  flex: 1;
+  overflow-wrap: anywhere;
+  color: #202633;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+#U9-profile-deposit-copy-address {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid #dfe5ed;
+  border-radius: 8px;
+  background: #fff;
+  color: #273247;
+  font-size: 11px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+#U9-profile-deposit-copy-address svg { width: 15px; height: 15px; }
+#U9-profile-deposit-copy-address:hover { background: #f1f5fa; }
+#U9-profile-deposit-copy-address:focus-visible,
+#U9-profile-deposit-submit:focus-visible,
+#U9-profile-deposit-receipt-trigger:focus-visible {
+  outline: 2px solid #326be8;
+  outline-offset: 3px;
+}
+
+#U9-profile-deposit-copy-feedback {
+  min-height: 16px;
+  margin: 6px 0 0;
+  color: #168451;
+  font-size: 11px;
+  text-align: right;
+}
+
+#U9-profile-deposit-form { display: flex; flex-direction: column; gap: 16px; }
+
+#U9-profile-deposit-amount {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 13px;
+  border: 1px solid #dfe4eb;
+  border-radius: 10px;
+  outline: none;
+  background: #fff;
+  color: #171b24;
+  font: inherit;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+#U9-profile-deposit-amount:focus { border-color: #4779e8; box-shadow: 0 0 0 3px rgba(71,121,232,.1); }
+
+#U9-profile-deposit-receipt-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+#U9-profile-deposit-receipt-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 104px;
+  padding: 14px;
+  border: 1.5px dashed #cbd4e1;
+  border-radius: 12px;
+  background: #fafbfd;
+  color: #4d5a6d;
+  font-size: 12px;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+#U9-profile-deposit-receipt-trigger svg { width: 23px; height: 23px; color: #718096; }
+#U9-profile-deposit-receipt-trigger:hover { border-color: #7395e5; background: #f6f8ff; }
+
+#U9-profile-deposit-receipt-preview-wrap { display: none; margin-top: 10px; }
+#U9-profile-deposit-receipt-preview-wrap.has-image { display: block; }
+#U9-profile-deposit-receipt-preview {
+  display: block;
+  max-width: 100%;
+  max-height: 220px;
+  margin: 0 auto;
+  border: 1px solid #e7ebf0;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+#U9-profile-deposit-receipt-name {
+  margin: 7px 0 0;
+  color: #687386;
+  font-size: 11px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+#U9-profile-deposit-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #2463eb;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .18s ease, transform .18s ease, opacity .18s ease;
+}
+
+#U9-profile-deposit-submit:hover { background: #1854d5; }
+#U9-profile-deposit-submit:active { transform: scale(.99); }
+#U9-profile-deposit-submit:disabled { opacity: .58; cursor: not-allowed; }
+
+#U9-profile-deposit-submit-status {
+  display: none;
+  margin: 0;
+  padding: 11px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+#U9-profile-deposit-submit-status.is-visible { display: block; }
+#U9-profile-deposit-submit-status.is-error { background: #fff1f0; color: #b42318; }
+#U9-profile-deposit-submit-status.is-success { background: #ecfdf3; color: #067647; }
+#U9-profile-deposit-submit-status.is-info { background: #eff6ff; color: #1d4ed8; }
+
+.U9-profile-deposit-form-hint {
+  margin: -7px 0 0;
+  color: #8992a0;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+  #U9-profile-deposit-crypto-panel { padding: 6px 12px 24px; gap: 13px; }
+  .U9-profile-deposit-payment-card, .U9-profile-deposit-form-card { padding: 15px; border-radius: 13px; }
+  #U9-profile-deposit-qr-wrap { width: 190px; height: 190px; }
+  #U9-profile-deposit-wallet-address { font-size: 10px; }
+  #U9-profile-deposit-copy-address { padding: 0 8px; font-size: 10px; }
+}
