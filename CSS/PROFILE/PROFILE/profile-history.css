@@ -26,7 +26,8 @@
 .U9-history-amount.withdrawal { color:#e34b4b; }
 .U9-history-empty,.U9-history-loading,.U9-history-error { padding:48px 16px; text-align:center; color:#999; font-size:14px; }
 .U9-history-error { color:#d94b43; }
-#U9-profile-history-detail { width:100%; }
+#U9-profile-history-detail { box-sizing:border-box; width:100%; min-height:100%; }
+#U9-profile-history-detail[hidden], #U9-profile-history-list[hidden] { display:none !important; }
 .U9-history-detail-back { display:none; }
 .U9-history-detail-summary { display:flex; flex-direction:column; align-items:center; gap:10px; padding:25px 12px 28px; border-bottom:1px solid #eee; }
 .U9-history-detail-icon { width:58px; height:58px; display:flex; align-items:center; justify-content:center; border-radius:17px; background:#f1faf4; }
