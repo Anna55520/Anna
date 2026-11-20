@@ -49,6 +49,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
   <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-3.css">
   <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-4.css">
   <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-page-5.css">
+  <link rel="stylesheet" href="CSS/PROFILE/PROFILE/profile-history.css">
 
 
   <!-- Setting -->
@@ -1435,7 +1436,7 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
                         <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5"></path>
                         <path d="M4 16.5v2A1.5 1.5 0 0 0 5.5 20h13a1.5 1.5 0 0 0 1.5-1.5v-2"></path>
                       </svg>
-                      <span>Choose receipt image</span>
+                      <span>Choose receipt image (JPG, PNG, WebP · Max 8 MB)</span>
                     </button>
                     <div id="U9-profile-deposit-receipt-preview-wrap">
                       <img id="U9-profile-deposit-receipt-preview" alt="Selected transfer receipt preview">
@@ -2262,7 +2263,8 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
         <div id="U9-profile-history-page">
           <div id="U9-profile-history-page-content">
             <div id="U9-profile-history-body">
-              <!-- History records will be added later -->
+              <div id="U9-profile-history-list" aria-live="polite"></div>
+              <div id="U9-profile-history-detail" hidden></div>
             </div>
           </div>
         </div>
@@ -3730,6 +3732,8 @@ content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable
   <script src="JS/PROFILE/PROFILE/profile-page-4.js"></script>
 
   <script src="JS/PROFILE/PROFILE/profile-page-5.js"></script>
+
+  <script src="JS/PROFILE/PROFILE/profile-history.js"></script>
 
 
   <!-- =================================================
