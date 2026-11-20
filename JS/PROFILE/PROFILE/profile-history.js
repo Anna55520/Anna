@@ -72,9 +72,19 @@
     else { rows+=detailRow("Transaction Hash",r.tx_hash); rows+=detailRow("Note",r.note); rows+=detailRow("Reviewed Time",r.reviewed_at?dateValue(r.reviewed_at):""); rows+=detailRow("Completed Time",r.completed_at?dateValue(r.completed_at):""); }
     const receipt=deposit&&r.receipt_url?`<div class="U9-history-detail-row" style="display:block"><div class="U9-history-detail-label">Payment Receipt</div><a href="${escapeHTML(r.receipt_url)}" target="_blank" rel="noopener"><img class="U9-history-receipt" src="${escapeHTML(r.receipt_url)}" alt="Deposit receipt"></a></div>`:"";
     detail.innerHTML=`<div class="U9-history-detail-summary"><div class="U9-history-detail-icon ${deposit?"":"withdrawal"}">${icon(r.type)}</div><div class="U9-history-detail-amount ${r.type}">${amount}</div><span class="U9-history-status ${statusClass(r.status)}">${escapeHTML(statusLabel(r.status))}</span></div><div class="U9-history-detail-rows">${rows}${receipt}</div>`;
-    list.hidden=true; detail.hidden=false;
+    list.hidden=true;
+    detail.hidden=false;
+    if (window.U9Profile && typeof window.U9Profile.setHistoryDetailHeader === "function") {
+      window.U9Profile.setHistoryDetailHeader(true);
+    }
   }
-  function backToList() { if(detail) detail.hidden=true; if(list) list.hidden=false; }
+  function backToList() {
+    if(detail) detail.hidden=true;
+    if(list) list.hidden=false;
+    if (window.U9Profile && typeof window.U9Profile.setHistoryDetailHeader === "function") {
+      window.U9Profile.setHistoryDetailHeader(false);
+    }
+  }
   if(list) list.addEventListener("click",e=>{ const retry=e.target.closest("#U9-history-retry"); if(retry){load(true);return;} const card=e.target.closest("[data-history-index]"); if(!card)return; const r=records[Number(card.dataset.historyIndex)]; if(r)showDetail(r); });
   if(body) body.addEventListener("click",e=>{ if(e.target.closest("#U9-history-detail")) return; });
   window.U9ProfileHistory={load,refresh:()=>load(true),backToList,showDetail};
