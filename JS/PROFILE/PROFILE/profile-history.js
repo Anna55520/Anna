@@ -88,9 +88,10 @@
   if(list) list.addEventListener("click",e=>{ const retry=e.target.closest("#U9-history-retry"); if(retry){load(true);return;} const card=e.target.closest("[data-history-index]"); if(!card)return; const r=records[Number(card.dataset.historyIndex)]; if(r)showDetail(r); });
   if(body) body.addEventListener("click",e=>{ if(e.target.closest("#U9-history-detail")) return; });
   window.U9ProfileHistory={load,refresh:()=>load(true),backToList,showDetail};
-  const originalShow=window.openProfileHistory;
-  window.openProfileHistory=function(){ if(typeof originalShow==="function") originalShow(); if(window.U9Profile?.showHistory) load(); };
-  // profile.js calls U9Profile.showHistory directly from several buttons.
-  const waitForProfile=()=>{ if(window.U9Profile && !window.U9ProfileHistoryHooked){ const old=window.U9Profile.showHistory; window.U9Profile.showHistory=function(...args){ const result=old.apply(this,args); if(result) load(); return result; }; window.U9ProfileHistoryHooked=true; } };
-  waitForProfile();
+  // profile.js only announces that the History page has become visible.
+  // This module owns the actual data loading and list rendering.
+  window.addEventListener("u9:profile-history-open", function () {
+    backToList();
+    load();
+  });
 })();
