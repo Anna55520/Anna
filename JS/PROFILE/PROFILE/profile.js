@@ -785,6 +785,11 @@ function u9ProfileShowHistoryPage(returnPage) {
 
   u9ProfileSetHeader("history");
 
+  // Load deposit and withdrawal records whenever History is opened.
+  if (window.U9ProfileHistory && typeof window.U9ProfileHistory.load === "function") {
+    window.U9ProfileHistory.load();
+  }
+
   return true;
 }
 
