@@ -785,7 +785,10 @@ function u9ProfileShowHistoryPage(returnPage) {
 
   u9ProfileSetHeader("history");
 
-  // History data loading and rendering are owned by profile-history.js.
+  // Notify the History module that its page is now visible.
+  // profile-history.js owns all History data requests and rendering.
+  window.dispatchEvent(new CustomEvent("u9:profile-history-open"));
+
   return true;
 }
 
