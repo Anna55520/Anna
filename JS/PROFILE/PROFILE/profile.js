@@ -604,8 +604,8 @@ function u9ProfileSetHeader(page) {
      HISTORY PAGE
   ========================= */
 
-  else if (page === "history") {
-    pageTitle = "History";
+  else if (page === "history" || page === "history-detail") {
+    pageTitle = page === "history-detail" ? "Detailed" : "History";
 
     rightIcon = u9ProfileHeaderIcons.history;
   }
@@ -785,11 +785,7 @@ function u9ProfileShowHistoryPage(returnPage) {
 
   u9ProfileSetHeader("history");
 
-  // Load deposit and withdrawal records whenever History is opened.
-  if (window.U9ProfileHistory && typeof window.U9ProfileHistory.load === "function") {
-    window.U9ProfileHistory.load();
-  }
-
+  // History data loading and rendering are owned by profile-history.js.
   return true;
 }
 
@@ -1039,6 +1035,16 @@ if (profileModalClose) {
   profileModalClose.addEventListener(
     "click",
     async function() {
+      if (u9ProfileCurrentPage === "history-detail") {
+        if (window.U9ProfileHistory && typeof window.U9ProfileHistory.backToList === "function") {
+          window.U9ProfileHistory.backToList();
+        } else {
+          u9ProfileCurrentPage = "history";
+          u9ProfileSetHeader("history");
+        }
+        return;
+      }
+
       if (u9ProfileCurrentPage === "history") {
         u9ProfileReturnFromHistory();
         return;
@@ -1664,6 +1670,12 @@ window.U9Profile = {
   showHistory: u9ProfileShowHistoryPage,
 
   returnFromHistory: u9ProfileReturnFromHistory,
+
+  setHistoryDetailHeader: function(isDetail) {
+    if (u9ProfileCurrentPage !== "history" && u9ProfileCurrentPage !== "history-detail") return;
+    u9ProfileCurrentPage = isDetail ? "history-detail" : "history";
+    u9ProfileSetHeader(u9ProfileCurrentPage);
+  },
 
   toggleBalanceCoins: u9ProfileToggleBalanceCoins,
 
